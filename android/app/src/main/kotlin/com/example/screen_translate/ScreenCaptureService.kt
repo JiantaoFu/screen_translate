@@ -81,6 +81,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     
                     Log.d(TAG, "MediaProjection created successfully")
                     setupVirtualDisplay()
+                    isCapturing.set(true) // Set capturing to true when projection starts
                     result.success(true)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error creating MediaProjection", e)
@@ -92,6 +93,66 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             Log.e(TAG, "Error starting projection", e)
             result.error("PROJECTION_ERROR", "Error starting projection: ${e.message}", null)
             cleanup()
+        }
+    }
+
+    fun stopProjection() {
+        Log.d(TAG, "Stopping projection")
+        try {
+            cleanup()
+            isCapturing.set(false) // Set capturing to false when projection stops
+            context.stopService(Intent(context, ForegroundService::class.java))
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping projection", e)
+        }
+    }
+
+    fun captureScreen(result: MethodChannel.Result) {
+        try {
+            if (!isCapturing.get()) {
+                result.error("NOT_CAPTURING", "Screen capture is not active", null)
+                return
+            }
+
+            // Get latest frame from queue
+            val maxRetries = 5
+            var retryCount = 0
+
+            fun tryCapture() {
+                val frame = imageQueue.peekLast()
+                if (frame != null) {
+                    val (bytes, timestamp) = frame
+                    val age = System.currentTimeMillis() - timestamp
+                    if (age <= 2000) { // Accept frames up to 2 seconds old
+                        Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms, queue size: ${imageQueue.size}")
+                        result.success(mapOf(
+                            "bytes" to bytes,
+                            "width" to screenWidth,
+                            "height" to screenHeight
+                        ))
+                    } else {
+                        Log.d(TAG, "Frame too old (${age}ms), retrying")
+                        imageQueue.removeLast() // Remove old frame
+                        if (retryCount < maxRetries) {
+                            retryCount++
+                            mainHandler.postDelayed({ tryCapture() }, 100)
+                        } else {
+                            result.error("FRAME_TOO_OLD", "Could not get a recent frame after $maxRetries retries", null)
+                        }
+                    }
+                } else if (retryCount < maxRetries) {
+                    Log.d(TAG, "No frame available, retry ${retryCount + 1}/$maxRetries, frames: ${frameCount.get()}, queue size: ${imageQueue.size}")
+                    retryCount++
+                    mainHandler.postDelayed({ tryCapture() }, 100)
+                } else {
+                    result.error("NO_FRAME", "Could not get a frame after $maxRetries retries", null)
+                }
+            }
+            
+            mainHandler.postDelayed({ tryCapture() }, 200)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error capturing screen", e)
+            result.error("CAPTURE_ERROR", "Error capturing screen: ${e.message}", null)
         }
     }
 
@@ -191,65 +252,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
-    fun stopProjection() {
-        Log.d(TAG, "Stopping projection")
-        try {
-            cleanup()
-            context.stopService(Intent(context, ForegroundService::class.java))
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping projection", e)
-        }
-    }
-
-    fun captureScreen(result: MethodChannel.Result) {
-        try {
-            if (!isCapturing.get()) {
-                result.error("NOT_CAPTURING", "Screen capture is not active", null)
-                return
-            }
-
-            // Get latest frame from queue
-            val maxRetries = 5
-            var retryCount = 0
-
-            fun tryCapture() {
-                val frame = imageQueue.peekLast()
-                if (frame != null) {
-                    val (bytes, timestamp) = frame
-                    val age = System.currentTimeMillis() - timestamp
-                    if (age <= 2000) { // Accept frames up to 2 seconds old
-                        Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms, queue size: ${imageQueue.size}")
-                        result.success(mapOf(
-                            "bytes" to bytes,
-                            "width" to screenWidth,
-                            "height" to screenHeight
-                        ))
-                    } else {
-                        Log.d(TAG, "Frame too old (${age}ms), retrying")
-                        imageQueue.removeLast() // Remove old frame
-                        if (retryCount < maxRetries) {
-                            retryCount++
-                            mainHandler.postDelayed({ tryCapture() }, 100)
-                        } else {
-                            result.error("FRAME_TOO_OLD", "Could not get a recent frame after $maxRetries retries", null)
-                        }
-                    }
-                } else if (retryCount < maxRetries) {
-                    Log.d(TAG, "No frame available, retry ${retryCount + 1}/$maxRetries, frames: ${frameCount.get()}, queue size: ${imageQueue.size}")
-                    retryCount++
-                    mainHandler.postDelayed({ tryCapture() }, 100)
-                } else {
-                    result.error("NO_FRAME", "Could not get a frame after $maxRetries retries", null)
-                }
-            }
-            
-            mainHandler.postDelayed({ tryCapture() }, 200)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error capturing screen", e)
-            result.error("CAPTURE_ERROR", "Error capturing screen: ${e.message}", null)
-        }
-    }
-
     private fun cleanup() {
         try {
             Log.d(TAG, "Starting cleanup")
@@ -272,7 +274,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
-    // Made public for testing
     fun imageToBytes(image: Image): ByteArray? {
         try {
             val width = image.width
@@ -283,31 +284,104 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             val rowStride = planes[0].rowStride
             val rowPadding = rowStride - pixelStride * width
 
-            Log.d(TAG, "Converting image: ${width}x${height}, pixelStride: $pixelStride, rowStride: $rowStride")
+            Log.d(TAG, "Converting image: ${width}x${height}")
+            Log.d(TAG, "Buffer capacity: ${buffer.capacity()}")
+            Log.d(TAG, "PixelStride: $pixelStride")
+            Log.d(TAG, "RowStride: $rowStride")
+            Log.d(TAG, "RowPadding: $rowPadding")
 
-            // Allocate buffer with exact size needed (no padding)
-            val outputBuffer = ByteArray(width * height * 4)
-            var outputOffset = 0
+            // NV21 format size: height * width + 2 * (height/2 * width/2)
+            val nv21Size = width * height + 2 * ((height + 1) / 2) * ((width + 1) / 2)
+            val nv21Bytes = ByteArray(nv21Size)
             
-            // Copy pixels row by row, removing padding
+            // Fill Y plane
+            var yPos = 0
             for (row in 0 until height) {
-                buffer.position(row * rowStride)
                 for (col in 0 until width) {
-                    // Read RGBA values (note: buffer is already in RGBA format)
+                    val pos = row * rowStride + col * pixelStride
+                    buffer.position(pos)
+                    
+                    // Read RGBA values
                     val r = buffer.get().toInt() and 0xFF
                     val g = buffer.get().toInt() and 0xFF
                     val b = buffer.get().toInt() and 0xFF
-                    val a = buffer.get().toInt() and 0xFF
+                    buffer.get() // Skip alpha
                     
-                    // Write as BGRA (ML Kit's expected format)
-                    outputBuffer[outputOffset++] = b.toByte()
-                    outputBuffer[outputOffset++] = g.toByte()
-                    outputBuffer[outputOffset++] = r.toByte()
-                    outputBuffer[outputOffset++] = a.toByte()
+                    // Convert to Y
+                    val y = ((66 * r + 129 * g + 25 * b + 128) shr 8) + 16
+                    nv21Bytes[yPos++] = y.toByte()
+                }
+            }
+            
+            // Fill UV plane
+            val uvPos = width * height
+            var pos = uvPos
+            for (row in 0 until height step 2) {
+                for (col in 0 until width step 2) {
+                    val rgbaPos = row * rowStride + col * pixelStride
+                    buffer.position(rgbaPos)
+                    
+                    // Average 2x2 block
+                    var avgR = 0
+                    var avgG = 0
+                    var avgB = 0
+                    
+                    // Top left pixel
+                    var r = buffer.get().toInt() and 0xFF
+                    var g = buffer.get().toInt() and 0xFF
+                    var b = buffer.get().toInt() and 0xFF
+                    buffer.get() // Skip alpha
+                    avgR += r
+                    avgG += g
+                    avgB += b
+                    
+                    // Top right pixel (if within bounds)
+                    if (col + 1 < width) {
+                        buffer.position(rgbaPos + pixelStride * 1)
+                        r = buffer.get().toInt() and 0xFF
+                        g = buffer.get().toInt() and 0xFF
+                        b = buffer.get().toInt() and 0xFF
+                        avgR += r
+                        avgG += g
+                        avgB += b
+                    }
+                    
+                    // Bottom left pixel (if within bounds)
+                    if (row + 1 < height) {
+                        buffer.position(rgbaPos + rowStride)
+                        r = buffer.get().toInt() and 0xFF
+                        g = buffer.get().toInt() and 0xFF
+                        b = buffer.get().toInt() and 0xFF
+                        avgR += r
+                        avgG += g
+                        avgB += b
+                    }
+                    
+                    // Bottom right pixel (if within bounds)
+                    if (row + 1 < height && col + 1 < width) {
+                        buffer.position(rgbaPos + rowStride + pixelStride)
+                        r = buffer.get().toInt() and 0xFF
+                        g = buffer.get().toInt() and 0xFF
+                        b = buffer.get().toInt() and 0xFF
+                        avgR += r
+                        avgG += g
+                        avgB += b
+                    }
+                    
+                    avgR = avgR shr 2
+                    avgG = avgG shr 2
+                    avgB = avgB shr 2
+                    
+                    // Convert to V and U
+                    val v = (128 + (112 * avgR - 94 * avgG - 18 * avgB + 128) shr 8).toByte()
+                    val u = (128 + (-38 * avgR - 74 * avgG + 112 * avgB + 128) shr 8).toByte()
+                    
+                    nv21Bytes[pos++] = v
+                    nv21Bytes[pos++] = u
                 }
             }
 
-            return outputBuffer
+            return nv21Bytes
         } catch (e: Exception) {
             Log.e(TAG, "Error converting image to bytes", e)
             return null

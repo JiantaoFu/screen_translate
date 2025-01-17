@@ -81,7 +81,7 @@ class TranslationProvider with ChangeNotifier {
         if (imageData != null) {
           print('Screen captured, size: ${imageData['bytes'].length} bytes');
           try {
-            final recognizedText = await _ocrService.processImage(imageData['bytes']);
+            final recognizedText = await _ocrService.processImage(imageData);
             if (recognizedText.isNotEmpty) {
               print('Updating translated text: $recognizedText');
               _lastTranslatedText = recognizedText;

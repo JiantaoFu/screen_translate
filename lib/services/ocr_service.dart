@@ -21,8 +21,8 @@ class OCRService {
         metadata: InputImageMetadata(
           size: Size(width.toDouble(), height.toDouble()),
           rotation: InputImageRotation.rotation0deg,
-          format: InputImageFormat.bgra8888,
-          bytesPerRow: width * 4, // 4 bytes per pixel for BGRA
+          format: InputImageFormat.nv21,
+          bytesPerRow: width,
         ),
       );
 

@@ -1,0 +1,56 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "com.example.screen_translate"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion.toString()
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.example.screen_translate"
+        minSdkVersion 21
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        implementation 'com.google.mlkit:text-recognition-chinese:16.0.0'
+        implementation 'com.google.mlkit:text-recognition-devanagari:16.0.0'
+        implementation 'com.google.mlkit:text-recognition-japanese:16.0.0'
+        implementation 'com.google.mlkit:text-recognition-korean:16.0.0'
+        testImplementation 'junit:junit:4.13.2'
+        testImplementation 'org.mockito:mockito-core:5.3.1'
+        testImplementation 'org.robolectric:robolectric:4.10.3'
+    }
+}
+
+flutter {
+    source = "../.."
+}

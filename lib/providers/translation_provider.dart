@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
+import '../services/translation_service.dart';
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
@@ -13,6 +14,7 @@ class TranslationProvider with ChangeNotifier {
   AndroidScreenCaptureService? _androidScreenCaptureService;
   Timer? _captureTimer;
   final OCRService _ocrService = OCRService();
+  final TranslationService _translationService = TranslationService();
   final BuildContext context;
 
   TranslationProvider({required this.context}) {
@@ -76,22 +78,24 @@ class TranslationProvider with ChangeNotifier {
       }
 
       if (Platform.isAndroid) {
-        // print('Capturing screen...');
         final imageData = await _androidScreenCaptureService?.captureScreen();
         if (imageData != null) {
           print('Screen captured, size: ${imageData['bytes'].length} bytes');
           try {
             final recognizedText = await _ocrService.processImage(imageData);
             if (recognizedText.isNotEmpty) {
-              print('Updating translated text: $recognizedText');
-              _lastTranslatedText = recognizedText;
+              print('Text recognized, translating...');
+              final translatedText = await _translationService.translateText(
+                text: recognizedText,
+                sourceLanguage: _sourceLanguage,
+                targetLanguage: _targetLanguage,
+              );
+              _lastTranslatedText = translatedText;
               notifyListeners();
             }
           } catch (e) {
             print('Error processing captured screen: $e');
           }
-        } else {
-          // print('Failed to capture screen');
         }
       }
     });
@@ -132,11 +136,22 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void switchTranslationDirection() {
+    final temp = _sourceLanguage;
+    _sourceLanguage = _targetLanguage;
+    _targetLanguage = temp;
+    print('Translation direction switched: ${_sourceLanguage} -> ${_targetLanguage}');
+    notifyListeners();
+  }
+
+  bool get isChineseToEnglish => _sourceLanguage == 'zh' && _targetLanguage == 'en';
+
   @override
   void dispose() {
-    _captureTimer?.cancel();
     stopTranslation();
+    _captureTimer?.cancel();
     _ocrService.dispose();
+    _translationService.dispose();
     super.dispose();
   }
 }

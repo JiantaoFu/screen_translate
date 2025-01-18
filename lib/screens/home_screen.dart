@@ -18,6 +18,13 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  provider.isChineseToEnglish 
+                    ? '中文 → English'
+                    : 'English → 中文',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     try {
@@ -32,18 +39,15 @@ class HomeScreen extends StatelessWidget {
                       );
                     }
                   },
-                  child: Text(
-                    provider.isTranslating ? 'Stop Translation' : 'Start Translation',
-                  ),
+                  child: Text(provider.isTranslating ? 'Stop' : 'Start'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: provider.switchTranslationDirection,
+                  child: const Text('Switch Direction'),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  provider.isTranslating ? 'Translation Active' : 'Translation Inactive',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                if (provider.lastTranslatedText.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  const Text('Last Translation:'),
+                if (provider.lastTranslatedText.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
@@ -52,7 +56,6 @@ class HomeScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                ],
               ],
             ),
           );

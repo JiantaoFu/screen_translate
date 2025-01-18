@@ -16,6 +16,7 @@ class MainActivity: FlutterActivity() {
     private var pendingResult: MethodChannel.Result? = null
     private val TAG = "MainActivity"
     private var permissionData: Intent? = null
+    private val OVERLAY_CHANNEL = "com.example.screen_translate/overlay"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -76,6 +77,38 @@ class MainActivity: FlutterActivity() {
                     screenCaptureService?.captureScreen(result)
                 }
                 else -> result.notImplemented()
+            }
+        }
+
+        // Set up overlay channel
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OVERLAY_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "checkOverlayPermission" -> {
+                    result.success(OverlayService.hasOverlayPermission(this))
+                }
+                "requestOverlayPermission" -> {
+                    OverlayService.requestOverlayPermission(this)
+                    result.success(true)
+                }
+                "showTranslationOverlay" -> {
+                    val text = call.argument<String>("text")
+                    if (text != null) {
+                        val intent = Intent(this, OverlayService::class.java)
+                        intent.putExtra("text", text)
+                        startService(intent)
+                        result.success(true)
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Text argument is required", null)
+                    }
+                }
+                "hideTranslationOverlay" -> {
+                    val intent = Intent(this, OverlayService::class.java)
+                    stopService(intent)
+                    result.success(true)
+                }
+                else -> {
+                    result.notImplemented()
+                }
             }
         }
     }

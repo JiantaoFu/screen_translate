@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
-import '../services/translation_service.dart';
+import 'package:screen_translate/services/translation_service.dart';
+import '../services/overlay_service.dart';
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
@@ -15,6 +16,7 @@ class TranslationProvider with ChangeNotifier {
   Timer? _captureTimer;
   final OCRService _ocrService = OCRService();
   final TranslationService _translationService = TranslationService();
+  final OverlayService _overlayService = OverlayService();
   final BuildContext context;
 
   TranslationProvider({required this.context}) {
@@ -91,6 +93,9 @@ class TranslationProvider with ChangeNotifier {
                 targetLanguage: _targetLanguage,
               );
               _lastTranslatedText = translatedText;
+              if (Platform.isAndroid) {
+                await _overlayService.showTranslationOverlay(translatedText);
+              }
               notifyListeners();
             }
           } catch (e) {
@@ -116,17 +121,13 @@ class TranslationProvider with ChangeNotifier {
     // TODO: Implement iOS screen capture
   }
 
-  void stopTranslation() {
-    if (!_isTranslating) return;
-    
-    _captureTimer?.cancel();
-    _captureTimer = null;
-
-    if (Platform.isAndroid) {
-      _androidScreenCaptureService?.stopScreenCapture();
-    }
-
+  Future<void> stopTranslation() async {
     _isTranslating = false;
+    _captureTimer?.cancel();
+    if (Platform.isAndroid) {
+      await _androidScreenCaptureService?.stopScreenCapture();
+      await _overlayService.hideTranslationOverlay();
+    }
     notifyListeners();
   }
 

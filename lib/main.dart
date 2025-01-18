@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/home_screen.dart';
+import 'package:screen_translate/screens/overlay_test_screen.dart';
 
 void main() {
   runApp(const ScreenTranslateApp());

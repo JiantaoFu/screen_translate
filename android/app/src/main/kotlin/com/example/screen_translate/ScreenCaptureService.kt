@@ -141,11 +141,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                         }
                     }
                 } else if (retryCount < maxRetries) {
-                    Log.d(TAG, "No frame available, retry ${retryCount + 1}/$maxRetries, frames: ${frameCount.get()}, queue size: ${imageQueue.size}")
+                    // Log.d(TAG, "No frame available, retry ${retryCount + 1}/$maxRetries, frames: ${frameCount.get()}, queue size: ${imageQueue.size}")
                     retryCount++
                     mainHandler.postDelayed({ tryCapture() }, 100)
                 } else {
-                    result.error("NO_FRAME", "Could not get a frame after $maxRetries retries", null)
+                    // result.error("NO_FRAME", "Could not get a frame after $maxRetries retries", null)
                 }
             }
             

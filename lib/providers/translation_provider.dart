@@ -76,7 +76,7 @@ class TranslationProvider with ChangeNotifier {
       }
 
       if (Platform.isAndroid) {
-        print('Capturing screen...');
+        // print('Capturing screen...');
         final imageData = await _androidScreenCaptureService?.captureScreen();
         if (imageData != null) {
           print('Screen captured, size: ${imageData['bytes'].length} bytes');
@@ -91,7 +91,7 @@ class TranslationProvider with ChangeNotifier {
             print('Error processing captured screen: $e');
           }
         } else {
-          print('Failed to capture screen');
+          // print('Failed to capture screen');
         }
       }
     });

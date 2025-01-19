@@ -1,7 +1,6 @@
-import 'dart:io';
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
 import 'package:screen_translate/services/translation_service.dart';
@@ -10,16 +9,20 @@ import '../services/overlay_service.dart';
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
   String _lastTranslatedText = '';
+  int? _lastImageHash;
   String _sourceLanguage = 'en';
   String _targetLanguage = 'zh';
   AndroidScreenCaptureService? _androidScreenCaptureService;
   Timer? _captureTimer;
-  final OCRService _ocrService = OCRService();
-  final TranslationService _translationService = TranslationService();
-  final OverlayService _overlayService = OverlayService();
-  final BuildContext context;
+  final OCRService _ocrService;
+  final TranslationService _translationService;
+  final OverlayService _overlayService;
 
-  TranslationProvider({required this.context}) {
+  TranslationProvider(
+    this._ocrService,
+    this._translationService,
+    this._overlayService,
+  ) {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
     }
@@ -30,100 +33,100 @@ class TranslationProvider with ChangeNotifier {
   String get sourceLanguage => _sourceLanguage;
   String get targetLanguage => _targetLanguage;
 
-  Future<bool> requestPermissions() async {
-    if (Platform.isAndroid) {
-      if (needsOverlayPermission) {
-        final alertWindowStatus = await Permission.systemAlertWindow.request();
-        return alertWindowStatus.isGranted;
-      }
-      return true;
-    } else if (Platform.isIOS) {
-      return true;
-    }
-    return false;
+  void setSourceLanguage(String language) {
+    _sourceLanguage = language;
+    notifyListeners();
   }
 
-  bool get needsOverlayPermission => false;
+  void setTargetLanguage(String language) {
+    _targetLanguage = language;
+    notifyListeners();
+  }
 
   Future<void> startTranslation() async {
     if (_isTranslating) return;
 
-    final hasPermission = await requestPermissions();
-    if (!hasPermission) {
-      throw Exception('Required permissions were denied');
-    }
+    _isTranslating = true;
+    notifyListeners();
 
-    try {
-      if (Platform.isAndroid) {
+    if (Platform.isAndroid) {
+      try {
         await _startAndroidScreenCapture();
-      } else if (Platform.isIOS) {
-        await _startIOSScreenCapture();
-      } else {
-        throw Exception('Platform not supported');
+        _startPeriodicCapture();
+      } catch (e) {
+        print('Error starting translation: $e');
+        await stopTranslation();
       }
-
-      _isTranslating = true;
-      notifyListeners();
-
-      _startPeriodicCapture();
-    } catch (e) {
-      throw Exception('Failed to start screen capture: $e');
     }
   }
 
-  void _startPeriodicCapture() {
-    _captureTimer?.cancel();
-    _captureTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (!_isTranslating) {
-        timer.cancel();
-        return;
-      }
+  void _startPeriodicCapture() async {
+    if (_captureTimer != null) return;
+
+    _captureTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
+      if (!_isTranslating) return;
 
       if (Platform.isAndroid) {
         final imageData = await _androidScreenCaptureService?.captureScreen();
         if (imageData != null) {
-          print('Screen captured, size: ${imageData['bytes'].length} bytes');
-          try {
-            final recognizedText = await _ocrService.processImage(imageData);
-            if (recognizedText.isNotEmpty) {
-              print('Text recognized, translating...');
-              final translatedText = await _translationService.translateText(
-                text: recognizedText,
-                sourceLanguage: _sourceLanguage,
-                targetLanguage: _targetLanguage,
-              );
-              _lastTranslatedText = translatedText;
-              if (Platform.isAndroid) {
-                await _overlayService.showTranslationOverlay(translatedText);
+          final currentHash = _computeFastImageHash(imageData['bytes']);
+          if (currentHash != _lastImageHash) {
+            print('Screen content changed, processing...');
+            _lastImageHash = currentHash;
+            try {
+              final ocrResults = await _ocrService.processImage(imageData);
+              await _overlayService.hideTranslationOverlay(); // Clear old overlays
+              
+              for (var i = 0; i < ocrResults.length; i++) {
+                final ocrResult = ocrResults[i];
+                final translatedText = await _translationService.translateText(
+                  text: ocrResult.text,
+                  sourceLanguage: _sourceLanguage,
+                  targetLanguage: _targetLanguage,
+                );
+                if (Platform.isAndroid) {
+                  await _overlayService.showTranslationOverlay(
+                    translatedText,
+                    i,
+                    x: ocrResult.x,
+                    y: ocrResult.y,
+                  );
+                }
               }
-              notifyListeners();
+              
+              if (ocrResults.isNotEmpty) {
+                _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
+                notifyListeners();
+              }
+            } catch (e) {
+              print('Error processing captured screen: $e');
             }
-          } catch (e) {
-            print('Error processing captured screen: $e');
           }
         }
       }
     });
   }
 
+  int _computeFastImageHash(List<int> bytes) {
+    int hash = 0;
+    // Take every 4th byte to reduce computation while maintaining good distribution
+    for (int i = 0; i < bytes.length; i += 4) {
+      hash = (hash * 31 + bytes[i]) & 0x7FFFFFFF;  // Keep it positive
+    }
+    return hash;
+  }
+
   Future<void> _startAndroidScreenCapture() async {
     if (_androidScreenCaptureService == null) {
       throw Exception('Android screen capture service not initialized');
     }
-
-    final success = await _androidScreenCaptureService!.requestScreenCapture();
-    if (!success) {
-      throw Exception('Failed to start Android screen capture');
-    }
-  }
-
-  Future<void> _startIOSScreenCapture() async {
-    // TODO: Implement iOS screen capture
+    await _androidScreenCaptureService?.requestScreenCapture();
   }
 
   Future<void> stopTranslation() async {
     _isTranslating = false;
     _captureTimer?.cancel();
+    _captureTimer = null;
     if (Platform.isAndroid) {
       await _androidScreenCaptureService?.stopScreenCapture();
       await _overlayService.hideTranslationOverlay();
@@ -131,17 +134,15 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setLanguages(String source, String target) {
-    _sourceLanguage = source;
-    _targetLanguage = target;
-    notifyListeners();
+  void setAndroidScreenCaptureService(AndroidScreenCaptureService service) {
+    _androidScreenCaptureService = service;
   }
 
   void switchTranslationDirection() {
     final temp = _sourceLanguage;
     _sourceLanguage = _targetLanguage;
     _targetLanguage = temp;
-    print('Translation direction switched: ${_sourceLanguage} -> ${_targetLanguage}');
+    print('Translation direction switched: $_sourceLanguage -> $_targetLanguage');
     notifyListeners();
   }
 
@@ -152,7 +153,6 @@ class TranslationProvider with ChangeNotifier {
     stopTranslation();
     _captureTimer?.cancel();
     _ocrService.dispose();
-    _translationService.dispose();
     super.dispose();
   }
 }

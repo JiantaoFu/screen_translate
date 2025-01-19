@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_translate/providers/translation_provider.dart';
-import 'package:screen_translate/screens/home_screen.dart';
-import 'package:screen_translate/screens/overlay_test_screen.dart';
+import 'screens/home_screen.dart';
+import 'providers/translation_provider.dart';
+import 'services/ocr_service.dart';
+import 'services/translation_service.dart';
+import 'services/overlay_service.dart';
 
 void main() {
   runApp(const ScreenTranslateApp());
@@ -16,12 +18,20 @@ class ScreenTranslateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Screen Translate',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: Builder(
-        builder: (context) => ChangeNotifierProvider(
-          create: (_) => TranslationProvider(context: context),
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => TranslationProvider(
+                OCRService(),
+                TranslationService(),
+                OverlayService(),
+              ),
+            ),
+          ],
           child: const HomeScreen(),
         ),
       ),

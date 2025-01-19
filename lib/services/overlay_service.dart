@@ -27,10 +27,13 @@ class OverlayService {
   }
 
   // Show overlay with translated text
-  Future<bool> showTranslationOverlay(String text) async {
+  Future<bool> showTranslationOverlay(String text, int id, {double? x, double? y}) async {
     try {
       final bool shown = await _channel.invokeMethod('showTranslationOverlay', {
         'text': text,
+        'id': id,
+        'x': x,
+        'y': y,
       });
       return shown;
     } on PlatformException catch (e) {
@@ -39,7 +42,7 @@ class OverlayService {
     }
   }
 
-  // Hide the overlay
+  // Hide all overlays
   Future<bool> hideTranslationOverlay() async {
     try {
       final bool hidden = await _channel.invokeMethod('hideTranslationOverlay');

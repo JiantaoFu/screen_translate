@@ -8,28 +8,14 @@ class OverlayTestScreen extends StatefulWidget {
   State<OverlayTestScreen> createState() => _OverlayTestScreenState();
 }
 
-class _OverlayTestScreenState extends State<OverlayTestScreen> with WidgetsBindingObserver {
+class _OverlayTestScreenState extends State<OverlayTestScreen> {
   final OverlayService _overlayService = OverlayService();
   bool _hasPermission = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _checkPermission();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _checkPermission();
-    }
   }
 
   Future<void> _checkPermission() async {
@@ -39,6 +25,12 @@ class _OverlayTestScreenState extends State<OverlayTestScreen> with WidgetsBindi
         _hasPermission = hasPermission;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _overlayService.hideTranslationOverlay();
+    super.dispose();
   }
 
   @override
@@ -59,6 +51,7 @@ class _OverlayTestScreenState extends State<OverlayTestScreen> with WidgetsBindi
             ElevatedButton(
               onPressed: () async {
                 await _overlayService.requestOverlayPermission();
+                await _checkPermission();
               },
               child: const Text('Request Overlay Permission'),
             ),
@@ -66,7 +59,12 @@ class _OverlayTestScreenState extends State<OverlayTestScreen> with WidgetsBindi
             ElevatedButton(
               onPressed: _hasPermission
                   ? () {
-                      _overlayService.showTranslationOverlay('Test Translation Overlay');
+                      _overlayService.showTranslationOverlay(
+                        'Test Translation Overlay',
+                        0,  // Use id 0 for test
+                        x: 100,  // Test position
+                        y: 200,
+                      );
                     }
                   : null,
               child: const Text('Show Overlay'),

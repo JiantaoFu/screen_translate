@@ -92,18 +92,28 @@ class MainActivity: FlutterActivity() {
                 }
                 "showTranslationOverlay" -> {
                     val text = call.argument<String>("text")
-                    if (text != null) {
+                    val x = call.argument<Double>("x")?.toFloat()
+                    val y = call.argument<Double>("y")?.toFloat()
+                    val id = call.argument<Int>("id")
+                    if (text != null && id != null) {
                         val intent = Intent(this, OverlayService::class.java)
+                        intent.action = "show"
                         intent.putExtra("text", text)
+                        intent.putExtra("id", id)
+                        if (x != null && y != null) {
+                            intent.putExtra("x", x)
+                            intent.putExtra("y", y)
+                        }
                         startService(intent)
                         result.success(true)
                     } else {
-                        result.error("INVALID_ARGUMENT", "Text argument is required", null)
+                        result.error("INVALID_ARGUMENT", "Text and id arguments are required", null)
                     }
                 }
                 "hideTranslationOverlay" -> {
                     val intent = Intent(this, OverlayService::class.java)
-                    stopService(intent)
+                    intent.action = "hideAll"
+                    startService(intent)
                     result.success(true)
                 }
                 else -> {

@@ -94,6 +94,8 @@ class MainActivity: FlutterActivity() {
                     val text = call.argument<String>("text")
                     val x = call.argument<Double>("x")?.toFloat()
                     val y = call.argument<Double>("y")?.toFloat()
+                    val width = call.argument<Double>("width")?.toFloat()
+                    val height = call.argument<Double>("height")?.toFloat()
                     val id = call.argument<Int>("id")
                     if (text != null && id != null) {
                         val intent = Intent(this, OverlayService::class.java)
@@ -103,6 +105,12 @@ class MainActivity: FlutterActivity() {
                         if (x != null && y != null) {
                             intent.putExtra("x", x)
                             intent.putExtra("y", y)
+                        }
+                        if (width != null) {
+                            intent.putExtra("width", width)
+                        }
+                        if (height != null) {
+                            intent.putExtra("height", height)
                         }
                         startService(intent)
                         result.success(true)

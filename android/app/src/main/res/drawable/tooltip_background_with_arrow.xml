@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Arrow pointing up -->
+    <item
+        android:top="0dp"
+        android:left="4dp"
+        android:right="4dp">
+        <rotate
+            android:fromDegrees="180"
+            android:pivotX="50%"
+            android:pivotY="0%">
+            <shape android:shape="rectangle">
+                <size android:width="8dp" android:height="4dp"/>
+                <solid android:color="#FF2196F3"/>
+            </shape>
+        </rotate>
+    </item>
+    <!-- Main tooltip body -->
+    <item android:top="4dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#FF2196F3"
+                android:endColor="#FF1976D2"
+                android:angle="45"/>
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
+</layer-list>

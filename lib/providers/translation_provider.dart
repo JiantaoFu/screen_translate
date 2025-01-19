@@ -90,6 +90,8 @@ class TranslationProvider with ChangeNotifier {
                     i,
                     x: ocrResult.x,
                     y: ocrResult.y,
+                    width: ocrResult.width,
+                    height: ocrResult.height,
                   );
                 }
               }

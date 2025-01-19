@@ -46,16 +46,6 @@ class HomeScreen extends StatelessWidget {
                   onPressed: provider.switchTranslationDirection,
                   child: const Text('Switch Direction'),
                 ),
-                const SizedBox(height: 20),
-                if (provider.lastTranslatedText.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      provider.lastTranslatedText,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
               ],
             ),
           );

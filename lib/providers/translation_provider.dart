@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
 import 'package:screen_translate/services/translation_service.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import '../services/overlay_service.dart';
 
 class TranslationProvider with ChangeNotifier {
@@ -69,7 +70,7 @@ class TranslationProvider with ChangeNotifier {
         final imageData = await _androidScreenCaptureService?.captureScreen();
         if (imageData != null) {
             try {
-              final ocrResults = await _ocrService.processImage(imageData);
+              final ocrResults = await _ocrService.processImage(imageData, currentOCRScript);
               await _overlayService.hideTranslationOverlay(); // Clear old overlays
               
               for (var i = 0; i < ocrResults.length; i++) {
@@ -134,6 +135,11 @@ class TranslationProvider with ChangeNotifier {
   }
 
   bool get isChineseToEnglish => _sourceLanguage == 'zh' && _targetLanguage == 'en';
+
+  TextRecognitionScript get currentOCRScript => 
+    isChineseToEnglish 
+      ? TextRecognitionScript.chinese
+      : TextRecognitionScript.latin;
 
   @override
   void dispose() {

@@ -6,10 +6,24 @@ import 'package:logging/logging.dart';
 import '../models/ocr_result.dart';
 
 class OCRService {
-  final TextRecognizer textRecognizer = TextRecognizer();
+  TextRecognizer? _textRecognizer;
+  TextRecognitionScript? _currentScript;
   final Logger _logger = Logger('OCRService');
 
-  Future<List<OCRResult>> processImage(Map<String, dynamic> imageData) async {
+  TextRecognizer getTextRecognizer(TextRecognitionScript script) {
+    // Reuse existing recognizer if script matches
+    if (_textRecognizer != null && _currentScript == script) {
+      return _textRecognizer!;
+    }
+
+    // Close and create new if different
+    _textRecognizer?.close();
+    _currentScript = script;
+    _textRecognizer = TextRecognizer(script: script);
+    return _textRecognizer!;
+  }
+
+  Future<List<OCRResult>> processImage(Map<String, dynamic> imageData, TextRecognitionScript script) async {
     try {
       _logger.info('Starting image processing');
       
@@ -31,6 +45,7 @@ class OCRService {
       );
 
       _logger.info('OCR: Processing image with ML Kit');
+      final textRecognizer = getTextRecognizer(script);
       final RecognizedText recognizedText = await textRecognizer.processImage(image);
       
       final List<OCRResult> results = [];
@@ -62,7 +77,7 @@ class OCRService {
         if (block.text.trim().isNotEmpty && 
             adjustedBox.width > 0 && 
             adjustedBox.height > 0) {
-          _logger.info('Text block recognized at position: $adjustedBox');
+          _logger.info('Text block recognized at position: $adjustedBox, text: ${block.text}');
           results.add(OCRResult(
             text: block.text,
             x: adjustedBox.left,
@@ -139,6 +154,7 @@ class OCRService {
   }
 
   void dispose() {
-    textRecognizer.close();
+    _textRecognizer?.close();
+    _textRecognizer = null;
   }
 }

@@ -10,6 +10,9 @@ class OCRService {
   TextRecognitionScript? _currentScript;
   final Logger _logger = Logger('OCRService');
 
+  static const double overlapThreshold = 0.1;
+  static const double PADDING = 5.0;
+
   TextRecognizer getTextRecognizer(TextRecognitionScript script) {
     // Reuse existing recognizer if script matches
     if (_textRecognizer != null && _currentScript == script) {
@@ -32,7 +35,6 @@ class OCRService {
       final int height = imageData['height'];
       
       _logger.info('Image dimensions: ${width}x${height}');
-      
       
       final InputImage image = InputImage.fromBytes(
         bytes: imageBytes,
@@ -66,7 +68,7 @@ class OCRService {
         Rect adjustedBox = boundingBox;
         
         for (final Rect processed in processedAreas) {
-          if (_calculateOverlap(adjustedBox, processed) > 0.3) { // 30% overlap threshold
+          if (_calculateOverlap(adjustedBox, processed) > OCRService.overlapThreshold) {
             // If significant overlap, adjust position
             adjustedBox = _adjustPosition(adjustedBox, processed);
             hasSignificantOverlap = true;
@@ -116,7 +118,7 @@ class OCRService {
         // Place above if there's room
         return Rect.fromLTWH(
           newBox.left,
-          max(0, existing.top - newBox.height - 5),
+          max(0, existing.top - newBox.height - PADDING),
           newBox.width,
           newBox.height,
         );
@@ -135,7 +137,7 @@ class OCRService {
       if (newBox.left < existing.left) {
         // Place to the left if there's room
         return Rect.fromLTWH(
-          max(0, existing.left - newBox.width - 5),
+          max(0, existing.left - newBox.width - PADDING),
           newBox.top,
           newBox.width,
           newBox.height,

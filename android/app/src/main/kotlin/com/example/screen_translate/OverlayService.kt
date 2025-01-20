@@ -18,6 +18,9 @@ import android.content.Context
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import android.widget.LinearLayout
+import android.view.ContextThemeWrapper
+import android.util.Log
 
 class OverlayService : Service() {
     private var windowManager: WindowManager? = null
@@ -139,9 +142,9 @@ class OverlayService : Service() {
 
     private fun switchMode() {
         displayMode = when (displayMode) {
-            DisplayMode.TRANSLATION_ON -> DisplayMode.ORIGINAL_ONLY
-            DisplayMode.ORIGINAL_ONLY -> DisplayMode.SIDE_BY_SIDE
-            DisplayMode.SIDE_BY_SIDE -> DisplayMode.TRANSLATION_ON
+            DisplayMode.TRANSLATION_ON -> DisplayMode.SIDE_BY_SIDE
+            DisplayMode.SIDE_BY_SIDE -> DisplayMode.ORIGINAL_ONLY
+            DisplayMode.ORIGINAL_ONLY -> DisplayMode.TRANSLATION_ON
         }
         
         controlButton?.apply {
@@ -249,14 +252,14 @@ class OverlayService : Service() {
             }
         }
 
-        val overlayView = AppCompatTextView(this).apply {
+        val themedContext = ContextThemeWrapper(this, R.style.Theme_AppCompat_Light)
+        val overlayView = AppCompatTextView(themedContext).apply {
             setText(text)
             setTextColor(android.graphics.Color.WHITE)
-            setBackgroundColor(android.graphics.Color.argb(180, 0, 0, 0))
+            setBackgroundColor(android.graphics.Color.argb(220, 0, 0, 0))
             setPadding(2, 1, 2, 1)
 
             setSingleLine(false)
-            ellipsize = null
 
             setAutoSizeTextTypeUniformWithConfiguration(
                 6,
@@ -266,14 +269,44 @@ class OverlayService : Service() {
             )
         }
 
-        val params = createLayoutParams(x, y, width, height)
-        
-        originalPositions[id] = Pair(params.x, params.y)
-        
-        overlayViews[id] = overlayView
-        overlayParams[id] = params
 
-        windowManager?.addView(overlayView, params)
+        val layoutParams = createLayoutParams(x, y, width, height)   
+        originalPositions[id] = Pair(layoutParams.x, layoutParams.y)
+        overlayViews[id] = overlayView
+        overlayParams[id] = layoutParams
+
+        var initialX = 0f
+        var initialY = 0f
+        var initialTouchX = 0f
+        var initialTouchY = 0f
+    
+        overlayView.setOnTouchListener { v, event ->
+            Log.d("DragHandle", "Touch event: ${event.action}")
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    Log.d("DragHandle", "Initial position: x=${event.rawX}, y=${event.rawY}")// Save the initial touch and position
+                    initialX = layoutParams.x.toFloat()
+                    initialY = layoutParams.y.toFloat()
+                    initialTouchX = event.rawX
+                    initialTouchY = event.rawY
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    Log.d("DragHandle", "Moving: x=${event.rawX}, y=${event.rawY}")
+                    layoutParams.x = (initialX + (event.rawX - initialTouchX)).toInt()
+                    layoutParams.y = (initialY + (event.rawY - initialTouchY)).toInt()
+                    windowManager?.updateViewLayout(overlayView, layoutParams)
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    Log.d("DragHandle", "Touch ended")
+                    true
+                }
+                else -> false
+            }
+        }
+
+        windowManager?.addView(overlayView, layoutParams)
         
         updateOverlayVisibility(id)
     }
@@ -315,7 +348,6 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {

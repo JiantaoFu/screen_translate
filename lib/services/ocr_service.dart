@@ -10,6 +10,8 @@ class OCRService {
   TextRecognitionScript? _currentScript;
   final Logger _logger = Logger('OCRService');
 
+  static const double overlapThreshold = 0.1;
+
   TextRecognizer getTextRecognizer(TextRecognitionScript script) {
     // Reuse existing recognizer if script matches
     if (_textRecognizer != null && _currentScript == script) {
@@ -66,7 +68,7 @@ class OCRService {
         Rect adjustedBox = boundingBox;
         
         for (final Rect processed in processedAreas) {
-          if (_calculateOverlap(adjustedBox, processed) > 0.3) { // 30% overlap threshold
+          if (_calculateOverlap(adjustedBox, processed) > OCRService.overlapThreshold) {
             // If significant overlap, adjust position
             adjustedBox = _adjustPosition(adjustedBox, processed);
             hasSignificantOverlap = true;

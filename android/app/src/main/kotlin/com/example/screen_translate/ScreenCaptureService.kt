@@ -33,12 +33,12 @@ class FrameStabilizer(
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
     private var stabilizationTimer: Timer? = null
-    private val stabilizationDelay = 500L // ms to wait before translating
+    private val stabilizationDelay = 1000L // ms to wait before translating
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastImageHash: Long = 0
     private var consecutiveScrollFrames = 0
     private val MAX_CONSECUTIVE_SCROLL_FRAMES = 1
-    private val scrollDetectionThreshold = 0.01
+    private val scrollDetectionThreshold = 0.05
 
     fun detectScrolling(currentFrame: ByteArray): Boolean {
         lastFrame?.let { previous ->

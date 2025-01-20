@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.Timer
 import java.util.TimerTask
 import android.view.OrientationEventListener
+import kotlin.math.abs
 
 class FrameStabilizer(
     private var screenWidth: Int, 
@@ -32,9 +33,50 @@ class FrameStabilizer(
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
     private var stabilizationTimer: Timer? = null
-    private val stabilizationDelay = 1000L // ms to wait before translating
+    private val stabilizationDelay = 500L // ms to wait before translating
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastImageHash: Long = 0
+    private var consecutiveScrollFrames = 0
+    private val MAX_CONSECUTIVE_SCROLL_FRAMES = 1
+    private val scrollDetectionThreshold = 0.01
+
+    fun detectScrolling(currentFrame: ByteArray): Boolean {
+        lastFrame?.let { previous ->
+            if (previous.size == currentFrame.size) {
+                val pixelDifference = computePixelDifference(previous, currentFrame)
+                
+                if (pixelDifference > scrollDetectionThreshold) {
+                    consecutiveScrollFrames++
+                    
+                    if (consecutiveScrollFrames >= MAX_CONSECUTIVE_SCROLL_FRAMES) {
+                        Log.d("FrameStabilizer", "Scrolling detected: $pixelDifference")
+                        return true
+                    }
+                } else {
+                    consecutiveScrollFrames = 0
+                }
+            }
+        }
+        
+        lastFrame = currentFrame.clone()
+        return false
+    }
+
+    private fun computePixelDifference(frame1: ByteArray, frame2: ByteArray): Double {
+        var differentPixels = 0
+        val totalPixels = frame1.size / 4 // Assuming RGBA
+
+        for (i in frame1.indices step 4) {
+            // Compare color channels, ignore alpha
+            val isDifferent = (0..2).any { channel -> 
+                abs(frame1[i + channel].toInt() - frame2[i + channel].toInt()) > 20 
+            }
+            
+            if (isDifferent) differentPixels++
+        }
+
+        return differentPixels.toDouble() / totalPixels
+    }
 
     // Method to update screen dimensions on orientation change
     fun updateScreenDimensions(newWidth: Int, newHeight: Int) {
@@ -225,10 +267,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 } else {
                     Log.w(TAG, "Frame too old: ${age}ms")
                     result.error("FRAME_TOO_OLD", "Captured frame is too old", null)
-                }
-            } else {
-                Log.w(TAG, "No frames available")
-                result.error("NO_FRAMES", "No frames in queue", null)
+                } 
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error capturing screen", e)
@@ -276,6 +315,13 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                                 
                                 val bytes = imageToBytes(image)
                                 if (bytes != null) {
+                                    if (frameStabilizer.detectScrolling(bytes)) {
+                                        // Clear translation overlay
+                                        val intent = Intent(context, OverlayService::class.java)
+                                        intent.action = "hideAll"
+                                        context.startService(intent)
+                                    }
+
                                     val currentTime = System.currentTimeMillis()
                                     // Pass a callback to process the stable frame
                                     frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->

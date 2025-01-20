@@ -21,6 +21,87 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.ConcurrentLinkedDeque
+import java.util.Timer
+import java.util.TimerTask
+import android.view.OrientationEventListener
+
+class FrameStabilizer(
+    private var screenWidth: Int, 
+    private var screenHeight: Int
+) {
+    private var lastFrame: ByteArray? = null
+    private var lastFrameTime = 0L
+    private var stabilizationTimer: Timer? = null
+    private val stabilizationDelay = 1000L // ms to wait before translating
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var lastImageHash: Long = 0
+
+    // Method to update screen dimensions on orientation change
+    fun updateScreenDimensions(newWidth: Int, newHeight: Int) {
+        Log.d("FrameStabilizer", "Screen dimensions updated: $newWidth x $newHeight")
+        screenWidth = newWidth
+        screenHeight = newHeight
+        // Reset last hash to force processing of next frame
+        lastImageHash = 0
+    }
+
+    private fun computeImageHash(bytes: ByteArray): Long {
+        // Sample pixels from different regions of the image
+        val sampleSize = 16
+        
+        var hash: Long = 0
+        for (y in 0 until screenHeight step (screenHeight / sampleSize)) {
+            for (x in 0 until screenWidth step (screenWidth / sampleSize)) {
+                val index = (y * screenWidth + x) * 4  // RGBA
+                if (index + 3 < bytes.size) {
+                    hash = 31 * hash + bytes[index].toLong()  // Use alpha or a color channel
+                }
+            }
+        }
+        return hash
+    }
+
+    fun onNewFrame(currentFrame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
+        // Compute hash of current frame
+        val currentImageHash = computeImageHash(currentFrame)
+
+        // Always proceed on first frame or after screen rotation
+        val shouldProcess = currentImageHash != lastImageHash
+
+        if (shouldProcess) {
+            Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
+            // Cancel previous timer
+            stabilizationTimer?.cancel()
+
+            // Always update last frame
+            lastFrame = currentFrame
+            lastFrameTime = currentTime
+            lastImageHash = currentImageHash
+
+            // Start a new timer
+            stabilizationTimer = Timer().apply {
+                schedule(object : TimerTask() {
+                    override fun run() {
+                        synchronized(this@FrameStabilizer) {
+                            // Check if no new frame has arrived since scheduling this timer
+                            if (currentTime == lastFrameTime) {
+                                lastFrame?.let { stableFrame ->
+                                    // Post to main handler to ensure thread safety
+                                    mainHandler.post {
+                                        Log.d("FrameStabilizer", "Frame stabilized after $stabilizationDelay ms")
+                                        onStable(stableFrame)
+                                        lastFrame = null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, stabilizationDelay)
+            }
+        }
+    }
+}
+
 
 class ScreenCaptureService(private val context: Context, private val activity: Activity) {
     private var mediaProjection: MediaProjection? = null
@@ -32,13 +113,14 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private val TAG = "ScreenCaptureService"
     private val isCapturing = AtomicBoolean(false)
     private val frameCount = AtomicInteger(0)
-    private val MAX_QUEUE_SIZE = 5
+    private val MAX_QUEUE_SIZE = 1
+    private val MAX_FRAME_AGE = 2000L
     private val imageQueue = ConcurrentLinkedDeque<Pair<ByteArray, Long>>() // Pair of bytes and timestamp
-    private val lastFrameTime = AtomicLong(0)
-    private val minFrameInterval = 100L // Minimum 100ms between frames (10 fps)
     private val handlerThread = HandlerThread("ImageReaderThread").apply { start() }
     private val imageReaderHandler = Handler(handlerThread.looper)
     private val mainHandler = Handler(Looper.getMainLooper())
+    private lateinit var frameStabilizer: FrameStabilizer
+    private var orientationListener: OrientationEventListener? = null
 
     init {
         val metrics = context.resources.displayMetrics
@@ -46,6 +128,20 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         screenHeight = metrics.heightPixels
         screenDensity = metrics.densityDpi
         Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
+
+        frameStabilizer = FrameStabilizer(screenWidth, screenHeight)
+
+        // Setup orientation listener
+        orientationListener = object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                val newMetrics = context.resources.displayMetrics
+                frameStabilizer.updateScreenDimensions(
+                    newMetrics.widthPixels, 
+                    newMetrics.heightPixels
+                )
+            }
+        }
+        orientationListener?.enable()
     }
 
     fun startProjection(resultCode: Int, data: Intent, result: MethodChannel.Result) {
@@ -113,43 +209,27 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 result.error("NOT_CAPTURING", "Screen capture is not active", null)
                 return
             }
-
-            // Get latest frame from queue
-            val maxRetries = 5
-            var retryCount = 0
-
-            fun tryCapture() {
-                val frame = imageQueue.peekLast()
-                if (frame != null) {
-                    val (bytes, timestamp) = frame
-                    val age = System.currentTimeMillis() - timestamp
-                    if (age <= 2000) { // Accept frames up to 2 seconds old
-                        Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms, queue size: ${imageQueue.size}")
-                        result.success(mapOf(
-                            "bytes" to bytes,
-                            "width" to screenWidth,
-                            "height" to screenHeight
-                        ))
-                    } else {
-                        Log.d(TAG, "Frame too old (${age}ms), retrying")
-                        imageQueue.removeLast() // Remove old frame
-                        if (retryCount < maxRetries) {
-                            retryCount++
-                            mainHandler.postDelayed({ tryCapture() }, 100)
-                        } else {
-                            result.error("FRAME_TOO_OLD", "Could not get a recent frame after $maxRetries retries", null)
-                        }
-                    }
-                } else if (retryCount < maxRetries) {
-                    // Log.d(TAG, "No frame available, retry ${retryCount + 1}/$maxRetries, frames: ${frameCount.get()}, queue size: ${imageQueue.size}")
-                    retryCount++
-                    mainHandler.postDelayed({ tryCapture() }, 100)
+           
+            val frame = imageQueue.pollLast() // Atomically peek and remove
+            if (frame != null) {
+                val (bytes, timestamp) = frame
+                val age = System.currentTimeMillis() - timestamp
+                
+                if (age <= MAX_FRAME_AGE) {
+                    Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms")
+                    result.success(mapOf(
+                        "bytes" to bytes,
+                        "width" to screenWidth,
+                        "height" to screenHeight
+                    ))
                 } else {
-                    // result.error("NO_FRAME", "Could not get a frame after $maxRetries retries", null)
+                    Log.w(TAG, "Frame too old: ${age}ms")
+                    result.error("FRAME_TOO_OLD", "Captured frame is too old", null)
                 }
+            } else {
+                Log.w(TAG, "No frames available")
+                result.error("NO_FRAMES", "No frames in queue", null)
             }
-            
-            mainHandler.postDelayed({ tryCapture() }, 200)
         } catch (e: Exception) {
             Log.e(TAG, "Error capturing screen", e)
             result.error("CAPTURE_ERROR", "Error capturing screen: ${e.message}", null)
@@ -197,13 +277,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                                 val bytes = imageToBytes(image)
                                 if (bytes != null) {
                                     val currentTime = System.currentTimeMillis()
-                                    // Remove old frames if queue is too large
-                                    while (imageQueue.size >= MAX_QUEUE_SIZE) {
-                                        imageQueue.removeFirst()
+                                    // Pass a callback to process the stable frame
+                                    frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
+                                        // Remove old frames if queue is too large
+                                        while (imageQueue.size >= MAX_QUEUE_SIZE) {
+                                            imageQueue.removeFirst()
+                                        }
+                                        imageQueue.addLast(Pair(stableFrame, currentTime))
+                                        Log.d(TAG, "New frame queued, queue size: ${imageQueue.size}")
                                     }
-                                    imageQueue.addLast(Pair(bytes, currentTime))
-                                    lastFrameTime.set(currentTime)
-                                    Log.d(TAG, "New frame queued, queue size: ${imageQueue.size}")
                                 } else {
                                     Log.e(TAG, "Failed to convert image to bytes")
                                 }
@@ -257,8 +339,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             Log.d(TAG, "Starting cleanup")
             imageQueue.clear()
             frameCount.set(0)
-            lastFrameTime.set(0)
-            
             virtualDisplay?.release()
             virtualDisplay = null
             
@@ -267,7 +347,10 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             
             mediaProjection?.stop()
             mediaProjection = null
-            
+
+            orientationListener?.disable()
+            orientationListener = null
+
             Log.d(TAG, "Cleanup complete")
         } catch (e: Exception) {
             Log.e(TAG, "Error during cleanup", e)

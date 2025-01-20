@@ -2,20 +2,23 @@ import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:logging/logging.dart';
 import '../models/ocr_result.dart';
 
 class OCRService {
   final TextRecognizer textRecognizer = TextRecognizer();
+  final Logger _logger = Logger('OCRService');
 
   Future<List<OCRResult>> processImage(Map<String, dynamic> imageData) async {
     try {
-      print('OCR: Starting image processing');
+      _logger.info('Starting image processing');
       
       final Uint8List imageBytes = imageData['bytes'];
       final int width = imageData['width'];
       final int height = imageData['height'];
       
-      print('OCR: Image dimensions: ${width}x${height}');
+      _logger.info('Image dimensions: ${width}x${height}');
+      
       
       final InputImage image = InputImage.fromBytes(
         bytes: imageBytes,
@@ -27,7 +30,7 @@ class OCRService {
         ),
       );
 
-      print('OCR: Processing image with ML Kit');
+      _logger.info('OCR: Processing image with ML Kit');
       final RecognizedText recognizedText = await textRecognizer.processImage(image);
       
       final List<OCRResult> results = [];
@@ -59,7 +62,7 @@ class OCRService {
         if (block.text.trim().isNotEmpty && 
             adjustedBox.width > 0 && 
             adjustedBox.height > 0) {
-          print('OCR: Text block recognized at position: $adjustedBox');
+          _logger.info('Text block recognized at position: $adjustedBox');
           results.add(OCRResult(
             text: block.text,
             x: adjustedBox.left,
@@ -71,10 +74,10 @@ class OCRService {
         }
       }
       
-      print('OCR: Found ${results.length} text blocks');
+      _logger.info('OCR: Found ${results.length} text blocks');
       return results;
     } catch (e) {
-      print('OCR Error: $e');
+      _logger.severe('OCR Error: $e');
       return [];
     }
   }

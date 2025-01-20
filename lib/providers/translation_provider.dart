@@ -9,7 +9,6 @@ import '../services/overlay_service.dart';
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
   String _lastTranslatedText = '';
-  int? _lastImageHash;
   String _sourceLanguage = 'en';
   String _targetLanguage = 'zh';
   AndroidScreenCaptureService? _androidScreenCaptureService;
@@ -69,10 +68,6 @@ class TranslationProvider with ChangeNotifier {
       if (Platform.isAndroid) {
         final imageData = await _androidScreenCaptureService?.captureScreen();
         if (imageData != null) {
-          final currentHash = _computeFastImageHash(imageData['bytes']);
-          if (currentHash != _lastImageHash) {
-            print('Screen content changed, processing...');
-            _lastImageHash = currentHash;
             try {
               final ocrResults = await _ocrService.processImage(imageData);
               await _overlayService.hideTranslationOverlay(); // Clear old overlays
@@ -103,19 +98,9 @@ class TranslationProvider with ChangeNotifier {
             } catch (e) {
               print('Error processing captured screen: $e');
             }
-          }
         }
       }
     });
-  }
-
-  int _computeFastImageHash(List<int> bytes) {
-    int hash = 0;
-    // Take every 4th byte to reduce computation while maintaining good distribution
-    for (int i = 0; i < bytes.length; i += 4) {
-      hash = (hash * 31 + bytes[i]) & 0x7FFFFFFF;  // Keep it positive
-    }
-    return hash;
   }
 
   Future<void> _startAndroidScreenCapture() async {

@@ -5,8 +5,13 @@ import 'providers/translation_provider.dart';
 import 'services/ocr_service.dart';
 import 'services/translation_service.dart';
 import 'services/overlay_service.dart';
+import 'package:logging/logging.dart';
 
 void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
+  });
   runApp(const ScreenTranslateApp());
 }
 

@@ -5,18 +5,16 @@ class TranslationService {
   late final modelManager = OnDeviceTranslatorModelManager();
 
   TranslateLanguage _getTranslateLanguage(String code) {
-    switch (code) {
-      case 'en':
-        return TranslateLanguage.english;
-      case 'zh':
-        return TranslateLanguage.chinese;
-      default:
-        throw Exception('Unsupported language code: $code');
+    TranslateLanguage? language = BCP47Code.fromRawValue(code);
+    if (language != null) {
+      return language!;
+    } else {
+      throw Exception('Unsupported language code: $code');
     }
   }
 
   String _getLanguageCode(TranslateLanguage language) {
-    return language == TranslateLanguage.chinese ? 'zh' : 'en';
+    return language.bcpCode;
   }
 
   Future<String> translateText({

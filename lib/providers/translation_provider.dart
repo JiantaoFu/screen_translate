@@ -5,7 +5,14 @@ import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
 import 'package:screen_translate/services/translation_service.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import '../services/overlay_service.dart';
+
+extension StringExtension on String {
+  String capitalize() {
+    return this[0].toUpperCase() + substring(1);
+  }
+}
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
@@ -136,10 +143,9 @@ class TranslationProvider with ChangeNotifier {
 
   bool get isChineseToEnglish => _sourceLanguage == 'zh' && _targetLanguage == 'en';
 
-  TextRecognitionScript get currentOCRScript => 
-    isChineseToEnglish 
-      ? TextRecognitionScript.chinese
-      : TextRecognitionScript.latin;
+  TextRecognitionScript get currentOCRScript {
+    return _ocrService.getScriptForLanguage(_sourceLanguage);
+  }
 
   @override
   void dispose() {
@@ -147,5 +153,12 @@ class TranslationProvider with ChangeNotifier {
     _captureTimer?.cancel();
     _ocrService.dispose();
     super.dispose();
+  }
+
+  static Map<String, String> get supportedLanguages {
+    return {
+      for (var language in TranslateLanguage.values)
+        language.bcpCode: language.toString().split('.').last.capitalize()
+    };
   }
 }

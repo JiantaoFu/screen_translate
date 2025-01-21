@@ -13,6 +13,22 @@ class OCRService {
   static const double overlapThreshold = 0.1;
   static const double PADDING = 5.0;
 
+  TextRecognitionScript getScriptForLanguage(String languageCode) {
+    switch (languageCode) {
+      case 'zh':
+        return TextRecognitionScript.chinese;
+      case 'hi':
+      case 'mr':
+        return TextRecognitionScript.devanagiri;
+      case 'ja':
+        return TextRecognitionScript.japanese;
+      case 'ko':
+        return TextRecognitionScript.korean;
+      default:
+        return TextRecognitionScript.latin;
+    }
+  }
+
   TextRecognizer getTextRecognizer(TextRecognitionScript script) {
     // Reuse existing recognizer if script matches
     if (_textRecognizer != null && _currentScript == script) {

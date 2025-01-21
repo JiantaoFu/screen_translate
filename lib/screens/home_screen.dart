@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
+import 'package:screen_translate/screens/model_management_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,15 @@ class HomeScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ModelManagementScreen()),
+                    );
+                  },
+                  child: Text('Manage Translation Models'),
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     try {

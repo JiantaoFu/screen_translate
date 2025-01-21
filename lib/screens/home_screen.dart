@@ -4,62 +4,217 @@ import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Screen Translate'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Consumer<TranslationProvider>(
-        builder: (context, provider, child) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  provider.isChineseToEnglish 
-                    ? '中文 → English'
-                    : 'English → 中文',
-                  style: Theme.of(context).textTheme.titleLarge,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Attractive header
+            _buildHeader(),
+            
+            // Main action buttons
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Language Selection Row
+                    _buildLanguageSelector(context),
+                    
+                    SizedBox(height: 20),
+
+                    Consumer<TranslationProvider>(
+                      builder: (context, provider, child) => _buildActionButton(
+                        icon: Icons.screenshot,
+                        label: provider.isTranslating ? 'Stop Translation' : 'Translate Screen',
+                        onTap: () async {
+                          try {
+                            if (provider.isTranslating) {
+                              provider.stopTranslation();
+                            } else {
+                              await provider.startTranslation();
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: ${e.toString()}')),
+                            );
+                          }
+                        },
+                        context: context,
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    _buildActionButton(
+                      icon: Icons.language,
+                      label: 'Manage Translation Models',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ModelManagementScreen(),
+                          ),
+                        );
+                      },
+                      context: context,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ModelManagementScreen()),
-                    );
-                  },
-                  child: Text('Manage Translation Models'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      if (provider.isTranslating) {
-                        provider.stopTranslation();
-                      } else {
-                        await provider.startTranslation();
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${e.toString()}')),
-                      );
-                    }
-                  },
-                  child: Text(provider.isTranslating ? 'Stop' : 'Start'),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: provider.switchTranslationDirection,
-                  child: const Text('Switch Direction'),
-                ),
-              ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    return Consumer<TranslationProvider>(
+      builder: (context, provider, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Source Language Dropdown
+            Flexible(
+              child: _buildLanguageDropdown(
+                value: provider.sourceLanguage,
+                onChanged: (language) {
+                  provider.setSourceLanguage(language!);
+                },
+                hint: 'From',
+              ),
+            ),
+            
+            SizedBox(width: 10),
+            
+            // Swap Languages Button
+            IconButton(
+              icon: Icon(Icons.swap_horiz, color: Colors.blue),
+              onPressed: provider.swapLanguages,
+            ),
+            
+            SizedBox(width: 10),
+            
+            // Target Language Dropdown
+            Flexible(
+              child: _buildLanguageDropdown(
+                value: provider.targetLanguage,
+                onChanged: (language) {
+                  provider.setTargetLanguage(language!);
+                },
+                hint: 'To',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade300, Colors.blue.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Screen Translate',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Icon(Icons.translate, color: Colors.white, size: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageDropdown({
+    required String? value,
+    required void Function(String?)? onChanged,
+    required String hint,
+  }) {
+    return Consumer<TranslationProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue, width: 1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: DropdownButton<String>(
+            value: value != null 
+              ? TranslationProvider.supportedLanguages[value] 
+              : null,
+            hint: Text(hint),
+            underline: SizedBox(), // Remove underline
+            icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
+            items: TranslationProvider.supportedLanguages.values.map((String language) {
+              return DropdownMenuItem<String>(
+                value: language,
+                child: Text(language),
+              );
+            }).toList(),
+            onChanged: onChanged != null 
+              ? (language) {
+                  // Find the BCP code for the selected language name
+                  final bcpCode = TranslationProvider.supportedLanguages.keys.firstWhere(
+                    (code) => TranslationProvider.supportedLanguages[code] == language,
+                    orElse: () => throw ArgumentError('Invalid language: $language'),
+                  );
+                  onChanged(bcpCode);
+                }
+              : null,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required BuildContext context,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        backgroundColor: Colors.blue.shade50,
+        elevation: 5,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.blue.shade700),
+          SizedBox(width: 10),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.blue.shade700,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

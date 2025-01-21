@@ -133,7 +133,7 @@ class TranslationProvider with ChangeNotifier {
     _androidScreenCaptureService = service;
   }
 
-  void switchTranslationDirection() {
+  void swapLanguages() {
     final temp = _sourceLanguage;
     _sourceLanguage = _targetLanguage;
     _targetLanguage = temp;

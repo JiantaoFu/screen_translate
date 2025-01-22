@@ -6,6 +6,8 @@ import 'services/ocr_service.dart';
 import 'services/translation_service.dart';
 import 'services/overlay_service.dart';
 import 'package:logging/logging.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   Logger.root.level = Level.ALL;
@@ -22,6 +24,14 @@ class ScreenTranslateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Screen Translate',
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (locale, supportedLocales) {
+        // Fallback to English if locale is not supported
+        print('Device Locale: $locale');
+        print('Supported Locales: $supportedLocales');
+        return locale;
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/localization_extension.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -62,12 +64,24 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
     );
   }
 
+  String _getLocalizedLanguageName(BuildContext context, String languageCode) {
+    final localizations = AppLocalizations.of(context);
+    
+    // Dynamically get the localized language name
+    if (TranslationProvider.supportedLanguages.keys.contains(languageCode)) {
+      return localizations?.getLocalizedValue('language_$languageCode') ?? languageCode;
+    }
+    
+    // Fallback to the original language code
+    return languageCode;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.blue, width: 1),
             borderRadius: BorderRadius.circular(10),
@@ -81,6 +95,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
             hint: Text(widget.hint),
             underline: SizedBox(), // Remove underline
             icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
+            isExpanded: true,
             items: TranslationProvider.supportedLanguages.keys
               .map((String code) {
                 return DropdownMenuItem<String>(
@@ -89,8 +104,11 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        TranslationProvider.supportedLanguages[code]!,
+                        _getLocalizedLanguageName(context, code),
+                        style: TextStyle(fontSize: 14), // Reduced font size
+                        overflow: TextOverflow.ellipsis,
                       ),
+                      SizedBox(width: 1), // Small spacing
                       // Check download status
                       _buildModelStatusIcon(code),
                     ],
@@ -106,7 +124,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
               if (isSameLanguage) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Source and target languages cannot be the same'),
+                    content: Text(AppLocalizations.of(context)!.source_and_target_cannot_be_the_same),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -146,7 +164,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             // Attractive header
-            _buildHeader(),
+            _buildHeader(context),
             
             // Main action buttons
             Expanded(
@@ -162,7 +180,7 @@ class HomeScreen extends StatelessWidget {
                     Consumer<TranslationProvider>(
                       builder: (context, provider, child) => _buildActionButton(
                         icon: Icons.screenshot,
-                        label: provider.isTranslating ? 'Stop Translation' : 'Translate Screen',
+                        label: provider.isTranslating ? AppLocalizations.of(context)!.stop_translation : AppLocalizations.of(context)!.translate_screen,
                         onTap: () async {
                           try {
                             if (provider.isTranslating) {
@@ -184,7 +202,7 @@ class HomeScreen extends StatelessWidget {
 
                     _buildActionButton(
                       icon: Icons.language,
-                      label: 'Manage Translation Models',
+                      label: AppLocalizations.of(context)!.manage_translation_models,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -208,49 +226,51 @@ class HomeScreen extends StatelessWidget {
   Widget _buildLanguageSelector(BuildContext context) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Source Language Dropdown
-            Flexible(
-              child: ModelStatusDropdown(
-                value: provider.sourceLanguage,
-                onChanged: (language) {
-                  provider.setSourceLanguage(language!);
-                },
-                hint: 'From',
-                isSourceLanguage: true,
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16), // Add some padding
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded( // Changed from Flexible to Expanded
+                flex: 2,
+                child: ModelStatusDropdown(
+                  value: provider.sourceLanguage,
+                  onChanged: (language) {
+                    provider.setSourceLanguage(language!);
+                  },
+                  hint: AppLocalizations.of(context)!.source_language,
+                  isSourceLanguage: true,
+                ),
               ),
-            ),
-            
-            SizedBox(width: 10),
-            
-            // Swap Languages Button
-            IconButton(
-              icon: Icon(Icons.swap_horiz, color: Colors.blue),
-              onPressed: provider.swapLanguages,
-            ),
-            
-            SizedBox(width: 10),
-            
-            // Target Language Dropdown
-            Flexible(
-              child: ModelStatusDropdown(
-                value: provider.targetLanguage,
-                onChanged: (language) {
-                  provider.setTargetLanguage(language!);
-                },
-                hint: 'To',
-                isSourceLanguage: false,
+              
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: IconButton(
+                  icon: Icon(Icons.swap_horiz, color: Colors.blue),
+                  onPressed: provider.swapLanguages,
+                  constraints: BoxConstraints(minWidth: 40),
+                ),
               ),
-            ),
-          ],
+              
+              Expanded( // Changed from Flexible to Expanded
+                flex: 2,
+                child: ModelStatusDropdown(
+                  value: provider.targetLanguage,
+                  onChanged: (language) {
+                    provider.setTargetLanguage(language!);
+                  },
+                  hint: AppLocalizations.of(context)!.target_language,
+                  isSourceLanguage: false,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -264,7 +284,7 @@ class HomeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Screen Translate',
+            AppLocalizations.of(context)!.app_title,
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,

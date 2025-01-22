@@ -87,6 +87,7 @@ class HomeScreen extends StatelessWidget {
                   provider.setSourceLanguage(language!);
                 },
                 hint: 'From',
+                isSourceLanguage: true,
               ),
             ),
             
@@ -108,6 +109,7 @@ class HomeScreen extends StatelessWidget {
                   provider.setTargetLanguage(language!);
                 },
                 hint: 'To',
+                isSourceLanguage: false,
               ),
             ),
           ],
@@ -147,6 +149,7 @@ class HomeScreen extends StatelessWidget {
     required String? value,
     required void Function(String?)? onChanged,
     required String hint,
+    required bool isSourceLanguage,
   }) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
@@ -157,28 +160,37 @@ class HomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: DropdownButton<String>(
-            value: value != null 
-              ? TranslationProvider.supportedLanguages[value] 
-              : null,
+            value: value,
             hint: Text(hint),
             underline: SizedBox(), // Remove underline
             icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
-            items: TranslationProvider.supportedLanguages.values.map((String language) {
-              return DropdownMenuItem<String>(
-                value: language,
-                child: Text(language),
-              );
-            }).toList(),
-            onChanged: onChanged != null 
-              ? (language) {
-                  // Find the BCP code for the selected language name
-                  final bcpCode = TranslationProvider.supportedLanguages.keys.firstWhere(
-                    (code) => TranslationProvider.supportedLanguages[code] == language,
-                    orElse: () => throw ArgumentError('Invalid language: $language'),
-                  );
-                  onChanged(bcpCode);
-                }
-              : null,
+            items: TranslationProvider.supportedLanguages.keys
+              .map((String code) {
+                return DropdownMenuItem<String>(
+                  value: code,
+                  child: Text(
+                    TranslationProvider.supportedLanguages[code]!,
+                  ),
+                );
+              }).toList(),
+            onChanged: (selectedCode) {
+              // Check for language conflict at the time of selection
+              final isSameLanguage = isSourceLanguage 
+                ? selectedCode == provider.targetLanguage 
+                : selectedCode == provider.sourceLanguage;
+
+              if (isSameLanguage) {
+                // Show a snackbar or dialog to inform the user
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Source and target languages cannot be the same'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } else if (onChanged != null) {
+                onChanged(selectedCode);
+              }
+            },
           ),
         );
       },

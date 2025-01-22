@@ -1,7 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
+
+class ModelStatusDropdown extends StatefulWidget {
+  final String? value;
+  final void Function(String?)? onChanged;
+  final String hint;
+  final bool isSourceLanguage;
+
+  const ModelStatusDropdown({
+    Key? key,
+    required this.value,
+    required this.onChanged,
+    required this.hint,
+    required this.isSourceLanguage,
+  }) : super(key: key);
+
+  @override
+  _ModelStatusDropdownState createState() => _ModelStatusDropdownState();
+}
+
+class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Create an animation controller that we'll use to force a rebuild
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 100),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  // Helper method to build model status icon
+  Widget _buildModelStatusIcon(String languageCode) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return FutureBuilder<bool>(
+          future: OnDeviceTranslatorModelManager().isModelDownloaded(languageCode),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return SizedBox.shrink();
+            }
+            
+            return snapshot.data! 
+              ? Icon(Icons.check_circle, color: Colors.green, size: 16)
+              : Icon(Icons.download, color: Colors.orange, size: 16);
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TranslationProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue, width: 1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: DropdownButton<String>(
+            onTap: () {
+              // Force a rebuild by triggering the animation controller
+              _animationController.forward(from: 0);
+            },
+            value: widget.value,
+            hint: Text(widget.hint),
+            underline: SizedBox(), // Remove underline
+            icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
+            items: TranslationProvider.supportedLanguages.keys
+              .map((String code) {
+                return DropdownMenuItem<String>(
+                  value: code,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        TranslationProvider.supportedLanguages[code]!,
+                      ),
+                      // Check download status
+                      _buildModelStatusIcon(code),
+                    ],
+                  ),
+                );
+              }).toList(),
+            onChanged: (selectedCode) {
+              // Existing selection logic remains the same
+              final isSameLanguage = widget.isSourceLanguage 
+                ? selectedCode == provider.targetLanguage 
+                : selectedCode == provider.sourceLanguage;
+
+              if (isSameLanguage) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Source and target languages cannot be the same'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } else {
+                // Check model download status
+                final modelManager = OnDeviceTranslatorModelManager();
+                modelManager.isModelDownloaded(selectedCode!).then((isDownloaded) {
+                  if (!isDownloaded) {
+                    // Navigate to Model Management Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModelManagementScreen(),
+                      ),
+                    );
+                  } else if (widget.onChanged != null) {
+                    widget.onChanged!(selectedCode);
+                  }
+                });
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+}
 
 class HomeScreen extends StatelessWidget {
 
@@ -81,7 +213,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Source Language Dropdown
             Flexible(
-              child: _buildLanguageDropdown(
+              child: ModelStatusDropdown(
                 value: provider.sourceLanguage,
                 onChanged: (language) {
                   provider.setSourceLanguage(language!);
@@ -103,7 +235,7 @@ class HomeScreen extends StatelessWidget {
             
             // Target Language Dropdown
             Flexible(
-              child: _buildLanguageDropdown(
+              child: ModelStatusDropdown(
                 value: provider.targetLanguage,
                 onChanged: (language) {
                   provider.setTargetLanguage(language!);
@@ -142,58 +274,6 @@ class HomeScreen extends StatelessWidget {
           Icon(Icons.translate, color: Colors.white, size: 30),
         ],
       ),
-    );
-  }
-
-  Widget _buildLanguageDropdown({
-    required String? value,
-    required void Function(String?)? onChanged,
-    required String hint,
-    required bool isSourceLanguage,
-  }) {
-    return Consumer<TranslationProvider>(
-      builder: (context, provider, child) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blue, width: 1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: DropdownButton<String>(
-            value: value,
-            hint: Text(hint),
-            underline: SizedBox(), // Remove underline
-            icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
-            items: TranslationProvider.supportedLanguages.keys
-              .map((String code) {
-                return DropdownMenuItem<String>(
-                  value: code,
-                  child: Text(
-                    TranslationProvider.supportedLanguages[code]!,
-                  ),
-                );
-              }).toList(),
-            onChanged: (selectedCode) {
-              // Check for language conflict at the time of selection
-              final isSameLanguage = isSourceLanguage 
-                ? selectedCode == provider.targetLanguage 
-                : selectedCode == provider.sourceLanguage;
-
-              if (isSameLanguage) {
-                // Show a snackbar or dialog to inform the user
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Source and target languages cannot be the same'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else if (onChanged != null) {
-                onChanged(selectedCode);
-              }
-            },
-          ),
-        );
-      },
     );
   }
 

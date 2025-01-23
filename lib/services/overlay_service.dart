@@ -1,8 +1,48 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OverlayService {
   static const MethodChannel _channel =
       MethodChannel('com.example.screen_translate/overlay');
+
+  // Static method to show overlay permission dialog
+  static Future<bool> showOverlayPermissionDialog(BuildContext context) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.overlay_permission_required),
+        content: Text(AppLocalizations.of(context)!.overlay_permission_required_content),
+        actions: [
+          TextButton(
+            child: Text(AppLocalizations.of(context)!.cancel),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text(AppLocalizations.of(context)!.grant_permission),
+            onPressed: () {
+              _channel.invokeMethod('requestOverlayPermission');
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      ),
+    );
+    
+    return result ?? false;
+  }
+
+  // Ensure overlay permission
+  Future<bool> ensureOverlayPermission(BuildContext context) async {
+    bool hasPermission = await checkOverlayPermission();
+    if (!hasPermission) {
+      hasPermission = await showOverlayPermissionDialog(context);
+      
+      // Recheck permission after request
+      return await checkOverlayPermission();
+    }
+    return hasPermission;
+  }
 
   // Check if we have overlay permission
   Future<bool> checkOverlayPermission() async {

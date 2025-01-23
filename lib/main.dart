@@ -41,6 +41,7 @@ class ScreenTranslateApp extends StatelessWidget {
           providers: [
             ChangeNotifierProvider(
               create: (context) => TranslationProvider(
+                context,
                 OCRService(),
                 TranslationService(),
                 OverlayService(),

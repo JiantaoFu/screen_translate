@@ -21,6 +21,9 @@ import androidx.core.content.ContextCompat
 import android.widget.LinearLayout
 import android.view.ContextThemeWrapper
 import android.util.Log
+import android.os.Build
+import android.app.Activity
+import android.net.Uri
 import com.example.screen_translate.LocalizationHelper
 
 class OverlayService : Service() {
@@ -77,10 +80,14 @@ class OverlayService : Service() {
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         )
 
+        // Use TYPE_APPLICATION_OVERLAY for overlay windows on newer Android versions
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) 
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            else 
+                WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT
@@ -414,16 +421,24 @@ class OverlayService : Service() {
 
     companion object {
         fun hasOverlayPermission(context: Context): Boolean {
-            return Settings.canDrawOverlays(context)
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Settings.canDrawOverlays(context)
+            } else {
+                // For older Android versions, always return true
+                true
+            }
         }
-
-        fun requestOverlayPermission(context: Context) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                android.net.Uri.parse("package:${context.packageName}")
-            )
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
+    
+        fun requestOverlayPermission(activity: Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasOverlayPermission(activity)) {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:${activity.packageName}")
+                )
+                activity.startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
+            }
         }
+    
+        private const val OVERLAY_PERMISSION_REQUEST_CODE = 5469
     }
 }

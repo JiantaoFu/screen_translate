@@ -6,6 +6,7 @@ import 'package:screen_translate/services/ocr_service.dart';
 import 'package:screen_translate/services/translation_service.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:flutter/material.dart';
 import '../services/overlay_service.dart';
 
 extension StringExtension on String {
@@ -24,8 +25,10 @@ class TranslationProvider with ChangeNotifier {
   final OCRService _ocrService;
   final TranslationService _translationService;
   final OverlayService _overlayService;
+  BuildContext? _context;
 
   TranslationProvider(
+    this._context,
     this._ocrService,
     this._translationService,
     this._overlayService,
@@ -53,13 +56,14 @@ class TranslationProvider with ChangeNotifier {
   Future<void> startTranslation() async {
     if (_isTranslating) return;
 
-    _isTranslating = true;
-    notifyListeners();
-
     if (Platform.isAndroid) {
       try {
-        await _startAndroidScreenCapture();
-        _startPeriodicCapture();
+        if (await _overlayService.ensureOverlayPermission(_context!)) {
+          _isTranslating = true;
+          notifyListeners();
+          await _startAndroidScreenCapture();
+          _startPeriodicCapture();
+        }
       } catch (e) {
         print('Error starting translation: $e');
         await stopTranslation();

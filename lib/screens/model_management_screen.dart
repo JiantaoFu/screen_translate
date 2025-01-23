@@ -1,6 +1,8 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/localization_extension.dart';
 
 enum ModelDownloadStatus {
   notDownloaded,
@@ -40,6 +42,8 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
   }
 
   Future<void> _toggleModelDownload(TranslateLanguage language) async {
+    final localizations = AppLocalizations.of(context)!;
+
     // Prevent multiple simultaneous actions
     if (_modelStatuses[language] == ModelDownloadStatus.downloading) return;
 
@@ -49,15 +53,17 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
       final confirmDelete = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Remove Translation Model'),
-          content: Text('Are you sure you want to remove the ${language.toString().split('.').last.capitalize()} translation model?'),
+          title: Text(localizations.remove_translation_model),
+          content: Text(
+            localizations.remove_translation_model_confirmation(localizations.getLocalizedValue('language_${language.bcpCode}')),
+          ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: Text(localizations.cancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: Text('Remove'),
+              child: Text(localizations.remove),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -88,7 +94,7 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
 
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove ${language.toString().split('.').last.capitalize()} model')),
+          SnackBar(content: Text(localizations.failed_to_remove_model(localizations.getLocalizedValue('language_${language.bcpCode}')))),
         );
       }
       return;
@@ -119,7 +125,7 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
 
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to download ${language.toString().split('.').last.capitalize()} model')),
+          SnackBar(content: Text(localizations.failed_to_download_model(localizations.getLocalizedValue('language_${language.bcpCode}')))),
         );
       }
 
@@ -141,13 +147,16 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Translation Model Management'),
+        title: Text(localizations.manage_translation_models),
       ),
       body: ListView(
         children: TranslateLanguage.values.map((language) {
-          final languageName = language.toString().split('.').last.capitalize();
+          final languageCode = language.bcpCode;
+          final languageName = localizations.getLocalizedValue('language_$languageCode');
 
           return ListTile(
             title: Text(languageName),
@@ -155,7 +164,7 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
               onTap: () => _toggleModelDownload(language),
               child: _buildModelStatusIndicator(language),
             ),
-            subtitle: Text(_getSubtitleText(language)),
+            subtitle: Text(_getSubtitleText(language, context)),
           );
         }).toList(),
       ),
@@ -180,18 +189,19 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
     }
   }
 
-  String _getSubtitleText(TranslateLanguage language) {
+  String _getSubtitleText(TranslateLanguage language, BuildContext context) {
     final status = _modelStatuses[language] ?? ModelDownloadStatus.notDownloaded;
+    final localizations = AppLocalizations.of(context)!;
 
     switch (status) {
       case ModelDownloadStatus.notDownloaded:
-        return 'Not Installed';
+        return localizations.not_installed;
       case ModelDownloadStatus.downloading:
-        return 'Downloading...';
+        return localizations.downloading;
       case ModelDownloadStatus.downloaded:
-        return 'Installed';
+        return localizations.installed;
       case ModelDownloadStatus.error:
-        return 'Download Failed';
+        return localizations.download_failed;
     }
   }
 }

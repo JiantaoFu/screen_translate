@@ -140,9 +140,16 @@ class OverlayService : Service() {
                     .scaleY(0.9f)
                     .setDuration(150)
                     .withEndAction {
-                        windowManager?.removeView(currentTooltip)
-                        if (tooltipView == currentTooltip) {
-                            tooltipView = null
+                        if (currentTooltip != null && currentTooltip.isAttachedToWindow) {
+                            try {
+                                windowManager?.removeView(currentTooltip)
+                                if (tooltipView == currentTooltip) {
+                                    tooltipView = null
+                                }
+                            } catch (e: IllegalArgumentException) {
+                                // Log the error or handle it gracefully
+                                Log.e("OverlayService", "Error removing tooltip view", e)
+                            }
                         }
                     }
                     .start()

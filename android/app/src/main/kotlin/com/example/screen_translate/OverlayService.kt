@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import android.widget.LinearLayout
 import android.view.ContextThemeWrapper
 import android.util.Log
+import com.example.screen_translate.LocalizationHelper
 
 class OverlayService : Service() {
     private var windowManager: WindowManager? = null
@@ -37,10 +38,14 @@ class OverlayService : Service() {
     private var tooltipHideRunnable: Runnable? = null
     private val handler = Handler()
 
-    enum class DisplayMode(val icon: Int, val description: String) {
-        TRANSLATION_ON(R.drawable.ic_translate_mode, "Translation Mode"),
-        ORIGINAL_ONLY(R.drawable.ic_original_mode, "Original Text Mode"),
-        SIDE_BY_SIDE(R.drawable.ic_side_by_side_mode, "Side by Side Mode")
+    enum class DisplayMode(val icon: Int, val labelKey: String) {
+        TRANSLATION_ON(R.drawable.ic_translate_mode, "translation_mode"),
+        ORIGINAL_ONLY(R.drawable.ic_original_mode, "original_text_mode"),
+        SIDE_BY_SIDE(R.drawable.ic_side_by_side_mode, "side_by_side_mode");
+    
+        fun getLocalizedLabel(context: Context): String {
+            return LocalizationHelper.getLocalizedString(context, labelKey)
+        }
     }
 
     private fun updateModeIcon() {
@@ -153,7 +158,7 @@ class OverlayService : Service() {
                 .setDuration(300)
                 .withEndAction { 
                     updateModeIcon()
-                    showTooltip(displayMode.description)
+                    showTooltip(displayMode.getLocalizedLabel(context))
                 }
                 .start()
         }
@@ -223,7 +228,7 @@ class OverlayService : Service() {
         }
 
         windowManager?.addView(controlButton, params)
-        showTooltip(displayMode.description)
+        showTooltip(displayMode.getLocalizedLabel(this))
     }
 
     private fun Int.dpToPx(): Int {

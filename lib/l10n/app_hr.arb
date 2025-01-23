@@ -23,7 +23,6 @@
   "failed_to_download_model": "Greška pri preuzimanju modela {language}",
   "translation_mode": "Način prevodovanja",
   "original_text_mode": "Originalni tekst",
-  "side_by_side_mode": "Na strani",
   "overlay_permission_required": "Način prevodovanja",
   "overlay_permission_required_content": "Ovaj program zahteva dozvolu za prevod na ekranu.",
   "grant_permission": "Dozvola",

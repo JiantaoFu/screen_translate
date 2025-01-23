@@ -23,7 +23,6 @@
   "failed_to_download_model": "Fehler beim Herunterladen des Übersetzungsmodells für {language}",
   "translation_mode": "Übersetzungsmodell",
   "original_text_mode": "Originaltextmodell",
-  "side_by_side_mode": "Seitengleich",
   "overlay_permission_required": "Møde kan oversættes på skærmen",
   "overlay_permission_required_content": "Dette program bruger tildelinger til at oversætte på skærmen.",
   "grant_permission": "Tildel tildelinger",

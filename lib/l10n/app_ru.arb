@@ -23,7 +23,6 @@
   "failed_to_download_model": "Не удалось загрузить модель для {language}",
   "translation_mode": "Модель перевода",
   "original_text_mode": "Модель оригинального текста",
-  "side_by_side_mode": "Модель стороннего текста",
   "overlay_permission_required": "Модель перевода",
   "overlay_permission_required_content": "Этот приложение требует разрешения на перевод на экране.",
   "grant_permission": "Позволить разрешения",

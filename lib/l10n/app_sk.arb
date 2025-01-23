@@ -23,7 +23,6 @@
   "failed_to_download_model": "Nelze stahnout model pre jazyk {language}",
   "translation_mode": "Módul prekladu",
   "original_text_mode": "Módul textu zdrojový",
-  "side_by_side_mode": "Módul textu straník",
   "overlay_permission_required": "Módul prekladu",
   "overlay_permission_required_content": "Tento program vyzaduje opračování prekladu na obrazovke.",
   "grant_permission": "Opračovat",

@@ -11,7 +11,7 @@ def convert_arb_to_json(arb_path, json_path):
     # Filter out Flutter-specific keys
     filtered_data = {k: v for k, v in arb_data.items() 
                      if not k.startswith('@') and 
-                     k in ['translation_mode', 'original_text_mode', 'side_by_side_mode']}
+                     k in ['translation_mode', 'original_text_mode']}
     
     with open(json_path, 'w') as json_file:
         json.dump(filtered_data, json_file, ensure_ascii=False, indent=2)

@@ -23,7 +23,6 @@
   "failed_to_download_model": "अनुवाद मॉडल {language} डाउनलोड करने में त्रुटि",
   "translation_mode": "अनुवाद मोड",
   "original_text_mode": "उर्व्यवस्थित टेक्स्ट मोड",
-  "side_by_side_mode": "साइड बय साइड मोड",
   "overlay_permission_required": "अनुवाद मोड",
   "overlay_permission_required_content": "अनुवाद मोड के लिए आपकी अनुमति आवश्यक है",
   "grant_permission": "अनुमति आवश्यक",

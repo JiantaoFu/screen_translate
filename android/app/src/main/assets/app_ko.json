@@ -1,5 +1,4 @@
 {
   "translation_mode": "번역 모델",
-  "original_text_mode": "원본 텍스트 모델",
-  "side_by_side_mode": "스라이드 모델"
+  "original_text_mode": "원본 텍스트 모델"
 }

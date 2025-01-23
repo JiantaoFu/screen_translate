@@ -23,7 +23,6 @@
   "failed_to_download_model": "翻訳モデルをダウンロードするのに失敗しました {language}",
   "translation_mode": "翻訳モデル",
   "original_text_mode": "オリジナルテキスト",
-  "side_by_side_mode": "両方向",
   "overlay_permission_required": "翻訳モデル",
   "overlay_permission_required_content": "このプログラムはスクリーンの翻訳を行うために権限が必要です。",
   "grant_permission": "権限を与える",

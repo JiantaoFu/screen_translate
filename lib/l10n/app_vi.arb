@@ -23,7 +23,6 @@
   "failed_to_download_model": "Lỗi khi tải mô hình dịch cho {language}",
   "translation_mode": "Chế độ dịch",
   "original_text_mode": "Chế độ văn bản gốc",
-  "side_by_side_mode": "Chế độ so sánh song song",
   "overlay_permission_required": "Chế độ dịch",
   "overlay_permission_required_content": "Chương trình nếu cần quyền trạch tại màn hình",
   "grant_permission": "Cung cấp quyền trạch",

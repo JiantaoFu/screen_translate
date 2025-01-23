@@ -23,7 +23,6 @@
   "failed_to_download_model": "Klaida atsisiunčiant {language} modelį",
   "translation_mode": "Vertimo Modelis",
   "original_text_mode": "Originalus Teksto Modelis",
-  "side_by_side_mode": "Kietoje Modelis",
   "overlay_permission_required": "Vertimo Modelis",
   "overlay_permission_required_content": "Šis programas turi butini prieigimo prie ekrano vertimui.",
   "grant_permission": "Griu prieiga",

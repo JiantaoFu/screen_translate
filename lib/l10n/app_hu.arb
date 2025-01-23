@@ -23,7 +23,6 @@
   "failed_to_download_model": "Hiba történt a(z) {language} modell letöltése közben",
   "translation_mode": "Fordítás náluk",
   "original_text_mode": "Erre a szöveg",
-  "side_by_side_mode": "Kijonosolt",
   "overlay_permission_required": "Fordítás náluk",
   "overlay_permission_required_content": "Fordítás náluk, hogy a kepernyő főnépének megfeleljen",
   "grant_permission": "Engedély",

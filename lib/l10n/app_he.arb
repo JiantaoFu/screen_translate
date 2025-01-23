@@ -23,7 +23,6 @@
   "failed_to_download_model": "שגיאה בהורדת מודל {language}",
   "translation_mode": "מודל תרגום",
   "original_text_mode": "מודל טקסט הפוך",
-  "side_by_side_mode": "מודל קצבית",
   "overlay_permission_required": "מודל תרגום",
   "overlay_permission_required_content": "פרוטם צריך להפוך את המסך לפנימי.",
   "grant_permission": "הפוך את המסך לפנימי",

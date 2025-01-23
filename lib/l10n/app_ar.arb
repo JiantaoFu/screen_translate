@@ -23,7 +23,6 @@
   "failed_to_download_model": "فشل تنزيل نموذج {language}",
   "translation_mode": "مودة الترجمة",
   "original_text_mode": "مودة النص الأصلي",
-  "side_by_side_mode": "مودة النصين الأحمر",
   "overlay_permission_required": "المسموح لرسم على الشاشة",
   "overlay_permission_required_content": "هذا البرنامج يحتاج اذن لرسم على الشاشة",
   "grant_permission": "المسموح",

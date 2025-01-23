@@ -43,9 +43,8 @@ class OverlayService : Service() {
 
     enum class DisplayMode(val icon: Int, val labelKey: String) {
         TRANSLATION_ON(R.drawable.ic_translate_mode, "translation_mode"),
-        ORIGINAL_ONLY(R.drawable.ic_original_mode, "original_text_mode"),
-        SIDE_BY_SIDE(R.drawable.ic_side_by_side_mode, "side_by_side_mode");
-    
+        ORIGINAL_ONLY(R.drawable.ic_original_mode, "original_text_mode");
+        
         fun getLocalizedLabel(context: Context): String {
             return LocalizationHelper.getLocalizedString(context, labelKey)
         }
@@ -161,8 +160,7 @@ class OverlayService : Service() {
 
     private fun switchMode() {
         displayMode = when (displayMode) {
-            DisplayMode.TRANSLATION_ON -> DisplayMode.SIDE_BY_SIDE
-            DisplayMode.SIDE_BY_SIDE -> DisplayMode.ORIGINAL_ONLY
+            DisplayMode.TRANSLATION_ON -> DisplayMode.ORIGINAL_ONLY
             DisplayMode.ORIGINAL_ONLY -> DisplayMode.TRANSLATION_ON
         }
         
@@ -348,12 +346,6 @@ class OverlayService : Service() {
                 DisplayMode.ORIGINAL_ONLY -> {
                     view.visibility = View.GONE
                     params.x = originalX
-                    params.y = originalY
-                    windowManager?.updateViewLayout(view, params)
-                }
-                DisplayMode.SIDE_BY_SIDE -> {
-                    view.visibility = View.VISIBLE
-                    params.x = originalX + view.width + 10.dpToPx()
                     params.y = originalY
                     windowManager?.updateViewLayout(view, params)
                 }

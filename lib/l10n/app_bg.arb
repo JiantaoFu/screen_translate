@@ -23,7 +23,6 @@
   "failed_to_download_model": "Неуспешно изтегляне на модел за {language}",
   "translation_mode": "Модел за превод",
   "original_text_mode": "Модел за оригинални текст",
-  "side_by_side_mode": "Модел за две страни",
   "overlay_permission_required": "Може да се рисуваме над други приложения",
   "overlay_permission_required_content": "Това приложение изисква разрешение за рисуване над други приложения.",
   "grant_permission": "Разрешение",

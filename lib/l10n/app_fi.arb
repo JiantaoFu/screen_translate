@@ -23,7 +23,6 @@
   "failed_to_download_model": "Lataaminen käännösmallista epäonnistui kielellä {language}",
   "translation_mode": "Käännösmalli asentaminen",
   "original_text_mode": "Käännösmalli asentaminen",
-  "side_by_side_mode": "Käännösmalli asentaminen",
   "overlay_permission_required": "Käännösmalli asentaminen",
   "overlay_permission_required_content": "This program requires permission to translate on the screen.",
   "grant_permission": "Give permission",

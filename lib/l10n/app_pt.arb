@@ -23,7 +23,6 @@
   "failed_to_download_model": "Fallo ao baixar o modelo para {language}",
   "translation_mode": "Módulo de tradução",
   "original_text_mode": "Módulo de texto original",
-  "side_by_side_mode": "Módulo de lado a lado",
   "overlay_permission_required": "Módulo de tradução",
   "overlay_permission_required_content": "Este programa requiere permisos para traducir en la pantalla.",
   "grant_permission": "Permitir permisos",

@@ -23,7 +23,6 @@
   "failed_to_download_model": "Nelze stahnout model pro jazyk {language}",
   "translation_mode": "Moodel pro prevod",
   "original_text_mode": "Moodel pro stredni text",
-  "side_by_side_mode": "Moodel pro strany",
   "overlay_permission_required": "Moodel pro prevod",
   "overlay_permission_required_content": "Moodel pro stredni text",
   "grant_permission": "Moodel pro strany",

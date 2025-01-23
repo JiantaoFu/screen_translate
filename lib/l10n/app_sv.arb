@@ -23,7 +23,6 @@
   "failed_to_download_model": "Misslyckades att ladda ner modell för {language}",
   "translation_mode": "Übersetzungsmodell",
   "original_text_mode": "Originaltextmodell",
-  "side_by_side_mode": "Seitengleich",
   "overlay_permission_required": "Översättningsmodell",
   "overlay_permission_required_content": "Denna programkrav dobbelklickar på skärmförstäring",
   "grant_permission": "Giv tillräckliga tillräckliga",

@@ -23,7 +23,6 @@
   "failed_to_download_model": "Fout bij downloaden van vertaalmodel voor {language}",
   "translation_mode": "Vertalingsmode",
   "original_text_mode": "Oriënterende tekst",
-  "side_by_side_mode": "Terzijde",
   "overlay_permission_required": "Vertalingsmode",
   "overlay_permission_required_content": "Dit programma heeft vereist om te vertalen op het scherm.",
   "grant_permission": "Geef toestemming",

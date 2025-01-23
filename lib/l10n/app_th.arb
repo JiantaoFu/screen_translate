@@ -23,7 +23,6 @@
   "failed_to_download_model": "การดาวน์โหลดโมเดลล้มเหลวสำหรับภาษา{language}",
   "translation_mode": "โหมดการแปล",
   "original_text_mode": "โหมดข้อความเดิม",
-  "side_by_side_mode": "โหมดด้านล่าง",
   "overlay_permission_required": "โหมดการแปล",
   "overlay_permission_required_content": "โปรแกรมนี้ต้องการสิทธิ์ในการแปลบนหน้าจอ",
   "grant_permission": "อนุญาตสิทธิ์",

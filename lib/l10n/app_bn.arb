@@ -23,7 +23,6 @@
   "failed_to_download_model": "{language} মডেল ডাউনলোড করতে ব্যর্থ হয়েছে",
   "translation_mode": "অনুবাদ মডেল",
   "original_text_mode": "স্থানী লেখা মডেল",
-  "side_by_side_mode": "সাইড বাই সাইড মডেল",
   "overlay_permission_required": "স্ক্রিন রিসিজ করার জন্য অনুমতি প্রদান করুন",
   "overlay_permission_required_content": "এই অ্যাপ্লিকেশনে স্ক্রিন রিসিজ করার জন্য অনুমতি প্রদান করুন",
   "grant_permission": "অনুমতি প্রদান",

@@ -23,7 +23,6 @@
   "failed_to_download_model": "Impossibile scaricare il modello di traduzione per {language}",
   "translation_mode": "Modalità di traduzione",
   "original_text_mode": "Testo originale",
-  "side_by_side_mode": "Con l'altro",
   "overlay_permission_required": "Modalità di traduzione",
   "overlay_permission_required_content": "Questo programma ha bisogno di permessi per tradurre sullo schermo.",
   "grant_permission": "Gestisci permessi",

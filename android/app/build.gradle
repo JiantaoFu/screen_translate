@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace "com.example.screen_translate"
+    namespace "com.lomoware.screen_translate"
     compileSdkVersion rootProject.ext.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -24,16 +24,25 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.screen_translate"
+        applicationId "com.lomoware.screen_translate"
         minSdkVersion 21
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../screen-trans-key.keystore")
+            storePassword "Jiantao123!"
+            keyAlias "screen-trans"
+            keyPassword "Jiantao123!"
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

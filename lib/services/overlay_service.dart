@@ -4,7 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OverlayService {
   static const MethodChannel _channel =
-      MethodChannel('com.example.screen_translate/overlay');
+      MethodChannel('com.lomoware.screen_translate/overlay');
 
   // Static method to show overlay permission dialog
   static Future<bool> showOverlayPermissionDialog(BuildContext context) async {

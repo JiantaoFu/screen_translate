@@ -1,4 +1,4 @@
-package com.example.screen_translate
+package com.lomoware.screen_translate
 
 import android.app.Activity
 import android.content.Context

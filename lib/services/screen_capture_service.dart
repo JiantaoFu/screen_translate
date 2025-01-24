@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class ScreenCaptureService {
-  static const platform = MethodChannel('com.example.screen_translate/screen_capture');
+  static const platform = MethodChannel('com.lomoware.screen_translate/screen_capture');
   bool _isCapturing = false;
   Timer? _debounceTimer;
   static const _debounceTime = Duration(milliseconds: 500);

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 class AndroidScreenCaptureService {
   static const MethodChannel _channel =
-      MethodChannel('com.example.screen_translate/screen_capture');
+      MethodChannel('com.lomoware.screen_translate/screen_capture');
 
   Future<bool> requestScreenCapture() async {
     try {

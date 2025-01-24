@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     
     <application
-        android:label="screen_translate"
+        android:label="Screen Translate"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -19,8 +19,11 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Surface
 import android.view.WindowManager
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -29,6 +32,39 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.math.abs
+
+data class CapturedFrame(
+    val frameBytes: ByteArray,
+    val timestamp: Long,
+    val width: Int,
+    val height: Int
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CapturedFrame
+
+        if (!frameBytes.contentEquals(other.frameBytes)) return false
+        if (timestamp != other.timestamp) return false
+        if (width != other.width) return false
+        if (height != other.height) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = frameBytes.contentHashCode()
+        result = 31 * result + timestamp.hashCode()
+        result = 31 * result + width
+        result = 31 * result + height
+        return result
+    }
+
+    override fun toString(): String {
+        return "CapturedFrame(timestamp=$timestamp, dimensions=${width}x$height)"
+    }
+}
 
 class FrameStabilizer(
     private var screenWidth: Int, 
@@ -80,15 +116,6 @@ class FrameStabilizer(
         }
 
         return differentPixels.toDouble() / totalPixels
-    }
-
-    // Method to update screen dimensions on orientation change
-    fun updateScreenDimensions(newWidth: Int, newHeight: Int) {
-        Log.d("FrameStabilizer", "Screen dimensions updated: $newWidth x $newHeight")
-        screenWidth = newWidth
-        screenHeight = newHeight
-        // Reset last hash to force processing of next frame
-        lastImageHash = 0
     }
 
     private fun computeImageHash(bytes: ByteArray): Long {
@@ -161,67 +188,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private val frameCount = AtomicInteger(0)
     private val MAX_QUEUE_SIZE = 1
     private val MAX_FRAME_AGE = 2000L
-    private val imageQueue = ConcurrentLinkedDeque<Pair<ByteArray, Long>>() // Pair of bytes and timestamp
+    private val imageQueue = ConcurrentLinkedDeque<CapturedFrame>() // Pair of bytes and timestamp
     private val handlerThread = HandlerThread("ImageReaderThread").apply { start() }
     private val imageReaderHandler = Handler(handlerThread.looper)
     private val mainHandler = Handler(Looper.getMainLooper())
     private lateinit var frameStabilizer: FrameStabilizer
-
-    // Add a broadcast receiver to handle configuration changes
-    private val configurationChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Intent.ACTION_CONFIGURATION_CHANGED -> {
-                    Log.d(TAG, "Configuration changed broadcast received")
-                    
-                    val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                    val display = windowManager.defaultDisplay
-                    val displayMetrics = DisplayMetrics()
-                    display.getMetrics(displayMetrics)
-
-                    val currentConfiguration = context.resources.configuration
-                    
-                    Log.d(TAG, "Current Configuration:")
-                    Log.d(TAG, "Orientation: ${currentConfiguration.orientation}")
-                    Log.d(TAG, "Screen Width (dp): ${currentConfiguration.screenWidthDp}")
-                    Log.d(TAG, "Screen Height (dp): ${currentConfiguration.screenHeightDp}")
-                    Log.d(TAG, "Screen Layout: ${currentConfiguration.screenLayout}")
-                    
-                    Log.d(TAG, "Display Metrics:")
-                    Log.d(TAG, "Width (pixels): ${displayMetrics.widthPixels}")
-                    Log.d(TAG, "Height (pixels): ${displayMetrics.heightPixels}")
-                    Log.d(TAG, "Density: ${displayMetrics.density}")
-
-                    // Trigger virtual display restart with new dimensions
-                    handleScreenOrientationChange(
-                        displayMetrics.widthPixels, 
-                        displayMetrics.heightPixels
-                    )
-                }
-            }
-        }
-    }
-
-    // Method to register configuration change listener
-    private fun registerConfigurationChangeListener() {
-        try {
-            val intentFilter = IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
-            context.registerReceiver(configurationChangeReceiver, intentFilter)
-            Log.d(TAG, "Configuration change listener registered")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error registering configuration change listener", e)
-        }
-    }
-
-    // Method to unregister configuration change listener
-    private fun unregisterConfigurationChangeListener() {
-        try {
-            context.unregisterReceiver(configurationChangeReceiver)
-            Log.d(TAG, "Configuration change listener unregistered")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error unregistering configuration change listener", e)
-        }
-    }
+    private var latestResultCode: Int = 0
+    private lateinit var latestProjectionIntent: Intent
+    private lateinit var latestProjectionResult: MethodChannel.Result
+    private var currentRotation: Int = 0
 
     init {
         val metrics = context.resources.displayMetrics
@@ -268,9 +243,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     setupVirtualDisplay()
                     isCapturing.set(true) // Set capturing to true when projection starts
                     result.success(true)
-                    
-                    // Register configuration change listener
-                    registerConfigurationChangeListener()
                 } catch (e: Exception) {
                     Log.e(TAG, "Error creating MediaProjection", e)
                     result.error("PROJECTION_ERROR", "Error creating MediaProjection: ${e.message}", null)
@@ -287,12 +259,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     fun stopProjection() {
         Log.d(TAG, "Stopping projection")
         try {
+            mediaProjection?.stop()
+            mediaProjection = null
             cleanup()
             isCapturing.set(false) // Set capturing to false when projection stops
             context.stopService(Intent(context, ForegroundService::class.java))
-            
-            // Unregister configuration change listener
-            unregisterConfigurationChangeListener()
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping projection", e)
         }
@@ -307,15 +278,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
            
             val frame = imageQueue.pollLast() // Atomically peek and remove
             if (frame != null) {
-                val (bytes, timestamp) = frame
+                val (bytes, timestamp, width, height) = frame
                 val age = System.currentTimeMillis() - timestamp
                 
                 if (age <= MAX_FRAME_AGE) {
                     Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms")
                     result.success(mapOf(
                         "bytes" to bytes,
-                        "width" to screenWidth,
-                        "height" to screenHeight
+                        "width" to width,
+                        "height" to height
                     ))
                 } else {
                     Log.w(TAG, "Frame too old: ${age}ms")
@@ -384,35 +355,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
-    private fun restartVirtualDisplay(newWidth: Int, newHeight: Int) {
-        Log.d(TAG, "Restarting virtual display with new dimensions: ${newWidth}x${newHeight}")
-
-        imageQueue.clear()
-        frameCount.set(0)
-
-        // Update frame stabilizer with new dimensions
-        frameStabilizer.updateScreenDimensions(newWidth, newHeight)
-        
-        // Update local screen dimensions
-        screenWidth = newWidth
-        screenHeight = newHeight
-
-        setupVirtualDisplay()
-        
-        Log.d(TAG, "Virtual display restarted successfully")
-    }
-
-    fun handleScreenOrientationChange(newWidth: Int, newHeight: Int) {
-        // Only restart if dimensions have actually changed
-        if (newWidth != screenWidth || newHeight != screenHeight) {
-            Log.d(TAG, "Screen orientation change detected")
-            Log.d(TAG, "Old dimensions: ${screenWidth}x${screenHeight}")
-            Log.d(TAG, "New dimensions: ${newWidth}x${newHeight}")
-            
-            restartVirtualDisplay(newWidth, newHeight)
-        }
-    }
-
     private fun cleanup() {
         try {
             Log.d(TAG, "Starting cleanup")
@@ -470,6 +412,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 synchronized(reader) {
                     val image = reader.acquireLatestImage()
                     if (image != null) {
+                        val width = image.width
+                        val height = image.height
+                        Log.d(TAG, "Captured image dimensions: ${width}x${height}")
+                        // saveImagePreview(image, width, height, currentRotation)
+
                         val bytes = imageToBytes(image)
                         if (bytes != null) {
                             if (frameStabilizer.detectScrolling(bytes)) {
@@ -485,7 +432,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                                 while (imageQueue.size >= MAX_QUEUE_SIZE) {
                                     imageQueue.removeFirst()
                                 }
-                                imageQueue.addLast(Pair(stableFrame, currentTime))
+                                imageQueue.addLast(CapturedFrame(stableFrame, currentTime, width, height))
                                 Log.d(TAG, "New frame queued, queue size: ${imageQueue.size}")
                             }
                         } else {
@@ -497,6 +444,37 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             } catch (e: Exception) {
                 Log.e(TAG, "Unexpected error in image available listener", e)
             }
+        }
+    }
+
+    private fun saveImagePreview(image: Image, width: Int, height: Int, rotation: Int) {
+        try {
+            // Create bitmap directly from the first plane (ARGB)
+            val planes = image.planes
+            val buffer = planes[0].buffer
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            bitmap.copyPixelsFromBuffer(buffer)
+
+            // Create a unique filename with timestamp and rotation
+            val timestamp = System.currentTimeMillis()
+            val filename = "screen_capture_${timestamp}_rot${rotation}.png"
+            
+            // Get the external files directory
+            val directory = context.getExternalFilesDir(null)
+            val file = File(directory, "previews/$filename")
+            
+            // Ensure the directory exists
+            file.parentFile?.mkdirs()
+
+            // Save the bitmap
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+
+            Log.d(TAG, "Image preview saved: ${file.absolutePath}")
+            Log.d(TAG, "Image details: ${width}x${height}, rotation: $rotation")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving image preview", e)
         }
     }
 

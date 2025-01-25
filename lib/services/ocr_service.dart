@@ -95,7 +95,7 @@ class OCRService {
         if (block.text.trim().isNotEmpty && 
             adjustedBox.width > 0 && 
             adjustedBox.height > 0) {
-          _logger.info('Text block recognized at position: $adjustedBox, text: ${block.text}');
+          _logger.info('Text block recognized at position: $adjustedBox, text: ${block.text}, bounding box: ${block.boundingBox.width}x${block.boundingBox.height}');
           results.add(OCRResult(
             text: block.text,
             x: adjustedBox.left,

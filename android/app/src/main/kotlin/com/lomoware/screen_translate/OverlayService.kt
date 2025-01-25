@@ -24,7 +24,9 @@ import android.util.Log
 import android.os.Build
 import android.app.Activity
 import android.net.Uri
+import android.view.Surface
 import com.lomoware.screen_translate.LocalizationHelper
+import android.util.DisplayMetrics
 
 class OverlayService : Service() {
     private var windowManager: WindowManager? = null
@@ -40,6 +42,111 @@ class OverlayService : Service() {
     private var originalY = 0
     private var tooltipHideRunnable: Runnable? = null
     private val handler = Handler()
+    private var screenWidth: Int = 0
+    private var screenHeight: Int = 0
+    private var oldScreenWidth: Int = 0
+    private var oldScreenHeight: Int = 0
+    private var screenDensity: Int = 0
+    private var currentRotation: Int = Surface.ROTATION_0
+    private var TAG = "OverlayService"
+
+    companion object {
+        // Use @Volatile to ensure visibility across threads
+        @Volatile
+        private var instance: OverlayService? = null
+
+        // Thread-safe getInstance method using double-checked locking
+        fun getInstance(): OverlayService? {
+            // First check without locking
+            if (instance == null) {
+                synchronized(this) {
+                    // Second check with locking
+                    if (instance == null) {
+                        return null
+                    }
+                }
+            }
+            return instance
+        }
+
+        // Thread-safe setInstance method
+        fun setInstance(service: OverlayService) {
+            synchronized(this) {
+                instance = service
+            }
+        }
+
+        // Thread-safe clearInstance method
+        fun clearInstance() {
+            synchronized(this) {
+                instance = null
+            }
+        }
+
+        fun hasOverlayPermission(context: Context): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Settings.canDrawOverlays(context)
+            } else {
+                // For older Android versions, always return true
+                true
+            }
+        }
+    
+        fun requestOverlayPermission(activity: Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasOverlayPermission(activity)) {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:${activity.packageName}")
+                )
+                activity.startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
+            }
+        }
+    
+        private const val OVERLAY_PERMISSION_REQUEST_CODE = 5469
+    }
+
+    private lateinit var displayMetrics: DisplayMetrics
+    private var windowManagerInstance: WindowManager? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        
+        // Initialize display metrics in onCreate
+        displayMetrics = DisplayMetrics()
+        windowManagerInstance = getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        
+        try {
+            // Try to get metrics from WindowManager
+            windowManagerInstance?.defaultDisplay?.getMetrics(displayMetrics)
+            
+            screenWidth = displayMetrics.widthPixels
+            screenHeight = displayMetrics.heightPixels
+            screenDensity = displayMetrics.densityDpi
+        } catch (e: Exception) {
+            // Fallback to resources if WindowManager fails
+            Log.e(TAG, "Failed to get metrics from WindowManager", e)
+            
+            val resources = applicationContext?.resources
+            if (resources != null) {
+                screenWidth = resources.displayMetrics.widthPixels
+                screenHeight = resources.displayMetrics.heightPixels
+                screenDensity = resources.displayMetrics.densityDpi
+            } else {
+                Log.e(TAG, "Both WindowManager and resources metric retrieval failed")
+                // Set some default or safe values
+                screenWidth = 1080  // Common Full HD width
+                screenHeight = 1920 // Common Full HD height
+                screenDensity = 480 // Common high-density DPI
+            }
+        }
+        oldScreenWidth = screenWidth
+        oldScreenHeight = screenHeight
+        
+        Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
+        setInstance(this)
+        windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        createControlButton()
+    }
 
     enum class DisplayMode(val icon: Int, val labelKey: String) {
         TRANSLATION_ON(R.drawable.ic_translate_mode, "translation_mode"),
@@ -178,12 +285,6 @@ class OverlayService : Service() {
         updateOverlayVisibility()
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        createControlButton()
-    }
-
     private fun createControlButton() {
         controlButton = ImageView(this).apply {
             setImageResource(displayMode.icon)
@@ -269,6 +370,14 @@ class OverlayService : Service() {
             }
         }
 
+        val (transformedX, transformedY) = if (x != -1f && y != -1f) {
+            reverseAspectRatioCoordinates(x, y, oldScreenWidth, oldScreenHeight, screenWidth, screenHeight)
+        } else {
+            Pair(x, y)
+        }
+
+        Log.d(TAG, "Showing overlay at transformed coordinates: ($transformedX, $transformedY)")
+
         val themedContext = ContextThemeWrapper(this, R.style.Theme_AppCompat_Light)
         val overlayView = AppCompatTextView(themedContext).apply {
             setText(text)
@@ -286,8 +395,7 @@ class OverlayService : Service() {
             )
         }
 
-
-        val layoutParams = createLayoutParams(x, y, width, height)   
+        val layoutParams = createLayoutParams(transformedX, transformedY, width, height)   
         originalPositions[id] = Pair(layoutParams.x, layoutParams.y)
         overlayViews[id] = overlayView
         overlayParams[id] = layoutParams
@@ -418,26 +526,80 @@ class OverlayService : Service() {
         windowManager = null
     }
 
-    companion object {
-        fun hasOverlayPermission(context: Context): Boolean {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Settings.canDrawOverlays(context)
-            } else {
-                // For older Android versions, always return true
-                true
-            }
+
+    fun reverseAspectRatioCoordinates(x: Float, y: Float, originalWidth: Int, originalHeight: Int, newWidth: Int, newHeight: Int): Pair<Float, Float> {
+        // Log input parameters
+        Log.d(TAG, "Reverse Aspect Ratio Coordinates Input:")
+        Log.d(TAG, "Original Coordinates: (x: $x, y: $y)")
+        Log.d(TAG, "Original Dimensions: ${originalWidth}x$originalHeight")
+        Log.d(TAG, "New Dimensions: ${newWidth}x$newHeight")
+
+        // Calculate aspect ratios
+        val originalAspectRatio = originalWidth.toFloat() / originalHeight
+        val newAspectRatio = newWidth.toFloat() / newHeight
+
+        Log.d(TAG, "Original Aspect Ratio: $originalAspectRatio")
+        Log.d(TAG, "New Aspect Ratio: $newAspectRatio")
+
+        // Adjust coordinates based on aspect ratio
+        val adjustedX: Float
+        val adjustedY: Float
+
+        if (originalAspectRatio < newAspectRatio) {
+            // New width is the limiting factor
+            val scaleFactor =  originalWidth.toFloat() / newWidth
+            adjustedX = x / scaleFactor
+            adjustedY = (y - (originalHeight - newHeight * scaleFactor) / 2) / scaleFactor
+            
+            Log.d(TAG, "Width is limiting factor")
+            Log.d(TAG, "Scale Factor: $scaleFactor")
+        } else {
+            // no need b/c no scaling in this case
+            adjustedX = x
+            adjustedY = y
         }
-    
-        fun requestOverlayPermission(activity: Activity) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasOverlayPermission(activity)) {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:${activity.packageName}")
-                )
-                activity.startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
-            }
+
+        // Log output coordinates
+        Log.d(TAG, "Adjusted Coordinates: (x: $adjustedX, y: $adjustedY)")
+
+        return Pair(adjustedX, adjustedY)
+    }
+
+    // Direct method to update display information
+    fun updateDisplayInfo(
+        widthPixels: Int, 
+        heightPixels: Int, 
+        density: Float, 
+        rotation: Int
+    ) {
+        Log.d(TAG, "Updating Display Info:")
+        Log.d(TAG, "Width Pixels: $widthPixels")
+        Log.d(TAG, "Height Pixels: $heightPixels")
+        Log.d(TAG, "Density: $density")
+        Log.d(TAG, "Rotation: $rotation")
+        Log.d(TAG, "Rotation Description: ${when(rotation) {
+            Surface.ROTATION_0 -> "Portrait"
+            Surface.ROTATION_90 -> "Landscape (90°)"
+            Surface.ROTATION_180 -> "Portrait (180°)"
+            Surface.ROTATION_270 -> "Landscape (270°)"
+            else -> "Unknown"
+        }}")
+
+        // Update rotation
+        currentRotation = rotation
+
+        // Only update dimensions if they've changed
+        if (widthPixels != screenWidth || heightPixels != screenHeight || density.toInt() != screenDensity) {
+            Log.d(TAG, "Screen orientation change detected")
+            Log.d(TAG, "Old dimensions: ${screenWidth}x${screenHeight}, density: $screenDensity")
+            Log.d(TAG, "New dimensions: ${widthPixels}x${heightPixels}, density: ${density.toInt()}")
+
+            // Update local screen dimensions
+            oldScreenWidth = screenWidth
+            oldScreenHeight = screenHeight
+            screenWidth = widthPixels
+            screenHeight = heightPixels
+            screenDensity = density.toInt()
         }
-    
-        private const val OVERLAY_PERMISSION_REQUEST_CODE = 5469
     }
 }

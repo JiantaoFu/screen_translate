@@ -97,6 +97,14 @@ class MainActivity: FlutterActivity() {
                     val width = call.argument<Double>("width")?.toFloat()
                     val height = call.argument<Double>("height")?.toFloat()
                     val id = call.argument<Int>("id")
+                    val overlayColor = call.argument<Long>("overlayColor")?.toInt()
+                    val backgroundColor = call.argument<Long>("backgroundColor")?.toInt()
+                    val isLight = call.argument<Boolean>("isLight")
+                    
+                    // Debug logging for colors
+                    Log.d(TAG, "Overlay Color: ${overlayColor?.let { String.format("#%06X", 0xFFFFFF and it) }}")
+                    Log.d(TAG, "Background Color: ${backgroundColor?.let { String.format("#%06X", 0xFFFFFF and it) }}")
+                    
                     if (text != null && id != null) {
                         val intent = Intent(this, OverlayService::class.java)
                         intent.action = "show"
@@ -111,6 +119,15 @@ class MainActivity: FlutterActivity() {
                         }
                         if (height != null) {
                             intent.putExtra("height", height)
+                        }
+                        if (overlayColor != null) {
+                            intent.putExtra("overlayColor", overlayColor)
+                        }
+                        if (backgroundColor != null) {
+                            intent.putExtra("backgroundColor", backgroundColor)
+                        }
+                        if (isLight != null) {
+                            intent.putExtra("isLight", isLight)
                         }
                         startService(intent)
                         result.success(true)

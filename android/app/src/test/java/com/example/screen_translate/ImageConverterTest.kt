@@ -3,13 +3,16 @@ package com.lomoware.screen_translate
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.media.Image
 import android.media.ImageReader
 import android.util.DisplayMetrics
+import com.lomoware.screen_translate.utils.ColorUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
 import org.mockito.Mockito.*
+import org.robolectric.shadows.ShadowLog
 import java.nio.ByteBuffer
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -26,6 +29,8 @@ class ImageConverterTest {
     
     @Before
     fun setup() {
+        ShadowLog.stream = System.out
+        
         // Create mocks
         mockContext = mock(Context::class.java)
         mockActivity = mock(Activity::class.java)
@@ -62,29 +67,17 @@ class ImageConverterTest {
 
     @Test
     fun `test output format matches ML Kit requirements`() {
-        // Create a test pattern that makes it easy to verify byte order
+        // Create a test pattern with all black pixels
         val width = 2
-        val height = 1
+        val height = 2
         val pixelStride = 4
         val rowStride = width * pixelStride
         
-        // Input data in RGBA format with known values
-        // Pixel 1: R=0xFF, G=0x00, B=0x00, A=0xFF (Pure Red)
-        // Pixel 2: R=0x00, G=0xFF, B=0x00, A=0xFF (Pure Green)
-        val inputData = byteArrayOf(
-            // RGBA RGBA
-            0xFF.toByte(), 0x00.toByte(), 0x00.toByte(), 0xFF.toByte(),  // Pure Red with full alpha
-            0x00.toByte(), 0xFF.toByte(), 0x00.toByte(), 0xFF.toByte()   // Pure Green with full alpha
-        )
+        // Input data in RGBA format with all black pixels
+        val inputData = ByteArray(width * height * 4) { 0 }
         
-        // Expected output in BGRA format
-        // Pixel 1: B=0x00, G=0x00, R=0xFF, A=0xFF
-        // Pixel 2: B=0x00, G=0xFF, R=0x00, A=0xFF
-        val expectedOutput = byteArrayOf(
-            // BGRA BGRA
-            0x00.toByte(), 0x00.toByte(), 0xFF.toByte(), 0xFF.toByte(),  // Red pixel in BGRA
-            0x00.toByte(), 0xFF.toByte(), 0x00.toByte(), 0xFF.toByte()   // Green pixel in BGRA
-        )
+        // Expected output in NV21 format
+        val expectedOutputSize = width * height + 2 * ((height + 1) / 2) * ((width + 1) / 2)
         
         // Create mock image
         val image = createMockImage(width, height, pixelStride, rowStride, inputData)
@@ -92,36 +85,70 @@ class ImageConverterTest {
         // Convert image
         val result = service.imageToBytes(image)
         
-        // Verify output
+        // Assertions
         assertNotNull("Conversion result should not be null", result)
-        assertEquals("Output size should match expected size", expectedOutput.size, result!!.size)
+        assertEquals("Output size should match NV21 format", expectedOutputSize, result!!.size)
         
-        // Verify each byte matches expected BGRA format
-        for (i in result.indices) {
+        // Dump full result bytes
+        println("Full result bytes:")
+        result.forEachIndexed { index, byte ->
+            println("Byte $index: ${byte.toInt() and 0xFF} (0x${(byte.toInt() and 0xFF).toString(16).padStart(2, '0')})")
+        }
+        
+        // Verify Y plane (luminance)
+        // For black pixels, Y value is ((66 * 0 + 129 * 0 + 25 * 0 + 128) shr 8) + 16 = 16
+        val expectedY = ByteArray(width * height) { 16.toByte() }
+        
+        // Verify Y plane values
+        for (i in 0 until width * height) {
+            val expectedValue = expectedY[i].toInt() and 0xFF
+            val actualValue = result[i].toInt() and 0xFF
+            
+            println("Y Plane Position $i:")
+            println("  Expected Y value: ${expectedValue.toString(16).padStart(2, '0')}")
+            println("  Actual Y value:   ${actualValue.toString(16).padStart(2, '0')}")
+            
             assertEquals(
-                "Byte at position $i should match expected BGRA format",
-                expectedOutput[i].toInt() and 0xFF,
-                result[i].toInt() and 0xFF
+                "Y plane value at position $i should match expected luminance",
+                expectedValue,
+                actualValue
             )
         }
         
-        // Additional verification of color channels
-        fun verifyPixel(offset: Int, b: Int, g: Int, r: Int, a: Int) {
-            assertEquals("B channel at offset $offset", b, result[offset + 0].toInt() and 0xFF)
-            assertEquals("G channel at offset $offset", g, result[offset + 1].toInt() and 0xFF)
-            assertEquals("R channel at offset $offset", r, result[offset + 2].toInt() and 0xFF)
-            assertEquals("A channel at offset $offset", a, result[offset + 3].toInt() and 0xFF)
+        // Verify UV plane values
+        val uvStart = width * height
+        val uvSize = width * height / 4  // Correct UV plane size for NV21
+        
+        println("\nUV Plane Bytes:")
+        for (i in 0 until uvSize) {
+            // First byte is V, second is U
+            val vValue = result[uvStart + i * 2].toInt() and 0xFF
+            val uValue = result[uvStart + i * 2 + 1].toInt() and 0xFF
+            
+            println("UV Block $i:")
+            println("  V value: ${vValue.toString(16).padStart(2, '0')}")
+            println("  U value: ${uValue.toString(16).padStart(2, '0')}")
+            
+            // Both V and U should be 128 for black pixels
+            assertEquals(
+                "V plane value at block $i should be 128 (neutral chrominance)",
+                128,
+                vValue
+            )
+            assertEquals(
+                "U plane value at block $i should be 128 (neutral chrominance)",
+                128,
+                uValue
+            )
         }
         
-        // Verify first pixel (Red)
-        verifyPixel(0, 0x00, 0x00, 0xFF, 0xFF)
+        // Verify dominant color extraction
+        val dominantColor = ColorUtils.extractDominantColorFromNV21(result, width, height)
+        println("Dominant color: ${String.format("#%06X", 0xFFFFFF and dominantColor)}")
         
-        // Verify second pixel (Green)
-        verifyPixel(4, 0x00, 0xFF, 0x00, 0xFF)
-        
-        // Log the actual bytes for debugging
-        println("Input bytes: ${inputData.joinToString { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }}")
-        println("Output bytes: ${result.joinToString { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }}")
-        println("Expected bytes: ${expectedOutput.joinToString { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }}")
+        // Black image should result in very dark color
+        assertTrue(Color.red(dominantColor) <= 20)
+        assertTrue(Color.green(dominantColor) <= 20)
+        assertTrue(Color.blue(dominantColor) <= 20)
     }
 }

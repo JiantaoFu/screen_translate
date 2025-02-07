@@ -352,7 +352,7 @@ class OverlayService : Service() {
         ).toInt()
     }
 
-    private fun showOverlay(id: Int, text: String, x: Float = -1f, y: Float = -1f, width: Float = -1f, height: Float = -1f) {
+    private fun showOverlay(id: Int, text: String, x: Float = -1f, y: Float = -1f, width: Float = -1f, height: Float = -1f, overlayColor: Int = -1, backgroundColor: Int = -1, isLight: Boolean = false) {
         if (!hasOverlayPermission(this)) {
             print("Cannot show overlay: permission not granted")
             return
@@ -381,8 +381,19 @@ class OverlayService : Service() {
         val themedContext = ContextThemeWrapper(this, R.style.Theme_AppCompat_Light)
         val overlayView = AppCompatTextView(themedContext).apply {
             setText(text)
-            setTextColor(android.graphics.Color.WHITE)
-            setBackgroundColor(android.graphics.Color.argb(220, 0, 0, 0))
+            
+            // Use dynamic overlay color from OCR result
+            val overlayTextColor = if (isLight) Color.WHITE else Color.BLACK
+            val overlayBackgroundColor = Color.argb(
+                220, 
+                Color.red(overlayColor), 
+                Color.green(overlayColor), 
+                Color.blue(overlayColor)
+            )
+            
+            setTextColor(overlayTextColor)
+            setBackgroundColor(overlayBackgroundColor)
+
             setPadding(2, 1, 2, 1)
 
             setSingleLine(false)
@@ -504,9 +515,13 @@ class OverlayService : Service() {
                 val y = intent.getFloatExtra("y", -1f)
                 val width = intent.getFloatExtra("width", -1f)
                 val height = intent.getFloatExtra("height", -1f)
-                val id = intent.getIntExtra("id", -1)
+                val id = intent.getIntExtra("id", -1)           
+                val overlayColor = intent.getIntExtra("overlayColor", -1)
+                val backgroundColor = intent.getIntExtra("backgroundColor", -1)
+                val isLight = intent.getBooleanExtra("isLight", false)
+                
                 if (text != null && id >= 0) {
-                    showOverlay(id, text, x, y, width, height)
+                    showOverlay(id, text, x, y, width, height, overlayColor, backgroundColor, isLight)
                 }
             }
             "hideAll" -> {

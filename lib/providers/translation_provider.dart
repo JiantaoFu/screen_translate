@@ -99,6 +99,9 @@ class TranslationProvider with ChangeNotifier {
                     y: ocrResult.y,
                     width: ocrResult.width,
                     height: ocrResult.height,
+                    overlayColor: ocrResult.overlayColor,
+                    backgroundColor: ocrResult.backgroundColor,
+                    isLight: ocrResult.isLight,
                   );
                 }
               }

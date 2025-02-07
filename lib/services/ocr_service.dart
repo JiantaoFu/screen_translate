@@ -4,6 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:logging/logging.dart';
 import '../models/ocr_result.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
+import '../utils/color_utils.dart';
+
+extension ColorAdaptation on Color {
+  // Determine if a color is considered "light"
+  bool isLight() {
+    // Consider a color dark if its luminance is below 0.3
+    return computeLuminance() >= 0.3;
+  }
+
+  // Create a contrasting color for text overlay
+  Color getContrastColor() {
+    return isLight() ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.7);
+  }
+
+  String toLoggableString() {
+    return '#${red.toRadixString(16).padLeft(2, '0')}${green.toRadixString(16).padLeft(2, '0')}${blue.toRadixString(16).padLeft(2, '0')}';
+  }
+}
 
 class OCRService {
   TextRecognizer? _textRecognizer;
@@ -66,6 +86,10 @@ class OCRService {
       final textRecognizer = getTextRecognizer(script);
       final RecognizedText recognizedText = await textRecognizer.processImage(image);
       
+      // Extract dominant background color
+      final Color backgroundColor = ColorUtils.extractDominantColorFromNV21(imageBytes, width, height);
+      final Color overlayColor = backgroundColor.getContrastColor();
+      
       final List<OCRResult> results = [];
       
       // Sort blocks by size (largest first) to prioritize main text blocks
@@ -102,12 +126,20 @@ class OCRService {
             y: adjustedBox.top,
             width: adjustedBox.width,
             height: adjustedBox.height,
+            overlayColor: overlayColor,
+            backgroundColor: backgroundColor,
+            isLight: backgroundColor.isLight(),
           ));
           processedAreas.add(adjustedBox);
         }
       }
       
       _logger.info('OCR: Found ${results.length} text blocks');
+
+      // Log final results
+      _logger.info('Background Color: ${backgroundColor.toLoggableString()}');
+      _logger.info('OCR: Found ${results.length} text blocks with overlay color ${overlayColor.toLoggableString()}');
+
       return results;
     } catch (e) {
       _logger.severe('OCR Error: $e');

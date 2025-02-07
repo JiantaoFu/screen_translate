@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
@@ -31,7 +32,11 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.Timer
 import java.util.TimerTask
+import android.graphics.ImageFormat
 import kotlin.math.abs
+import android.os.Build
+import com.lomoware.screen_translate.utils.ColorUtils
+import com.lomoware.screen_translate.utils.extractDominantColor
 
 data class CapturedFrame(
     val frameBytes: ByteArray,
@@ -404,10 +409,10 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
     private fun createImageAvailableListener(): ImageReader.OnImageAvailableListener {
         return ImageReader.OnImageAvailableListener { reader ->
-            try {
+                    try {
                 frameCount.incrementAndGet()
                 Log.d(TAG, "onImageAvailable called, frame #${frameCount.get()}")
-
+                        
                 // Synchronized using the specific reader instance
                 synchronized(reader) {
                     val image = reader.acquireLatestImage()
@@ -417,8 +422,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                         Log.d(TAG, "Captured image dimensions: ${width}x${height}")
                         // saveImagePreview(image, width, height, currentRotation)
 
+                        // val dominantColor = image.extractDominantColor()
+                        // Log.d(TAG, "Captured image dominant color: ${String.format("#%06X", 0xFFFFFF and dominantColor)}")
+
                         val bytes = imageToBytes(image)
                         if (bytes != null) {
+
+                            // val dominantColor = bytes.extractDominantColor(width, height)
+                            // Log.d(TAG, "Captured image dominant color: ${String.format("#%06X", 0xFFFFFF and dominantColor)}")
+
                             if (frameStabilizer.detectScrolling(bytes)) {
                                 // Clear translation overlay
                                 val intent = Intent(context, OverlayService::class.java)
@@ -487,6 +499,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             val pixelStride = planes[0].pixelStride
             val rowStride = planes[0].rowStride
             val rowPadding = rowStride - pixelStride * width
+            val imageFormat = image.format // Get the image format
 
             Log.d(TAG, "Converting image: ${width}x${height}")
             Log.d(TAG, "Buffer capacity: ${buffer.capacity()}")
@@ -576,9 +589,20 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     avgG = avgG shr 2
                     avgB = avgB shr 2
                     
+                    // Log average values
+                    // Log.d(TAG, "Average pixel values for block at ($row, $col):")
+                    // Log.d(TAG, "  avgR: $avgR")
+                    // Log.d(TAG, "  avgG: $avgG")
+                    // Log.d(TAG, "  avgB: $avgB")
+                    
                     // Convert to V and U
-                    val v = (128 + (112 * avgR - 94 * avgG - 18 * avgB + 128) shr 8).toByte()
-                    val u = (128 + (-38 * avgR - 74 * avgG + 112 * avgB + 128) shr 8).toByte()
+                    val v = (128 + ((112 * avgR - 94 * avgG - 18 * avgB) shr 8)).toByte()
+                    val u = (128 + ((-38 * avgR - 74 * avgG + 112 * avgB) shr 8)).toByte()
+                    
+                    // Log UV calculations
+                    // Log.d(TAG, "UV Calculation for block at ($row, $col):")
+                    // Log.d(TAG, "  V calculation: 128 + (112 * $avgR - 94 * $avgG - 18 * $avgB shr 8) = $v")
+                    // Log.d(TAG, "  U calculation: 128 + (-38 * $avgR - 74 * $avgG + 112 * $avgB shr 8) = $u")
                     
                     nv21Bytes[pos++] = v
                     nv21Bytes[pos++] = u

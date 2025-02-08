@@ -67,7 +67,7 @@ class OverlayService {
   }
 
   // Show overlay with translated text
-  Future<bool> showTranslationOverlay(String text, int id, {double? x, double? y, double? width, double? height, Color? overlayColor, Color? backgroundColor, bool? isLight}) async {
+  Future<bool> showTranslationOverlay(String text, int id, {double? x, double? y, double? width, double? height, Color? overlayColor, Color? backgroundColor, bool? isLight, double? imgWidth, double? imgHeight}) async {
     try {
       final bool shown = await _channel.invokeMethod('showTranslationOverlay', {
         'text': text,
@@ -79,6 +79,8 @@ class OverlayService {
         'overlayColor': overlayColor?.value,
         'backgroundColor': backgroundColor?.value,
         'isLight': isLight,
+        'imgWidth': imgWidth,
+        'imgHeight': imgHeight,
       });
       return shown;
     } on PlatformException catch (e) {

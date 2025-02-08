@@ -102,6 +102,8 @@ class TranslationProvider with ChangeNotifier {
                     overlayColor: ocrResult.overlayColor,
                     backgroundColor: ocrResult.backgroundColor,
                     isLight: ocrResult.isLight,
+                    imgWidth: ocrResult.imgWidth,
+                    imgHeight: ocrResult.imgHeight,
                   );
                 }
               }

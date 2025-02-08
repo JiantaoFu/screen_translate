@@ -108,25 +108,73 @@ object ColorUtils {
     private fun extractDominantColor(width: Int, height: Int, extractColorAtPoint: (Int, Int) -> Int): Int {
         try {
             val samplePoints = listOf(
-                Pair(width / 8, height / 8),       // Top-left quadrant (weight: 1.0)
-                Pair(width / 2, height / 8),        // Top middle (weight: 1.2)
-                Pair(7 * width / 8, height / 8),    // Top-right quadrant (weight: 1.0)
-                Pair(width / 8, height / 2),        // Middle left (weight: 1.1)
-                Pair(width / 2, height / 2),        // Center (weight: 1.5)
-                Pair(7 * width / 8, height / 2),    // Middle right (weight: 1.1)
-                Pair(width / 8, 7 * height / 8),    // Bottom-left quadrant (weight: 1.0)
-                Pair(width / 2, 7 * height / 8),    // Bottom middle (weight: 1.2)
-                Pair(7 * width / 8, 7 * height / 8) // Bottom-right quadrant (weight: 1.0)
+                // Top row (9 points)
+                Pair(width / 16, height / 16),       // Top-left corner (weight: 1.0)
+                Pair(width / 8, height / 16),         // Top-left first third (weight: 1.1)
+                Pair(width / 4, height / 16),         // Top-left middle (weight: 1.2)
+                Pair(3 * width / 8, height / 16),     // Top-left two-thirds (weight: 1.1)
+                Pair(width / 2, height / 16),         // Top middle (weight: 1.3)
+                Pair(5 * width / 8, height / 16),     // Top-right two-thirds (weight: 1.1)
+                Pair(3 * width / 4, height / 16),     // Top-right middle (weight: 1.2)
+                Pair(7 * width / 8, height / 16),     // Top-right first third (weight: 1.1)
+                Pair(15 * width / 16, height / 16),   // Top-right corner (weight: 1.0)
+
+                // Upper-middle row (9 points)
+                Pair(width / 16, height / 4),         // Left upper-middle first third (weight: 1.1)
+                Pair(width / 8, height / 4),          // Left upper-middle middle (weight: 1.2)
+                Pair(width / 4, height / 4),          // Left upper-middle two-thirds (weight: 1.1)
+                Pair(3 * width / 8, height / 4),      // Center-left upper-middle (weight: 1.3)
+                Pair(width / 2, height / 4),          // Center upper-middle (weight: 1.4)
+                Pair(5 * width / 8, height / 4),      // Center-right upper-middle (weight: 1.3)
+                Pair(3 * width / 4, height / 4),      // Right upper-middle two-thirds (weight: 1.1)
+                Pair(7 * width / 8, height / 4),      // Right upper-middle middle (weight: 1.2)
+                Pair(15 * width / 16, height / 4),    // Right upper-middle first third (weight: 1.1)
+
+                // Middle row (9 points)
+                Pair(width / 16, height / 2),         // Left middle first third (weight: 1.2)
+                Pair(width / 8, height / 2),          // Left middle middle (weight: 1.3)
+                Pair(width / 4, height / 2),          // Left middle two-thirds (weight: 1.2)
+                Pair(3 * width / 8, height / 2),      // Center-left middle (weight: 1.4)
+                Pair(width / 2, height / 2),          // Exact center (weight: 1.5)
+                Pair(5 * width / 8, height / 2),      // Center-right middle (weight: 1.4)
+                Pair(3 * width / 4, height / 2),      // Right middle two-thirds (weight: 1.2)
+                Pair(7 * width / 8, height / 2),      // Right middle middle (weight: 1.3)
+                Pair(15 * width / 16, height / 2),    // Right middle first third (weight: 1.2)
+
+                // Lower-middle row (9 points)
+                Pair(width / 16, 3 * height / 4),     // Left lower-middle first third (weight: 1.1)
+                Pair(width / 8, 3 * height / 4),      // Left lower-middle middle (weight: 1.2)
+                Pair(width / 4, 3 * height / 4),      // Left lower-middle two-thirds (weight: 1.1)
+                Pair(3 * width / 8, 3 * height / 4),  // Center-left lower-middle (weight: 1.3)
+                Pair(width / 2, 3 * height / 4),      // Center lower-middle (weight: 1.4)
+                Pair(5 * width / 8, 3 * height / 4),  // Center-right lower-middle (weight: 1.3)
+                Pair(3 * width / 4, 3 * height / 4),  // Right lower-middle two-thirds (weight: 1.1)
+                Pair(7 * width / 8, 3 * height / 4),  // Right lower-middle middle (weight: 1.2)
+                Pair(15 * width / 16, 3 * height / 4),// Right lower-middle first third (weight: 1.1)
+
+                // Bottom row (9 points)
+                Pair(width / 16, 15 * height / 16),   // Bottom-left corner (weight: 1.0)
+                Pair(width / 8, 15 * height / 16),    // Bottom-left first third (weight: 1.1)
+                Pair(width / 4, 15 * height / 16),    // Bottom-left middle (weight: 1.2)
+                Pair(3 * width / 8, 15 * height / 16),// Bottom-left two-thirds (weight: 1.1)
+                Pair(width / 2, 15 * height / 16),    // Bottom middle (weight: 1.3)
+                Pair(5 * width / 8, 15 * height / 16),// Bottom-right two-thirds (weight: 1.1)
+                Pair(3 * width / 4, 15 * height / 16),// Bottom-right middle (weight: 1.2)
+                Pair(7 * width / 8, 15 * height / 16),// Bottom-right first third (weight: 1.1)
+                Pair(15 * width / 16, 15 * height / 16)// Bottom-right corner (weight: 1.0)
             )
 
             // Weighted color averaging
             val weightedColors = samplePoints.mapIndexed { index, (x, y) ->
                 val color = extractColorAtPoint(x, y)
                 val weight = when (index) {
-                    1, 7 -> 1.2f   // Top and bottom middle
-                    3, 5 -> 1.1f   // Middle left and right
-                    4 -> 1.5f      // Center
-                    else -> 1.0f   // Corners
+                    1, 7, 10, 16, 25, 28, 31, 34, 37 -> 1.1f
+                    2, 6, 9, 15, 18, 23, 26, 33, 36 -> 1.2f
+                    3, 5, 12, 14, 20, 22, 29, 32, 35 -> 1.1f
+                    4, 11, 13, 19, 21, 27, 30 -> 1.3f
+                    8, 17, 24 -> 1.4f
+                    4 -> 1.5f
+                    else -> 1.0f
                 }
                 Pair(color, weight)
             }

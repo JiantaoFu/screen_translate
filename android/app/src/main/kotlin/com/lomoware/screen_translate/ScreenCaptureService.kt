@@ -419,7 +419,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     if (image != null) {
                         val width = image.width
                         val height = image.height
-                        Log.d(TAG, "Captured image dimensions: ${width}x${height}")
+                        // Log.d(TAG, "Captured image dimensions: ${width}x${height}")
                         // saveImagePreview(image, width, height, currentRotation)
 
                         // val dominantColor = image.extractDominantColor()
@@ -501,11 +501,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             val rowPadding = rowStride - pixelStride * width
             val imageFormat = image.format // Get the image format
 
-            Log.d(TAG, "Converting image: ${width}x${height}")
-            Log.d(TAG, "Buffer capacity: ${buffer.capacity()}")
-            Log.d(TAG, "PixelStride: $pixelStride")
-            Log.d(TAG, "RowStride: $rowStride")
-            Log.d(TAG, "RowPadding: $rowPadding")
+            // Log.d(TAG, "Converting image: ${width}x${height}")
+            // Log.d(TAG, "Buffer capacity: ${buffer.capacity()}")
+            // Log.d(TAG, "PixelStride: $pixelStride")
+            // Log.d(TAG, "RowStride: $rowStride")
+            // Log.d(TAG, "RowPadding: $rowPadding")
 
             // NV21 format size: height * width + 2 * (height/2 * width/2)
             val nv21Size = width * height + 2 * ((height + 1) / 2) * ((width + 1) / 2)

@@ -9,6 +9,8 @@ class OCRResult {
   Color? overlayColor; // New property to store adaptive overlay color
   Color? backgroundColor; // Background color extracted from the image
   bool isLight; // Whether the background is considered light
+  final double imgWidth;
+  final double imgHeight;
 
   OCRResult({
     required this.text,
@@ -19,29 +21,7 @@ class OCRResult {
     this.overlayColor,
     this.backgroundColor,
     this.isLight = false,
+    required this.imgWidth,
+    required this.imgHeight,
   });
-
-  // Optional: Add a toJson method if you're serializing these results
-  Map<String, dynamic> toJson() => {
-    'text': text,
-    'x': x,
-    'y': y,
-    'width': width,
-    'height': height,
-    'overlayColor': overlayColor?.value,
-    'backgroundColor': backgroundColor?.value,
-    'isLight': isLight,
-  };
-
-  // Optional: Add a fromJson constructor if you're deserializing
-  factory OCRResult.fromJson(Map<String, dynamic> json) => OCRResult(
-    text: json['text'],
-    x: json['x'],
-    y: json['y'],
-    width: json['width'],
-    height: json['height'],
-    overlayColor: json['overlayColor'] != null ? Color(json['overlayColor']) : null,
-    backgroundColor: json['backgroundColor'] != null ? Color(json['backgroundColor']) : null,
-    isLight: json['isLight'] ?? false,
-  );
 }

@@ -100,6 +100,8 @@ class MainActivity: FlutterActivity() {
                     val overlayColor = call.argument<Long>("overlayColor")?.toInt()
                     val backgroundColor = call.argument<Long>("backgroundColor")?.toInt()
                     val isLight = call.argument<Boolean>("isLight")
+                    val imgWidth = call.argument<Double>("imgWidth")?.toFloat()
+                    val imgHeight = call.argument<Double>("imgHeight")?.toFloat()
                     
                     // Debug logging for colors
                     Log.d(TAG, "Overlay Color: ${overlayColor?.let { String.format("#%06X", 0xFFFFFF and it) }}")
@@ -128,6 +130,12 @@ class MainActivity: FlutterActivity() {
                         }
                         if (isLight != null) {
                             intent.putExtra("isLight", isLight)
+                        }
+                        if (imgWidth != null) {
+                            intent.putExtra("imgWidth", imgWidth)
+                        }
+                        if (imgHeight != null) {
+                            intent.putExtra("imgHeight", imgHeight)
                         }
                         startService(intent)
                         result.success(true)

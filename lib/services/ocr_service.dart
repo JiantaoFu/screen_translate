@@ -7,6 +7,10 @@ import '../models/ocr_result.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import '../utils/color_utils.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 
 extension ColorAdaptation on Color {
   // Determine if a color is considered "light"
@@ -62,7 +66,11 @@ class OCRService {
     return _textRecognizer!;
   }
 
-  Future<List<OCRResult>> processImage(Map<String, dynamic> imageData, TextRecognitionScript script) async {
+  Future<List<OCRResult>> processImage(
+    Map<String, dynamic> imageData, 
+    TextRecognitionScript script, 
+    {bool drawDebugBoxes = false}
+  ) async {
     try {
       _logger.info('Starting image processing');
       
@@ -129,6 +137,8 @@ class OCRService {
             overlayColor: overlayColor,
             backgroundColor: backgroundColor,
             isLight: backgroundColor.isLight(),
+            imgWidth: width.toDouble(),
+            imgHeight: height.toDouble(),
           ));
           processedAreas.add(adjustedBox);
         }
@@ -140,10 +150,238 @@ class OCRService {
       _logger.info('Background Color: ${backgroundColor.toLoggableString()}');
       _logger.info('OCR: Found ${results.length} text blocks with overlay color ${overlayColor.toLoggableString()}');
 
+      // Optional: Draw and save bounding boxes for debugging
+      if (drawDebugBoxes) {
+        final debugImagePath = await drawAndSaveBoundingBoxes(
+          imageBytes, 
+          width, 
+          height, 
+          recognizedText.blocks
+        );
+        
+        if (debugImagePath != null) {
+          _logger.info('Debug bounding boxes image saved at: $debugImagePath');
+        }
+      }
+
       return results;
     } catch (e) {
       _logger.severe('OCR Error: $e');
       return [];
+    }
+  }
+
+  // Utility method to convert NV21 to RGB using image package
+  Uint8List convertNV21toRGB(
+    Uint8List nv21Bytes, 
+    int width, 
+    int height
+  ) {
+    try {
+      _logger.info('Converting NV21 to RGB: $width x $height');
+      _logger.info('Input NV21 bytes length: ${nv21Bytes.length}');
+      
+      // Validate input - match Kotlin's size calculation
+      final expectedNV21Size = width * height + 2 * ((height + 1) ~/ 2) * ((width + 1) ~/ 2);
+      if (nv21Bytes.length != expectedNV21Size) {
+        _logger.severe('Invalid NV21 byte array size. '
+          'Expected $expectedNV21Size, got ${nv21Bytes.length}');
+        return Uint8List(0);
+      }
+
+      // Create an image from raw bytes
+      final image = img.Image(width: width, height: height);
+
+      // Manual NV21 to RGB conversion
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          // Y component index
+          final yIndex = y * width + x;
+          
+          // UV component indices
+          final uvIndex = width * height + (y >> 1) * width + (x & ~1);
+          
+          // Safely access Y, U, V components
+          final yComponent = nv21Bytes[yIndex] & 0xFF;
+          final uComponent = nv21Bytes[uvIndex] & 0xFF;
+          final vComponent = nv21Bytes[uvIndex + 1] & 0xFF;
+          
+          // YUV to RGB conversion
+          final c = yComponent - 16;
+          final d = uComponent - 128;
+          final e = vComponent - 128;
+          
+          final r = (298 * c + 409 * e + 128) >> 8;
+          final g = (298 * c - 100 * d - 208 * e + 128) >> 8;
+          final b = (298 * c + 516 * d + 128) >> 8;
+          
+          // Clamp and set pixel
+          final rClamped = r.clamp(0, 255);
+          final gClamped = g.clamp(0, 255);
+          final bClamped = b.clamp(0, 255);
+          
+          image.setPixelRgb(x, y, rClamped, gClamped, bClamped);
+        }
+      }
+
+      // Convert to PNG bytes
+      final pngBytes = img.encodePng(image);
+      
+      _logger.info('Converted PNG bytes length: ${pngBytes.length}');
+      return Uint8List.fromList(pngBytes);
+    } catch (e, stackTrace) {
+      _logger.severe('Error converting NV21 to RGB', e, stackTrace);
+      return Uint8List(0);
+    }
+  }
+
+  Future<ui.Image?> drawBoundingBoxes(
+    Uint8List imageBytes, 
+    int width, 
+    int height, 
+    List<TextBlock> blocks
+  ) async {
+    try {
+      _logger.info('Drawing bounding boxes: Image bytes length ${imageBytes.length}');
+      
+      // Validate image bytes
+      if (imageBytes.isEmpty) {
+        _logger.severe('Empty image bytes array');
+        return null;
+      }
+
+      // Decode the original image
+      final originalImage = await decodeImageFromList(imageBytes);
+
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+
+      // Draw the original image, scaled to fit
+      canvas.drawImage(originalImage, Offset.zero, Paint());
+
+      // Draw bounding boxes
+      final boxPaint = Paint()
+        ..color = Colors.red.withOpacity(0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.0;
+
+      final textPaintFill = Paint()
+        ..color = Colors.black.withOpacity(0.7);
+
+      for (final block in blocks) {
+        final rect = block.boundingBox;
+        
+        // Draw bounding box
+        canvas.drawRect(
+          Rect.fromLTWH(
+            rect.left, 
+            rect.top, 
+            rect.width, 
+            rect.height
+          ), 
+          boxPaint
+        );
+
+        // Draw text background
+        final textRect = Rect.fromLTWH(
+          rect.left, 
+          rect.top - 20, 
+          rect.width, 
+          20
+        );
+        canvas.drawRect(textRect, textPaintFill);
+
+        // Draw text
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: block.text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            )
+          ),
+          textDirection: TextDirection.ltr
+        )..layout(maxWidth: rect.width);
+
+        textPainter.paint(
+          canvas, 
+          Offset(rect.left, rect.top - 20)
+        );
+      }
+
+      // Finish recording and convert to image
+      final picture = recorder.endRecording();
+      return picture.toImage(width, height);
+    } catch (e, stackTrace) {
+      _logger.severe('Error drawing bounding boxes', e, stackTrace);
+      return null;
+    }
+  }
+
+  Future<String?> drawAndSaveBoundingBoxes(
+    Uint8List imageBytes, 
+    int width, 
+    int height, 
+    List<TextBlock> blocks
+  ) async {
+    try {
+      // Convert NV21 to RGB/PNG
+      final convertedBytes = convertNV21toRGB(imageBytes, width, height);
+      
+      if (convertedBytes.isEmpty) {
+        _logger.severe('Failed to convert NV21 to RGB');
+        return null;
+      }
+
+      final debugImage = await drawBoundingBoxes(convertedBytes, width, height, blocks);
+      
+      if (debugImage == null) {
+        _logger.severe('Failed to create debug image');
+        return null;
+      }
+
+      // Convert ui.Image to ByteData with PNG format
+      final byteData = await debugImage.toByteData(format: ui.ImageByteFormat.png);
+      
+      if (byteData == null) {
+        _logger.severe('Failed to convert debug image to ByteData');
+        return null;
+      }
+
+      // Validate byte data
+      final uint8List = byteData.buffer.asUint8List();
+      if (uint8List.isEmpty) {
+        _logger.severe('Generated image byte data is empty');
+        return null;
+      }
+
+      // Get external files directory
+      final directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        _logger.severe('Failed to get external storage directory');
+        return null;
+      }
+
+      // Create previews subdirectory
+      final previewsDir = Directory('${directory.path}/previews');
+      if (!previewsDir.existsSync()) {
+        previewsDir.createSync(recursive: true);
+      }
+
+      // Generate a unique filename
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = 'ocr_debug_${timestamp}.png';
+      final file = File('${previewsDir.path}/$filename');
+      
+      // Write image bytes to file
+      await file.writeAsBytes(uint8List);
+      
+      final filePath = file.path;
+      _logger.info('Debug bounding boxes image saved: $filePath');
+      return filePath;
+    } catch (e, stackTrace) {
+      _logger.severe('Error saving debug bounding boxes', e, stackTrace);
+      return null;
     }
   }
 

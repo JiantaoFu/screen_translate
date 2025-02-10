@@ -1,4 +1,5 @@
 {
-  "translation_mode": "अनुवाद मोड",
+  "auto_translate_mode": "ऑटो अनुवाद मोड",
+  "manual_translate_mode": "व्यक्तिगत अनुवाद मोड",
   "original_text_mode": "उर्व्यवस्थित टेक्स्ट मोड"
 }

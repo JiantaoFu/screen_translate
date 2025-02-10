@@ -69,7 +69,7 @@ class OCRService {
   Future<List<OCRResult>> processImage(
     Map<String, dynamic> imageData, 
     TextRecognitionScript script, 
-    {bool drawDebugBoxes = false}
+    {bool drawDebugBoxes = false, int minTextLength = 6}
   ) async {
     try {
       _logger.info('Starting image processing');
@@ -123,8 +123,9 @@ class OCRService {
           }
         }
         
-        // Only add if text is not empty and box is valid
+        // Only add if text is not empty, meets minimum length, and box is valid
         if (block.text.trim().isNotEmpty && 
+            block.text.trim().length >= minTextLength && 
             adjustedBox.width > 0 && 
             adjustedBox.height > 0) {
           _logger.info('Text block recognized at position: $adjustedBox, text: ${block.text}, bounding box: ${block.boundingBox.width}x${block.boundingBox.height}');

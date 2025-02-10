@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Tõlkemood",
-  "original_text_mode": "Algne tekstimood"
+  "auto_translate_mode": "Automatizm",
+  "manual_translate_mode": "Traduce manual",
+  "original_text_mode": "Text original"
 }

@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Übersetzungsmodell",
-  "original_text_mode": "Originaltextmodell"
+  "auto_translate_mode": "Automatische Übersetzung",
+  "original_text_mode": "Originaltextmodell",
+  "manual_translate_mode": "Manuelle Übersetzung"
 }

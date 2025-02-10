@@ -1,4 +1,5 @@
 {
-  "translation_mode": "অনুবাদ মডেল",
+  "auto_translate_mode": "সময় অনুবাদ মডেল",
+  "manual_translate_mode": "মানুয়াল অনুবাদ মডেল",
   "original_text_mode": "স্থানী লেখা মডেল"
 }

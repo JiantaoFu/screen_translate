@@ -1,4 +1,5 @@
 {
-  "translation_mode": "โหมดการแปล",
-  "original_text_mode": "โหมดข้อความเดิม"
+  "auto_translate_mode": "โหมดการแปลอัตโนมัติ",
+  "original_text_mode": "โหมดข้อความเดิม",
+  "manual_translate_mode": "โหมดการแปลที่ต้องการ"
 }

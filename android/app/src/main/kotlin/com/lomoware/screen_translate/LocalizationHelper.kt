@@ -61,9 +61,9 @@ class LocalizationHelper {
             } catch (e: Exception) {
                 // Absolute fallback
                 mapOf(
-                    "translation_mode" to "Translation Mode",
                     "original_text_mode" to "Original Text Mode",
-                    "side_by_side_mode" to "Side by Side Mode"
+                    "auto_translate_mode" to "Auto Translate Mode",
+                    "manual_translate_mode" to "Manual Translate Mode"
                 )
             }
         }

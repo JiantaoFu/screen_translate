@@ -89,12 +89,12 @@ class FrameStabilizer(
         lastFrame?.let { previous ->
             if (previous.size == currentFrame.size) {
                 val pixelDifference = computePixelDifference(previous, currentFrame)
+                Log.d("FrameStabilizer", "Scrolling detected: $pixelDifference")
                 
                 if (pixelDifference > scrollDetectionThreshold) {
                     consecutiveScrollFrames++
                     
                     if (consecutiveScrollFrames >= MAX_CONSECUTIVE_SCROLL_FRAMES) {
-                        Log.d("FrameStabilizer", "Scrolling detected: $pixelDifference")
                         lastFrame = currentFrame.clone()
                         return true
                     }

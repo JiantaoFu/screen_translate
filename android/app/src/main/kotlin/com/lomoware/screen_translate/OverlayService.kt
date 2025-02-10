@@ -158,17 +158,13 @@ class OverlayService : Service() {
         methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/manualTranslate")
     }
 
-    enum class DisplayMode(val icon: Int) {
-        AUTO(R.drawable.ic_translate_mode),
-        ORIGINAL(R.drawable.ic_original_mode),
-        MANUAL(R.drawable.ic_manual_translate);
+    enum class DisplayMode(val icon: Int, val labelKey: String) {
+        AUTO(R.drawable.ic_translate_mode, "auto_translate_mode"),
+        ORIGINAL(R.drawable.ic_original_mode, "original_text_mode"),
+        MANUAL(R.drawable.ic_manual_translate, "manual_translate_mode");
 
         fun getLocalizedLabel(context: Context): String {
-            return when (this) {
-                AUTO -> context.getString(R.string.mode_auto_translate)
-                ORIGINAL -> context.getString(R.string.mode_show_original)
-                MANUAL -> context.getString(R.string.mode_manual_translate)
-            }
+            return LocalizationHelper.getLocalizedString(context, labelKey)
         }
     }
 

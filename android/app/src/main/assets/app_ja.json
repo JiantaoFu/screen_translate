@@ -1,4 +1,5 @@
 {
-  "translation_mode": "翻訳モデル",
+  "auto_translate_mode": "自動翻訳",
+  "manual_translate_mode": "手動翻訳",
   "original_text_mode": "オリジナルテキスト"
 }

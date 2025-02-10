@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Translation Mode",
+  "auto_translate_mode": "Auto Translate Mode",
+  "manual_translate_mode": "Manual Translate Mode",
   "original_text_mode": "Original Text Mode"
 }

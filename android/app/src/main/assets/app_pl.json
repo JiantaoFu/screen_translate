@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Tryb tłumaczenia",
+  "auto_translate_mode": "Automatyczne tłumaczenie",
+  "manual_translate_mode": "Tłumaczenie rejestrowane",
   "original_text_mode": "Tryb tekstu oryginalnego"
 }

@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Moodel pro prevod",
+  "auto_translate_mode": "Moodel pro automatické prevod",
+  "manual_translate_mode": "Moodel pro rucní prevod",
   "original_text_mode": "Moodel pro stredni text"
 }

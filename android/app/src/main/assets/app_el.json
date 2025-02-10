@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Μοντέλο μετάφρασης",
-  "original_text_mode": "Μοντέλο κεφαλης κειμενου"
+  "auto_translate_mode": "Μοντέλο μετάφρασης",
+  "original_text_mode": "Μοντέλο κεφαλης κειμενου",
+  "manual_translate_mode": "Μοντέλο μετάφρασης"
 }

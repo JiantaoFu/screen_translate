@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Mode Terjemahan",
+  "auto_translate_mode": "Automatisasi Terjemahan",
+  "manual_translate_mode": "Terjemahan Manual",
   "original_text_mode": "Mode Text Asli"
 }

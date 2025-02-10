@@ -1,4 +1,5 @@
 {
-  "translation_mode": "번역 모델",
-  "original_text_mode": "원본 텍스트 모델"
+  "auto_translate_mode": "자동 트랜스",
+  "manual_translate_mode": "마달 트랜스",
+  "original_text_mode": "예전 텍스트 모델"
 }

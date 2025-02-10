@@ -1,4 +1,5 @@
 {
-  "translation_mode": "Fordítás náluk",
+  "auto_translate_mode": "Automatikus forrásközépfordítás",
+  "manual_translate_mode": "Manuális forrásközépfordítás",
   "original_text_mode": "Erre a szöveg"
 }

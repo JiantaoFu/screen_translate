@@ -8,6 +8,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:flutter/material.dart';
 import '../services/overlay_service.dart';
+import 'package:flutter/services.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -26,6 +27,9 @@ class TranslationProvider with ChangeNotifier {
   final TranslationService _translationService;
   final OverlayService _overlayService;
   BuildContext? _context;
+  bool _isManualCaptureRequested = false;
+  static const MethodChannel _manualTranslateChannel = 
+      MethodChannel('com.lomoware.screen_translate/manualTranslate');
 
   TranslationProvider(
     this._context,
@@ -35,6 +39,7 @@ class TranslationProvider with ChangeNotifier {
   ) {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
+      initManualTranslateChannel();
     }
   }
 
@@ -71,15 +76,24 @@ class TranslationProvider with ChangeNotifier {
     }
   }
 
+  void requestManualCapture() {
+    _isManualCaptureRequested = true;
+  }
+
   void _startPeriodicCapture() async {
     if (_captureTimer != null) return;
 
     _captureTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
       if (!_isTranslating) return;
 
-      if (Platform.isAndroid) {
-        final imageData = await _androidScreenCaptureService?.captureScreen();
-        if (imageData != null) {
+      // Check translation mode from Android service
+      final translationMode = await _androidScreenCaptureService?.getTranslationMode();
+      
+      // Capture only in auto mode or when manual capture is requested
+      if (translationMode == 'auto' || _isManualCaptureRequested) {
+        if (Platform.isAndroid) {
+          final imageData = await _androidScreenCaptureService?.captureScreen();
+          if (imageData != null) {
             try {
               final ocrResults = await _ocrService.processImage(imageData, currentOCRScript);
               await _overlayService.hideTranslationOverlay(); // Clear old overlays
@@ -115,7 +129,11 @@ class TranslationProvider with ChangeNotifier {
             } catch (e) {
               print('Error processing captured screen: $e');
             }
+          }
         }
+
+        // Reset manual capture flag after processing
+        _isManualCaptureRequested = false;
       }
     });
   }
@@ -154,6 +172,25 @@ class TranslationProvider with ChangeNotifier {
 
   TextRecognitionScript get currentOCRScript {
     return _ocrService.getScriptForLanguage(_sourceLanguage);
+  }
+
+  Future<void> initManualTranslateChannel() async {
+    if (Platform.isAndroid) {
+      try {
+        _manualTranslateChannel.setMethodCallHandler((MethodCall call) async {
+          switch (call.method) {
+            case 'requestManualCapture':
+              print("Manual capture requested"); // Add this debug print
+              requestManualCapture();
+              break;
+            default:
+              throw MissingPluginException();
+          }
+        });
+      } catch (e) {
+        print('Error setting up method channel: $e');
+      }
+    }
   }
 
   @override

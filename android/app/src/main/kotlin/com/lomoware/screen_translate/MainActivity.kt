@@ -8,6 +8,8 @@ import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.BinaryMessenger
+import android.os.Bundle
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.lomoware.screen_translate/screen_capture"
@@ -18,12 +20,17 @@ class MainActivity: FlutterActivity() {
     private var permissionData: Intent? = null
     private val OVERLAY_CHANNEL = "com.lomoware.screen_translate/overlay"
 
+    companion object {
+        lateinit var binaryMessenger: BinaryMessenger
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
         screenCaptureService = ScreenCaptureService(context, this)
+        binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+        MethodChannel(binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "requestScreenCapture" -> {
                     Log.d(TAG, "Requesting screen capture permission")
@@ -76,12 +83,16 @@ class MainActivity: FlutterActivity() {
                 "captureScreen" -> {
                     screenCaptureService?.captureScreen(result)
                 }
+                "getTranslationMode" -> {
+                    val translationMode = OverlayService.getInstance()?.getCurrentTranslationMode() ?: "auto"
+                    result.success(translationMode)
+                }
                 else -> result.notImplemented()
             }
         }
 
         // Set up overlay channel
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OVERLAY_CHANNEL).setMethodCallHandler { call, result ->
+        MethodChannel(binaryMessenger, OVERLAY_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "checkOverlayPermission" -> {
                     result.success(OverlayService.hasOverlayPermission(this))

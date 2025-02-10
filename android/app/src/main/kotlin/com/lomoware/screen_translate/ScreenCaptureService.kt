@@ -83,7 +83,7 @@ class FrameStabilizer(
     private var lastImageHash: Long = 0
     private var consecutiveScrollFrames = 0
     private val MAX_CONSECUTIVE_SCROLL_FRAMES = 1
-    private val scrollDetectionThreshold = 0.05
+    private val scrollDetectionThreshold = 0.4
 
     fun detectScrolling(currentFrame: ByteArray): Boolean {
         lastFrame?.let { previous ->
@@ -95,6 +95,7 @@ class FrameStabilizer(
                     
                     if (consecutiveScrollFrames >= MAX_CONSECUTIVE_SCROLL_FRAMES) {
                         Log.d("FrameStabilizer", "Scrolling detected: $pixelDifference")
+                        lastFrame = currentFrame.clone()
                         return true
                     }
                 } else {
@@ -147,7 +148,7 @@ class FrameStabilizer(
         val shouldProcess = currentImageHash != lastImageHash
 
         if (shouldProcess) {
-            Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
+            // Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
             // Cancel previous timer
             stabilizationTimer?.cancel()
 
@@ -202,6 +203,14 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private lateinit var latestProjectionIntent: Intent
     private lateinit var latestProjectionResult: MethodChannel.Result
     private var currentRotation: Int = 0
+
+    companion object {
+        private const val PREF_TRANSLATION_MODE = "translation_mode"
+        private const val MODE_AUTO = "auto"
+        private const val MODE_MANUAL = "manual"
+        private const val MODE_OFF = "off"
+        private const val MODE_ORIGINAL = "original"
+    }
 
     init {
         val metrics = context.resources.displayMetrics
@@ -288,15 +297,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 
                 if (age <= MAX_FRAME_AGE) {
                     Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms")
-                    result.success(mapOf(
-                        "bytes" to bytes,
-                        "width" to width,
-                        "height" to height
-                    ))
                 } else {
                     Log.w(TAG, "Frame too old: ${age}ms")
-                    result.error("FRAME_TOO_OLD", "Captured frame is too old", null)
-                } 
+                }
+
+                result.success(mapOf(
+                    "bytes" to bytes,
+                    "width" to width,
+                    "height" to height
+                ))
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error capturing screen", e)
@@ -409,7 +418,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
     private fun createImageAvailableListener(): ImageReader.OnImageAvailableListener {
         return ImageReader.OnImageAvailableListener { reader ->
-                    try {
+            try {
                 frameCount.incrementAndGet()
                 Log.d(TAG, "onImageAvailable called, frame #${frameCount.get()}")
                         
@@ -427,10 +436,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
                         val bytes = imageToBytes(image)
                         if (bytes != null) {
-
-                            // val dominantColor = bytes.extractDominantColor(width, height)
-                            // Log.d(TAG, "Captured image dominant color: ${String.format("#%06X", 0xFFFFFF and dominantColor)}")
-
                             if (frameStabilizer.detectScrolling(bytes)) {
                                 // Clear translation overlay
                                 val intent = Intent(context, OverlayService::class.java)

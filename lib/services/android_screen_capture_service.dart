@@ -52,4 +52,14 @@ class AndroidScreenCaptureService {
       return null;
     }
   }
+
+  Future<String> getTranslationMode() async {
+    try {
+      final result = await _channel.invokeMethod('getTranslationMode');
+      return result as String? ?? 'auto';
+    } on PlatformException catch (e) {
+      print('Error getting translation mode: ${e.message}');
+      return 'auto';
+    }
+  }
 }

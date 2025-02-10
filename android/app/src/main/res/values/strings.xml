@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate Scroll Detection</string>
+    <string name="accessibility_service_description">Enables Screen Translate to detect scrolling in other apps for seamless translation. This service helps identify when content changes so translations can be updated accurately.</string>
+    
+    <string name="accessibility_permission_title">Accessibility Service Required</string>
+    <string name="accessibility_permission_message">Screen Translate needs Accessibility Service to detect scrolling and translate content across different apps.</string>
+    <string name="accessibility_permission_benefits">Benefits:\n• Seamless translation while scrolling\n• Works across multiple applications\n• Improves translation accuracy</string>
+    <string name="accessibility_permission_how_to">How to enable:\n1. Tap \'Enable\'\n2. Find \'Screen Translate Scroll Detection\' in Accessibility Services\n3. Toggle the service on</string>
+    <string name="btn_enable_accessibility">Enable</string>
+    <string name="btn_cancel">Cancel</string>
+</resources>

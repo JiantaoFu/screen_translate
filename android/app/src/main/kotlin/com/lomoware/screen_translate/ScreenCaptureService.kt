@@ -22,6 +22,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.FileOutputStream
@@ -203,6 +204,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private lateinit var latestProjectionIntent: Intent
     private lateinit var latestProjectionResult: MethodChannel.Result
     private var currentRotation: Int = 0
+    private val methodChannel: MethodChannel by lazy {
+        val messenger = MainActivity.binaryMessenger
+        if (messenger != null) {
+            MethodChannel(messenger, "com.lomoware.screen_translate/translationService")
+        } else {
+            Log.e(TAG, "Cannot create method channel: Binary messenger is null")
+            throw IllegalStateException("Binary messenger is not available")
+        }
+    }
 
     companion object {
         private const val PREF_TRANSLATION_MODE = "translation_mode"
@@ -213,6 +223,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     }
 
     init {
+        // Log service initialization details
+        Log.d(TAG, "ScreenCaptureService initialized")
+        Log.d(TAG, "Context: $context")
+        Log.d(TAG, "Context class: ${context.javaClass.name}")
+        
         val metrics = context.resources.displayMetrics
         screenWidth = metrics.widthPixels
         screenHeight = metrics.heightPixels
@@ -220,12 +235,17 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
 
         frameStabilizer = FrameStabilizer(screenWidth, screenHeight)
+
+        // Register scroll detection receiver during initialization
+        registerScrollDetectionReceiver()
+        
+        // Automatically check and prompt for Accessibility Service
+        checkAccessibilityServiceOnFirstLaunch()
     }
 
     fun startProjection(resultCode: Int, data: Intent, result: MethodChannel.Result) {
         try {
             Log.d(TAG, "Starting projection with result code: $resultCode")
-            cleanup() // Cleanup any existing resources
 
             val serviceIntent = Intent(context, ForegroundService::class.java)
             context.startForegroundService(serviceIntent)
@@ -381,6 +401,9 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             mediaProjection?.stop()
             mediaProjection = null
 
+            // Unregister broadcast receiver
+            unregisterScrollDetectionReceiver()
+
             Log.d(TAG, "Cleanup complete")
         } catch (e: Exception) {
             Log.e(TAG, "Error during cleanup", e)
@@ -420,7 +443,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         return ImageReader.OnImageAvailableListener { reader ->
             try {
                 frameCount.incrementAndGet()
-                Log.d(TAG, "onImageAvailable called, frame #${frameCount.get()}")
+                // Log.d(TAG, "onImageAvailable called, frame #${frameCount.get()}")
                         
                 // Synchronized using the specific reader instance
                 synchronized(reader) {
@@ -436,12 +459,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
                         val bytes = imageToBytes(image)
                         if (bytes != null) {
-                            if (frameStabilizer.detectScrolling(bytes)) {
-                                // Clear translation overlay
-                                val intent = Intent(context, OverlayService::class.java)
-                                intent.action = "hideAll"
-                                context.startService(intent)
-                            }
+                            // if (frameStabilizer.detectScrolling(bytes)) {
+                            //     // Clear translation overlay
+                            //     val intent = Intent(context, OverlayService::class.java)
+                            //     intent.action = "hideAll"
+                            //     context.startService(intent)
+                            // }
                             val currentTime = System.currentTimeMillis()
                             // Pass a callback to process the stable frame
                             frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
@@ -618,6 +641,138 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         } catch (e: Exception) {
             Log.e(TAG, "Error converting image to bytes", e)
             return null
+        }
+    }
+
+    private fun cancelAllTranslations() {
+        Log.d(TAG, "Canceling all translations")
+        
+        try {
+            methodChannel.invokeMethod("cancelTranslation", null, object : MethodChannel.Result {
+                override fun success(result: Any?) {
+                    Log.d(TAG, "Translation cancellation method invocation successful")
+                }
+
+                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+                    Log.e(TAG, "Translation cancellation method invocation error: $errorCode, $errorMessage")
+                }
+
+                override fun notImplemented() {
+                    Log.e(TAG, "Translation cancellation method not implemented")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error invoking translation cancellation method", e)
+        }
+    }
+
+    // Scroll detection broadcast receiver
+    private var scrollDetectionReceiver: BroadcastReceiver? = null
+
+    private fun createScrollDetectionReceiver(): BroadcastReceiver {
+        return object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                try {
+                    // Log all intent details for debugging
+                    Log.d(TAG, "Local Broadcast received")
+                    Log.d(TAG, "Intent action: ${intent.action}")
+                    Log.d(TAG, "Intent extras: ${intent.extras}")
+
+                    when (intent.action) {
+                        ScrollDetectionAccessibilityService.SCROLL_DETECTED_ACTION -> {
+                            val packageName = intent.getStringExtra("package") ?: "unknown"
+                            val scrollDelta = intent.getIntExtra("scrollDelta", 0)
+                            
+                            Log.d(TAG, "Scroll event received - Package: $packageName, Delta: $scrollDelta")
+
+                            // Pause translation or take appropriate action
+                            val overlayIntent = Intent(context, OverlayService::class.java)
+                            overlayIntent.action = "hideAll"
+                            context.startService(overlayIntent)
+
+                            cancelAllTranslations()
+                        }
+                        else -> {
+                            Log.w(TAG, "Unexpected intent action: ${intent.action}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in scroll detection receiver", e)
+                }
+            }
+        }
+    }
+
+    private fun registerScrollDetectionReceiver() {
+        try {
+            // Ensure previous receiver is unregistered
+            unregisterScrollDetectionReceiver()
+
+            // Create a new receiver
+            scrollDetectionReceiver = createScrollDetectionReceiver()
+
+            // Detailed logging about receiver registration
+            Log.d(TAG, "Attempting to register local scroll detection receiver")
+            Log.d(TAG, "Current context: $context")
+            Log.d(TAG, "Context class: ${context.javaClass.name}")
+            
+            val filter = IntentFilter(ScrollDetectionAccessibilityService.SCROLL_DETECTED_ACTION)
+            
+            // Register using LocalBroadcastManager with application context
+            val appContext = context.applicationContext
+            scrollDetectionReceiver?.let { receiver ->
+                LocalBroadcastManager.getInstance(appContext)
+                    .registerReceiver(receiver, filter)
+                
+                Log.d(TAG, "Local scroll detection receiver registered successfully")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error registering local scroll detection receiver", e)
+            
+            // Additional context logging for debugging
+            Log.e(TAG, "Context details:")
+            Log.e(TAG, "Context: $context")
+            Log.e(TAG, "Context class: ${context.javaClass.name}")
+            Log.e(TAG, "Exception: ${e.message}")
+            Log.e(TAG, "Stack trace: ${e.stackTraceToString()}")
+        }
+    }
+
+    private fun unregisterScrollDetectionReceiver() {
+        try {
+            scrollDetectionReceiver?.let { receiver ->
+                // Unregister using LocalBroadcastManager with application context
+                val appContext = context.applicationContext
+                LocalBroadcastManager.getInstance(appContext)
+                    .unregisterReceiver(receiver)
+                
+                Log.d(TAG, "Local scroll detection receiver unregistered")
+                
+                // Set to null to prevent multiple unregistrations
+                scrollDetectionReceiver = null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error unregistering local scroll detection receiver", e)
+            Log.e(TAG, "Exception: ${e.message}")
+            Log.e(TAG, "Stack trace: ${e.stackTraceToString()}")
+        }
+    }
+
+    // Ensure receiver is unregistered when service is stopped or destroyed
+    fun onStop() {
+        unregisterScrollDetectionReceiver()
+    }
+
+    // Automatically check and prompt for Accessibility Service
+    fun checkAccessibilityServiceOnFirstLaunch() {
+        try {
+            // Use application context to avoid potential context-related issues
+            val appContext = context.applicationContext
+            val permissionDialog = AccessibilityPermissionDialog(appContext)
+            Log.d(TAG, "Checking accessibility service on first launch")
+            permissionDialog.show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking accessibility service", e)
         }
     }
 }

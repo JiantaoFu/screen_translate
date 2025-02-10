@@ -155,7 +155,7 @@ class OverlayService : Service() {
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         createControlButton()
         createTranslateButton()
-        methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/manualTranslate")
+        methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/translationService")
     }
 
     enum class DisplayMode(val icon: Int, val labelKey: String) {
@@ -487,8 +487,8 @@ class OverlayService : Service() {
         if (displayMode == DisplayMode.MANUAL) {
             Log.d(TAG, "Manually triggering translation")
             
-            // Send method call to Flutter side to request manual capture
-            methodChannel.invokeMethod("requestManualCapture", null, object : MethodChannel.Result {
+            // Send method call to Flutter side to request manual translation
+            methodChannel.invokeMethod("requestManualTranslation", null, object : MethodChannel.Result {
                 override fun success(result: Any?) {
                     Log.d(TAG, "Method invocation successful")
                 }
@@ -606,10 +606,10 @@ class OverlayService : Service() {
         var initialTouchY = 0f
     
         containerLayout.setOnTouchListener { v, event ->
-            Log.d("DragHandle", "Touch event: ${event.action}")
+            // Log.d("DragHandle", "Touch event: ${event.action}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    Log.d("DragHandle", "Initial position: x=${event.rawX}, y=${event.rawY}")
+                    // Log.d("DragHandle", "Initial position: x=${event.rawX}, y=${event.rawY}")
                     initialX = layoutParams.x.toFloat()
                     initialY = layoutParams.y.toFloat()
                     initialTouchX = event.rawX
@@ -617,14 +617,14 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    Log.d("DragHandle", "Moving: x=${event.rawX}, y=${event.rawY}")
+                    // Log.d("DragHandle", "Moving: x=${event.rawX}, y=${event.rawY}")
                     layoutParams.x = (initialX + (event.rawX - initialTouchX)).toInt()
                     layoutParams.y = (initialY + (event.rawY - initialTouchY)).toInt()
                     windowManager?.updateViewLayout(containerLayout, layoutParams)
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    Log.d("DragHandle", "Touch ended")
+                    // Log.d("DragHandle", "Touch ended")
                     true
                 }
                 else -> false

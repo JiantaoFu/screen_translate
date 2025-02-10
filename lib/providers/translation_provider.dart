@@ -27,9 +27,9 @@ class TranslationProvider with ChangeNotifier {
   final TranslationService _translationService;
   final OverlayService _overlayService;
   BuildContext? _context;
-  bool _isManualCaptureRequested = false;
-  static const MethodChannel _manualTranslateChannel = 
-      MethodChannel('com.lomoware.screen_translate/manualTranslate');
+  bool _isManualTranslationRequested = false;
+  static const MethodChannel _translationServiceChannel = 
+      MethodChannel('com.lomoware.screen_translate/translationService');
 
   TranslationProvider(
     this._context,
@@ -39,7 +39,7 @@ class TranslationProvider with ChangeNotifier {
   ) {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
-      initManualTranslateChannel();
+      initTranslationServiceChannel();
     }
   }
 
@@ -76,8 +76,8 @@ class TranslationProvider with ChangeNotifier {
     }
   }
 
-  void requestManualCapture() {
-    _isManualCaptureRequested = true;
+  void requestManualTranslation() {
+    _isManualTranslationRequested = true;
   }
 
   void _startPeriodicCapture() async {
@@ -90,7 +90,7 @@ class TranslationProvider with ChangeNotifier {
       final translationMode = await _androidScreenCaptureService?.getTranslationMode();
       
       // Capture only in auto mode or when manual capture is requested
-      if (translationMode == 'auto' || _isManualCaptureRequested) {
+      if (translationMode == 'auto' || _isManualTranslationRequested) {
         if (Platform.isAndroid) {
           final imageData = await _androidScreenCaptureService?.captureScreen();
           if (imageData != null) {
@@ -132,8 +132,8 @@ class TranslationProvider with ChangeNotifier {
           }
         }
 
-        // Reset manual capture flag after processing
-        _isManualCaptureRequested = false;
+        // Reset manual translation flag after processing
+        _isManualTranslationRequested = false;
       }
     });
   }
@@ -174,14 +174,19 @@ class TranslationProvider with ChangeNotifier {
     return _ocrService.getScriptForLanguage(_sourceLanguage);
   }
 
-  Future<void> initManualTranslateChannel() async {
+  Future<void> initTranslationServiceChannel() async {
     if (Platform.isAndroid) {
       try {
-        _manualTranslateChannel.setMethodCallHandler((MethodCall call) async {
+        _translationServiceChannel.setMethodCallHandler((MethodCall call) async {
           switch (call.method) {
-            case 'requestManualCapture':
-              print("Manual capture requested"); // Add this debug print
-              requestManualCapture();
+            case 'requestManualTranslation':
+              print("Manual translation requested"); // Add this debug print
+              requestManualTranslation();
+              break;
+            case 'cancelTranslation':
+              print("Translation cancelled");
+              cancelTranslation(_lastTranslatedText, _sourceLanguage, _targetLanguage);
+              _translationService.cancelAllTranslations();
               break;
             default:
               throw MissingPluginException();
@@ -191,6 +196,14 @@ class TranslationProvider with ChangeNotifier {
         print('Error setting up method channel: $e');
       }
     }
+  }
+
+  void cancelTranslation(String text, String sourceLanguage, String targetLanguage) {
+    _translationService.cancelTranslation(text, sourceLanguage, targetLanguage);
+  }
+
+  void cancelAllTranslations() {
+    _translationService.cancelAllTranslations();
   }
 
   @override

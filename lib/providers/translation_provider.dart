@@ -9,11 +9,17 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:flutter/material.dart';
 import '../services/overlay_service.dart';
 import 'package:flutter/services.dart';
+import '../services/llm_translation_service.dart';
 
 extension StringExtension on String {
   String capitalize() {
     return this[0].toUpperCase() + substring(1);
   }
+}
+
+enum TranslationMode {
+  onDevice,
+  llm
 }
 
 class TranslationProvider with ChangeNotifier {
@@ -26,17 +32,20 @@ class TranslationProvider with ChangeNotifier {
   final OCRService _ocrService;
   final TranslationService _translationService;
   final OverlayService _overlayService;
+  final LLMTranslationService _llmTranslationService;
   BuildContext? _context;
   bool _isManualTranslationRequested = false;
   static const MethodChannel _translationServiceChannel = 
       MethodChannel('com.lomoware.screen_translate/translationService');
+  TranslationMode _translationMode = TranslationMode.onDevice;
 
   TranslationProvider(
     this._context,
     this._ocrService,
     this._translationService,
-    this._overlayService,
-  ) {
+    this._overlayService, {
+    LLMTranslationService? llmTranslationService,
+  }) : _llmTranslationService = llmTranslationService ?? LLMTranslationService() {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
       initTranslationServiceChannel();
@@ -47,6 +56,7 @@ class TranslationProvider with ChangeNotifier {
   String get lastTranslatedText => _lastTranslatedText;
   String get sourceLanguage => _sourceLanguage;
   String get targetLanguage => _targetLanguage;
+  TranslationMode get translationMode => _translationMode;
 
   void setSourceLanguage(String language) {
     _sourceLanguage = language;
@@ -55,6 +65,11 @@ class TranslationProvider with ChangeNotifier {
 
   void setTargetLanguage(String language) {
     _targetLanguage = language;
+    notifyListeners();
+  }
+
+  void setTranslationMode(TranslationMode mode) {
+    _translationMode = mode;
     notifyListeners();
   }
 
@@ -100,11 +115,7 @@ class TranslationProvider with ChangeNotifier {
               
               for (var i = 0; i < ocrResults.length; i++) {
                 final ocrResult = ocrResults[i];
-                final translatedText = await _translationService.translateText(
-                  text: ocrResult.text,
-                  sourceLanguage: _sourceLanguage,
-                  targetLanguage: _targetLanguage,
-                );
+                final translatedText = await translateText(ocrResult.text);
                 if (Platform.isAndroid) {
                   await _overlayService.showTranslationOverlay(
                     translatedText,
@@ -204,6 +215,23 @@ class TranslationProvider with ChangeNotifier {
 
   void cancelAllTranslations() {
     _translationService.cancelAllTranslations();
+  }
+
+  Future<String> translateText(String text) async {
+    switch (_translationMode) {
+      case TranslationMode.onDevice:
+        return await _translationService.translateText(
+          text: text, 
+          sourceLanguage: _sourceLanguage, 
+          targetLanguage: _targetLanguage
+        );
+      case TranslationMode.llm:
+        return await _llmTranslationService.translateText(
+          text: text, 
+          sourceLanguage: _sourceLanguage, 
+          targetLanguage: _targetLanguage
+        );
+    }
   }
 
   @override

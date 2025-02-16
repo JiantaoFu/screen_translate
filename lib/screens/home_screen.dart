@@ -5,6 +5,9 @@ import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
+import '../providers/translation_provider.dart';
+import '../services/llm_translation_service.dart';
+import 'llm_api_config_screen.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -177,6 +180,8 @@ class HomeScreen extends StatelessWidget {
                     
                     SizedBox(height: 20),
 
+                    _buildTranslationModeToggle(context),
+
                     Consumer<TranslationProvider>(
                       builder: (context, provider, child) => _buildActionButton(
                         icon: Icons.screenshot,
@@ -220,6 +225,17 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(
+              builder: (context) => const LLMApiConfigScreen()
+            )
+          );
+        },
+        child: const Icon(Icons.settings),
+      ),
     );
   }
 
@@ -262,6 +278,131 @@ class HomeScreen extends StatelessWidget {
                   hint: AppLocalizations.of(context)!.target_language,
                   isSourceLanguage: false,
                 ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTranslationModeToggle(BuildContext context) {
+    return Consumer<TranslationProvider>(
+      builder: (context, translationProvider, child) {
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  'Translation Mode', 
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                'Choose how you want to translate text',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 15),
+              ToggleButtons(
+                isSelected: [
+                  translationProvider.translationMode == TranslationMode.onDevice,
+                  translationProvider.translationMode == TranslationMode.llm
+                ],
+                onPressed: (index) async {
+                  if (index == 1) { // LLM mode selected
+                    // Show loading dialog
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return WillPopScope(
+                          onWillPop: () async => false,
+                          child: AlertDialog(
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const CircularProgressIndicator(),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Checking API Key...',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+
+                    final llmService = LLMTranslationService();
+                    final hasApiKey = await llmService.hasValidApiKey();
+                    
+                    // Dismiss the loading dialog
+                    Navigator.of(context).pop();
+
+                    if (!hasApiKey) {
+                      // Show dialog to guide user to API key settings
+                      await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('API Key Required'),
+                            content: const Text('Please set up your ChatGLM API key to use LLM translation.'),
+                            actions: [
+                              TextButton(
+                                child: const Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Text('Go to Settings'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const LLMApiConfigScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      return; // Exit without changing mode
+                    }
+                  }
+                  
+                  // Change translation mode
+                  translationProvider.setTranslationMode(
+                    index == 0 
+                      ? TranslationMode.onDevice 
+                      : TranslationMode.llm
+                  );
+                },
+                color: Colors.grey,
+                selectedColor: Colors.white,
+                fillColor: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(10),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text('On-Device', style: TextStyle(fontSize: 16)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text('LLM', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
               ),
             ],
           ),

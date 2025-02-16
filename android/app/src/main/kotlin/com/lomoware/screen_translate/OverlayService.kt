@@ -724,18 +724,59 @@ class OverlayService : Service() {
             "hideAll" -> {
                 hideAllOverlays()
             }
+            "stop" -> {
+                hideAllOverlays()
+                removeOverlayButtons()
+            }
         }
         return START_NOT_STICKY
+    }
+
+    private fun removeOverlayButtons() {
+        controlButton?.let { button ->
+            Log.d(TAG, "Attempting to remove control button")
+            if (windowManager != null) {
+                try {
+                    windowManager?.removeView(button)
+                    Log.d(TAG, "Control button removed successfully")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error removing control button: ${e.message}", e)
+                }
+            } else {
+                Log.e(TAG, "windowManager is null, cannot remove control button")
+            }
+            controlButton = null 
+        }
+        
+        translateButton?.let { button ->
+            Log.d(TAG, "Attempting to remove translate button")
+            if (windowManager != null) {
+                try {
+                    windowManager?.removeView(button)
+                    Log.d(TAG, "Translate button removed successfully")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error removing translate button: ${e.message}", e)
+                }
+            } else {
+                Log.e(TAG, "windowManager is null, cannot remove translate button")
+            }
+            translateButton = null 
+        }
+        
+        tooltipView?.let { 
+            try {
+                windowManager?.removeView(it)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error removing tooltip view: ${e.message}", e)
+            }
+        }
+        tooltipHideRunnable?.let { handler.removeCallbacks(it) }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         hideAllOverlays()
-        controlButton?.let { windowManager?.removeView(it) }
-        translateButton?.let { windowManager?.removeView(it) }
-        tooltipView?.let { windowManager?.removeView(it) }
-        tooltipHideRunnable?.let { handler.removeCallbacks(it) }
-        originalPositions.clear()
+        removeOverlayButtons()
         windowManager = null
     }
 

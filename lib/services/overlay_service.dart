@@ -99,4 +99,14 @@ class OverlayService {
       return false;
     }
   }
+
+    Future<bool> stop() async {
+    try {
+      final bool succ = await _channel.invokeMethod('stopTranslationOverlay');
+      return succ;
+    } on PlatformException catch (e) {
+      print('Error stopping translation overlay: ${e.message}');
+      return false;
+    }
+  }
 }

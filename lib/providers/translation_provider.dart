@@ -151,7 +151,7 @@ class TranslationProvider with ChangeNotifier {
     _captureTimer = null;
     if (Platform.isAndroid) {
       await _androidScreenCaptureService?.stopScreenCapture();
-      await _overlayService.hideTranslationOverlay();
+      await _overlayService.stop();
     }
     notifyListeners();
   }

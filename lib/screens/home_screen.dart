@@ -346,7 +346,7 @@ class HomeScreen extends StatelessWidget {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: const Text('API Key Required'),
-                            content: const Text('Please set up your ChatGLM API key to use LLM translation.'),
+                            content: const Text('Please set up your ChatGLM API key to use AI translation.'),
                             actions: [
                               TextButton(
                                 child: const Text('Cancel'),
@@ -391,7 +391,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text('LLM', style: TextStyle(fontSize: 16)),
+                    child: Text('AI', style: TextStyle(fontSize: 16)),
                   ),
                 ],
               ),

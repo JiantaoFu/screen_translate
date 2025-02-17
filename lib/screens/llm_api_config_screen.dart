@@ -58,7 +58,7 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LLM Translation API Configuration'),
+        title: const Text('AI Translation API Configuration'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,7 +67,7 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
           child: ListView(
             children: [
               Text(
-                'ChatGLM LLM Translation',
+                'ChatGLM AI Translation',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

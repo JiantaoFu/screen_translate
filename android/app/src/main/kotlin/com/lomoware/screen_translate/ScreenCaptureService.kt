@@ -149,7 +149,7 @@ class FrameStabilizer(
         val shouldProcess = currentImageHash != lastImageHash
 
         if (shouldProcess) {
-            // Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
+            Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
             // Cancel previous timer
             stabilizationTimer?.cancel()
 
@@ -681,9 +681,10 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     when (intent.action) {
                         ScrollDetectionAccessibilityService.SCROLL_DETECTED_ACTION -> {
                             val packageName = intent.getStringExtra("package") ?: "unknown"
-                            val scrollDelta = intent.getIntExtra("scrollDelta", 0)
-                            
-                            Log.d(TAG, "Scroll event received - Package: $packageName, Delta: $scrollDelta")
+                            val scrollXDelta = intent.getIntExtra("scrollXDelta", 0)
+                            val scrollYDelta = intent.getIntExtra("scrollYDelta", 0)
+
+                            Log.d(TAG, "Scroll event received - Package: $packageName, X Delta: $scrollXDelta, Y Delta: $scrollYDelta")
 
                             // Pause translation or take appropriate action
                             val overlayIntent = Intent(context, OverlayService::class.java)

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlin.math.abs
 
 class ScrollDetectionAccessibilityService : AccessibilityService() {
     companion object {
@@ -15,6 +16,16 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
 
         private const val TAG = "ScrollDetectionService"
     }
+
+    // Track scroll state for different packages
+    private val scrollStateMap = mutableMapOf<String, ScrollState>()
+
+    // Inner class to track scroll state
+    private data class ScrollState(
+        var lastScrollX: Int = 0,
+        var lastScrollY: Int = 0,
+        var lastScrollTimestamp: Long = 0
+    )
 
     private var isScrolling = false
     private var lastScrolledPackage: String? = null
@@ -33,65 +44,56 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        try {
-            when (event.eventType) {
-                AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
-                    handleScrollEvent(event)
-                }
-                else -> {
-                    // Log other event types for debugging
-                    Log.v(TAG, "Received event type: ${event.eventType}")
-                }
+        when (event.eventType) {
+            AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
+                handleScrollEvent(event)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error processing accessibility event", e)
+            // Other event types can be handled here if needed
         }
     }
 
     private fun handleScrollEvent(event: AccessibilityEvent) {
         val currentTime = System.currentTimeMillis()
+        val packageName = event.packageName?.toString() ?: "unknown"
 
-        // Prevent rapid successive scroll events
-        if (currentTime - scrollStartTimestamp < 100) {
-            Log.d(TAG, "Ignoring rapid successive scroll event")
-            return
-        }
+        // Get or create scroll state for this package
+        val scrollState = scrollStateMap.getOrPut(packageName) { ScrollState() }
 
-        // Calculate scroll difference
-        val scrollDelta = when {
-            event.scrollY != 0 -> event.scrollY
-            event.scrollX != 0 -> event.scrollX
-            event.fromIndex != null && event.toIndex != null -> event.toIndex - event.fromIndex
-            else -> 0
-        }
+        // Calculate scroll deltas
+        val scrollXDelta = event.scrollX - scrollState.lastScrollX
+        val scrollYDelta = event.scrollY - scrollState.lastScrollY
 
-        if (scrollDelta != 0) {
-            val packageName = event.packageName?.toString() ?: "unknown"
-            
-            isScrolling = true
-            lastScrolledPackage = packageName
-            scrollStartTimestamp = currentTime
+        // Log raw event details for debugging
+        Log.d(TAG, "Raw Scroll Event Details:")
+        Log.d(TAG, "Current ScrollX: ${event.scrollX}, Last ScrollX: ${scrollState.lastScrollX}")
+        Log.d(TAG, "Current ScrollY: ${event.scrollY}, Last ScrollY: ${scrollState.lastScrollY}")
+        Log.d(TAG, "Calculated X Delta: $scrollXDelta, Y Delta: $scrollYDelta")
 
-            // Broadcast scroll event using LocalBroadcastManager
+        // More conservative scroll detection
+        val isSignificantScroll = 
+            abs(scrollXDelta) > 50 || 
+            abs(scrollYDelta) > 50
+
+        if (isSignificantScroll) {
+            // Update scroll state
+            scrollState.lastScrollX = event.scrollX
+            scrollState.lastScrollY = event.scrollY
+            scrollState.lastScrollTimestamp = currentTime
+
+            // Broadcast scroll event
             val intent = Intent(SCROLL_DETECTED_ACTION).apply {
                 putExtra("package", packageName)
-                putExtra("scrollDelta", scrollDelta)
+                putExtra("scrollXDelta", scrollXDelta)
+                putExtra("scrollYDelta", scrollYDelta)
             }
             
             try {
-                Log.d(TAG, "Preparing to send local broadcast")
-                Log.d(TAG, "Broadcast Action: $SCROLL_DETECTED_ACTION")
-                Log.d(TAG, "Package Name: $packageName")
-                Log.d(TAG, "Scroll Delta: $scrollDelta")
+                Log.d(TAG, "Significant Scroll Detected in $packageName")
+                Log.d(TAG, "X Delta: $scrollXDelta, Y Delta: $scrollYDelta")
                 
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-                
-                Log.d(TAG, "Local broadcast sent successfully")
-                Log.d(TAG, "Scroll detected in $packageName, delta: $scrollDelta")
             } catch (e: Exception) {
-                Log.e(TAG, "Error sending local broadcast", e)
-                Log.e(TAG, "Exception details: ${e.message}")
-                Log.e(TAG, "Exception stack trace: ${e.stackTraceToString()}")
+                Log.e(TAG, "Error sending scroll broadcast", e)
             }
         }
     }

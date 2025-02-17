@@ -166,6 +166,12 @@ class MainActivity: FlutterActivity() {
                     startService(intent)
                     result.success(true)
                 }
+                "startTranslationOverlay" -> {
+                    val intent = Intent(this, OverlayService::class.java)
+                    intent.action = "start"
+                    startService(intent)
+                    result.success(true)
+                }
                 else -> {
                     result.notImplemented()
                 }

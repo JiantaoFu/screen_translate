@@ -165,25 +165,44 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() { _isLoading = true; });
       
-      final llmService = LLMTranslationService(apiKey: _apiKeyController.text);
-      
+      final apiKey = _apiKeyController.text.trim();
+
+      // First, do a basic validation
+      if (apiKey.isEmpty || apiKey.length <= 10) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('API Key is too short. Please provide a valid key.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() { _isLoading = false; });
+        return;
+      }
+
+      final llmService = LLMTranslationService();
+
       try {
-        // Validate the API key before saving
+        // Temporarily save the API key to test validation
+        await llmService.saveApiKey(apiKey);
+        
+        // Validate the API key
         final isValidKey = await llmService.hasValidApiKey();
         
         if (!isValidKey) {
+          // If invalid, remove the temporarily saved key
+          await llmService.clearApiKey();
+          
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Invalid API Key. Please check and try again.'),
               backgroundColor: Colors.red,
             ),
           );
+          setState(() { _isLoading = false; });
           return;
         }
         
-        // If key is valid, save it
-        await llmService.saveApiKey(_apiKeyController.text);
-        
+        // If key is valid, keep it saved
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('API Key saved successfully'),

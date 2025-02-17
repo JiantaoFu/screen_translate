@@ -81,6 +81,7 @@ class TranslationProvider with ChangeNotifier {
         if (await _overlayService.ensureOverlayPermission(_context!)) {
           _isTranslating = true;
           notifyListeners();
+          await _overlayService.start();
           await _startAndroidScreenCapture();
           _startPeriodicCapture();
         }
@@ -210,7 +211,14 @@ class TranslationProvider with ChangeNotifier {
   }
 
   void cancelTranslation(String text, String sourceLanguage, String targetLanguage) {
-    _translationService.cancelTranslation(text, sourceLanguage, targetLanguage);
+    switch (_translationMode) {
+      case TranslationMode.onDevice:
+        _translationService.cancelTranslation(text, sourceLanguage, targetLanguage);
+        break;
+      case TranslationMode.llm:
+        _llmTranslationService.cancelTranslation(text, sourceLanguage, targetLanguage);
+        break;
+    }
   }
 
   void cancelAllTranslations() {

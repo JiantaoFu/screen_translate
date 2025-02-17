@@ -46,21 +46,32 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
     super.dispose();
   }
 
-  // Helper method to build model status icon
-  Widget _buildModelStatusIcon(String languageCode) {
+  Future<bool> _checkModelAvailability(String languageCode, TranslationMode mode) async {
+    switch (mode) {
+      case TranslationMode.onDevice:
+        return await OnDeviceTranslatorModelManager().isModelDownloaded(languageCode);
+      case TranslationMode.llm:
+        // For LLM, always consider the language "ready"
+        return true;
+    }
+  }
+
+  Widget _buildModelStatusIcon(String languageCode, TranslationMode mode) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return FutureBuilder<bool>(
-          future: OnDeviceTranslatorModelManager().isModelDownloaded(languageCode),
+          future: _checkModelAvailability(languageCode, mode),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return SizedBox.shrink();
             }
-            
+
             return snapshot.data! 
               ? Icon(Icons.check_circle, color: Colors.green, size: 16)
-              : Icon(Icons.download, color: Colors.orange, size: 16);
+              : (mode == TranslationMode.onDevice 
+                  ? Icon(Icons.download, color: Colors.orange, size: 16)
+                  : SizedBox.shrink());
           },
         );
       },
@@ -113,7 +124,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                       ),
                       SizedBox(width: 1), // Small spacing
                       // Check download status
-                      _buildModelStatusIcon(code),
+                      _buildModelStatusIcon(code , Provider.of<TranslationProvider>(context).translationMode),
                     ],
                   ),
                 );
@@ -205,18 +216,25 @@ class HomeScreen extends StatelessWidget {
 
                     SizedBox(height: 20),
 
-                    _buildActionButton(
-                      icon: Icons.language,
-                      label: AppLocalizations.of(context)!.manage_translation_models,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ModelManagementScreen(),
-                          ),
-                        );
+                    Consumer<TranslationProvider>(
+                      builder: (context, provider, child) {
+                        if (provider.translationMode == TranslationMode.onDevice)
+                          return _buildActionButton(
+                            icon: Icons.language,
+                            label: AppLocalizations.of(context)!.manage_translation_models,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ModelManagementScreen(),
+                                ),
+                              );
+                            },
+                            context: context,
+                          );
+                        else
+                          return SizedBox.shrink();
                       },
-                      context: context,
                     ),
                   ],
                 ),
@@ -318,35 +336,8 @@ class HomeScreen extends StatelessWidget {
                 ],
                 onPressed: (index) async {
                   if (index == 1) { // LLM mode selected
-                    // Show loading dialog
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return WillPopScope(
-                          onWillPop: () async => false,
-                          child: AlertDialog(
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const CircularProgressIndicator(),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Checking API Key...',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-
                     final llmService = LLMTranslationService();
-                    final hasApiKey = await llmService.hasValidApiKey();
-                    
-                    // Dismiss the loading dialog
-                    Navigator.of(context).pop();
+                    final hasApiKey = await LLMTranslationService.isApiKeyConfigured();
 
                     if (!hasApiKey) {
                       // Show dialog to guide user to API key settings

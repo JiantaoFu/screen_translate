@@ -103,8 +103,16 @@ class TranslationService {
     if (taskKey.isNotEmpty) {
       final completer = _translationCompleters[taskKey];
       if (completer != null && !completer.isCompleted) {
-        print('Translation: Cancelling specific translation task');
+        print('Translation: Attempting to cancel specific translation task');
+        
+        // Close the current translator to interrupt any ongoing translation
+        _translator?.close();
+        _translator = null;
+
+        // Complete the completer with the original text to signal cancellation
         completer.complete(text);
+        
+        // Remove the task from tracking
         _translations.remove(taskKey);
         _translationCompleters.remove(taskKey);
       }
@@ -121,6 +129,9 @@ class TranslationService {
         completer.complete('');
       }
     }
+    // Close the current translator to interrupt any ongoing translation
+    _translator?.close();
+    _translator = null;
     _translations.clear();
     _translationCompleters.clear();
   }

@@ -57,6 +57,7 @@ class OverlayService : Service() {
     private var currentRotation: Int = Surface.ROTATION_0
     private var TAG = "OverlayService"
     private lateinit var methodChannel: MethodChannel
+    private var isStopped = false
 
     companion object {
         // Use @Volatile to ensure visibility across threads
@@ -153,8 +154,6 @@ class OverlayService : Service() {
         Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
         setInstance(this)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        createControlButton()
-        createTranslateButton()
         methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/translationService")
     }
 
@@ -704,27 +703,38 @@ class OverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
+            "start" -> {
+                // Reset stopped flag when starting the service
+                isStopped = false
+                createControlButton()
+                createTranslateButton()
+                Log.d(TAG, "Service started, reset stopped flag")
+            }
             "show" -> {
-                val text = intent.getStringExtra("text")
-                val x = intent.getFloatExtra("x", -1f)
-                val y = intent.getFloatExtra("y", -1f)
-                val width = intent.getFloatExtra("width", -1f)
-                val height = intent.getFloatExtra("height", -1f)
-                val id = intent.getIntExtra("id", -1)           
-                val overlayColor = intent.getIntExtra("overlayColor", -1)
-                val backgroundColor = intent.getIntExtra("backgroundColor", -1)
-                val isLight = intent.getBooleanExtra("isLight", false)
-                val imgWidth = intent.getFloatExtra("imgWidth", -1f)
-                val imgHeight = intent.getFloatExtra("imgHeight", -1f)
-                
-                if (text != null && id >= 0) {
-                    showOverlay(id, text, x, y, width, height, overlayColor, backgroundColor, isLight, imgWidth, imgHeight)
+                // Reset stopped flag when showing
+                if (!isStopped) {
+                    val text = intent.getStringExtra("text")
+                    val x = intent.getFloatExtra("x", -1f)
+                    val y = intent.getFloatExtra("y", -1f)
+                    val width = intent.getFloatExtra("width", -1f)
+                    val height = intent.getFloatExtra("height", -1f)
+                    val id = intent.getIntExtra("id", -1) 
+                    val overlayColor = intent.getIntExtra("overlayColor", -1)
+                    val backgroundColor = intent.getIntExtra("backgroundColor", -1)
+                    val isLight = intent.getBooleanExtra("isLight", false)
+                    val imgWidth = intent.getFloatExtra("imgWidth", -1f)
+                    val imgHeight = intent.getFloatExtra("imgHeight", -1f)
+                    
+                    if (text != null && id >= 0) {
+                        showOverlay(id, text, x, y, width, height, overlayColor, backgroundColor, isLight, imgWidth, imgHeight)
+                    }
                 }
             }
             "hideAll" -> {
                 hideAllOverlays()
             }
             "stop" -> {
+                isStopped = true
                 hideAllOverlays()
                 removeOverlayButtons()
             }
@@ -733,6 +743,10 @@ class OverlayService : Service() {
     }
 
     private fun removeOverlayButtons() {
+        if (isStopped) {
+            Log.d(TAG, "Service is stopped, removing overlay buttons")
+        }
+
         controlButton?.let { button ->
             Log.d(TAG, "Attempting to remove control button")
             if (windowManager != null) {
@@ -760,7 +774,7 @@ class OverlayService : Service() {
             } else {
                 Log.e(TAG, "windowManager is null, cannot remove translate button")
             }
-            translateButton = null 
+            translateButton = null
         }
         
         tooltipView?.let { 

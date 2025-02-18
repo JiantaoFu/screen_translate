@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../services/llm_translation_service.dart';
 import '../providers/translation_provider.dart';
 
@@ -56,9 +58,10 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Translation API Configuration'),
+        title: Text(localizations.api_key_dialog_title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,7 +70,7 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
           child: ListView(
             children: [
               Text(
-                'ChatGLM AI Translation',
+                localizations.api_key_configuration_title,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -77,8 +80,8 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
                 text: TextSpan(
                   style: Theme.of(context).textTheme.bodyMedium,
                   children: [
-                    const TextSpan(
-                      text: 'To use ChatGLM for translations, you need to obtain an free API key from ',
+                    TextSpan(
+                      text: localizations.api_key_get_key_from,
                     ),
                     TextSpan(
                       text: 'BigModel.cn',
@@ -90,29 +93,29 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
-                'API Key Configuration Steps:',
+              Text(
+                localizations.api_key_configuration_steps,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               _buildConfigurationStep(
-                '1. Visit open.bigmodel.cn and create an account',
+                localizations.api_key_step_1,
                 Icons.account_circle,
               ),
               _buildConfigurationStep(
-                '2. Navigate to API Management section',
+                localizations.api_key_step_2,
                 Icons.settings,
               ),
               _buildConfigurationStep(
-                '3. Generate a new API key for your application',
+                localizations.api_key_step_3,
                 Icons.key,
               ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _apiKeyController,
                 decoration: InputDecoration(
-                  labelText: 'ChatGLM API Key',
-                  hintText: 'Enter your ChatGLM API key',
+                  labelText: localizations.api_key_input_label,
+                  hintText: localizations.api_key_input_hint,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -120,9 +123,8 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your ChatGLM API key';
+                    return localizations.api_key_input_error;
                   }
-                  // Add more specific validation if needed
                   return null;
                 },
               ),
@@ -134,11 +136,11 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
                 ),
                 child: _isLoading 
                   ? const CircularProgressIndicator() 
-                  : const Text('Save API Key', style: TextStyle(fontSize: 16)),
+                  : Text(localizations.api_key_save_button, style: TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Note: Your API key will be securely stored and used only for translation services.',
+              Text(
+                localizations.api_key_note,
                 style: TextStyle(color: Colors.grey),
               ),
             ],
@@ -166,12 +168,13 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
       setState(() { _isLoading = true; });
       
       final apiKey = _apiKeyController.text.trim();
+      final localizations = AppLocalizations.of(context)!;
 
       // First, do a basic validation
       if (apiKey.isEmpty || apiKey.length <= 10) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('API Key is too short. Please provide a valid key.'),
+          SnackBar(
+            content: Text(localizations.api_key_input_error),
             backgroundColor: Colors.red,
           ),
         );
@@ -193,33 +196,29 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
           await llmService.clearApiKey();
           
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Invalid API Key. Please check and try again.'),
+            SnackBar(
+              content: Text(localizations.api_key_save_error),
               backgroundColor: Colors.red,
             ),
           );
           setState(() { _isLoading = false; });
-          return;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(localizations.api_key_save_success),
+              backgroundColor: Colors.green,
+            ),
+          );
+          setState(() { _isLoading = false; });
+          Navigator.of(context).pop();
         }
-        
-        // If key is valid, keep it saved
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('API Key saved successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Optional: Pop the screen after successful save
-        Navigator.of(context).pop();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving API Key: $e'),
+            content: Text(localizations.api_key_save_error),
             backgroundColor: Colors.red,
           ),
         );
-      } finally {
         setState(() { _isLoading = false; });
       }
     }

@@ -90,5 +90,13 @@
   "review_prompt_message": "Haluaisimme kuulla mielipiteesi! Haluatko arvioida sovelluksen Google Playssa?",
   "rate_now": "Arvioi nyt",
   "not_now": "Ei nyt",
-  "cannot_open_store": "Google Play Storea ei voitu avata"
-} 
+  "cannot_open_store": "Google Play Storea ei voitu avata",
+  "translation_mode_on_device": "Käännös Laitteessa",
+  "translation_mode_on_device_description": "Käyttää laitteeseen sisäänrakennettuja käännösmalleja. Nopea ja toimii offline-tilassa, mutta voi olla rajoitettu kielen tuki ja tarkkuus.",
+  "translation_mode_ai": "AI-Käännös",
+  "translation_mode_ai_description": "Käyttää edistyneitä AI-malleja tarkempiin ja kontekstuaalisiin käännöksiin. Vaatii internet-yhteyden ja API-avaimen.",
+  "translation_mode_title": "Käännöstila",
+  "translation_mode_on_device_label": "Laitteessa",
+  "translation_mode_ai_label": "AI",
+  "close": "Sulje"
+}

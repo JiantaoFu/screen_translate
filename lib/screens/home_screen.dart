@@ -10,6 +10,7 @@ import '../services/llm_translation_service.dart';
 import 'llm_api_config_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -210,7 +211,7 @@ class HomeScreen extends StatelessWidget {
             TextButton(
               child: Text(AppLocalizations.of(context)!.rate_now),
               onPressed: () {
-                _launchGooglePlayReview(context);
+                _launchInAppReview(context);
                 Navigator.of(dialogContext).pop();
               },
             ),
@@ -220,10 +221,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _launchGooglePlayReview(BuildContext context) async {
-    const String googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.lomoware.screen_translate';
-    if (await canLaunch(googlePlayUrl)) {
-      await launch(googlePlayUrl);
+  void _launchInAppReview(BuildContext context) async {
+    final InAppReview inAppReview = InAppReview.instance;
+
+    if (await inAppReview.isAvailable()) {
+      inAppReview.requestReview();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.cannot_open_store)),
@@ -366,6 +368,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildTranslationModeToggle(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Consumer<TranslationProvider>(
       builder: (context, translationProvider, child) {
         return Container(
@@ -373,14 +376,50 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Translation Mode', 
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Translation Mode', 
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
+                  IconButton(
+                    icon: Icon(Icons.info_outline, size: 20),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(localizations.translation_mode_title),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${localizations.translation_mode_on_device}:', 
+                                style: Theme.of(context).textTheme.titleSmall
+                              ),
+                              Text(localizations.translation_mode_on_device_description),
+                              SizedBox(height: 10),
+                              Text(
+                                '${localizations.translation_mode_ai}:', 
+                                style: Theme.of(context).textTheme.titleSmall
+                              ),
+                              Text(localizations.translation_mode_ai_description),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text(localizations.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
               Text(
                 'Choose how you want to translate text',
@@ -405,18 +444,19 @@ class HomeScreen extends StatelessWidget {
                       await showDialog(
                         context: context,
                         builder: (BuildContext context) {
+                          final localizations = AppLocalizations.of(context)!;
                           return AlertDialog(
-                            title: const Text('API Key Required'),
-                            content: const Text('Please set up your ChatGLM API key to use AI translation.'),
+                            title: Text(localizations.api_key_required),
+                            content: Text(localizations.api_key_setup_prompt),
                             actions: [
                               TextButton(
-                                child: const Text('Cancel'),
+                                child: Text(localizations.cancel),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               ElevatedButton(
-                                child: const Text('Go to Settings'),
+                                child: Text(localizations.go_to_settings),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).push(
@@ -445,14 +485,20 @@ class HomeScreen extends StatelessWidget {
                 selectedColor: Colors.white,
                 fillColor: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(10),
-                children: const [
+                children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text('On-Device', style: TextStyle(fontSize: 16)),
+                    child: Text(
+                      localizations.translation_mode_on_device_label, 
+                      style: TextStyle(fontSize: 16)
+                    ),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text('AI', style: TextStyle(fontSize: 16)),
+                    child: Text(
+                      localizations.translation_mode_ai_label, 
+                      style: TextStyle(fontSize: 16)
+                    ),
                   ),
                 ],
               ),

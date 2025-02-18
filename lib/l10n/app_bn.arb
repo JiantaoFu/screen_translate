@@ -85,5 +85,10 @@
   "language_ukrainian": "ইউক্রেনিয়ান",
   "language_urdu": "উর্দু",
   "language_vietnamese": "ভিয়েতনামি",
-  "language_welsh": "ওয়েলশ"
-} 
+  "language_welsh": "ওয়েলশ",
+  "enjoying_app": "Screen Translate কেমন লাগছে?",
+  "review_prompt_message": "আমরা আপনার মতামত শুনতে চাই! Google Play-এ কি আপনি অ্যাপটি রেট করবেন?",
+  "rate_now": "এখনই রেট করুন",
+  "not_now": "এখন নয়",
+  "cannot_open_store": "Google Play Store খুলতে পারছি না"
+}

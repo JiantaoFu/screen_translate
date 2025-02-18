@@ -85,5 +85,10 @@
   "language_ukrainian": "אוקראינית",
   "language_urdu": "אורדו",
   "language_vietnamese": "וייטנאמית",
-  "language_welsh": "וולשית"
-} 
+  "language_welsh": "וולשית",
+  "enjoying_app": "נהנים מ-Screen Translate?",
+  "review_prompt_message": "נשמח לשמוע את דעתכם! האם תרצו לדרג את האפליקציה ב-Google Play?",
+  "rate_now": "דרגו עכשיו",
+  "not_now": "לא עכשיו",
+  "cannot_open_store": "לא ניתן לפתוח את חנות Google Play"
+}

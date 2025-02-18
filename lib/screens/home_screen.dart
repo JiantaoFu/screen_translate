@@ -8,6 +8,8 @@ import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import 'llm_api_config_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -171,6 +173,64 @@ class HomeScreen extends StatelessWidget {
 
   const HomeScreen({Key? key}) : super(key: key);
 
+  Future<void> _trackTranslationAndPromptReview(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    int translationCount = prefs.getInt('translationCount') ?? 0;
+    int promptCount = prefs.getInt('reviewPromptCount') ?? 0;
+  
+    translationCount++;
+    await prefs.setInt('translationCount', translationCount);
+
+    // Prompt at increasing translation milestones
+    final promptThresholds = [10, 50, 100, 250, 500];
+  
+    if (promptCount < promptThresholds.length && 
+        translationCount >= promptThresholds[promptCount]) {
+      _showReviewPromptDialog(context);
+      await prefs.setInt('reviewPromptCount', promptCount + 1);
+    }
+  }
+
+  void _showReviewPromptDialog(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+  
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.enjoying_app),
+          content: Text(AppLocalizations.of(context)!.review_prompt_message),
+          actions: [
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.not_now),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.rate_now),
+              onPressed: () {
+                _launchGooglePlayReview(context);
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _launchGooglePlayReview(BuildContext context) async {
+    const String googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.lomoware.screen_translate';
+    if (await canLaunch(googlePlayUrl)) {
+      await launch(googlePlayUrl);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.cannot_open_store)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,6 +264,7 @@ class HomeScreen extends StatelessWidget {
                             } else {
                               await provider.startTranslation();
                             }
+                            await _trackTranslationAndPromptReview(context);
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Error: ${e.toString()}')),

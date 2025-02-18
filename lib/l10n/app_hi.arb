@@ -85,5 +85,10 @@
   "language_ukrainian": "यूक्रेनी",
   "language_urdu": "उर्दू",
   "language_vietnamese": "वियतनामी",
-  "language_welsh": "वेल्श"
+  "language_welsh": "वेल्श",
+  "enjoying_app": "क्या आपको स्क्रीन अनुवाद पसंद आ रहा है?",
+  "review_prompt_message": "हमें आपकी राय जानने में खुशी होगी! क्या आप गूगल प्ले स्टोर पर हमारे ऐप को रेट करना चाहेंगे?",
+  "rate_now": "अब रेट करें",
+  "not_now": "अब नहीं",
+  "cannot_open_store": "गूगल प्ले स्टोर नहीं खोला जा सकता"
 } 

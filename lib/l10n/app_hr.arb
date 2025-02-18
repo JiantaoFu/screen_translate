@@ -85,5 +85,10 @@
   "language_ukrainian": "Ukrajinski",
   "language_urdu": "Urdu",
   "language_vietnamese": "Vijetnamski",
-  "language_welsh": "Velški"
+  "language_welsh": "Velški",
+  "enjoying_app": "Sviđa li vam se Screen Translate?",
+  "review_prompt_message": "Željeli bismo čuti vaše mišljenje! Želite li ocijeniti aplikaciju na Google Playu?",
+  "rate_now": "Ocijeni sada",
+  "not_now": "Ne sada",
+  "cannot_open_store": "Nije moguće otvoriti Google Play Store"
 } 

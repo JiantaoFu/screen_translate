@@ -85,5 +85,10 @@
   "language_ukrainian": "Ukraynaca",
   "language_urdu": "Urduca",
   "language_vietnamese": "Vietnamca",
-  "language_welsh": "Galce"
+  "language_welsh": "Galce",
+  "enjoying_app": "Screen Translate'ten memnun musunuz?",
+  "review_prompt_message": "Geri bildiriminizi duymak isteriz! Google Play'de uygulamayı değerlendirir misiniz?",
+  "rate_now": "Şimdi Değerlendir",
+  "not_now": "Şimdi Değil",
+  "cannot_open_store": "Google Play Store açılamadı"
 } 

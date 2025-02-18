@@ -1,8 +1,13 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -25,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId "com.lomoware.screen_translate"
-        minSdkVersion 21
+        minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
@@ -33,10 +38,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../screen-trans-key.keystore")
-            storePassword "Jiantao123!"
-            keyAlias "screen-trans"
-            keyPassword "Jiantao123!"
+            storeFile file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD') ?: ''
+            keyAlias keystoreProperties['keyAlias'] ?: 'screen-trans'
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD') ?: ''
         }
     }
 

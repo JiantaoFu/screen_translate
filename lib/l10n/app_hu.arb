@@ -85,5 +85,10 @@
   "language_ukrainian": "Ukrán",
   "language_urdu": "Urdu",
   "language_vietnamese": "Vietnami",
-  "language_welsh": "Walesi"
+  "language_welsh": "Walesi",
+  "enjoying_app": "Tetszik a Screen Translate?",
+  "review_prompt_message": "Szeretnénk hallani a véleményét! Szeretné értékelni az alkalmazást a Google Playen?",
+  "rate_now": "Értékelés most",
+  "not_now": "Most nem",
+  "cannot_open_store": "Nem sikerült megnyitni a Google Play áruházat"
 } 

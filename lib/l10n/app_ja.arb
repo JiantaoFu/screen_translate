@@ -85,5 +85,10 @@
   "language_ukrainian": "ウクライナ語",
   "language_urdu": "ウルドゥー語",
   "language_vietnamese": "ベトナム語",
-  "language_welsh": "ウェールズ語"
-} 
+  "language_welsh": "ウェールズ語",
+  "enjoying_app": "Screen Translateを楽しんでいますか？",
+  "review_prompt_message": "ぜひあなたのご意見をお聞かせください！Google Playでアプリを評価していただけますか？",
+  "rate_now": "今すぐ評価",
+  "not_now": "後で",
+  "cannot_open_store": "Google Playストアを開けませんでした"
+}

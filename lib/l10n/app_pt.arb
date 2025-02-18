@@ -85,5 +85,10 @@
   "language_ukrainian": "Ucraniano",
   "language_urdu": "Urdu",
   "language_vietnamese": "Vietnamita",
-  "language_welsh": "Galês"
-} 
+  "language_welsh": "Galês",
+  "enjoying_app": "Está gostando do Screen Translate?",
+  "review_prompt_message": "Adoraríamos ouvir sua opinião! Gostaria de avaliar o aplicativo no Google Play?",
+  "rate_now": "Avaliar agora",
+  "not_now": "Agora não",
+  "cannot_open_store": "Não foi possível abrir a Google Play Store"
+}

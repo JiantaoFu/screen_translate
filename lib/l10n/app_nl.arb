@@ -85,5 +85,10 @@
   "language_ukrainian": "Oekraïens",
   "language_urdu": "Urdu",
   "language_vietnamese": "Vietnamees",
-  "language_welsh": "Welsh"
-} 
+  "language_welsh": "Welsh",
+  "enjoying_app": "Bevalt Screen Translate je?",
+  "review_prompt_message": "We zouden graag je mening horen! Wil je de app beoordelen in Google Play?",
+  "rate_now": "Nu beoordelen",
+  "not_now": "Niet nu",
+  "cannot_open_store": "Kan Google Play Store niet openen"
+}

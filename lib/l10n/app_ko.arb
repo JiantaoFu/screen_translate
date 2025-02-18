@@ -12,7 +12,7 @@
   "model_not_downloaded": "모델이 다운로드되지 않음",
   "download_model": "다운로드",
   "remove_translation_model": "번역 모델 삭제",
-  "remove_translation_model_confirmation": "{language}번역 모델을 삭제しますか?",
+  "remove_translation_model_confirmation": "{language}번역 모델을 삭제합니다か?",
   "cancel": "죽기",
   "remove": " 삭제",
   "not_installed": "설치되지 않음",
@@ -85,5 +85,10 @@
   "language_ukrainian": "우크라이나어",
   "language_urdu": "우르두어",
   "language_vietnamese": "베트남어",
-  "language_welsh": "웨일스어"
+  "language_welsh": "웨일스어",
+  "enjoying_app": "Screen Translate가 마음에 드시나요?",
+  "review_prompt_message": "사용자 여러분의 소중한 의견을 듣고 싶습니다! Google Play에서 앱을 평가해 주시겠어요?",
+  "rate_now": "지금 평가하기",
+  "not_now": "나중에",
+  "cannot_open_store": "Google Play 스토어를 열 수 없습니다"
 } 

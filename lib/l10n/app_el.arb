@@ -85,5 +85,10 @@
   "language_ukrainian": "ουκρανικά",
   "language_urdu": "ούρντου",
   "language_vietnamese": "βιετναμικά",
-  "language_welsh": "ουαλικά"
+  "language_welsh": "ουαλικά",
+  "enjoying_app": "Σας αρέσει το Screen Translate;",
+  "review_prompt_message": "Θα θέλαμε να ακούσουμε τη γνώμη σας! Θα θέλατε να αξιολογήσετε την εφαρμογή στο Google Play;",
+  "rate_now": "Αξιολόγηση τώρα",
+  "not_now": "Όχι τώρα",
+  "cannot_open_store": "Δεν ήταν δυνατό το άνοιγμα του Google Play Store"
 } 

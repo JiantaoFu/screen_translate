@@ -85,5 +85,10 @@
   "language_ukrainian": "ukraina",
   "language_urdu": "urdu",
   "language_vietnamese": "vietnam",
-  "language_welsh": "wales"
+  "language_welsh": "wales",
+  "enjoying_app": "Pidätkö Screen Translatesta?",
+  "review_prompt_message": "Haluaisimme kuulla mielipiteesi! Haluatko arvioida sovelluksen Google Playssa?",
+  "rate_now": "Arvioi nyt",
+  "not_now": "Ei nyt",
+  "cannot_open_store": "Google Play Storea ei voitu avata"
 } 

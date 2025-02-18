@@ -85,5 +85,10 @@
   "language_ukrainian": "Ukrainiečių",
   "language_urdu": "Urdu",
   "language_vietnamese": "Vietnamiečių",
-  "language_welsh": "Valų"
+  "language_welsh": "Valų",
+  "enjoying_app": "Patinka Screen Translate?",
+  "review_prompt_message": "Norėtume išgirsti jūsų nuomonę! Ar norėtumėte įvertinti programėlę Google Play?",
+  "rate_now": "Vertinti dabar",
+  "not_now": "Ne dabar",
+  "cannot_open_store": "Nepavyko atidaryti Google Play parduotuvės"
 } 

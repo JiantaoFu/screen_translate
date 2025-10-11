@@ -1,10 +1,11 @@
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'dart:async';
 
+import 'model_download_service.dart';
+
 class TranslationService {
   OnDeviceTranslator? _translator;
-  late final modelManager = OnDeviceTranslatorModelManager();
-  
+
   // Support multiple ongoing translations
   final _translations = <String, Future<String>>{};
   final _translationCompleters = <String, Completer<String>>{};
@@ -42,16 +43,17 @@ class TranslationService {
 
       // Download language model if needed
       final targetCode = _getLanguageCode(targetLang);
-      final isModelDownloaded = await modelManager.isModelDownloaded(targetCode);
+      final modelService = ModelDownloadService();
+      final isModelDownloaded = await modelService.isModelDownloaded(targetCode);
       if (!isModelDownloaded) {
         print('Translation: Downloading language model for $targetCode');
-        await modelManager.downloadModel(targetCode);
-        print('Translation: Language model downloaded successfully');
+        await modelService.downloadModelWithFallback(targetCode);
+        print('Translation: Language model is now available.');
       }
 
       // Create or update translator if needed
-      if (_translator == null || 
-          _translator!.sourceLanguage != sourceLang || 
+      if (_translator == null ||
+          _translator!.sourceLanguage != sourceLang ||
           _translator!.targetLanguage != targetLang) {
         _translator?.close();
         _translator = OnDeviceTranslator(
@@ -104,14 +106,14 @@ class TranslationService {
       final completer = _translationCompleters[taskKey];
       if (completer != null && !completer.isCompleted) {
         print('Translation: Attempting to cancel specific translation task');
-        
+
         // Close the current translator to interrupt any ongoing translation
         _translator?.close();
         _translator = null;
 
         // Complete the completer with the original text to signal cancellation
         completer.complete(text);
-        
+
         // Remove the task from tracking
         _translations.remove(taskKey);
         _translationCompleters.remove(taskKey);

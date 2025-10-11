@@ -4,6 +4,7 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/services/model_download_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
@@ -52,7 +53,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
   Future<bool> _checkModelAvailability(String languageCode, TranslationMode mode) async {
     switch (mode) {
       case TranslationMode.onDevice:
-        return await OnDeviceTranslatorModelManager().isModelDownloaded(languageCode);
+        return await ModelDownloadService().isModelDownloaded(languageCode);
       case TranslationMode.llm:
         // For LLM, always consider the language "ready"
         return true;
@@ -70,9 +71,9 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
               return SizedBox.shrink();
             }
 
-            return snapshot.data! 
+            return snapshot.data!
               ? Icon(Icons.check_circle, color: Colors.green, size: 16)
-              : (mode == TranslationMode.onDevice 
+              : (mode == TranslationMode.onDevice
                   ? Icon(Icons.download, color: Colors.orange, size: 16)
                   : SizedBox.shrink());
           },
@@ -83,12 +84,12 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
 
   String _getLocalizedLanguageName(BuildContext context, String languageCode) {
     final localizations = AppLocalizations.of(context);
-    
+
     // Dynamically get the localized language name
     if (TranslationProvider.supportedLanguages.keys.contains(languageCode)) {
       return localizations?.getLocalizedValue('language_$languageCode') ?? languageCode;
     }
-    
+
     // Fallback to the original language code
     return languageCode;
   }
@@ -134,8 +135,8 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
               }).toList(),
             onChanged: (selectedCode) {
               // Existing selection logic remains the same
-              final isSameLanguage = widget.isSourceLanguage 
-                ? selectedCode == provider.targetLanguage 
+              final isSameLanguage = widget.isSourceLanguage
+                ? selectedCode == provider.targetLanguage
                 : selectedCode == provider.sourceLanguage;
 
               if (isSameLanguage) {
@@ -147,8 +148,8 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 );
               } else {
                 // Check model download status
-                final modelManager = OnDeviceTranslatorModelManager();
-                modelManager.isModelDownloaded(selectedCode!).then((isDownloaded) {
+                final modelService = ModelDownloadService();
+                modelService.isModelDownloaded(selectedCode!).then((isDownloaded) {
                   if (!isDownloaded) {
                     // Navigate to Model Management Screen
                     Navigator.push(
@@ -178,14 +179,14 @@ class HomeScreen extends StatelessWidget {
     final prefs = await SharedPreferences.getInstance();
     int translationCount = prefs.getInt('translationCount') ?? 0;
     int promptCount = prefs.getInt('reviewPromptCount') ?? 0;
-  
+
     translationCount++;
     await prefs.setInt('translationCount', translationCount);
 
     // Prompt at increasing translation milestones
     final promptThresholds = [10, 50, 100, 250, 500];
-  
-    if (promptCount < promptThresholds.length && 
+
+    if (promptCount < promptThresholds.length &&
         translationCount >= promptThresholds[promptCount]) {
       _showReviewPromptDialog(context);
       await prefs.setInt('reviewPromptCount', promptCount + 1);
@@ -194,7 +195,7 @@ class HomeScreen extends StatelessWidget {
 
   void _showReviewPromptDialog(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-  
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -241,7 +242,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Attractive header
             _buildHeader(context),
-            
+
             // Main action buttons
             Expanded(
               child: Center(
@@ -250,7 +251,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     // Language Selection Row
                     _buildLanguageSelector(context),
-                    
+
                     SizedBox(height: 20),
 
                     _buildTranslationModeToggle(context),
@@ -309,7 +310,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-            context, 
+            context,
             MaterialPageRoute(
               builder: (context) => const LLMApiConfigScreen()
             )
@@ -339,7 +340,7 @@ class HomeScreen extends StatelessWidget {
                   isSourceLanguage: true,
                 ),
               ),
-              
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: IconButton(
@@ -348,7 +349,7 @@ class HomeScreen extends StatelessWidget {
                   constraints: BoxConstraints(minWidth: 40),
                 ),
               ),
-              
+
               Expanded( // Changed from Flexible to Expanded
                 flex: 2,
                 child: ModelStatusDropdown(
@@ -380,7 +381,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Translation Mode', 
+                    'Translation Mode',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -397,13 +398,13 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${localizations.translation_mode_on_device}:', 
+                                '${localizations.translation_mode_on_device}:',
                                 style: Theme.of(context).textTheme.titleSmall
                               ),
                               Text(localizations.translation_mode_on_device_description),
                               SizedBox(height: 10),
                               Text(
-                                '${localizations.translation_mode_ai}:', 
+                                '${localizations.translation_mode_ai}:',
                                 style: Theme.of(context).textTheme.titleSmall
                               ),
                               Text(localizations.translation_mode_ai_description),
@@ -473,11 +474,11 @@ class HomeScreen extends StatelessWidget {
                       return; // Exit without changing mode
                     }
                   }
-                  
+
                   // Change translation mode
                   translationProvider.setTranslationMode(
-                    index == 0 
-                      ? TranslationMode.onDevice 
+                    index == 0
+                      ? TranslationMode.onDevice
                       : TranslationMode.llm
                   );
                 },
@@ -489,14 +490,14 @@ class HomeScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Text(
-                      localizations.translation_mode_on_device_label, 
+                      localizations.translation_mode_on_device_label,
                       style: TextStyle(fontSize: 16)
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Text(
-                      localizations.translation_mode_ai_label, 
+                      localizations.translation_mode_ai_label,
                       style: TextStyle(fontSize: 16)
                     ),
                   ),

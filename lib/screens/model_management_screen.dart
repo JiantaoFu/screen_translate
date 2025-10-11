@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
+import 'package:screen_translate/services/model_download_service.dart';
 
 enum ModelDownloadStatus {
   notDownloaded,
@@ -17,7 +18,7 @@ class ModelManagementScreen extends StatefulWidget {
 }
 
 class _ModelManagementScreenState extends State<ModelManagementScreen> {
-  final modelManager = OnDeviceTranslatorModelManager();
+  final _modelService = ModelDownloadService();
   Map<TranslateLanguage, ModelDownloadStatus> _modelStatuses = {};
 
   @override
@@ -28,11 +29,11 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
 
   Future<void> _loadModelStatuses() async {
     final statuses = <TranslateLanguage, ModelDownloadStatus>{};
-    
+
     for (var language in TranslateLanguage.values) {
-      final isDownloaded = await modelManager.isModelDownloaded(language.bcpCode);
-      statuses[language] = isDownloaded 
-        ? ModelDownloadStatus.downloaded 
+      final isDownloaded = await _modelService.isModelDownloaded(language.bcpCode);
+      statuses[language] = isDownloaded
+        ? ModelDownloadStatus.downloaded
         : ModelDownloadStatus.notDownloaded;
     }
 
@@ -74,22 +75,22 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
       if (confirmDelete != true) return;
 
       // Attempt to delete the model
-      developer.log('Attempting to delete model for ${language.bcpCode}', 
+      developer.log('Attempting to delete model for ${language.bcpCode}',
         name: 'ModelManagement',
         error: 'Deletion attempt'
       );
 
-      final success = await modelManager.deleteModel(language.bcpCode);
-      
-      developer.log('Model deletion result: $success', 
+      final success = await _modelService.deleteModel(language.bcpCode);
+
+      developer.log('Model deletion result: $success',
         name: 'ModelManagement',
         error: success ? null : 'Deletion failed'
       );
 
+      // The model might not be recognized as deleted immediately.
+      // For a better UX, we optimistically update the UI.
       setState(() {
-        _modelStatuses[language] = success 
-          ? ModelDownloadStatus.notDownloaded 
-          : ModelDownloadStatus.error;
+        _modelStatuses[language] = ModelDownloadStatus.notDownloaded;
       });
 
       if (!success) {
@@ -106,31 +107,23 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
     });
 
     try {
-      developer.log('Attempting to download model for ${language.bcpCode}', 
+      developer.log('Attempting to download model for ${language.bcpCode}',
         name: 'ModelManagement'
       );
 
-      final success = await modelManager.downloadModel(language.bcpCode);
-      
-      developer.log('Model download result: $success', 
+      await _modelService.downloadModelWithFallback(language.bcpCode);
+
+      developer.log('Model download for ${language.bcpCode} completed.',
         name: 'ModelManagement',
-        error: success ? null : 'Download failed'
       );
 
+      // After download, update the status to downloaded.
       setState(() {
-        _modelStatuses[language] = success 
-          ? ModelDownloadStatus.downloaded 
-          : ModelDownloadStatus.error;
+        _modelStatuses[language] = ModelDownloadStatus.downloaded;
       });
 
-      if (!success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizations.failed_to_download_model(localizations.getLocalizedValue('language_${language.bcpCode}')))),
-        );
-      }
-
     } catch (e) {
-      developer.log('Error in model management', 
+      developer.log('Error in model management',
         name: 'ModelManagement',
         error: e
       );
@@ -138,9 +131,9 @@ class _ModelManagementScreenState extends State<ModelManagementScreen> {
       setState(() {
         _modelStatuses[language] = ModelDownloadStatus.error;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text(localizations.failed_to_download_model(localizations.getLocalizedValue('language_${language.bcpCode}')))),
       );
     }
   }

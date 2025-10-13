@@ -100,7 +100,7 @@ class OverlayService : Service() {
                 true
             }
         }
-    
+
         fun requestOverlayPermission(activity: Activity) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasOverlayPermission(activity)) {
                 val intent = Intent(
@@ -110,7 +110,7 @@ class OverlayService : Service() {
                 activity.startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
             }
         }
-    
+
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 5469
     }
 
@@ -119,22 +119,22 @@ class OverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        
+
         // Initialize display metrics in onCreate
         displayMetrics = DisplayMetrics()
         windowManagerInstance = getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-        
+
         try {
             // Try to get metrics from WindowManager
             windowManagerInstance?.defaultDisplay?.getMetrics(displayMetrics)
-            
+
             screenWidth = displayMetrics.widthPixels
             screenHeight = displayMetrics.heightPixels
             screenDensity = displayMetrics.densityDpi
         } catch (e: Exception) {
             // Fallback to resources if WindowManager fails
             Log.e(TAG, "Failed to get metrics from WindowManager", e)
-            
+
             val resources = applicationContext?.resources
             if (resources != null) {
                 screenWidth = resources.displayMetrics.widthPixels
@@ -150,11 +150,10 @@ class OverlayService : Service() {
         }
         oldScreenWidth = screenWidth
         oldScreenHeight = screenHeight
-        
+
         Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
         setInstance(this)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/translationService")
     }
 
     enum class DisplayMode(val icon: Int, val labelKey: String) {
@@ -187,9 +186,9 @@ class OverlayService : Service() {
             this.text = text
             elevation = 8f  // Match button elevation
         }
-        
+
         tooltipView = newTooltip
-        
+
         // Measure the view
         newTooltip.measure(
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
@@ -200,9 +199,9 @@ class OverlayService : Service() {
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            else 
+            else
                 WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
@@ -215,13 +214,13 @@ class OverlayService : Service() {
         if (buttonParams != null) {
             val screenWidth = resources.displayMetrics.widthPixels
             val buttonSize = 48.dpToPx()
-            
+
             // Position directly below button with minimal gap
             params.y = buttonParams.y + buttonSize + 1.dpToPx()
-            
+
             // Center horizontally with button
             params.x = buttonParams.x + (buttonSize - newTooltip.measuredWidth) / 2
-            
+
             // Keep tooltip on screen
             if (params.x < 4.dpToPx()) {
                 params.x = 4.dpToPx()
@@ -231,7 +230,7 @@ class OverlayService : Service() {
         }
 
         windowManager?.addView(newTooltip, params)
-        
+
         // Quick pop animation
         newTooltip.alpha = 0f
         newTooltip.scaleX = 0.9f
@@ -281,19 +280,19 @@ class OverlayService : Service() {
             DisplayMode.ORIGINAL -> DisplayMode.MANUAL
             DisplayMode.MANUAL -> DisplayMode.AUTO
         }
-        
+
         controlButton?.apply {
             animate()
                 .rotationBy(360f)
                 .setDuration(300)
-                .withEndAction { 
+                .withEndAction {
                     updateModeIcon()
                     showTooltip(displayMode.getLocalizedLabel(context))
                     updateTranslateButtonVisibility()
                 }
                 .start()
         }
-        
+
         updateOverlayVisibility()
     }
 
@@ -311,9 +310,9 @@ class OverlayService : Service() {
             background = ContextCompat.getDrawable(context, R.drawable.floating_button_bg)
             elevation = 8f
             alpha = 0.95f
-            
+
             val size = 48.dpToPx()
-            
+
             val padding = (size * 0.25f).toInt()
             setPadding(padding, padding, padding, padding)
 
@@ -329,7 +328,7 @@ class OverlayService : Service() {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
-                        val moved = Math.abs(event.rawX - lastTouchX) > 5 || 
+                        val moved = Math.abs(event.rawX - lastTouchX) > 5 ||
                                   Math.abs(event.rawY - lastTouchY) > 5
                         if (!moved) {
                             switchMode()
@@ -341,7 +340,7 @@ class OverlayService : Service() {
                         params.x = (originalX + (event.rawX - lastTouchX)).toInt()
                         params.y = (originalY + (event.rawY - lastTouchY)).toInt()
                         windowManager?.updateViewLayout(view, params)
-                        
+
                         // Update translate button position to match
                         updateTranslateButtonPosition(params.x, params.y)
                         true
@@ -373,7 +372,7 @@ class OverlayService : Service() {
             background = ContextCompat.getDrawable(context, R.drawable.floating_button_bg)
             elevation = 8f
             alpha = 0.95f
-            
+
             val size = 48.dpToPx()
             val padding = (size * 0.25f).toInt()
             setPadding(padding, padding, padding, padding)
@@ -413,13 +412,13 @@ class OverlayService : Service() {
                     MotionEvent.ACTION_MOVE -> {
                         val deltaX = event.rawX - lastTouchX
                         val deltaY = event.rawY - lastTouchY
-                        
+
                         // Consider it a drag if moved more than 5 pixels
-                        if (!isDragging && 
+                        if (!isDragging &&
                             (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
                             isDragging = true
                         }
-                        
+
                         if (isDragging) {
                             // Move control button, which will automatically move translate button
                             controlButton?.let { controlBtn ->
@@ -428,7 +427,7 @@ class OverlayService : Service() {
                                 controlParams.y = (controlParams.y + deltaY).toInt()
                                 windowManager?.updateViewLayout(controlBtn, controlParams)
                             }
-                            
+
                             lastTouchX = event.rawX
                             lastTouchY = event.rawY
                         }
@@ -469,8 +468,8 @@ class OverlayService : Service() {
             // Adjust x position to be right next to control button
             params.x = x - 48.dpToPx()
             params.y = y
-            translateButton?.let { 
-                windowManager?.updateViewLayout(it, params) 
+            translateButton?.let {
+                windowManager?.updateViewLayout(it, params)
             }
         }
     }
@@ -485,17 +484,17 @@ class OverlayService : Service() {
     private fun triggerManualTranslation() {
         if (displayMode == DisplayMode.MANUAL) {
             Log.d(TAG, "Manually triggering translation")
-            
+
             // Send method call to Flutter side to request manual translation
             methodChannel.invokeMethod("requestManualTranslation", null, object : MethodChannel.Result {
                 override fun success(result: Any?) {
                     Log.d(TAG, "Method invocation successful")
                 }
-    
+
                 override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
                     Log.e(TAG, "Method invocation error: $errorCode, $errorMessage")
                 }
-    
+
                 override fun notImplemented() {
                     Log.e(TAG, "Method not implemented")
                 }
@@ -529,82 +528,109 @@ class OverlayService : Service() {
             }
         }
 
-        val (transformedX, transformedY) = if (x != -1f && y != -1f) {
-            reverseAspectRatioCoordinates(x, y, oldScreenWidth, oldScreenHeight, screenWidth, screenHeight, imgWidth, imgHeight)
-        } else {
-            Pair(x, y)
+        // Get status bar height
+        var statusBarHeight = 0
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
 
-        Log.d(TAG, "Showing overlay at transformed coordinates: ($transformedX, $transformedY)")
+        // Coordinate transformation from image space to screen space
+        val scaleY = screenHeight.toFloat() / imgHeight
+        val xPadding = (imgWidth - screenWidth / scaleY) / 2
 
-        val themedContext = ContextThemeWrapper(this, R.style.Theme_AppCompat_Light)
+        val transformedX = (x - xPadding) * scaleY
+        val transformedY = y * scaleY
+        val transformedWidth = width * scaleY
+        val transformedHeight = height * scaleY
 
-        // Create a container to hold both bounding box and text
-        val containerLayout = FrameLayout(themedContext).apply {
-            // // Bounding box with precise positioning
-            // val boundingBoxParams = FrameLayout.LayoutParams(
-            //     width.toInt(), 
-            //     height.toInt()
-            // ).apply {
-            //     gravity = Gravity.CENTER
-            // }
-            
-            // val boundingBoxView = View(themedContext).apply {
-            //     background = GradientDrawable().apply {
-            //         setStroke(3, Color.RED)  // 3px wide red border
-            //         setColor(Color.TRANSPARENT)  // Transparent background
-            //     }
-            // }
-            // addView(boundingBoxView, boundingBoxParams)
+        Log.d(TAG, "Original box (x:$x, y:$y, w:$width, h:$height) on image ($imgWidth x $imgHeight)")
+        Log.d(TAG, "Transformed box (x:$transformedX, y:$transformedY, w:$transformedWidth, h:$transformedHeight) for screen ($screenWidth x $screenHeight) with status bar: $statusBarHeight")
 
-            // Text view with precise positioning
-            val textParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, 
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                gravity = Gravity.CENTER
-                setMargins(10, 10, 10, 10) // Add margins to ensure text fits within the bounding box
+        // if (x != -1f && y != -1f) {
+        //     (transformedX, transformedY) = reverseAspectRatioCoordinates(x, y, oldScreenWidth, oldScreenHeight, screenWidth, screenHeight, imgWidth, imgHeight)
+        // }
+
+        val finalView: View = if (false) {
+            // 调试模式：只创建一个带红色边框的透明视图
+            View(this).apply {
+                background = GradientDrawable().apply {
+                    setStroke(3, Color.RED)  // 3px 宽的红色边框
+                    setColor(Color.TRANSPARENT)  // 透明背景
+                }
             }
-            
-            val overlayView = AppCompatTextView(themedContext).apply {
+        } else {
+            // 正常模式：创建带有文本的完整视图
+            val containerLayout = FrameLayout(this).apply {
+                elevation = 8.dpToPx().toFloat() // Add shadow for the container
+                // Set width constraints on the container, as it's the view being added to WindowManager
+                minimumWidth = if (transformedWidth > 0) transformedWidth.toInt() else 0
+                // Use View.setMinimumWidth as it's the correct method for FrameLayout
+            }
+            val overlayView = AppCompatTextView(this).apply {
                 setText(text)
-                
-                // Use dynamic overlay color from OCR result
+
                 val overlayTextColor = if (isLight) Color.WHITE else Color.BLACK
                 val overlayBackgroundColor = Color.argb(
-                    200, 
-                    Color.red(overlayColor), 
-                    Color.green(overlayColor), 
+                    220, // Slightly more opaque for better readability
+                    Color.red(overlayColor),
+                    Color.green(overlayColor),
                     Color.blue(overlayColor)
                 )
-                
-                setTextColor(overlayTextColor)
-                setBackgroundColor(overlayBackgroundColor)
 
-                setPadding(2, 1, 2, 1)
+                setTextColor(overlayTextColor)
+                // Add a subtle shadow for better text contrast
+                setShadowLayer(2f, 1f, 1f, if(isLight) Color.BLACK else Color.argb(80, 0, 0, 0))
+
+                maxWidth = (screenWidth * 0.9).toInt()
+
+                val backgroundDrawable = GradientDrawable().apply {
+                    setColor(overlayBackgroundColor)
+                    cornerRadius = 8.dpToPx().toFloat() // Rounded corners
+                }
+                background = backgroundDrawable
+
+                // Increased padding for more breathing room
+                val horizontalPadding = 8.dpToPx()
+                val verticalPadding = 4.dpToPx()
+                setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
                 setSingleLine(false)
 
                 setAutoSizeTextTypeUniformWithConfiguration(
-                    10,
-                    24,
-                    1,
-                    TypedValue.COMPLEX_UNIT_SP
+                    10, 22, 1, TypedValue.COMPLEX_UNIT_SP
                 )
+                gravity = Gravity.CENTER
             }
-            addView(overlayView, textParams)
+            containerLayout.addView(overlayView, FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT, // Let TextView determine its width within the container
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ))
+            containerLayout
         }
 
-        val layoutParams = createLayoutParams(transformedX, transformedY, width, height)
+        // 使用精确的 width 和 height 创建布局参数
+        val layoutParams = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            this.x = transformedX.toInt()
+            this.y = transformedY.toInt()
+        }
+
         originalPositions[id] = Pair(layoutParams.x, layoutParams.y)
-        overlayViews[id] = containerLayout
+        overlayViews[id] = finalView
         overlayParams[id] = layoutParams
 
         var initialX = 0f
         var initialY = 0f
         var initialTouchX = 0f
         var initialTouchY = 0f
-    
-        containerLayout.setOnTouchListener { v, event ->
+
+        finalView.setOnTouchListener { v, event ->
             // Log.d("DragHandle", "Touch event: ${event.action}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -619,7 +645,7 @@ class OverlayService : Service() {
                     // Log.d("DragHandle", "Moving: x=${event.rawX}, y=${event.rawY}")
                     layoutParams.x = (initialX + (event.rawX - initialTouchX)).toInt()
                     layoutParams.y = (initialY + (event.rawY - initialTouchY)).toInt()
-                    windowManager?.updateViewLayout(containerLayout, layoutParams)
+                    windowManager?.updateViewLayout(finalView, layoutParams)
                     true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -630,19 +656,19 @@ class OverlayService : Service() {
             }
         }
 
-        windowManager?.addView(containerLayout, layoutParams)
-        
+        windowManager?.addView(finalView, layoutParams)
+
         updateOverlayVisibility(id)
     }
 
     private fun updateOverlayVisibility(specificId: Int? = null) {
         val idsToUpdate = specificId?.let { listOf(it) } ?: overlayViews.keys.toList()
-        
+
         idsToUpdate.forEach { id ->
             val view = overlayViews[id] ?: return@forEach
             val params = overlayParams[id] ?: return@forEach
             val (originalX, originalY) = originalPositions[id] ?: return@forEach
-            
+
             when (displayMode) {
                 DisplayMode.AUTO -> {
                     view.visibility = View.VISIBLE
@@ -662,24 +688,6 @@ class OverlayService : Service() {
                     params.y = originalY
                     windowManager?.updateViewLayout(view, params)
                 }
-            }
-        }
-    }
-
-    private fun createLayoutParams(x: Float, y: Float, width: Float, height: Float): WindowManager.LayoutParams {
-        return WindowManager.LayoutParams(
-            if (width > 0) (width * 1.1f).toInt() else WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.TOP or Gravity.START
-            
-            if (x >= 0 && y >= 0) {
-                this.x = x.toInt()
-                this.y = y.toInt()
             }
         }
     }
@@ -706,6 +714,8 @@ class OverlayService : Service() {
             "start" -> {
                 // Reset stopped flag when starting the service
                 isStopped = false
+                // Initialize MethodChannel here to ensure binaryMessenger is available
+                methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/translationService")
                 createControlButton()
                 createTranslateButton()
                 Log.d(TAG, "Service started, reset stopped flag")
@@ -718,13 +728,13 @@ class OverlayService : Service() {
                     val y = intent.getFloatExtra("y", -1f)
                     val width = intent.getFloatExtra("width", -1f)
                     val height = intent.getFloatExtra("height", -1f)
-                    val id = intent.getIntExtra("id", -1) 
+                    val id = intent.getIntExtra("id", -1)
                     val overlayColor = intent.getIntExtra("overlayColor", -1)
                     val backgroundColor = intent.getIntExtra("backgroundColor", -1)
                     val isLight = intent.getBooleanExtra("isLight", false)
                     val imgWidth = intent.getFloatExtra("imgWidth", -1f)
                     val imgHeight = intent.getFloatExtra("imgHeight", -1f)
-                    
+
                     if (text != null && id >= 0) {
                         showOverlay(id, text, x, y, width, height, overlayColor, backgroundColor, isLight, imgWidth, imgHeight)
                     }
@@ -759,9 +769,9 @@ class OverlayService : Service() {
             } else {
                 Log.e(TAG, "windowManager is null, cannot remove control button")
             }
-            controlButton = null 
+            controlButton = null
         }
-        
+
         translateButton?.let { button ->
             Log.d(TAG, "Attempting to remove translate button")
             if (windowManager != null) {
@@ -776,8 +786,8 @@ class OverlayService : Service() {
             }
             translateButton = null
         }
-        
-        tooltipView?.let { 
+
+        tooltipView?.let {
             try {
                 windowManager?.removeView(it)
             } catch (e: Exception) {
@@ -791,6 +801,10 @@ class OverlayService : Service() {
         super.onDestroy()
         hideAllOverlays()
         removeOverlayButtons()
+        // Disconnect the method channel to prevent further calls
+        if (::methodChannel.isInitialized) {
+            methodChannel.setMethodCallHandler(null)
+        }
         windowManager = null
     }
 
@@ -815,7 +829,7 @@ class OverlayService : Service() {
             val scaleFactor =  originalWidth.toFloat() / newWidth
             adjustedX = x / scaleFactor
             adjustedY = (y - (originalHeight - newHeight * scaleFactor) / 2) / scaleFactor
-            
+
             Log.d(TAG, "Width is limiting factor")
             Log.d(TAG, "Scale Factor: $scaleFactor")
         } else {
@@ -834,9 +848,9 @@ class OverlayService : Service() {
 
     // Direct method to update display information
     fun updateDisplayInfo(
-        widthPixels: Int, 
-        heightPixels: Int, 
-        density: Float, 
+        widthPixels: Int,
+        heightPixels: Int,
+        density: Float,
         rotation: Int
     ) {
         Log.d(TAG, "Updating Display Info:")

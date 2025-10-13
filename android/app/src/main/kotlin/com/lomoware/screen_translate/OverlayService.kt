@@ -126,7 +126,11 @@ class OverlayService : Service() {
 
         try {
             // Try to get metrics from WindowManager
-            windowManagerInstance?.defaultDisplay?.getMetrics(displayMetrics)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                windowManagerInstance?.defaultDisplay?.getRealMetrics(displayMetrics)
+            } else {
+                windowManagerInstance?.defaultDisplay?.getMetrics(displayMetrics)
+            }
 
             screenWidth = displayMetrics.widthPixels
             screenHeight = displayMetrics.heightPixels
@@ -536,13 +540,33 @@ class OverlayService : Service() {
         }
 
         // Coordinate transformation from image space to screen space
-        val scaleY = screenHeight.toFloat() / imgHeight
-        val xPadding = (imgWidth - screenWidth / scaleY) / 2
+        val imgAspectRatio = imgWidth / imgHeight
+        val screenAspectRatio = screenWidth.toFloat() / screenHeight.toFloat()
 
-        val transformedX = (x - xPadding) * scaleY
-        val transformedY = y * scaleY
-        val transformedWidth = width * scaleY
-        val transformedHeight = height * scaleY
+        var scale: Float
+        var xOffset = 0f
+        var yOffset = 0f
+
+        // Determine how the screen is scaled and centered on the image canvas
+        if (screenAspectRatio < imgAspectRatio) {
+            Log.d(TAG, "Screen is taller relative to image: $screenAspectRatio vs $imgAspectRatio, img: $imgWidth x $imgHeight, screen: $screenWidth x $screenHeight")
+            // Screen is taller than the image relative to its width, so it's scaled to fit height
+            scale = screenHeight.toFloat() / imgHeight
+            // The screen is centered vertically, so we calculate the left/right padding (yOffset)
+            xOffset = (imgWidth - screenWidth / scale) / 2
+        } else {
+            Log.d(TAG, "Screen is wider relative to image: $screenAspectRatio vs $imgAspectRatio, img: $imgWidth x $imgHeight, screen: $screenWidth x $screenHeight")
+            // Screen is wider than the image relative to its height, so it's scaled to fit width
+            scale = screenWidth.toFloat() / imgWidth
+            // The screen is centered horizontally, so we calculate the top/bottom padding (xOffset)
+            yOffset = (imgHeight - screenHeight / scale) / 2
+        }
+
+        // Apply the calculated scale and offset to transform the coordinates
+        val transformedX = (x - xOffset) * scale
+        val transformedY = (y - yOffset) * scale
+        val transformedWidth = width * scale
+        val transformedHeight = height * scale
 
         Log.d(TAG, "Original box (x:$x, y:$y, w:$width, h:$height) on image ($imgWidth x $imgHeight)")
         Log.d(TAG, "Transformed box (x:$transformedX, y:$transformedY, w:$transformedWidth, h:$transformedHeight) for screen ($screenWidth x $screenHeight) with status bar: $statusBarHeight")

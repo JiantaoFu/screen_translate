@@ -40,7 +40,7 @@ class ForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        
+
         // Register configuration change receiver
         val filter = IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
         registerReceiver(configurationChangeReceiver, filter)
@@ -60,7 +60,7 @@ class ForegroundService : Service() {
             .build()
 
         startForeground(NOTIFICATION_ID, notification)
-        
+
         return START_NOT_STICKY
     }
 
@@ -80,7 +80,11 @@ class ForegroundService : Service() {
         val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val defaultDisplay = windowManager.defaultDisplay
         val displayMetrics = DisplayMetrics()
-        defaultDisplay.getMetrics(displayMetrics)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            defaultDisplay.getRealMetrics(displayMetrics)
+        } else {
+            defaultDisplay.getMetrics(displayMetrics)
+        }
 
         Log.d(TAG, "WindowManager Display Info:")
         Log.d(TAG, "Screen Width: ${displayMetrics.widthPixels}")
@@ -92,7 +96,7 @@ class ForegroundService : Service() {
         val displays = displayManager.displays
 
         Log.d(TAG, "Number of Displays: ${displays.size}")
-        
+
         displays.forEachIndexed { index, display ->
             Log.d(TAG, "Display $index:")
             Log.d(TAG, "  Display ID: ${display.displayId}")
@@ -109,9 +113,9 @@ class ForegroundService : Service() {
         // Find the OverlayService and update display info
         val overlayService = OverlayService.getInstance()
         overlayService?.updateDisplayInfo(
-            displayMetrics.widthPixels, 
-            displayMetrics.heightPixels, 
-            displayMetrics.density, 
+            displayMetrics.widthPixels,
+            displayMetrics.heightPixels,
+            displayMetrics.density,
             displays[0].rotation
         )
     }
@@ -125,7 +129,7 @@ class ForegroundService : Service() {
             ).apply {
                 description = "Used for screen capture service"
             }
-            
+
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }

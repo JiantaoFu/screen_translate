@@ -1,8 +1,8 @@
 buildscript {
     ext {
         kotlin_version = '1.9.22'
-        compileSdkVersion = 34
-        targetSdkVersion = 34
+        compileSdkVersion = 35
+        targetSdkVersion = 35
         minSdkVersion = 21
         javaVersion = JavaVersion.VERSION_11  // Updated to Java 11
     }
@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -27,23 +27,23 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    
+
     afterEvaluate { project ->
         if (project.hasProperty('android')) {
             project.android {
                 compileSdkVersion rootProject.ext.compileSdkVersion
-                
+
                 defaultConfig {
                     minSdkVersion rootProject.ext.minSdkVersion
                     targetSdkVersion rootProject.ext.targetSdkVersion
                 }
-                
+
                 compileOptions {
                     sourceCompatibility rootProject.ext.javaVersion
                     targetCompatibility rootProject.ext.javaVersion
                 }
             }
-            
+
             if (project.plugins.hasPlugin('kotlin-android')) {
                 project.android.kotlinOptions {
                     jvmTarget = rootProject.ext.javaVersion.toString()

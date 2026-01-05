@@ -24,6 +24,7 @@ class FirebaseRemoteConfigService {
         'enable_analytics': true,
         'translation_timeout_seconds': 30,
         'max_concurrent_translations': 3,
+        'ocr_sampling_rate': 0.0,
       });
 
       // Set cache duration - how long to use cached values before fetching fresh
@@ -100,6 +101,9 @@ class FirebaseRemoteConfigService {
 
   /// Get max concurrent translations
   int getMaxConcurrentTranslations() => getInt('max_concurrent_translations');
+
+  /// Get OCR sampling rate
+  double getOcrSamplingRate() => getDouble('ocr_sampling_rate');
 
   /// Manually fetch fresh config from server
   Future<void> fetchAndActivate() async {

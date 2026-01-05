@@ -12,6 +12,8 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'firebase_remote_config_service.dart';
+import 'ocr_sampling_service.dart';
+import 'device_info_service.dart';
 
 extension ColorAdaptation on Color {
   // Determine if a color is considered "light"
@@ -112,7 +114,44 @@ class OCRService {
 
       _logger.info('OCR: Processing image with ML Kit');
       final textRecognizer = getTextRecognizer(script);
-      final RecognizedText recognizedText = await textRecognizer.processImage(image);
+
+      final stopwatch = Stopwatch()..start();
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(image);
+      stopwatch.stop();
+
+      // Add this after you get your OCRResults
+      final samplingService = OCRSamplingService();
+      if (samplingService.shouldSample()) {
+        final textBlockMetadata = recognizedText.blocks
+            .map((r) => TextBlockMetadata(
+                  text: r.text,
+                  x: r.boundingBox.left,
+                  y: r.boundingBox.top,
+                  width: r.boundingBox.width,
+                  height: r.boundingBox.height,
+                  textLength: r.text.length,
+                ))
+            .toList();
+
+        // Capture sample in background (don't await)
+        () async {
+          final deviceInfoService = DeviceInfoService();
+          final deviceId = await deviceInfoService.getDeviceId();
+
+          samplingService.captureSample(
+            nv21Bytes: imageBytes,
+            width: width,
+            height: height,
+            detectedTextBlocks: recognizedText.blocks.length,
+            detectedScript: script.toString().split('.').last,
+            processingTimeMs: stopwatch.elapsedMilliseconds.toDouble(),
+            textBlocks: textBlockMetadata,
+            deviceId: deviceId,
+          );
+        }();
+      }
+
 
       // Extract dominant background color
       final Color backgroundColor = ColorUtils.extractDominantColorFromNV21(imageBytes, width, height);

@@ -12,6 +12,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'services/ocr_sampling_service.dart';
 
 Future<void> main() async {
   Logger.root.level = Level.ALL;
@@ -32,6 +33,13 @@ Future<void> main() async {
   final analytics = FirebaseAnalyticsService();
   await analytics.init();
   await analytics.trackAppOpen();
+
+  // Initialize OCR Sampling Service
+  final ocrSamplingService = OCRSamplingService();
+  await ocrSamplingService.init(
+    cloudinaryCloudName: 'dyr6qobke',
+    cloudinaryUploadPreset: 'oucv1boz',
+  );
 
   runApp(const ScreenTranslateApp());
 }

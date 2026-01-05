@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'firebase_remote_config_service.dart';
 
 extension ColorAdaptation on Color {
   // Determine if a color is considered "light"
@@ -69,9 +70,14 @@ class OCRService {
   Future<List<OCRResult>> processImage(
     Map<String, dynamic> imageData,
     TextRecognitionScript script,
-    {bool drawDebugBoxes = false, int minTextLength = 1}
+    {bool? drawDebugBoxes, int? minTextLength}
   ) async {
     try {
+      // Get configuration from Firebase Remote Config
+      final remoteConfig = FirebaseRemoteConfigService();
+      drawDebugBoxes ??= remoteConfig.isDebugOCRBoxesEnabled();
+      minTextLength ??= remoteConfig.getOCRMinTextLength();
+
       _logger.info('Starting image processing');
 
       final Uint8List imageBytes = imageData['bytes'];

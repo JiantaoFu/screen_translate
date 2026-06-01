@@ -103,20 +103,21 @@ class MainActivity: FlutterActivity() {
                 }
                 "showTranslationOverlay" -> {
                     val text = call.argument<String>("text")
-                    val x = call.argument<Double>("x")?.toFloat()
-                    val y = call.argument<Double>("y")?.toFloat()
-                    val width = call.argument<Double>("width")?.toFloat()
-                    val height = call.argument<Double>("height")?.toFloat()
-                    val id = call.argument<Int>("id")
-                    val overlayColor = call.argument<Long>("overlayColor")?.toInt()
-                    val backgroundColor = call.argument<Long>("backgroundColor")?.toInt()
+                    val x = call.argument<Number>("x")?.toFloat()
+                    val y = call.argument<Number>("y")?.toFloat()
+                    val width = call.argument<Number>("width")?.toFloat()
+                    val height = call.argument<Number>("height")?.toFloat()
+                    val id = call.argument<Number>("id")?.toInt()
+                    val overlayColor = call.argument<Number>("overlayColor")?.toInt()
+                    val backgroundColor = call.argument<Number>("backgroundColor")?.toInt()
                     val isLight = call.argument<Boolean>("isLight")
-                    val imgWidth = call.argument<Double>("imgWidth")?.toFloat()
-                    val imgHeight = call.argument<Double>("imgHeight")?.toFloat()
+                    val imgWidth = call.argument<Number>("imgWidth")?.toFloat()
+                    val imgHeight = call.argument<Number>("imgHeight")?.toFloat()
                     
-                    // Debug logging for colors
-                    Log.d(TAG, "Overlay Color: ${overlayColor?.let { String.format("#%06X", 0xFFFFFF and it) }}")
-                    Log.d(TAG, "Background Color: ${backgroundColor?.let { String.format("#%06X", 0xFFFFFF and it) }}")
+                    // Debug logging for colors and all params
+                    Log.d(TAG, "showTranslationOverlay: text='${text?.take(30)}', id=$id, x=$x, y=$y, w=$width, h=$height")
+                    Log.d(TAG, "showTranslationOverlay: overlayColor=${overlayColor?.let { String.format("#%08X", it) }}, bgColor=${backgroundColor?.let { String.format("#%08X", it) }}, isLight=$isLight")
+                    Log.d(TAG, "showTranslationOverlay: imgW=$imgWidth, imgH=$imgHeight")
                     
                     if (text != null && id != null) {
                         val intent = Intent(this, OverlayService::class.java)

@@ -5,7 +5,7 @@ import os
 import sys
 
 def convert_arb_to_json(arb_path, json_path):
-    with open(arb_path, 'r') as arb_file:
+    with open(arb_path, 'r', encoding='utf-8') as arb_file:
         arb_data = json.load(arb_file)
     
     # Filter out Flutter-specific keys
@@ -13,7 +13,7 @@ def convert_arb_to_json(arb_path, json_path):
                      if not k.startswith('@') and 
                      k in ['auto_translate_mode', 'original_text_mode', 'manual_translate_mode']}
     
-    with open(json_path, 'w') as json_file:
+    with open(json_path, 'w', encoding='utf-8') as json_file:
         json.dump(filtered_data, json_file, ensure_ascii=False, indent=2)
 
 def main():

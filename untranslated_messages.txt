@@ -1,0 +1,21 @@
+{
+  "fi": [
+    "api_key_required",
+    "api_key_setup_prompt",
+    "go_to_settings",
+    "api_key_dialog_title",
+    "api_key_configuration_title",
+    "api_key_get_key_from",
+    "api_key_configuration_steps",
+    "api_key_step_1",
+    "api_key_step_2",
+    "api_key_step_3",
+    "api_key_input_label",
+    "api_key_input_hint",
+    "api_key_input_error",
+    "api_key_save_button",
+    "api_key_note",
+    "api_key_save_error",
+    "api_key_save_success"
+  ]
+}

@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import '../services/overlay_service.dart';
 import 'package:flutter/services.dart';
 import '../services/llm_translation_service.dart';
+import '../models/ocr_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -38,6 +40,25 @@ class TranslationProvider with ChangeNotifier {
   static const MethodChannel _translationServiceChannel = 
       MethodChannel('com.lomoware.screen_translate/translationService');
   TranslationMode _translationMode = TranslationMode.onDevice;
+  bool _isProcessingCapture = false;
+  List<OCRResult> _previousOcrResults = [];
+  double _mergeAggressiveness = 1.5;
+
+  bool _areOcrResultsIdentical(List<OCRResult> a, List<OCRResult> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].text != b[i].text) return false;
+      
+      // Allow a small tolerance of 12 physical pixels for screen coordinate noise
+      final dx = (a[i].x - b[i].x).abs();
+      final dy = (a[i].y - b[i].y).abs();
+      final dw = (a[i].width - b[i].width).abs();
+      final dh = (a[i].height - b[i].height).abs();
+      
+      if (dx > 12 || dy > 12 || dw > 12 || dh > 12) return false;
+    }
+    return true;
+  }
 
   TranslationProvider(
     this._context,
@@ -50,6 +71,7 @@ class TranslationProvider with ChangeNotifier {
       _androidScreenCaptureService = AndroidScreenCaptureService();
       initTranslationServiceChannel();
     }
+    _initPreferences();
   }
 
   bool get isTranslating => _isTranslating;
@@ -57,6 +79,20 @@ class TranslationProvider with ChangeNotifier {
   String get sourceLanguage => _sourceLanguage;
   String get targetLanguage => _targetLanguage;
   TranslationMode get translationMode => _translationMode;
+  double get mergeAggressiveness => _mergeAggressiveness;
+
+  Future<void> _initPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    _mergeAggressiveness = prefs.getDouble('mergeAggressiveness') ?? 1.5;
+    notifyListeners();
+  }
+
+  Future<void> setMergeAggressiveness(double value) async {
+    _mergeAggressiveness = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('mergeAggressiveness', value);
+    notifyListeners();
+  }
 
   void setSourceLanguage(String language) {
     _sourceLanguage = language;
@@ -101,51 +137,153 @@ class TranslationProvider with ChangeNotifier {
 
     _captureTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
       if (!_isTranslating) return;
+      if (_isProcessingCapture) return; // Guard to prevent overlapping ticks
 
-      // Check translation mode from Android service
-      final translationMode = await _androidScreenCaptureService?.getTranslationMode();
-      
-      // Capture only in auto mode or when manual capture is requested
-      if (translationMode == 'auto' || _isManualTranslationRequested) {
-        if (Platform.isAndroid) {
-          final imageData = await _androidScreenCaptureService?.captureScreen();
-          if (imageData != null) {
-            try {
-              final ocrResults = await _ocrService.processImage(imageData, currentOCRScript);
-              await _overlayService.hideTranslationOverlay(); // Clear old overlays
+      _isProcessingCapture = true;
+
+      try {
+        // Check translation mode from Android service
+        final translationMode = await _androidScreenCaptureService?.getTranslationMode();
+        print('Timer: translationMode=$translationMode, isManualRequested=$_isManualTranslationRequested');
+        
+        // Skip only in "original" mode (shows untranslated screen)
+        // In "auto" mode: always capture and translate
+        // In "manual" mode: capture and translate when manual button pressed
+        // In null/unknown mode: treat as auto
+        final bool shouldProcess = (translationMode != 'manual' && translationMode != 'original') || _isManualTranslationRequested;
+        if (shouldProcess) {
+          if (Platform.isAndroid) {
+            print('Timer: capturing screen...');
+            final stopwatch = Stopwatch()..start();
+            final imageData = await _androidScreenCaptureService?.captureScreen();
+            final captureMs = stopwatch.elapsedMilliseconds;
+            print('Timer: captureScreen returned ${imageData != null ? "data (${imageData['width']}x${imageData['height']})" : "null"} in ${captureMs}ms, isTranslating=$_isTranslating');
+            if (imageData != null && _isTranslating) {
+              print('Timer: running OCR...');
+              stopwatch.reset();
+              final ocrResults = await _ocrService.processImage(
+                imageData,
+                currentOCRScript,
+                minTextLength: 1, // Ignore blocks that have only 1 character
+                mergeAggressiveness: _mergeAggressiveness,
+              );
+              final ocrMs = stopwatch.elapsedMilliseconds;
+              print('Timer: OCR found ${ocrResults.length} text blocks in ${ocrMs}ms');
               
-              for (var i = 0; i < ocrResults.length; i++) {
-                final ocrResult = ocrResults[i];
-                final translatedText = await translateText(ocrResult.text);
-                if (Platform.isAndroid) {
-                  await _overlayService.showTranslationOverlay(
-                    translatedText,
-                    i,
-                    x: ocrResult.x,
-                    y: ocrResult.y,
-                    width: ocrResult.width,
-                    height: ocrResult.height,
-                    overlayColor: ocrResult.overlayColor,
-                    backgroundColor: ocrResult.backgroundColor,
-                    isLight: ocrResult.isLight,
-                    imgWidth: ocrResult.imgWidth,
-                    imgHeight: ocrResult.imgHeight,
-                  );
-                }
+              // Change Detection Check - but always honor manual translation requests
+              if (!_isManualTranslationRequested && _areOcrResultsIdentical(ocrResults, _previousOcrResults)) {
+                // Skip processing as screen is unchanged
+                print('OCR: Screen unchanged (${ocrResults.length} blocks), skipping translation');
+                return;
               }
+
+              // Screen has changed (e.g., user is scrolling). Immediately hide old overlays so they don't stick to the text.
+              if (!_isManualTranslationRequested) {
+                _overlayService.hideTranslationOverlay();
+                print('Overlay: Screen changed, immediately hiding old overlays');
+              } else {
+                // For manual translation, we clear here right before generating new ones
+                _overlayService.hideTranslationOverlay();
+              }
+
+              // Translate blocks and render (Streaming for on-device to minimize perceived latency)
+              print('Timer: translating ${ocrResults.length} blocks (mode=$_translationMode)...');
+              final List<String> translatedTexts = [];
+              stopwatch.reset();
+              var translateMs = 0;
+              var renderMs = 0;
               
+              if (_translationMode == TranslationMode.llm) {
+                final textsToTranslate = ocrResults.map((r) => r.text).toList();
+                final batchResults = await _llmTranslationService.translateBatch(
+                  texts: textsToTranslate,
+                  sourceLanguage: _sourceLanguage,
+                  targetLanguage: _targetLanguage,
+                );
+                translateMs = stopwatch.elapsedMilliseconds;
+                
+                if (!_isTranslating) {
+                  print('Overlay: Translation stopped during translate phase, aborting');
+                  return; // Guard if stopped
+                }
+                
+                stopwatch.reset();
+                for (var i = 0; i < ocrResults.length; i++) {
+                  final ocrResult = ocrResults[i];
+                  translatedTexts.add(batchResults[i]); // Keep history
+                  if (Platform.isAndroid) {
+                    await _overlayService.showTranslationOverlay(
+                      batchResults[i], i,
+                      x: ocrResult.x, y: ocrResult.y, width: ocrResult.width, height: ocrResult.height,
+                      overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
+                    );
+                  }
+                }
+                renderMs = stopwatch.elapsedMilliseconds;
+              } else {
+                // Streaming mode for On-Device
+                var tMs = 0;
+                var rMs = 0;
+                for (var i = 0; i < ocrResults.length; i++) {
+                  if (!_isTranslating) break; // Guard if stopped
+                  final ocrResult = ocrResults[i];
+                  
+                  final tWatch = Stopwatch()..start();
+                  final translatedText = await translateText(ocrResult.text);
+                  tMs += tWatch.elapsedMilliseconds;
+                  translatedTexts.add(translatedText);
+                  
+                  final rWatch = Stopwatch()..start();
+                  if (Platform.isAndroid) {
+                    await _overlayService.showTranslationOverlay(
+                      translatedText, i,
+                      x: ocrResult.x, y: ocrResult.y, width: ocrResult.width, height: ocrResult.height,
+                      overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
+                    );
+                  }
+                  rMs += rWatch.elapsedMilliseconds;
+                }
+                translateMs = tMs;
+                renderMs = rMs;
+              }
+
+              print('Overlay: Translations complete (${translatedTexts.length} blocks)');
+              
+              // -------------------------------------------------------------
+              // SUMMARY METRICS
+              // -------------------------------------------------------------
+              final totalMs = captureMs + ocrMs + translateMs + renderMs;
+              print('\n======================================================');
+              print('[METRICS] Total Processing: ${totalMs}ms');
+              print('[METRICS] -> Capture: ${captureMs}ms');
+              print('[METRICS] -> OCR:     ${ocrMs}ms');
+              print('[METRICS] -> Translate: ${translateMs}ms');
+              print('[METRICS] -> Render:  ${renderMs}ms');
+              print('======================================================\n');
+
+              if (!_isManualTranslationRequested) {
+                _previousOcrResults = ocrResults;
+              }
+
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
                 notifyListeners();
               }
-            } catch (e) {
-              print('Error processing captured screen: $e');
+            } else {
+              print('Timer: captureScreen returned null or not translating, skipping');
             }
           }
-        }
 
-        // Reset manual translation flag after processing
-        _isManualTranslationRequested = false;
+          // Reset manual translation flag after processing
+          _isManualTranslationRequested = false;
+        } else {
+          print('Timer: skipping - mode=$translationMode, isManualRequested=$_isManualTranslationRequested');
+        }
+      } catch (e, stackTrace) {
+        print('Error processing captured screen: $e');
+        print('Stack trace: $stackTrace');
+      } finally {
+        _isProcessingCapture = false; // Always release guard
       }
     });
   }
@@ -159,6 +297,8 @@ class TranslationProvider with ChangeNotifier {
 
   Future<void> stopTranslation() async {
     _isTranslating = false;
+    _isProcessingCapture = false;
+    _previousOcrResults = [];
     _captureTimer?.cancel();
     _captureTimer = null;
     if (Platform.isAndroid) {
@@ -196,9 +336,11 @@ class TranslationProvider with ChangeNotifier {
               requestManualTranslation();
               break;
             case 'cancelTranslation':
-              print("Translation cancelled");
+              print("Translation cancelled due to scroll");
               cancelTranslation(_lastTranslatedText, _sourceLanguage, _targetLanguage);
               _translationService.cancelAllTranslations();
+              _overlayService.hideTranslationOverlay();
+              _previousOcrResults.clear();
               break;
             default:
               throw MissingPluginException();

@@ -262,6 +262,80 @@ class LLMTranslationService {
     return translatedText;
   }
 
+  // New method for batch translation
+  Future<List<String>> translateBatch({
+    required List<String> texts,
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async {
+    if (texts.isEmpty) return [];
+    
+    // Check cache for each text
+    List<String> results = List.filled(texts.length, '');
+    List<int> uncashedIndices = [];
+    List<String> uncashedTexts = [];
+    
+    for (int i = 0; i < texts.length; i++) {
+      final cacheKey = _generateCacheKey(texts[i], sourceLanguage, targetLanguage);
+      final cachedTranslation = _translationCache.get(cacheKey);
+      if (cachedTranslation != null) {
+        results[i] = cachedTranslation;
+      } else {
+        uncashedIndices.add(i);
+        uncashedTexts.add(texts[i]);
+      }
+    }
+    
+    if (uncashedTexts.isEmpty) return results;
+
+    // Convert uncashed texts to a JSON string
+    final jsonInput = jsonEncode(uncashedTexts);
+    
+    // Create a special translation task for the batch
+    final task = _TranslationTask(
+      text: "BATCH:$jsonInput", // Use a prefix to distinguish batch requests
+      sourceLanguage: sourceLanguage,
+      targetLanguage: targetLanguage,
+      completer: Completer<String>(),
+    );
+
+    _translationQueue.add(task);
+    if (_queueProcessingTimer == null || !_queueProcessingTimer!.isActive) {
+      _startQueueProcessingTimer();
+    }
+
+    try {
+      final batchResultStr = await task.completer.future;
+      try {
+        final decoded = jsonDecode(batchResultStr);
+        if (decoded is List) {
+          for (int i = 0; i < decoded.length && i < uncashedIndices.length; i++) {
+            results[uncashedIndices[i]] = decoded[i].toString();
+            // Cache the result
+            final cacheKey = _generateCacheKey(uncashedTexts[i], sourceLanguage, targetLanguage);
+            _translationCache.put(cacheKey, decoded[i].toString());
+          }
+        } else {
+          // Fallback if LLM didn't return a JSON array
+          for (int i = 0; i < uncashedIndices.length; i++) {
+            results[uncashedIndices[i]] = uncashedTexts[i]; // Return original on failure
+          }
+        }
+      } catch (e) {
+        // Fallback on JSON parse error
+        for (int i = 0; i < uncashedIndices.length; i++) {
+          results[uncashedIndices[i]] = uncashedTexts[i];
+        }
+      }
+    } catch (e) {
+      for (int i = 0; i < uncashedIndices.length; i++) {
+        results[uncashedIndices[i]] = uncashedTexts[i];
+      }
+    }
+
+    return results;
+  }
+
   Future<String> _performTranslation({
     required String text, 
     required String sourceLanguage, 
@@ -273,6 +347,9 @@ class LLMTranslationService {
     if (storedApiKey == null || storedApiKey.isEmpty) {
       throw StateError('No API key configured. Please set up LLM translation in settings.');
     }
+
+    final isBatch = text.startsWith('BATCH:');
+    final actualText = isBatch ? text.substring(6) : text;
 
     try {
       final response = await http.post(
@@ -300,6 +377,11 @@ class LLMTranslationService {
   - If the original text is date time format "2024-01-01 12:00:00", the translation result should be "2024-01-01 12:00:00"
   - If the original text is something you don't know, like"Lomorage", the translation result should be "Lomorage"
 
+${isBatch ? '''
+CRITICAL INSTRUCTION: The user will provide a JSON array of strings. You MUST return ONLY a JSON array of strings, where each element is the translation of the corresponding element in the input array. 
+Maintain the exact same array length. DO NOT output any markdown blocks or explanations, ONLY the raw JSON array.
+''' : ''}
+
 ## Skills
 - Professional knowledge of multilingual translation
 - Understanding and accurately translating text content
@@ -318,7 +400,9 @@ class LLMTranslationService {
             },
             {
               'role': 'user', 
-              'content': 'Translate the following text from $sourceLanguage to $targetLanguage: "$text"'
+              'content': isBatch 
+                  ? 'Translate the following JSON array of strings from $sourceLanguage to $targetLanguage:\n\n$actualText'
+                  : 'Translate the following text from $sourceLanguage to $targetLanguage:\n\n$actualText'
             }
           ]
         }),

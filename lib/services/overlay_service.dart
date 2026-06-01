@@ -69,22 +69,33 @@ class OverlayService {
   // Show overlay with translated text
   Future<bool> showTranslationOverlay(String text, int id, {double? x, double? y, double? width, double? height, Color? overlayColor, Color? backgroundColor, bool? isLight, double? imgWidth, double? imgHeight}) async {
     try {
-      final bool shown = await _channel.invokeMethod('showTranslationOverlay', {
+      final colorValue = overlayColor?.value;
+      final bgColorValue = backgroundColor?.value;
+      print('OverlayService.show: id=$id, colorValue=$colorValue (type=${colorValue.runtimeType}), bgColorValue=$bgColorValue (type=${bgColorValue.runtimeType})');
+      
+      final args = {
         'text': text,
         'id': id,
         'x': x,
         'y': y,
         'width': width,
         'height': height,
-        'overlayColor': overlayColor?.value,
-        'backgroundColor': backgroundColor?.value,
+        'overlayColor': colorValue,
+        'backgroundColor': bgColorValue,
         'isLight': isLight,
         'imgWidth': imgWidth,
         'imgHeight': imgHeight,
-      });
+      };
+      print('OverlayService.show: invoking method channel with args keys=${args.keys.toList()}');
+      
+      final bool shown = await _channel.invokeMethod('showTranslationOverlay', args);
+      print('OverlayService.show: result=$shown');
       return shown;
     } on PlatformException catch (e) {
       print('Error showing translation overlay: ${e.message}');
+      return false;
+    } catch (e) {
+      print('Unexpected error showing translation overlay: $e');
       return false;
     }
   }
@@ -92,10 +103,15 @@ class OverlayService {
   // Hide all overlays
   Future<bool> hideTranslationOverlay() async {
     try {
+      print('OverlayService.hide: invoking hideTranslationOverlay');
       final bool hidden = await _channel.invokeMethod('hideTranslationOverlay');
+      print('OverlayService.hide: result=$hidden');
       return hidden;
     } on PlatformException catch (e) {
       print('Error hiding translation overlay: ${e.message}');
+      return false;
+    } catch (e) {
+      print('Unexpected error hiding translation overlay: $e');
       return false;
     }
   }

@@ -9,6 +9,8 @@ import android.os.IBinder
 import android.provider.Settings
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.GestureDetector
+import android.widget.ScrollView
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -57,6 +59,7 @@ class OverlayService : Service() {
     private var currentRotation: Int = Surface.ROTATION_0
     private var TAG = "OverlayService"
     private lateinit var methodChannel: MethodChannel
+    @Volatile
     private var isStopped = false
 
     companion object {
@@ -520,6 +523,21 @@ class OverlayService : Service() {
             return
         }
 
+        // Dynamically get the current screen metrics to handle rotation!
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                windowManager?.defaultDisplay?.getRealMetrics(displayMetrics)
+            } else {
+                windowManager?.defaultDisplay?.getMetrics(displayMetrics)
+            }
+            screenWidth = displayMetrics.widthPixels
+            screenHeight = displayMetrics.heightPixels
+            screenDensity = displayMetrics.densityDpi
+            Log.d(TAG, "showOverlay dynamic metrics: ${screenWidth}x${screenHeight}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to dynamically get metrics in showOverlay", e)
+        }
+
         if (overlayViews.containsKey(id)) {
             try {
                 val existingView = overlayViews[id]
@@ -539,32 +557,32 @@ class OverlayService : Service() {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
 
-        // Coordinate transformation from image space to screen space
+        // Coordinate transformation from image space to screen space using aspect-fit
         val imgAspectRatio = imgWidth / imgHeight
         val screenAspectRatio = screenWidth.toFloat() / screenHeight.toFloat()
 
         var scale: Float
-        var xOffset = 0f
-        var yOffset = 0f
+        var transformedX: Float
+        var transformedY: Float
 
-        // Determine how the screen is scaled and centered on the image canvas
         if (screenAspectRatio < imgAspectRatio) {
-            Log.d(TAG, "Screen is taller relative to image: $screenAspectRatio vs $imgAspectRatio, img: $imgWidth x $imgHeight, screen: $screenWidth x $screenHeight")
-            // Screen is taller than the image relative to its width, so it's scaled to fit height
-            scale = screenHeight.toFloat() / imgHeight
-            // The screen is centered vertically, so we calculate the left/right padding (yOffset)
-            xOffset = (imgWidth - screenWidth / scale) / 2
-        } else {
-            Log.d(TAG, "Screen is wider relative to image: $screenAspectRatio vs $imgAspectRatio, img: $imgWidth x $imgHeight, screen: $screenWidth x $screenHeight")
-            // Screen is wider than the image relative to its height, so it's scaled to fit width
+            Log.d(TAG, "Screen is taller relative to image: $screenAspectRatio vs $imgAspectRatio (portrait display showing landscape image)")
+            // Screen is taller, so the image is scaled to fit the screen width
             scale = screenWidth.toFloat() / imgWidth
-            // The screen is centered horizontally, so we calculate the top/bottom padding (xOffset)
-            yOffset = (imgHeight - screenHeight / scale) / 2
+            val yPadding = (screenHeight - imgHeight * scale) / 2f
+            
+            transformedX = x * scale
+            transformedY = y * scale + yPadding
+        } else {
+            Log.d(TAG, "Screen is wider relative to image: $screenAspectRatio vs $imgAspectRatio (landscape display showing portrait image)")
+            // Screen is wider, so the image is scaled to fit the screen height
+            scale = screenHeight.toFloat() / imgHeight
+            val xPadding = (screenWidth - imgWidth * scale) / 2f
+            
+            transformedX = x * scale + xPadding
+            transformedY = y * scale
         }
 
-        // Apply the calculated scale and offset to transform the coordinates
-        val transformedX = (x - xOffset) * scale
-        val transformedY = (y - yOffset) * scale
         val transformedWidth = width * scale
         val transformedHeight = height * scale
 
@@ -586,10 +604,8 @@ class OverlayService : Service() {
         } else {
             // 正常模式：创建带有文本的完整视图
             val containerLayout = FrameLayout(this).apply {
-                elevation = 8.dpToPx().toFloat() // Add shadow for the container
-                // Set width constraints on the container, as it's the view being added to WindowManager
-                minimumWidth = if (transformedWidth > 0) transformedWidth.toInt() else 0
-                // Use View.setMinimumWidth as it's the correct method for FrameLayout
+                elevation = 4.dpToPx().toFloat() // Subtle shadow for a clean look
+                // Do not force minimumWidth = transformedWidth. Let the FrameLayout wrap content beautifully!
             }
             val overlayView = AppCompatTextView(this).apply {
                 setText(text)
@@ -603,39 +619,38 @@ class OverlayService : Service() {
                 )
 
                 setTextColor(overlayTextColor)
+                setBackgroundColor(overlayBackgroundColor)
+                
                 // Add a subtle shadow for better text contrast
                 setShadowLayer(2f, 1f, 1f, if(isLight) Color.BLACK else Color.argb(80, 0, 0, 0))
 
-                maxWidth = (screenWidth * 0.9).toInt()
+                // Make dimensions exactly match the original text box to preserve layout
+                val exactWidth = if (transformedWidth > 0) transformedWidth.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
+                val exactHeight = if (transformedHeight > 0) transformedHeight.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
 
-                val backgroundDrawable = GradientDrawable().apply {
-                    setColor(overlayBackgroundColor)
-                    cornerRadius = 8.dpToPx().toFloat() // Rounded corners
-                }
-                background = backgroundDrawable
-
-                // Increased padding for more breathing room
-                val horizontalPadding = 8.dpToPx()
-                val verticalPadding = 4.dpToPx()
-                setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+                // Minimal padding to maximize text space inside the precise bounding box
+                setPadding(2, 1, 2, 1)
                 setSingleLine(false)
 
                 setAutoSizeTextTypeUniformWithConfiguration(
-                    10, 22, 1, TypedValue.COMPLEX_UNIT_SP
+                    6, 24, 1, TypedValue.COMPLEX_UNIT_SP
                 )
                 gravity = Gravity.CENTER
             }
             containerLayout.addView(overlayView, FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, // Let TextView determine its width within the container
-                FrameLayout.LayoutParams.WRAP_CONTENT
+                FrameLayout.LayoutParams.MATCH_PARENT, 
+                FrameLayout.LayoutParams.MATCH_PARENT
             ))
             containerLayout
         }
 
-        // 使用精确的 width 和 height 创建布局参数
+        val exactWidth = if (transformedWidth > 0) transformedWidth.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
+        val exactHeight = if (transformedHeight > 0) transformedHeight.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
+
+        // 使用精准的边界约束
         val layoutParams = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            exactWidth,
+            exactHeight,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT
@@ -654,26 +669,42 @@ class OverlayService : Service() {
         var initialTouchX = 0f
         var initialTouchY = 0f
 
+        var isDragging = false
+        val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                showExpandedTextDialog(text, isLight)
+                return true
+            }
+        })
+
         finalView.setOnTouchListener { v, event ->
-            // Log.d("DragHandle", "Touch event: ${event.action}")
+            gestureDetector.onTouchEvent(event)
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // Log.d("DragHandle", "Initial position: x=${event.rawX}, y=${event.rawY}")
                     initialX = layoutParams.x.toFloat()
                     initialY = layoutParams.y.toFloat()
                     initialTouchX = event.rawX
                     initialTouchY = event.rawY
+                    isDragging = false
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    // Log.d("DragHandle", "Moving: x=${event.rawX}, y=${event.rawY}")
-                    layoutParams.x = (initialX + (event.rawX - initialTouchX)).toInt()
-                    layoutParams.y = (initialY + (event.rawY - initialTouchY)).toInt()
-                    windowManager?.updateViewLayout(finalView, layoutParams)
+                    val deltaX = event.rawX - initialTouchX
+                    val deltaY = event.rawY - initialTouchY
+                    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                        isDragging = true
+                    }
+                    if (isDragging) {
+                        layoutParams.x = (initialX + deltaX).toInt()
+                        layoutParams.y = (initialY + deltaY).toInt()
+                        windowManager?.updateViewLayout(finalView, layoutParams)
+                    }
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    // Log.d("DragHandle", "Touch ended")
+                    if (!isDragging) {
+                        v.performClick()
+                    }
                     true
                 }
                 else -> false
@@ -681,6 +712,7 @@ class OverlayService : Service() {
         }
 
         windowManager?.addView(finalView, layoutParams)
+        Log.d(TAG, "Overlay $id added to window manager at (${layoutParams.x}, ${layoutParams.y}), displayMode=$displayMode")
 
         updateOverlayVisibility(id)
     }
@@ -717,16 +749,92 @@ class OverlayService : Service() {
     }
 
     private fun hideAllOverlays() {
-        overlayViews.forEach { (_, view) ->
+        Log.d(TAG, "hideAllOverlays: removing ${overlayViews.size} overlays")
+        overlayViews.forEach { (id, view) ->
             try {
                 windowManager?.removeView(view)
+                Log.d(TAG, "hideAllOverlays: removed overlay $id")
             } catch (e: Exception) {
-                print("Error removing view: ${e.message}")
+                Log.e(TAG, "Error removing view $id: ${e.message}")
             }
         }
         overlayViews.clear()
         overlayParams.clear()
         originalPositions.clear()
+    }
+
+    private fun showExpandedTextDialog(text: String, isLight: Boolean) {
+        val container = FrameLayout(this).apply {
+            setBackgroundColor(Color.argb(200, 0, 0, 0)) // Semi-transparent dim background
+            setOnClickListener {
+                try {
+                    windowManager?.removeView(this)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error removing expanded text dialog: ${e.message}")
+                }
+            }
+        }
+
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val padding = 20.dpToPx()
+            setPadding(padding, padding, padding, padding)
+            background = GradientDrawable().apply {
+                setColor(if (isLight) Color.DKGRAY else Color.WHITE)
+                cornerRadius = 16.dpToPx().toFloat()
+            }
+        }
+
+        val textView = TextView(this).apply {
+            this.text = text
+            textSize = 22f
+            setTextColor(if (isLight) Color.WHITE else Color.BLACK)
+            // Allow text selection in the expanded view!
+            setTextIsSelectable(true)
+        }
+        
+        val scrollView = ScrollView(this).apply {
+            addView(textView)
+        }
+        
+        // Prevent dialog from being too tall by using weight
+        scrollView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            0,
+            1f
+        )
+
+        val cardParams = FrameLayout.LayoutParams(
+            (screenWidth * 0.85).toInt(),
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.CENTER
+            val margin = 24.dpToPx()
+            setMargins(margin, margin, margin, margin)
+        }
+        
+        card.addView(scrollView)
+
+        val closeText = TextView(this).apply {
+            this.text = "Tap outside to close"
+            textSize = 12f
+            setTextColor(Color.GRAY)
+            gravity = Gravity.CENTER
+            setPadding(0, 16.dpToPx(), 0, 0)
+        }
+        card.addView(closeText)
+
+        container.addView(card, cardParams)
+
+        val layoutParams = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT
+        )
+
+        windowManager?.addView(container, layoutParams)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -745,6 +853,7 @@ class OverlayService : Service() {
                 Log.d(TAG, "Service started, reset stopped flag")
             }
             "show" -> {
+                Log.d(TAG, "onStartCommand: show action received, isStopped=$isStopped")
                 // Reset stopped flag when showing
                 if (!isStopped) {
                     val text = intent.getStringExtra("text")
@@ -759,9 +868,15 @@ class OverlayService : Service() {
                     val imgWidth = intent.getFloatExtra("imgWidth", -1f)
                     val imgHeight = intent.getFloatExtra("imgHeight", -1f)
 
+                    Log.d(TAG, "onStartCommand show: text='${text?.take(30)}', id=$id, overlayColor=${String.format("#%08X", overlayColor)}, isLight=$isLight")
+
                     if (text != null && id >= 0) {
                         showOverlay(id, text, x, y, width, height, overlayColor, backgroundColor, isLight, imgWidth, imgHeight)
+                    } else {
+                        Log.w(TAG, "onStartCommand show: invalid params text=$text, id=$id")
                     }
+                } else {
+                    Log.w(TAG, "onStartCommand show: SKIPPED because isStopped=true")
                 }
             }
             "hideAll" -> {

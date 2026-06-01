@@ -74,7 +74,9 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
             abs(scrollXDelta) > 50 || 
             abs(scrollYDelta) > 50
 
-        if (isSignificantScroll) {
+        val isSystemPackage = packageName == "com.android.systemui"
+
+        if (isSignificantScroll && !isSystemPackage) {
             // Update scroll state
             scrollState.lastScrollX = event.scrollX
             scrollState.lastScrollY = event.scrollY

@@ -134,7 +134,6 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 );
               }).toList(),
             onChanged: (selectedCode) {
-              // Existing selection logic remains the same
               final isSameLanguage = widget.isSourceLanguage
                 ? selectedCode == provider.targetLanguage
                 : selectedCode == provider.sourceLanguage;
@@ -147,7 +146,15 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                   ),
                 );
               } else {
-                // Check model download status
+                // If in LLM (AI) mode, bypass local model downloads entirely!
+                if (provider.translationMode == TranslationMode.llm) {
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(selectedCode);
+                  }
+                  return;
+                }
+
+                // Check model download status for on-device translation
                 final modelService = ModelDownloadService();
                 modelService.isModelDownloaded(selectedCode!).then((isDownloaded) {
                   if (!isDownloaded) {
@@ -157,7 +164,14 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                       MaterialPageRoute(
                         builder: (context) => ModelManagementScreen(),
                       ),
-                    );
+                    ).then((_) {
+                      // Re-check model download status upon returning from download screen
+                      modelService.isModelDownloaded(selectedCode).then((nowDownloaded) {
+                        if (nowDownloaded && widget.onChanged != null) {
+                          widget.onChanged!(selectedCode);
+                        }
+                      });
+                    });
                   } else if (widget.onChanged != null) {
                     widget.onChanged!(selectedCode);
                   }
@@ -309,10 +323,14 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          final provider = Provider.of<TranslationProvider>(context, listen: false);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const LLMApiConfigScreen()
+              builder: (context) => ChangeNotifierProvider.value(
+                value: provider,
+                child: const LLMApiConfigScreen(),
+              ),
             )
           );
         },

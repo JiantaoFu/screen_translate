@@ -9,7 +9,7 @@ class ColorUtils {
       // Check if the byte array is large enough for NV21 format
       if (bytes.length < width * height * 1.5) {
         print('Image bytes too small for color extraction');
-        return Colors.grey;
+        return Colors.white; // Default to white to ensure dark overlay
       }
 
       // Strategic sampling points with weights
@@ -105,7 +105,7 @@ class ColorUtils {
       return dominantColor;
     } catch (e) {
       print('NV21 color extraction error: $e');
-      return Colors.grey;
+      return Colors.white;
     }
   }
 
@@ -165,7 +165,7 @@ class ColorUtils {
   static Color _getColorFromBytesNV21(Uint8List bytes, int width, int height, int x, int y) {
     try {
       if (y < 0 || y >= height || x < 0 || x >= width) {
-        return Colors.grey;
+        return Colors.white;
       }
 
       // NV21 format: Y plane followed by interleaved V and U planes
@@ -185,7 +185,7 @@ class ColorUtils {
       return Color.fromRGBO(r, g, b, 1.0);
     } catch (e) {
       print('Color extraction error at ($x, $y): $e');
-      return Colors.grey;
+      return Colors.white;
     }
   }
 }

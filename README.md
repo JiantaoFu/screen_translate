@@ -30,3 +30,34 @@
 - 可以结合OCR（光学字符识别）技术，提取屏幕中的文字并翻译，再通过弹出窗口或侧边栏显示翻译结果。
 
 总的来说，你的点子具备非常大的潜力，可以为用户提供更方便、流畅的跨语言交流体验。随着技术的进步，像你说的这种屏幕实时翻译的应用未来可能会变得非常流行。
+
+---
+
+## 👨‍💻 开发者指南 (Developer Guide)
+
+### 1. 发布正式版前置配置 (Release Keystore)
+在编译 `Release` 版本的 APK 或 AppBundle 前，您必须配置应用的签名证书秘钥。
+请在 `android/` 目录下创建一个名为 `key.properties` 的文件（请不要提交到 Git），并填入以下内容：
+```properties
+storePassword=您的秘钥库密码
+keyPassword=您的密钥密码
+keyAlias=screen-trans
+storeFile=../screen-trans-key.keystore
+```
+
+### 2. 自动化构建与版本升级
+本项目包含两个自动化构建脚本，支持多语言转换、版本号自动升级以及一键打包，极大简化了发布流程。
+
+#### Windows 环境 (`build.bat`)
+双击运行 `build.bat`，或在 CMD/PowerShell 中执行：
+- 选择 **[7] Bump Version + Full Release (APK + AAB)**
+- 在二级菜单中，您可以选择升级大版本号(Major)、小版本号(Minor)、补丁号(Patch) 或 仅升级构建号(Build Number)。
+- 脚本会自动修改 `pubspec.yaml`，然后进行全局多语言生成的编译打包。
+
+#### Mac / Linux 环境 (`build.sh`)
+打开终端执行以下命令：
+- **常规发布构建**：`./build.sh --release`
+- **升级构建号并发布**：`./build.sh --release --bump build`
+- **升级补丁号并发布**：`./build.sh --release --bump patch`
+- **升级小版本并发布**：`./build.sh --release --bump minor`
+- **升级大版本并发布**：`./build.sh --release --bump major`

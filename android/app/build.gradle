@@ -13,10 +13,26 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(new java.io.InputStreamReader(new java.io.FileInputStream(localPropertiesFile), 'UTF-8'))
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
 android {
     namespace "com.lomoware.screen_translate"
     compileSdkVersion rootProject.ext.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility rootProject.ext.javaVersion
@@ -35,8 +51,8 @@ android {
         applicationId "com.lomoware.screen_translate"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode flutter.versionCode
-        versionName flutter.versionName
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     signingConfigs {
@@ -50,7 +66,13 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            def keystoreFile = file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
+            if (keystoreFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+                println "WARNING: Release keystore not found at ${keystoreFile.absolutePath}. Falling back to DEBUG signing config for local testing."
+            }
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

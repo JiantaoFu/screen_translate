@@ -74,12 +74,13 @@ data class CapturedFrame(
 
 class FrameStabilizer(
     private var screenWidth: Int, 
-    private var screenHeight: Int
+    private var screenHeight: Int,
+    private val onMotionDetected: () -> Unit
 ) {
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
     private var stabilizationTimer: Timer? = null
-    private val stabilizationDelay = 1000L // ms to wait before translating
+    private val stabilizationDelay = 300L // ms to wait before translating
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastImageHash: Long = 0
     private var consecutiveScrollFrames = 0
@@ -150,6 +151,12 @@ class FrameStabilizer(
 
         if (shouldProcess) {
             Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
+            
+            // Motion detected - trigger callback immediately to clear overlays
+            if (lastImageHash != 0L) {
+                onMotionDetected()
+            }
+
             // Cancel previous timer
             stabilizationTimer?.cancel()
 
@@ -228,13 +235,24 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         Log.d(TAG, "Context: $context")
         Log.d(TAG, "Context class: ${context.javaClass.name}")
         
-        val metrics = context.resources.displayMetrics
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val metrics = DisplayMetrics()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            wm.defaultDisplay.getRealMetrics(metrics)
+        } else {
+            wm.defaultDisplay.getMetrics(metrics)
+        }
         screenWidth = metrics.widthPixels
         screenHeight = metrics.heightPixels
         screenDensity = metrics.densityDpi
-        Log.d(TAG, "Screen metrics: $screenWidth x $screenHeight @ $screenDensity")
+        Log.d(TAG, "Screen metrics (real): $screenWidth x $screenHeight @ $screenDensity")
 
-        frameStabilizer = FrameStabilizer(screenWidth, screenHeight)
+        frameStabilizer = FrameStabilizer(screenWidth, screenHeight) {
+            val intent = Intent(context, OverlayService::class.java)
+            intent.action = "hideAll"
+            context.startService(intent)
+            cancelAllTranslations()
+        }
 
         // Register scroll detection receiver during initialization
         registerScrollDetectionReceiver()
@@ -309,12 +327,39 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 result.error("NOT_CAPTURING", "Screen capture is not active", null)
                 return
             }
+
+            // Check if screen orientation changed dynamically!
+            try {
+                val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                val metrics = DisplayMetrics()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    wm.defaultDisplay.getRealMetrics(metrics)
+                } else {
+                    wm.defaultDisplay.getMetrics(metrics)
+                }
+                val currentW = metrics.widthPixels
+                val currentH = metrics.heightPixels
+                if (currentW != screenWidth || currentH != screenHeight) {
+                    Log.d(TAG, "Screen rotation detected! Updating dimensions: ${screenWidth}x${screenHeight} -> ${currentW}x${currentH}")
+                    screenWidth = currentW
+                    screenHeight = currentH
+                    frameStabilizer = FrameStabilizer(screenWidth, screenHeight) {
+                        val intent = Intent(context, OverlayService::class.java)
+                        intent.action = "hideAll"
+                        context.startService(intent)
+                        cancelAllTranslations()
+                    }
+                    setupVirtualDisplay()
+                }
+            } catch (rotationEx: Exception) {
+                Log.e(TAG, "Error checking screen rotation in captureScreen: ${rotationEx.message}", rotationEx)
+            }
            
             val frame = imageQueue.pollLast() // Atomically peek and remove
             if (frame != null) {
                 val (bytes, timestamp, width, height) = frame
                 val age = System.currentTimeMillis() - timestamp
-                
+
                 if (age <= MAX_FRAME_AGE) {
                     Log.d(TAG, "Sending image bytes: ${bytes.size}, frame age: ${age}ms")
                 } else {
@@ -326,6 +371,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     "width" to width,
                     "height" to height
                 ))
+            } else {
+                // No frame available yet - return null so Flutter can retry on next tick
+                // CRITICAL: We must ALWAYS call result.success or result.error,
+                // otherwise the Flutter method channel will hang forever!
+                Log.d(TAG, "captureScreen: No frame available in queue, returning null")
+                result.success(null)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error capturing screen", e)
@@ -403,6 +454,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
             // Unregister broadcast receiver
             unregisterScrollDetectionReceiver()
+
+            // Also stop and clear all overlays
+            val intent = Intent(context, OverlayService::class.java).apply {
+                action = "stop"
+            }
+            context.startService(intent)
 
             Log.d(TAG, "Cleanup complete")
         } catch (e: Exception) {
@@ -526,117 +583,51 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             val buffer = planes[0].buffer
             val pixelStride = planes[0].pixelStride
             val rowStride = planes[0].rowStride
-            val rowPadding = rowStride - pixelStride * width
-            val imageFormat = image.format // Get the image format
 
-            // Log.d(TAG, "Converting image: ${width}x${height}")
-            // Log.d(TAG, "Buffer capacity: ${buffer.capacity()}")
-            // Log.d(TAG, "PixelStride: $pixelStride")
-            // Log.d(TAG, "RowStride: $rowStride")
-            // Log.d(TAG, "RowPadding: $rowPadding")
+            // 1. Read entire buffer to a fast local array to eliminate JNI crossing overhead
+            val bufferBytes = ByteArray(buffer.capacity())
+            buffer.position(0)
+            buffer.get(bufferBytes)
 
             // NV21 format size: height * width + 2 * (height/2 * width/2)
             val nv21Size = width * height + 2 * ((height + 1) / 2) * ((width + 1) / 2)
             val nv21Bytes = ByteArray(nv21Size)
             
-            // Fill Y plane
             var yPos = 0
+            // Fill Y plane
             for (row in 0 until height) {
+                var pos = row * rowStride
                 for (col in 0 until width) {
-                    val pos = row * rowStride + col * pixelStride
-                    buffer.position(pos)
+                    val r = bufferBytes[pos].toInt() and 0xFF
+                    val g = bufferBytes[pos + 1].toInt() and 0xFF
+                    val b = bufferBytes[pos + 2].toInt() and 0xFF
                     
-                    // Read RGBA values
-                    val r = buffer.get().toInt() and 0xFF
-                    val g = buffer.get().toInt() and 0xFF
-                    val b = buffer.get().toInt() and 0xFF
-                    buffer.get() // Skip alpha
-                    
-                    // Convert to Y
                     val y = ((66 * r + 129 * g + 25 * b + 128) shr 8) + 16
                     nv21Bytes[yPos++] = y.toByte()
+                    pos += pixelStride
                 }
             }
             
             // Fill UV plane
             val uvPos = width * height
-            var pos = uvPos
+            var posNv21 = uvPos
             for (row in 0 until height step 2) {
+                var pos = row * rowStride
                 for (col in 0 until width step 2) {
-                    val rgbaPos = row * rowStride + col * pixelStride
-                    buffer.position(rgbaPos)
+                    val r = bufferBytes[pos].toInt() and 0xFF
+                    val g = bufferBytes[pos + 1].toInt() and 0xFF
+                    val b = bufferBytes[pos + 2].toInt() and 0xFF
                     
-                    // Average 2x2 block
-                    var avgR = 0
-                    var avgG = 0
-                    var avgB = 0
+                    // Nearest neighbor NV21 UV calculation (faster, sufficient for ML Kit)
+                    val u = ((-38 * r - 74 * g + 112 * b + 128) shr 8) + 128
+                    val v = ((112 * r - 94 * g - 18 * b + 128) shr 8) + 128
                     
-                    // Top left pixel
-                    var r = buffer.get().toInt() and 0xFF
-                    var g = buffer.get().toInt() and 0xFF
-                    var b = buffer.get().toInt() and 0xFF
-                    buffer.get() // Skip alpha
-                    avgR += r
-                    avgG += g
-                    avgB += b
-                    
-                    // Top right pixel (if within bounds)
-                    if (col + 1 < width) {
-                        buffer.position(rgbaPos + pixelStride * 1)
-                        r = buffer.get().toInt() and 0xFF
-                        g = buffer.get().toInt() and 0xFF
-                        b = buffer.get().toInt() and 0xFF
-                        avgR += r
-                        avgG += g
-                        avgB += b
-                    }
-                    
-                    // Bottom left pixel (if within bounds)
-                    if (row + 1 < height) {
-                        buffer.position(rgbaPos + rowStride)
-                        r = buffer.get().toInt() and 0xFF
-                        g = buffer.get().toInt() and 0xFF
-                        b = buffer.get().toInt() and 0xFF
-                        avgR += r
-                        avgG += g
-                        avgB += b
-                    }
-                    
-                    // Bottom right pixel (if within bounds)
-                    if (row + 1 < height && col + 1 < width) {
-                        buffer.position(rgbaPos + rowStride + pixelStride)
-                        r = buffer.get().toInt() and 0xFF
-                        g = buffer.get().toInt() and 0xFF
-                        b = buffer.get().toInt() and 0xFF
-                        avgR += r
-                        avgG += g
-                        avgB += b
-                    }
-                    
-                    avgR = avgR shr 2
-                    avgG = avgG shr 2
-                    avgB = avgB shr 2
-                    
-                    // Log average values
-                    // Log.d(TAG, "Average pixel values for block at ($row, $col):")
-                    // Log.d(TAG, "  avgR: $avgR")
-                    // Log.d(TAG, "  avgG: $avgG")
-                    // Log.d(TAG, "  avgB: $avgB")
-                    
-                    // Convert to V and U
-                    val v = (128 + ((112 * avgR - 94 * avgG - 18 * avgB) shr 8)).toByte()
-                    val u = (128 + ((-38 * avgR - 74 * avgG + 112 * avgB) shr 8)).toByte()
-                    
-                    // Log UV calculations
-                    // Log.d(TAG, "UV Calculation for block at ($row, $col):")
-                    // Log.d(TAG, "  V calculation: 128 + (112 * $avgR - 94 * $avgG - 18 * $avgB shr 8) = $v")
-                    // Log.d(TAG, "  U calculation: 128 + (-38 * $avgR - 74 * $avgG + 112 * $avgB shr 8) = $u")
-                    
-                    nv21Bytes[pos++] = v
-                    nv21Bytes[pos++] = u
+                    nv21Bytes[posNv21++] = v.toByte()
+                    nv21Bytes[posNv21++] = u.toByte()
+                    pos += pixelStride * 2
                 }
             }
-
+            
             return nv21Bytes
         } catch (e: Exception) {
             Log.e(TAG, "Error converting image to bytes", e)

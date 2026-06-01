@@ -72,7 +72,7 @@ class OCRService {
   Future<List<OCRResult>> processImage(
     Map<String, dynamic> imageData,
     TextRecognitionScript script,
-    {bool? drawDebugBoxes, int? minTextLength}
+    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
   ) async {
     try {
       // Get configuration from Firebase Remote Config
@@ -157,15 +157,7 @@ class OCRService {
       final Color backgroundColor = ColorUtils.extractDominantColorFromNV21(imageBytes, width, height);
       final Color overlayColor = backgroundColor.getContrastColor();
 
-      final List<OCRResult> results = [];
-
-      // Sort blocks by size (largest first) to prioritize main text blocks
-      // final List<TextBlock> sortedBlocks = recognizedText.blocks.toList()
-      //   ..sort((a, b) => (b.boundingBox.width * b.boundingBox.height)
-      //       .compareTo(a.boundingBox.width * a.boundingBox.height));
-
-      // Track processed areas to avoid overlaps
-      // final List<Rect> processedAreas = [];
+      final List<OCRResult> initialResults = [];
 
       for (final TextBlock block in recognizedText.blocks) {
         final Rect boundingBox = block.boundingBox;
@@ -175,10 +167,8 @@ class OCRService {
             block.text.trim().length >= minTextLength &&
             boundingBox.width > 0 &&
             boundingBox.height > 0) {
-          _logger.info('Text block recognized {${block.text}}, sending mapped screen coords {x:${boundingBox.left}, y:${boundingBox.top}, w:${boundingBox.width}, h:${boundingBox.height}}');
-          results.add(OCRResult(
+          initialResults.add(OCRResult(
             text: block.text,
-            // Pass original bounding box coordinates relative to the image
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,
@@ -186,13 +176,92 @@ class OCRService {
             overlayColor: overlayColor,
             backgroundColor: backgroundColor,
             isLight: backgroundColor.isLight(),
-            // keep original image dims for reference if needed
             imgWidth: width.toDouble(),
             imgHeight: height.toDouble(),
           ));
-          // processedAreas.add(adjustedBox);
         }
       }
+
+      // Spatial Block Merging Algorithm
+      // Iteratively merge blocks that are spatially close to each other
+      bool merged;
+      do {
+        merged = false;
+        for (int i = 0; i < initialResults.length; i++) {
+          for (int j = i + 1; j < initialResults.length; j++) {
+            final a = initialResults[i];
+            final b = initialResults[j];
+
+            // Calculate distance between bounding boxes
+            final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
+            final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
+            final distance = sqrt(dx * dx + dy * dy);
+
+            // Estimate font size (min dimension of the block)
+            final fontSizeA = min(a.height, a.width);
+            final fontSizeB = min(b.height, b.width);
+            
+            // 智能合并算法 (Smart Merging Algorithm):
+            // 如果两个文本块在 X 轴或 Y 轴上投影有重叠 (overlapX 或 overlapY)，说明它们是对齐的（属于同一段落/气泡的概率极大）。
+            // 如果它们处于完全对角线位置 (无任何轴向重叠)，它们大概率属于两个不同的相邻气泡，此时我们大幅度收紧合并阈值。
+            final overlapX = dx == 0.0;
+            final overlapY = dy == 0.0;
+            final isAligned = overlapX || overlapY;
+            
+            final thresholdMultiplier = isAligned ? mergeAggressiveness : (mergeAggressiveness * 0.3);
+            final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
+
+            if (distance < threshold) {
+              // Merge these two blocks!
+              String mergedText;
+              
+              // Determine concatenation order
+              if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
+                // Vertical alignment: top-to-bottom
+                mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+              } else {
+                // Horizontal alignment: 
+                // For Japanese/Chinese manga, vertical text reads Right-to-Left
+                // So if it's primarily vertical script (height > width), smaller X means it comes AFTER larger X.
+                // We'll use a simple heuristic: if a is to the left of b, and it's CJK, it might be R-to-L.
+                // But appending with a space is safest.
+                if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
+                   mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+                } else {
+                   mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
+                }
+              }
+
+              final newLeft = min(a.x, b.x);
+              final newTop = min(a.y, b.y);
+              final newRight = max(a.x + a.width, b.x + b.width);
+              final newBottom = max(a.y + a.height, b.y + b.height);
+
+              _logger.info('Merging blocks: {${a.text}} and {${b.text}} -> {${mergedText}}');
+
+              initialResults[i] = OCRResult(
+                text: mergedText,
+                x: newLeft,
+                y: newTop,
+                width: newRight - newLeft,
+                height: newBottom - newTop,
+                overlayColor: a.overlayColor,
+                backgroundColor: a.backgroundColor,
+                isLight: a.isLight,
+                imgWidth: a.imgWidth,
+                imgHeight: a.imgHeight,
+              );
+
+              initialResults.removeAt(j);
+              merged = true;
+              break; // Break inner loop to restart with new boundaries
+            }
+          }
+          if (merged) break; // Break outer loop to restart
+        }
+      } while (merged);
+
+      final results = initialResults;
 
       _logger.info('OCR: Found ${results.length} text blocks');
 

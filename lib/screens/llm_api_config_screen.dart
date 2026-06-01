@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/llm_translation_service.dart';
 import '../providers/translation_provider.dart';
+import 'package:provider/provider.dart';
 
 class LLMApiConfigScreen extends StatefulWidget {
   const LLMApiConfigScreen({Key? key}) : super(key: key);
@@ -142,6 +143,41 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
               Text(
                 localizations.api_key_note,
                 style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 30),
+              const Divider(),
+              const SizedBox(height: 10),
+              Text(
+                'Advanced Settings',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Consumer<TranslationProvider>(
+                builder: (context, provider, child) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('OCR Merge Aggressiveness: ${provider.mergeAggressiveness.toStringAsFixed(1)}x'),
+                      const SizedBox(height: 5),
+                      const Text(
+                        'Higher values merge distant text blocks. Default is 1.5x.',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      Slider(
+                        value: provider.mergeAggressiveness,
+                        min: 0.0,
+                        max: 3.0,
+                        divisions: 30,
+                        label: '${provider.mergeAggressiveness.toStringAsFixed(1)}x',
+                        onChanged: (value) {
+                          provider.setMergeAggressiveness(value);
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),

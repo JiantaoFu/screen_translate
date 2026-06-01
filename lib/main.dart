@@ -20,28 +20,39 @@ Future<void> main() async {
     print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
   });
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
-  // Initialize Firebase Remote Config
-  final remoteConfig = FirebaseRemoteConfigService();
-  await remoteConfig.init();
-  remoteConfig.logAllValues();
-
-  // Initialize Firebase Analytics
-  final analytics = FirebaseAnalyticsService();
-  await analytics.init();
-  await analytics.trackAppOpen();
-
-  // Initialize OCR Sampling Service
-  final ocrSamplingService = OCRSamplingService();
-  await ocrSamplingService.init(
-    cloudinaryCloudName: 'dyr6qobke',
-    cloudinaryUploadPreset: 'oucv1boz',
-  );
-
+  // Run the app UI immediately so the user never gets stuck on the splash screen/logo!
   runApp(const ScreenTranslateApp());
+
+  // Initialize Firebase and other network-dependent background services asynchronously
+  Future(() async {
+    try {
+      print('Background Services: Initializing Firebase...');
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ).timeout(const Duration(seconds: 10));
+
+      // Initialize Firebase Remote Config
+      final remoteConfig = FirebaseRemoteConfigService();
+      await remoteConfig.init().timeout(const Duration(seconds: 10));
+      remoteConfig.logAllValues();
+
+      // Initialize Firebase Analytics
+      final analytics = FirebaseAnalyticsService();
+      await analytics.init().timeout(const Duration(seconds: 5));
+      await analytics.trackAppOpen();
+
+      // Initialize OCR Sampling Service
+      final ocrSamplingService = OCRSamplingService();
+      await ocrSamplingService.init(
+        cloudinaryCloudName: 'dyr6qobke',
+        cloudinaryUploadPreset: 'oucv1boz',
+      ).timeout(const Duration(seconds: 5));
+      print('Background Services: All services initialized successfully.');
+    } catch (e) {
+      print('Background Services: Non-fatal initialization error: $e');
+    }
+  });
 }
 
 class ScreenTranslateApp extends StatelessWidget {

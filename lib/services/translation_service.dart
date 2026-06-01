@@ -107,9 +107,8 @@ class TranslationService {
       if (completer != null && !completer.isCompleted) {
         print('Translation: Attempting to cancel specific translation task');
 
-        // Close the current translator to interrupt any ongoing translation
-        _translator?.close();
-        _translator = null;
+        // DO NOT close the translator here to interrupt, as it causes a fatal ML Kit crash if a translation is ongoing.
+        // The result will simply be discarded since we complete the completer early.
 
         // Complete the completer with the original text to signal cancellation
         completer.complete(text);
@@ -131,9 +130,7 @@ class TranslationService {
         completer.complete('');
       }
     }
-    // Close the current translator to interrupt any ongoing translation
-    _translator?.close();
-    _translator = null;
+    // DO NOT close the translator here, to prevent ML Kit crash for ongoing translations.
     _translations.clear();
     _translationCompleters.clear();
   }

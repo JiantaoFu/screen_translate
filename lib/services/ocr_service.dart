@@ -290,6 +290,130 @@ class OCRService {
     }
   }
 
+  Future<List<OCRResult>> processFile(
+    File file,
+    TextRecognitionScript script,
+    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
+  ) async {
+    try {
+      final remoteConfig = FirebaseRemoteConfigService();
+      drawDebugBoxes ??= remoteConfig.isDebugOCRBoxesEnabled();
+      minTextLength ??= remoteConfig.getOCRMinTextLength();
+
+      _logger.info('OCR: Processing file with ML Kit');
+      final InputImage image = InputImage.fromFilePath(file.path);
+      final textRecognizer = getTextRecognizer(script);
+
+      final stopwatch = Stopwatch()..start();
+      final RecognizedText recognizedText = await textRecognizer.processImage(image);
+      stopwatch.stop();
+
+      // For standard files, we might not have a simple way to extract NV21 dominant color fast,
+      // so we will just use a fallback or try to extract it from the image if possible.
+      // Since it's a static image, we'll just use a dark overlay with white text as default.
+      final Color backgroundColor = Colors.black.withOpacity(0.6);
+      final Color overlayColor = Colors.white;
+
+      // To get image width and height for OCRResult, we need to decode it
+      final decodedImage = await decodeImageFromList(await file.readAsBytes());
+      final double width = decodedImage.width.toDouble();
+      final double height = decodedImage.height.toDouble();
+
+      final List<OCRResult> initialResults = [];
+
+      for (final TextBlock block in recognizedText.blocks) {
+        final Rect boundingBox = block.boundingBox;
+
+        if (block.text.trim().isNotEmpty &&
+            block.text.trim().length >= minTextLength &&
+            boundingBox.width > 0 &&
+            boundingBox.height > 0) {
+          initialResults.add(OCRResult(
+            text: block.text,
+            x: boundingBox.left,
+            y: boundingBox.top,
+            width: boundingBox.width,
+            height: boundingBox.height,
+            overlayColor: overlayColor,
+            backgroundColor: backgroundColor,
+            isLight: false,
+            imgWidth: width,
+            imgHeight: height,
+          ));
+        }
+      }
+
+      // We should ideally extract the merging algorithm into a shared private method,
+      // but for now, we'll just return the raw blocks or copy the merging logic.
+      // Let's do the same merging logic:
+      bool merged;
+      do {
+        merged = false;
+        for (int i = 0; i < initialResults.length; i++) {
+          for (int j = i + 1; j < initialResults.length; j++) {
+            final a = initialResults[i];
+            final b = initialResults[j];
+
+            final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
+            final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
+            final distance = sqrt(dx * dx + dy * dy);
+
+            final fontSizeA = min(a.height, a.width);
+            final fontSizeB = min(b.height, b.width);
+            
+            final overlapX = dx == 0.0;
+            final overlapY = dy == 0.0;
+            final isAligned = overlapX || overlapY;
+            
+            final thresholdMultiplier = isAligned ? mergeAggressiveness : (mergeAggressiveness * 0.3);
+            final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
+
+            if (distance < threshold) {
+              String mergedText;
+              if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
+                mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+              } else {
+                if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
+                   mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+                } else {
+                   mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
+                }
+              }
+
+              final newLeft = min(a.x, b.x);
+              final newTop = min(a.y, b.y);
+              final newRight = max(a.x + a.width, b.x + b.width);
+              final newBottom = max(a.y + a.height, b.y + b.height);
+
+              initialResults[i] = OCRResult(
+                text: mergedText,
+                x: newLeft,
+                y: newTop,
+                width: newRight - newLeft,
+                height: newBottom - newTop,
+                overlayColor: a.overlayColor,
+                backgroundColor: a.backgroundColor,
+                isLight: a.isLight,
+                imgWidth: a.imgWidth,
+                imgHeight: a.imgHeight,
+              );
+
+              initialResults.removeAt(j);
+              merged = true;
+              break;
+            }
+          }
+          if (merged) break;
+        }
+      } while (merged);
+
+      return initialResults;
+    } catch (e) {
+      _logger.severe('OCR File Error: $e');
+      return [];
+    }
+  }
+
   // Utility method to convert NV21 to RGB using image package
   Uint8List convertNV21toRGB(
     Uint8List nv21Bytes,

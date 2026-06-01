@@ -12,6 +12,11 @@ import 'llm_api_config_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:screen_translate/screens/image_translation_screen.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -185,9 +190,61 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
   }
 }
 
-class HomeScreen extends StatelessWidget {
-
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late StreamSubscription _intentDataStreamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSharingIntent();
+  }
+
+  void _initSharingIntent() {
+    // For sharing images coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
+      if (value.isNotEmpty) {
+        _navigateToImageTranslation(File(value.first.path));
+      }
+    }, onError: (err) {
+      print("getIntentDataStream error: $err");
+    });
+
+    // For sharing images coming from outside the app while the app is closed
+    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
+      if (value.isNotEmpty) {
+        // clear the intent so it doesn't fire again
+        ReceiveSharingIntent.instance.reset();
+        _navigateToImageTranslation(File(value.first.path));
+      }
+    });
+  }
+
+  void _navigateToImageTranslation(File file) {
+    // Provide translation provider so ImageTranslationScreen can use it
+    final provider = Provider.of<TranslationProvider>(context, listen: false);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider.value(
+          value: provider,
+          child: ImageTranslationScreen(imageFile: file),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _intentDataStreamSubscription.cancel();
+    super.dispose();
+  }
 
   Future<void> _trackTranslationAndPromptReview(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -271,25 +328,47 @@ class HomeScreen extends StatelessWidget {
                     _buildTranslationModeToggle(context),
 
                     Consumer<TranslationProvider>(
-                      builder: (context, provider, child) => _buildActionButton(
-                        icon: Icons.screenshot,
-                        label: provider.isTranslating ? AppLocalizations.of(context)!.stop_translation : AppLocalizations.of(context)!.translate_screen,
-                        onTap: () async {
-                          try {
-                            if (provider.isTranslating) {
-                              provider.stopTranslation();
-                            } else {
-                              await provider.startTranslation();
-                            }
-                            await _trackTranslationAndPromptReview(context);
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: ${e.toString()}')),
-                            );
-                          }
-                        },
-                        context: context,
-                      ),
+                      builder: (context, provider, child) {
+                        return Column(
+                          children: [
+                            if (Platform.isAndroid)
+                              _buildActionButton(
+                                icon: Icons.screenshot,
+                                label: provider.isTranslating ? AppLocalizations.of(context)!.stop_translation : AppLocalizations.of(context)!.translate_screen,
+                                onTap: () async {
+                                  try {
+                                    if (provider.isTranslating) {
+                                      provider.stopTranslation();
+                                    } else {
+                                      await provider.startTranslation();
+                                    }
+                                    await _trackTranslationAndPromptReview(context);
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: ${e.toString()}')),
+                                    );
+                                  }
+                                },
+                                context: context,
+                              ),
+                            if (Platform.isIOS || Platform.isAndroid) ...[
+                              if (Platform.isAndroid) SizedBox(height: 15),
+                              _buildActionButton(
+                                icon: Icons.image,
+                                label: AppLocalizations.of(context)!.translate_screen, // Using same label or we could add a new one "Translate Image"
+                                onTap: () async {
+                                  final picker = ImagePicker();
+                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                  if (pickedFile != null) {
+                                    _navigateToImageTranslation(File(pickedFile.path));
+                                  }
+                                },
+                                context: context,
+                              ),
+                            ]
+                          ],
+                        );
+                      },
                     ),
 
                     SizedBox(height: 20),

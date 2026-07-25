@@ -154,13 +154,13 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
           width: result.width * scaleX,
           height: result.height * scaleY,
           child: Container(
-            color: Color(result.backgroundColor),
+            color: result.backgroundColor,
             child: Text(
               translatedText,
               style: TextStyle(
-                color: Color(result.overlayColor),
+                color: result.overlayColor,
                 fontSize: 14 * scaleX, // Approximate
-                backgroundColor: Color(result.backgroundColor),
+                backgroundColor: result.backgroundColor,
               ),
               softWrap: true,
             ),

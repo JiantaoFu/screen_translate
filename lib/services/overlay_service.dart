@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
 
 class OverlayService {
   static const MethodChannel _channel =
@@ -133,6 +133,15 @@ class OverlayService {
     } on PlatformException catch (e) {
       print('Error stopping translation overlay: ${e.message}');
       return false;
+    }
+  }
+
+  // Show a native toast message
+  Future<void> showToast(String message) async {
+    try {
+      await _channel.invokeMethod('showToast', {'text': message});
+    } on PlatformException catch (e) {
+      print('Error showing toast: ${e.message}');
     }
   }
 }

@@ -99,8 +99,13 @@ class LLMTranslationService {
 
   // Load API key from secure storage or environment
   static Future<String?> getStoredApiKey() async {
-    final secureStorage = const FlutterSecureStorage();
-    return await secureStorage.read(key: _apiKeyStorageKey);
+    try {
+      final secureStorage = const FlutterSecureStorage();
+      return await secureStorage.read(key: _apiKeyStorageKey);
+    } catch (e) {
+      debugPrint('Error reading API key from secure storage: $e');
+      return null;
+    }
   }
 
   // Save API key to secure storage

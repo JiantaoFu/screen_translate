@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/model_management_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/screens/translation_settings_screen.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
+import '../services/onnx_translation_service.dart';
 import 'llm_api_config_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,6 +61,12 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
     switch (mode) {
       case TranslationMode.onDevice:
         return await ModelDownloadService().isModelDownloaded(languageCode);
+      case TranslationMode.onnx:
+        // Check if either en-zh or ja-zh ONNX model is ready
+        final svc = ModelDownloadService();
+        final enZh = await svc.getOnnxModelStatus('opus-mt-en-zh');
+        final jaZh = await svc.getOnnxModelStatus('opus-mt-jap-zh');
+        return enZh == OnnxModelStatus.ready || jaZh == OnnxModelStatus.ready;
       case TranslationMode.llm:
         // For LLM, always consider the language "ready"
         return true;
@@ -106,6 +114,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(color: Colors.blue, width: 1),
             borderRadius: BorderRadius.circular(10),
           ),
@@ -126,12 +135,14 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        _getLocalizedLanguageName(context, code),
-                        style: TextStyle(fontSize: 14), // Reduced font size
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          _getLocalizedLanguageName(context, code),
+                          style: TextStyle(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      SizedBox(width: 1), // Small spacing
+                      SizedBox(width: 4),
                       // Check download status
                       _buildModelStatusIcon(code , Provider.of<TranslationProvider>(context).translationMode),
                     ],
@@ -163,11 +174,13 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 final modelService = ModelDownloadService();
                 modelService.isModelDownloaded(selectedCode!).then((isDownloaded) {
                   if (!isDownloaded) {
-                    // Navigate to Model Management Screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ModelManagementScreen(),
+                        builder: (_) => ChangeNotifierProvider.value(
+                          value: Provider.of<TranslationProvider>(context, listen: false),
+                          child: const TranslationSettingsScreen(),
+                        ),
                       ),
                     ).then((_) {
                       // Re-check model download status upon returning from download screen
@@ -355,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (Platform.isAndroid) SizedBox(height: 15),
                               _buildActionButton(
                                 icon: Icons.image,
-                                label: AppLocalizations.of(context)!.translate_screen, // Using same label or we could add a new one "Translate Image"
+                                label: 'Translate Image',
                                 onTap: () async {
                                   final picker = ImagePicker();
                                   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -375,22 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     Consumer<TranslationProvider>(
                       builder: (context, provider, child) {
-                        if (provider.translationMode == TranslationMode.onDevice)
-                          return _buildActionButton(
-                            icon: Icons.language,
-                            label: AppLocalizations.of(context)!.manage_translation_models,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ModelManagementScreen(),
-                                ),
-                              );
-                            },
-                            context: context,
-                          );
-                        else
-                          return SizedBox.shrink();
+                        return SizedBox.shrink(); // Removed: now in settings screen
                       },
                     ),
                   ],
@@ -408,9 +406,9 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(
               builder: (context) => ChangeNotifierProvider.value(
                 value: provider,
-                child: const LLMApiConfigScreen(),
+                child: const TranslationSettingsScreen(),
               ),
-            )
+            ),
           );
         },
         child: const Icon(Icons.settings),
@@ -530,28 +528,66 @@ class _HomeScreenState extends State<HomeScreen> {
               ToggleButtons(
                 isSelected: [
                   translationProvider.translationMode == TranslationMode.onDevice,
-                  translationProvider.translationMode == TranslationMode.llm
+                  translationProvider.translationMode == TranslationMode.onnx,
+                  translationProvider.translationMode == TranslationMode.llm,
                 ],
                 onPressed: (index) async {
-                  if (index == 1) { // LLM mode selected
-                    final llmService = LLMTranslationService();
-                    final hasApiKey = await LLMTranslationService.isApiKeyConfigured();
+                  if (index == 1) { // ONNX mode selected
+                    // Check if at least one ONNX model is downloaded
+                    final svc = ModelDownloadService();
+                    final enZhReady = await svc.getOnnxModelStatus('opus-mt-en-zh');
+                    final jaZhReady = await svc.getOnnxModelStatus('opus-mt-jap-zh');
+                    final anyReady = enZhReady == OnnxModelStatus.ready ||
+                        jaZhReady == OnnxModelStatus.ready;
 
-                    if (!hasApiKey) {
-                      // Show dialog to guide user to API key settings
+                    if (!anyReady) {
                       await showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          final localizations = AppLocalizations.of(context)!;
                           return AlertDialog(
-                            title: Text(localizations.api_key_required),
-                            content: Text(localizations.api_key_setup_prompt),
+                            title: const Text('Download a Language Pack'),
+                            content: const Text(
+                              'To use AI Enhanced mode, download a language pack first.\n\nGo to Settings to download one.',
+                            ),
+                            actions: [
+                              TextButton(
+                                child: const Text('Cancel'),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              ElevatedButton(
+                                child: const Text('Open Settings'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => ChangeNotifierProvider.value(
+                                        value: Provider.of<TranslationProvider>(context, listen: false),
+                                        child: const TranslationSettingsScreen(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      return; // Do not switch mode
+                    }
+                  } else if (index == 2) { // LLM mode selected
+                    final hasApiKey = await LLMTranslationService.isApiKeyConfigured();
+
+                    if (!hasApiKey) {
+                      await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('API Key Required'),
+                            content: const Text('Cloud AI requires an API key. Set it up in Settings.'),
                             actions: [
                               TextButton(
                                 child: Text(localizations.cancel),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
+                                onPressed: () => Navigator.of(context).pop(),
                               ),
                               ElevatedButton(
                                 child: Text(localizations.go_to_settings),
@@ -559,7 +595,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) => const LLMApiConfigScreen(),
+                                      builder: (_) => ChangeNotifierProvider.value(
+                                        value: Provider.of<TranslationProvider>(context, listen: false),
+                                        child: const TranslationSettingsScreen(),
+                                      ),
                                     ),
                                   );
                                 },
@@ -573,11 +612,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   // Change translation mode
-                  translationProvider.setTranslationMode(
-                    index == 0
-                      ? TranslationMode.onDevice
-                      : TranslationMode.llm
-                  );
+                  const modes = [
+                    TranslationMode.onDevice,
+                    TranslationMode.onnx,
+                    TranslationMode.llm,
+                  ];
+                  translationProvider.setTranslationMode(modes[index]);
                 },
                 color: Colors.grey,
                 selectedColor: Colors.white,
@@ -585,17 +625,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(10),
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text(
-                      localizations.translation_mode_on_device_label,
-                      style: TextStyle(fontSize: 16)
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.flash_on_rounded, size: 14),
+                        SizedBox(width: 4),
+                        Text('Quick', style: TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.memory_rounded, size: 14),
+                        SizedBox(width: 4),
+                        Text('AI', style: TextStyle(fontSize: 14)),
+                      ],
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text(
-                      localizations.translation_mode_ai_label,
-                      style: TextStyle(fontSize: 16)
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.cloud_rounded, size: 14),
+                        SizedBox(width: 4),
+                        Text('Cloud', style: TextStyle(fontSize: 14)),
+                      ],
                     ),
                   ),
                 ],
@@ -643,23 +702,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        minimumSize: Size(280, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
         ),
         backgroundColor: Colors.blue.shade50,
-        elevation: 5,
+        foregroundColor: Colors.blue.shade700,
+        elevation: 1,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.blue.shade700),
-          SizedBox(width: 10),
+          Icon(icon, color: Colors.blue.shade700, size: 22),
+          const SizedBox(width: 12),
           Text(
             label,
             style: TextStyle(
               color: Colors.blue.shade700,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
           ),

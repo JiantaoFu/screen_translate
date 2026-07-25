@@ -86,6 +86,32 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Track translation performance metrics
+  Future<void> trackPerformance({
+    required int captureMs,
+    required int ocrMs,
+    required int translateMs,
+    required int renderMs,
+    required int totalMs,
+    required String translationType,
+  }) async {
+    try {
+      await logEvent(
+        'translation_performance',
+        {
+          'capture_ms': captureMs,
+          'ocr_ms': ocrMs,
+          'translate_ms': translateMs,
+          'render_ms': renderMs,
+          'total_ms': totalMs,
+          'translation_type': translationType,
+        },
+      );
+    } catch (e) {
+      _logger.severe('Error tracking performance: $e');
+    }
+  }
+
   /// Track OCR operation
   Future<void> trackOCR({
     required int textBlocksFound,

@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import '../models/ocr_result.dart';
 import '../providers/translation_provider.dart';
 import '../services/ocr_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
+import '../services/firebase_analytics_service.dart';
 
 class ImageTranslationScreen extends StatefulWidget {
   final File? imageFile;
@@ -33,27 +35,43 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       _isProcessing = true;
     });
 
+    final stopwatch = Stopwatch()..start();
+    debugPrint('[ImageTranslation] Starting image processing...');
+
     try {
       final translationProvider = Provider.of<TranslationProvider>(context, listen: false);
       final ocrService = OCRService();
 
       List<OCRResult> results = [];
       if (widget.memoryImage != null) {
+        debugPrint('[ImageTranslation] Processing memory image via OCR...');
         results = await ocrService.processImage(
-          {'bytes': widget.memoryImage, 'width': 0, 'height': 0}, // ML Kit expects path or specific format, wait... OCRService might need fixing for iOS file paths
+          {'bytes': widget.memoryImage, 'width': 0, 'height': 0},
           translationProvider.currentOCRScript,
         );
       } else if (widget.imageFile != null) {
+        debugPrint('[ImageTranslation] Processing image file via OCR: ${widget.imageFile!.path}');
         results = await ocrService.processFile(
           widget.imageFile!,
           translationProvider.currentOCRScript,
         );
       }
 
-      final translated = <String>[];
-      for (var result in results) {
-        final text = await translationProvider.translateText(result.text);
-        translated.add(text);
+      final ocrMs = stopwatch.elapsedMilliseconds;
+      debugPrint('[ImageTranslation] OCR completed in ${ocrMs}ms. Found ${results.length} text blocks.');
+      for (var i = 0; i < results.length; i++) {
+        debugPrint('[ImageTranslation] OCR Block $i: "${results[i].text}"');
+      }
+
+      stopwatch.reset();
+      final textsToTranslate = results.map((r) => r.text).toList();
+      debugPrint('[ImageTranslation] Requesting batch translation for ${textsToTranslate.length} texts (mode=${translationProvider.translationMode.name})...');
+      
+      final translated = await translationProvider.translateBatch(textsToTranslate);
+      final transMs = stopwatch.elapsedMilliseconds;
+      debugPrint('[ImageTranslation] Batch translation completed in ${transMs}ms.');
+      for (var i = 0; i < translated.length; i++) {
+        debugPrint('[ImageTranslation] Result Block $i: "${results[i].text}" -> "${translated[i]}"');
       }
 
       setState(() {
@@ -61,8 +79,14 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
         _translatedTexts = translated;
         _isProcessing = false;
       });
-    } catch (e) {
-      print('Error processing image: $e');
+
+      FirebaseAnalyticsService().trackTranslation(
+        sourceLanguage: translationProvider.sourceLanguage,
+        targetLanguage: translationProvider.targetLanguage,
+        translationType: 'image_${translationProvider.translationMode.name}',
+      );
+    } catch (e, stack) {
+      debugPrint('[ImageTranslation] ERROR processing image: $e\n$stack');
       setState(() {
         _isProcessing = false;
       });
@@ -155,14 +179,16 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
           height: result.height * scaleY,
           child: Container(
             color: result.backgroundColor,
-            child: Text(
+            child: AutoSizeText(
               translatedText,
               style: TextStyle(
                 color: result.overlayColor,
-                fontSize: 14 * scaleX, // Approximate
                 backgroundColor: result.backgroundColor,
+                fontSize: 100, // Large base size so it can scale down to fit perfectly
               ),
-              softWrap: true,
+              minFontSize: 6,
+              maxLines: 15,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),

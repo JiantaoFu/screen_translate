@@ -1,7 +1,9 @@
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 import 'model_download_service.dart';
+import 'overlay_service.dart';
 
 class TranslationService {
   OnDeviceTranslator? _translator;
@@ -41,15 +43,26 @@ class TranslationService {
       final sourceLang = _getTranslateLanguage(sourceLanguage);
       final targetLang = _getTranslateLanguage(targetLanguage);
 
-      // Download language model if needed
+      // Download language models if needed
+      final sourceCode = _getLanguageCode(sourceLang);
       final targetCode = _getLanguageCode(targetLang);
       final modelService = ModelDownloadService();
-      final isModelDownloaded = await modelService.isModelDownloaded(targetCode);
-      if (!isModelDownloaded) {
-        print('Translation: Downloading language model for $targetCode');
-        await modelService.downloadModelWithFallback(targetCode);
-        print('Translation: Language model is now available.');
+      final overlayService = OverlayService();
+      
+      // Check and download source language model
+      if (!await modelService.isModelDownloaded(sourceCode)) {
+        print('Translation: Downloading language model for $sourceCode');
+        overlayService.showToast('Downloading language model... (~30MB). Please wait.');
+        await modelService.downloadModelWithFallback(sourceCode);
       }
+      
+      // Check and download target language model
+      if (!await modelService.isModelDownloaded(targetCode)) {
+        print('Translation: Downloading language model for $targetCode');
+        overlayService.showToast('Downloading language model... (~30MB). Please wait.');
+        await modelService.downloadModelWithFallback(targetCode);
+      }
+      print('Translation: Both language models are available.');
 
       // Create or update translator if needed
       if (_translator == null ||

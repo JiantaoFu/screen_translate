@@ -633,7 +633,7 @@ class OverlayService : Service() {
                 setSingleLine(false)
 
                 setAutoSizeTextTypeUniformWithConfiguration(
-                    6, 24, 1, TypedValue.COMPLEX_UNIT_SP
+                    6, 100, 1, TypedValue.COMPLEX_UNIT_SP
                 )
                 gravity = Gravity.CENTER
             }

@@ -10,8 +10,10 @@ import 'package:flutter/material.dart';
 import '../services/overlay_service.dart';
 import 'package:flutter/services.dart';
 import '../services/llm_translation_service.dart';
+import '../services/onnx_translation_service.dart';
 import '../models/ocr_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/firebase_analytics_service.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -20,12 +22,17 @@ extension StringExtension on String {
 }
 
 enum TranslationMode {
+  /// Google ML Kit on-device translation (always available, fallback)
   onDevice,
-  llm
+  /// Helsinki-NLP OPUS-MT ONNX local inference (higher quality, requires download)
+  onnx,
+  /// Online LLM translation via BigModel API
+  llm,
 }
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
+  int _translationToken = 0; // Bumped each capture cycle to detect stale results
   String _lastTranslatedText = '';
   String _sourceLanguage = 'en';
   String _targetLanguage = 'zh';
@@ -35,6 +42,7 @@ class TranslationProvider with ChangeNotifier {
   final TranslationService _translationService;
   final OverlayService _overlayService;
   final LLMTranslationService _llmTranslationService;
+  final OnnxTranslationService _onnxTranslationService;
   BuildContext? _context;
   bool _isManualTranslationRequested = false;
   static const MethodChannel _translationServiceChannel = 
@@ -66,7 +74,9 @@ class TranslationProvider with ChangeNotifier {
     this._translationService,
     this._overlayService, {
     LLMTranslationService? llmTranslationService,
-  }) : _llmTranslationService = llmTranslationService ?? LLMTranslationService() {
+    OnnxTranslationService? onnxTranslationService,
+  })  : _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
+        _onnxTranslationService = onnxTranslationService ?? OnnxTranslationService() {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
       initTranslationServiceChannel();
@@ -116,6 +126,13 @@ class TranslationProvider with ChangeNotifier {
       try {
         if (await _overlayService.ensureOverlayPermission(_context!)) {
           _isTranslating = true;
+          
+          FirebaseAnalyticsService().trackTranslation(
+            sourceLanguage: _sourceLanguage,
+            targetLanguage: _targetLanguage,
+            translationType: 'screen_${_translationMode.name}',
+          );
+          
           notifyListeners();
           await _overlayService.start();
           await _startAndroidScreenCapture();
@@ -130,6 +147,11 @@ class TranslationProvider with ChangeNotifier {
 
   void requestManualTranslation() {
     _isManualTranslationRequested = true;
+    FirebaseAnalyticsService().trackTranslation(
+      sourceLanguage: _sourceLanguage,
+      targetLanguage: _targetLanguage,
+      translationType: 'manual_screen_${_translationMode.name}',
+    );
   }
 
   void _startPeriodicCapture() async {
@@ -186,6 +208,25 @@ class TranslationProvider with ChangeNotifier {
                 _overlayService.hideTranslationOverlay();
               }
 
+              // Bump token so any in-flight translation from a previous cycle becomes stale
+              final myToken = ++_translationToken;
+
+              // ── Show "Translating..." placeholders immediately ───────────────────
+              // Only for ONNX/LLM which can take noticeable time; on-device is instant.
+              if (_translationMode == TranslationMode.onnx || _translationMode == TranslationMode.llm) {
+                for (var i = 0; i < ocrResults.length; i++) {
+                  final r = ocrResults[i];
+                  if (Platform.isAndroid) {
+                    await _overlayService.showTranslationOverlay(
+                      '…', i,
+                      x: r.x, y: r.y, width: r.width, height: r.height,
+                      overlayColor: r.overlayColor, backgroundColor: r.backgroundColor,
+                      isLight: r.isLight, imgWidth: r.imgWidth, imgHeight: r.imgHeight,
+                    );
+                  }
+                }
+              }
+
               // Translate blocks and render (Streaming for on-device to minimize perceived latency)
               print('Timer: translating ${ocrResults.length} blocks (mode=$_translationMode)...');
               final List<String> translatedTexts = [];
@@ -202,9 +243,11 @@ class TranslationProvider with ChangeNotifier {
                 );
                 translateMs = stopwatch.elapsedMilliseconds;
                 
-                if (!_isTranslating) {
-                  print('Overlay: Translation stopped during translate phase, aborting');
-                  return; // Guard if stopped
+                // Stale check: if the user has scrolled/changed page, discard results
+                if (!_isTranslating || myToken != _translationToken) {
+                  print('Overlay: Translation stale or stopped (token mismatch), aborting');
+                  if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                  return;
                 }
                 
                 stopwatch.reset();
@@ -221,11 +264,16 @@ class TranslationProvider with ChangeNotifier {
                 }
                 renderMs = stopwatch.elapsedMilliseconds;
               } else {
-                // Streaming mode for On-Device
+                // Streaming mode for On-Device / ONNX (one block at a time)
                 var tMs = 0;
                 var rMs = 0;
                 for (var i = 0; i < ocrResults.length; i++) {
-                  if (!_isTranslating) break; // Guard if stopped
+                  // Stale check on each block: abort if user has navigated away
+                  if (!_isTranslating || myToken != _translationToken) {
+                    print('Overlay: Translation stale at block $i (token mismatch), aborting');
+                    if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                    return;
+                  }
                   final ocrResult = ocrResults[i];
                   
                   final tWatch = Stopwatch()..start();
@@ -233,6 +281,13 @@ class TranslationProvider with ChangeNotifier {
                   tMs += tWatch.elapsedMilliseconds;
                   translatedTexts.add(translatedText);
                   
+                  // Stale check again after the (potentially slow) translation call
+                  if (myToken != _translationToken) {
+                    print('Overlay: Translation stale after block $i, discarding');
+                    if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                    return;
+                  }
+
                   final rWatch = Stopwatch()..start();
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
@@ -260,6 +315,15 @@ class TranslationProvider with ChangeNotifier {
               print('[METRICS] -> Translate: ${translateMs}ms');
               print('[METRICS] -> Render:  ${renderMs}ms');
               print('======================================================\n');
+
+              FirebaseAnalyticsService().trackPerformance(
+                captureMs: captureMs,
+                ocrMs: ocrMs,
+                translateMs: translateMs,
+                renderMs: renderMs,
+                totalMs: totalMs,
+                translationType: _translationMode.name,
+              );
 
               if (!_isManualTranslationRequested) {
                 _previousOcrResults = ocrResults;
@@ -357,6 +421,10 @@ class TranslationProvider with ChangeNotifier {
       case TranslationMode.onDevice:
         _translationService.cancelTranslation(text, sourceLanguage, targetLanguage);
         break;
+      case TranslationMode.onnx:
+        // ONNX runs in an Isolate; cancellation is handled by Isolate lifecycle.
+        // No additional action required here.
+        break;
       case TranslationMode.llm:
         _llmTranslationService.cancelTranslation(text, sourceLanguage, targetLanguage);
         break;
@@ -371,17 +439,59 @@ class TranslationProvider with ChangeNotifier {
     switch (_translationMode) {
       case TranslationMode.onDevice:
         return await _translationService.translateText(
-          text: text, 
-          sourceLanguage: _sourceLanguage, 
-          targetLanguage: _targetLanguage
+          text: text,
+          sourceLanguage: _sourceLanguage,
+          targetLanguage: _targetLanguage,
         );
+
+      case TranslationMode.onnx:
+        try {
+          return await _onnxTranslationService.translateText(
+            text: text,
+            sourceLanguage: _sourceLanguage,
+            targetLanguage: _targetLanguage,
+          );
+        } on OnnxModelNotReadyException catch (e) {
+          // Model not downloaded yet — fall back to Google ML Kit silently.
+          debugPrint('OnnxTranslation: ${e.langPairKey} not ready, falling back to ML Kit');
+          return await _translationService.translateText(
+            text: text,
+            sourceLanguage: _sourceLanguage,
+            targetLanguage: _targetLanguage,
+          );
+        } on UnsupportedError catch (_) {
+          // Language pair not supported by ONNX — fall back to ML Kit.
+          return await _translationService.translateText(
+            text: text,
+            sourceLanguage: _sourceLanguage,
+            targetLanguage: _targetLanguage,
+          );
+        }
+
       case TranslationMode.llm:
         return await _llmTranslationService.translateText(
-          text: text, 
-          sourceLanguage: _sourceLanguage, 
-          targetLanguage: _targetLanguage
+          text: text,
+          sourceLanguage: _sourceLanguage,
+          targetLanguage: _targetLanguage,
         );
     }
+  }
+
+  Future<List<String>> translateBatch(List<String> texts) async {
+    if (texts.isEmpty) return [];
+    if (_translationMode == TranslationMode.llm) {
+      return await _llmTranslationService.translateBatch(
+        texts: texts,
+        sourceLanguage: _sourceLanguage,
+        targetLanguage: _targetLanguage,
+      );
+    }
+    // For ONNX and MLKit native sessions, run sequentially to avoid platform channel & JNI deadlocks
+    final results = <String>[];
+    for (final text in texts) {
+      results.add(await translateText(text));
+    }
+    return results;
   }
 
   @override
@@ -389,6 +499,7 @@ class TranslationProvider with ChangeNotifier {
     stopTranslation();
     _captureTimer?.cancel();
     _ocrService.dispose();
+    _onnxTranslationService.dispose();
     super.dispose();
   }
 

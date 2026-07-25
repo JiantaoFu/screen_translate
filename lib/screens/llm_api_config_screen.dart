@@ -4,9 +4,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 import '../services/llm_translation_service.dart';
+import '../services/model_download_service.dart';
+import '../services/onnx_translation_service.dart';
 import '../providers/translation_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +23,10 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
   final _apiKeyController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  // ONNX model download state
+  final Map<String, OnnxModelStatus> _onnxStatus = {};
+  final Map<String, double> _onnxProgress = {};
 
   Future<void> _launchURL(String urlString) async {
     try {
@@ -48,6 +54,17 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
   void initState() {
     super.initState();
     _loadStoredApiKey();
+    _refreshOnnxStatus();
+  }
+
+  Future<void> _refreshOnnxStatus() async {
+    final svc = ModelDownloadService();
+    for (final pair in kSupportedOnnxPairs) {
+      final status = await svc.getOnnxModelStatus(pair.key);
+      if (mounted) {
+        setState(() => _onnxStatus[pair.key] = status);
+      }
+    }
   }
 
   Future<void> _loadStoredApiKey() async {
@@ -144,6 +161,22 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
                 localizations.api_key_note,
                 style: TextStyle(color: Colors.grey),
               ),
+              const SizedBox(height: 30),
+              const Divider(),
+              const SizedBox(height: 10),
+              Text(
+                'ONNX Local Models',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Download Helsinki-NLP OPUS-MT models for high-quality offline translation (~40MB each).',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              ...kSupportedOnnxPairs.map((pair) => _buildOnnxModelTile(pair)),
               const SizedBox(height: 30),
               const Divider(),
               const SizedBox(height: 10),
@@ -258,6 +291,140 @@ class _LLMApiConfigScreenState extends State<LLMApiConfigScreen> {
         setState(() { _isLoading = false; });
       }
     }
+  }
+
+  Widget _buildOnnxModelTile(OnnxLangPair pair) {
+    final status = _onnxStatus[pair.key] ?? OnnxModelStatus.notDownloaded;
+    final progress = _onnxProgress[pair.key];
+
+    IconData icon;
+    Color iconColor;
+    String statusLabel;
+    switch (status) {
+      case OnnxModelStatus.ready:
+        icon = Icons.check_circle;
+        iconColor = Colors.green;
+        statusLabel = 'Ready';
+        break;
+      case OnnxModelStatus.downloading:
+        icon = Icons.downloading;
+        iconColor = Colors.blue;
+        statusLabel = 'Downloading...';
+        break;
+      case OnnxModelStatus.error:
+        icon = Icons.error_outline;
+        iconColor = Colors.red;
+        statusLabel = 'Error';
+        break;
+      case OnnxModelStatus.notDownloaded:
+      default:
+        icon = Icons.download_outlined;
+        iconColor = Colors.grey;
+        statusLabel = 'Not downloaded';
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: iconColor, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        pair.displayName,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        statusLabel,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+                if (status == OnnxModelStatus.notDownloaded || status == OnnxModelStatus.error)
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.download, size: 16),
+                    label: const Text('Download', style: TextStyle(fontSize: 13)),
+                    onPressed: () => _downloadOnnxModel(pair),
+                  )
+                else if (status == OnnxModelStatus.ready)
+                  TextButton.icon(
+                    icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                    label: const Text('Delete', style: TextStyle(fontSize: 13, color: Colors.red)),
+                    onPressed: () async {
+                      await ModelDownloadService().deleteOnnxModel(pair.key);
+                      _refreshOnnxStatus();
+                    },
+                  )
+                else if (status == OnnxModelStatus.downloading)
+                  const SizedBox(
+                    width: 24, height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+              ],
+            ),
+            if (status == OnnxModelStatus.downloading && progress != null) ...
+              [
+                const SizedBox(height: 8),
+                LinearProgressIndicator(value: progress),
+                const SizedBox(height: 2),
+                Text(
+                  '${(progress * 100).toStringAsFixed(0)}%',
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+              ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _downloadOnnxModel(OnnxLangPair pair) async {
+    setState(() => _onnxStatus[pair.key] = OnnxModelStatus.downloading);
+    try {
+      await ModelDownloadService().downloadOnnxModel(
+        pair.key,
+        onProgress: (p) {
+          if (mounted) setState(() => _onnxProgress[pair.key] = p);
+        },
+      );
+      if (mounted) {
+        // Immediately flip to ready and clear progress so spinner stops.
+        setState(() {
+          _onnxStatus[pair.key] = OnnxModelStatus.ready;
+          _onnxProgress.remove(pair.key);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${pair.displayName} downloaded successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _onnxStatus[pair.key] = OnnxModelStatus.error;
+          _onnxProgress.remove(pair.key);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Download failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+    await _refreshOnnxStatus();
   }
 
   @override

@@ -9,7 +9,7 @@ import 'services/firebase_analytics_service.dart';
 import 'services/firebase_remote_config_service.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'services/ocr_sampling_service.dart';

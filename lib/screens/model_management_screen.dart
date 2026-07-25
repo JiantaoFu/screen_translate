@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import 'package:screen_translate/services/model_download_service.dart';
 

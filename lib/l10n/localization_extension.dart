@@ -1,4 +1,4 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/app_localizations.dart';
 
 extension AppLocalizationsExtension on AppLocalizations {
   String getLocalizedValue(String key) {

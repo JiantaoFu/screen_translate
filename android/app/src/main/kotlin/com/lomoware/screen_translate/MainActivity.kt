@@ -101,6 +101,13 @@ class MainActivity: FlutterActivity() {
                     OverlayService.requestOverlayPermission(this)
                     result.success(true)
                 }
+                "showToast" -> {
+                    val text = call.argument<String>("text")
+                    if (text != null) {
+                        android.widget.Toast.makeText(this@MainActivity, text, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                    result.success(true)
+                }
                 "showTranslationOverlay" -> {
                     val text = call.argument<String>("text")
                     val x = call.argument<Number>("x")?.toFloat()

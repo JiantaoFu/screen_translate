@@ -11,6 +11,13 @@ import kotlin.math.abs
 class ScrollDetectionAccessibilityService : AccessibilityService() {
     companion object {
         const val SCROLL_DETECTED_ACTION = "com.lomoware.screen_translate.SCROLL_DETECTED"
+        // Fired when the foreground window changes to a different package —
+        // switching apps, going Home, or opening Recents. Without this, a
+        // translation overlay captured for one screen kept floating over
+        // whatever the user navigated to next (e.g. the Recents task
+        // switcher), which looked like leftover garbage plastered over
+        // unrelated content.
+        const val WINDOW_CHANGED_ACTION = "com.lomoware.screen_translate.WINDOW_CHANGED"
         var instance: ScrollDetectionAccessibilityService? = null
             private set
 
@@ -31,6 +38,13 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
     private var lastScrolledPackage: String? = null
     private var scrollStartTimestamp: Long = 0
 
+    // Track foreground window changes, debounced — a single app switch can
+    // fire several TYPE_WINDOW_STATE_CHANGED events within milliseconds
+    // (e.g. an intermediate transition window), which would otherwise
+    // spam redundant hide/cancel broadcasts.
+    private var lastForegroundPackage: String? = null
+    private var lastWindowChangeTimestamp: Long = 0
+
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "ScrollDetectionAccessibilityService created")
@@ -48,7 +62,33 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
                 handleScrollEvent(event)
             }
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                handleWindowStateChanged(event)
+            }
             // Other event types can be handled here if needed
+        }
+    }
+
+    private fun handleWindowStateChanged(event: AccessibilityEvent) {
+        val packageName = event.packageName?.toString() ?: return
+        val currentTime = System.currentTimeMillis()
+
+        if (packageName == lastForegroundPackage) return
+        if (currentTime - lastWindowChangeTimestamp < 300) return
+
+        lastForegroundPackage = packageName
+        lastWindowChangeTimestamp = currentTime
+
+        Log.d(TAG, "Foreground window changed to $packageName")
+
+        val intent = Intent(WINDOW_CHANGED_ACTION).apply {
+            putExtra("package", packageName)
+        }
+
+        try {
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending window-changed broadcast", e)
         }
     }
 
@@ -111,7 +151,7 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
         
         // Configure service capabilities
         val info = AccessibilityServiceInfo().apply {
-            this.eventTypes = AccessibilityEvent.TYPE_VIEW_SCROLLED
+            this.eventTypes = AccessibilityEvent.TYPE_VIEW_SCROLLED or AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
             this.feedbackType = AccessibilityServiceInfo.FEEDBACK_VISUAL
             this.notificationTimeout = 100
             this.flags = AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS

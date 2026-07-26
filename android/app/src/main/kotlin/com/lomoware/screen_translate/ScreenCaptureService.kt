@@ -684,6 +684,21 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
                             cancelAllTranslations()
                         }
+                        ScrollDetectionAccessibilityService.WINDOW_CHANGED_ACTION -> {
+                            val packageName = intent.getStringExtra("package") ?: "unknown"
+                            Log.d(TAG, "Foreground window changed to $packageName — clearing stale overlays")
+
+                            // The captured screen no longer matches what's on
+                            // screen (user switched apps, went Home, or opened
+                            // Recents) — leaving the old overlay up just
+                            // plasters stale translated text over unrelated
+                            // content.
+                            val overlayIntent = Intent(context, OverlayService::class.java)
+                            overlayIntent.action = "hideAll"
+                            context.startService(overlayIntent)
+
+                            cancelAllTranslations()
+                        }
                         else -> {
                             Log.w(TAG, "Unexpected intent action: ${intent.action}")
                         }
@@ -709,6 +724,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             Log.d(TAG, "Context class: ${context.javaClass.name}")
             
             val filter = IntentFilter(ScrollDetectionAccessibilityService.SCROLL_DETECTED_ACTION)
+            filter.addAction(ScrollDetectionAccessibilityService.WINDOW_CHANGED_ACTION)
             
             // Register using LocalBroadcastManager with application context
             val appContext = context.applicationContext

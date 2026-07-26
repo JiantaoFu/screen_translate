@@ -40,6 +40,19 @@ class OCRService {
   static const double overlapThreshold = 0.1;
   static const double PADDING = 5.0;
 
+  /// Whether two locally-sampled background colors are close enough to
+  /// plausibly be the same bubble/container. Tolerant enough to absorb
+  /// anti-aliasing and stray glyph-pixel contamination in the sample, but
+  /// tight enough to separate genuinely different backgrounds (e.g. a chat
+  /// screen's alternating message-bubble colors).
+  bool _colorsSimilar(Color? a, Color? b, {double threshold = 35}) {
+    if (a == null || b == null) return true;
+    final dr = a.red - b.red;
+    final dg = a.green - b.green;
+    final db = a.blue - b.blue;
+    return sqrt((dr * dr + dg * dg + db * db).toDouble()) < threshold;
+  }
+
   TextRecognitionScript getScriptForLanguage(String languageCode) {
     switch (languageCode) {
       case 'zh':
@@ -153,10 +166,6 @@ class OCRService {
       }
 
 
-      // Extract dominant background color
-      final Color backgroundColor = ColorUtils.extractDominantColorFromNV21(imageBytes, width, height);
-      final Color overlayColor = backgroundColor.getContrastColor();
-
       final List<OCRResult> initialResults = [];
 
       for (final TextBlock block in recognizedText.blocks) {
@@ -167,20 +176,45 @@ class OCRService {
             block.text.trim().length >= minTextLength &&
             boundingBox.width > 0 &&
             boundingBox.height > 0) {
+          // Sample a little outside the tight OCR box (which hugs the
+          // glyphs) so this catches the surrounding bubble/container color
+          // rather than mostly text-ink pixels. Used below to stop the
+          // merge algorithm from gluing together text that sits on visibly
+          // different backgrounds — e.g. a chat screen's alternating
+          // message-bubble colors — even when the boxes are close enough
+          // spatially that they'd otherwise look like one paragraph.
+          final pad = boundingBox.height * 0.3;
+          final localColor = ColorUtils.extractRegionColorFromNV21(
+            imageBytes, width, height,
+            boundingBox.left - pad, boundingBox.top - pad,
+            boundingBox.width + pad * 2, boundingBox.height + pad * 2,
+          );
           initialResults.add(OCRResult(
             text: block.text,
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,
             height: boundingBox.height,
-            overlayColor: overlayColor,
-            backgroundColor: backgroundColor,
-            isLight: backgroundColor.isLight(),
+            backgroundColor: localColor,
             imgWidth: width.toDouble(),
             imgHeight: height.toDouble(),
           ));
         }
       }
+
+      // Busy/cluttered screens (e.g. a home screen full of widgets and app
+      // icons) produce many small, unrelated text blocks that happen to sit
+      // close together in a tight grid. Merging those the same way we'd
+      // merge lines of a real paragraph glues unrelated labels into
+      // nonsense (e.g. "Battery Scale Your Social Eana"). A genuinely
+      // translatable passage (game UI, comic bubble, document) rarely
+      // produces more than a couple dozen blocks per screen, so scale
+      // aggressiveness down as block count rises.
+      final effectiveMergeAggressiveness = initialResults.length > 25
+          ? mergeAggressiveness * 0.4
+          : initialResults.length > 15
+              ? mergeAggressiveness * 0.7
+              : mergeAggressiveness;
 
       // Spatial Block Merging Algorithm
       // Iteratively merge blocks that are spatially close to each other
@@ -200,27 +234,37 @@ class OCRService {
             // Estimate font size (min dimension of the block)
             final fontSizeA = min(a.height, a.width);
             final fontSizeB = min(b.height, b.width);
-            
+
             // 智能合并算法 (Smart Merging Algorithm):
             // 如果两个文本块在 X 轴或 Y 轴上投影有重叠 (overlapX 或 overlapY)，说明它们是对齐的（属于同一段落/气泡的概率极大）。
             // 如果它们处于完全对角线位置 (无任何轴向重叠)，它们大概率属于两个不同的相邻气泡，此时我们大幅度收紧合并阈值。
             final overlapX = dx == 0.0;
             final overlapY = dy == 0.0;
             final isAligned = overlapX || overlapY;
-            
-            final thresholdMultiplier = isAligned ? mergeAggressiveness : (mergeAggressiveness * 0.3);
+
+            final thresholdMultiplier = isAligned ? effectiveMergeAggressiveness : (effectiveMergeAggressiveness * 0.3);
             final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
 
-            if (distance < threshold) {
+            // Refuse to merge across a visible background change — this is
+            // what actually separates chat bubbles (e.g. alternating
+            // sender colors) or comic speech bubbles from each other even
+            // when they're spatially close enough to otherwise pass as one
+            // paragraph. Without this, a busy chat screen merges fragments
+            // of unrelated messages into nonsense (confirmed from a real
+            // screenshot: "O quê? Sentindo-se inseguro ab qual show você
+            // assistência" is two different messages glued together).
+            final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
+
+            if (distance < threshold && sameBackground) {
               // Merge these two blocks!
               String mergedText;
-              
+
               // Determine concatenation order
               if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
                 // Vertical alignment: top-to-bottom
                 mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
               } else {
-                // Horizontal alignment: 
+                // Horizontal alignment:
                 // For Japanese/Chinese manga, vertical text reads Right-to-Left
                 // So if it's primarily vertical script (height > width), smaller X means it comes AFTER larger X.
                 // We'll use a simple heuristic: if a is to the left of b, and it's CJK, it might be R-to-L.
@@ -263,11 +307,20 @@ class OCRService {
 
       final results = initialResults;
 
-      _logger.info('OCR: Found ${results.length} text blocks');
+      // Sample each final (post-merge) box's own background locally rather
+      // than using one dominant color for the whole screen — a home screen
+      // full of widgets has wildly different local backgrounds behind each
+      // piece of text, and a single global color clashed with most of them.
+      for (final result in results) {
+        final localColor = ColorUtils.extractRegionColorFromNV21(
+          imageBytes, width, height, result.x, result.y, result.width, result.height,
+        );
+        result.backgroundColor = localColor;
+        result.overlayColor = localColor.getContrastColor();
+        result.isLight = localColor.isLight();
+      }
 
-      // Log final results
-      _logger.info('Background Color: ${backgroundColor.toLoggableString()}');
-      _logger.info('OCR: Found ${results.length} text blocks with overlay color ${overlayColor.toLoggableString()}');
+      _logger.info('OCR: Found ${results.length} text blocks');
 
       // Optional: Draw and save bounding boxes for debugging
       if (drawDebugBoxes) {
@@ -308,14 +361,16 @@ class OCRService {
       final RecognizedText recognizedText = await textRecognizer.processImage(image);
       stopwatch.stop();
 
-      // For standard files, we might not have a simple way to extract NV21 dominant color fast,
-      // so we will just use a fallback or try to extract it from the image if possible.
-      // Since it's a static image, we'll just use a dark overlay with white text as default.
-      final Color backgroundColor = Colors.black.withOpacity(0.6);
-      final Color overlayColor = Colors.white;
-
-      // To get image width and height for OCRResult, we need to decode it
-      final decodedImage = await decodeImageFromList(await file.readAsBytes());
+      // Decode once for both dimensions and per-block local color sampling
+      // below — a fixed black/white scheme for every block (the previous
+      // approach here) gave the merge algorithm no way to tell that two
+      // nearby blocks sit on visibly different backgrounds (e.g. a chat
+      // screenshot's alternating message-bubble colors), so it happily
+      // glued unrelated messages together. Falls back to a plain default
+      // if decoding fails for any reason.
+      final fileBytes = await file.readAsBytes();
+      final decodedForColor = img.decodeImage(fileBytes);
+      final decodedImage = await decodeImageFromList(fileBytes);
       final double width = decodedImage.width.toDouble();
       final double height = decodedImage.height.toDouble();
 
@@ -328,15 +383,22 @@ class OCRService {
             block.text.trim().length >= minTextLength &&
             boundingBox.width > 0 &&
             boundingBox.height > 0) {
+          Color localColor = Colors.white;
+          if (decodedForColor != null) {
+            final pad = boundingBox.height * 0.3;
+            localColor = ColorUtils.extractRegionColorFromImage(
+              decodedForColor,
+              boundingBox.left - pad, boundingBox.top - pad,
+              boundingBox.width + pad * 2, boundingBox.height + pad * 2,
+            );
+          }
           initialResults.add(OCRResult(
             text: block.text,
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,
             height: boundingBox.height,
-            overlayColor: overlayColor,
-            backgroundColor: backgroundColor,
-            isLight: false,
+            backgroundColor: localColor,
             imgWidth: width,
             imgHeight: height,
           ));
@@ -346,6 +408,15 @@ class OCRService {
       // We should ideally extract the merging algorithm into a shared private method,
       // but for now, we'll just return the raw blocks or copy the merging logic.
       // Let's do the same merging logic:
+      // Same busy-screen dampening as processImage() above — a screenshot
+      // of a cluttered UI (home screen, app grid) shouldn't merge nearby
+      // unrelated labels as readily as a real paragraph would.
+      final effectiveMergeAggressiveness = initialResults.length > 25
+          ? mergeAggressiveness * 0.4
+          : initialResults.length > 15
+              ? mergeAggressiveness * 0.7
+              : mergeAggressiveness;
+
       bool merged;
       do {
         merged = false;
@@ -360,15 +431,20 @@ class OCRService {
 
             final fontSizeA = min(a.height, a.width);
             final fontSizeB = min(b.height, b.width);
-            
+
             final overlapX = dx == 0.0;
             final overlapY = dy == 0.0;
             final isAligned = overlapX || overlapY;
-            
-            final thresholdMultiplier = isAligned ? mergeAggressiveness : (mergeAggressiveness * 0.3);
+
+            final thresholdMultiplier = isAligned ? effectiveMergeAggressiveness : (effectiveMergeAggressiveness * 0.3);
             final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
 
-            if (distance < threshold) {
+            // Same background-change gate as processImage() above — stops
+            // e.g. a chat screenshot's alternating message-bubble colors
+            // from being glued into one nonsensical block.
+            final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
+
+            if (distance < threshold && sameBackground) {
               String mergedText;
               if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
                 mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
@@ -406,6 +482,21 @@ class OCRService {
           if (merged) break;
         }
       } while (merged);
+
+      // Resample each final (post-merge) box's own background locally,
+      // same as processImage() above — a fresh sample of the whole merged
+      // box gives a more representative color than just inheriting the
+      // first sub-block's single sample.
+      if (decodedForColor != null) {
+        for (final result in initialResults) {
+          final localColor = ColorUtils.extractRegionColorFromImage(
+            decodedForColor, result.x, result.y, result.width, result.height,
+          );
+          result.backgroundColor = localColor;
+          result.overlayColor = localColor.getContrastColor();
+          result.isLight = localColor.isLight();
+        }
+      }
 
       return initialResults;
     } catch (e) {

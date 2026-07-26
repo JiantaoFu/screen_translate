@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 
 class ColorUtils {
   /// Extract dominant color from NV21 formatted byte array using weighted average
@@ -105,6 +106,93 @@ class ColorUtils {
       return dominantColor;
     } catch (e) {
       print('NV21 color extraction error: $e');
+      return Colors.white;
+    }
+  }
+
+  /// Extract an average color from a specific region of an NV21 byte array
+  /// (image coordinates, not screen coordinates). Used to give each OCR
+  /// overlay box a background color sampled from what's actually behind
+  /// *that* piece of text, instead of one dominant color for the whole
+  /// screen plastered onto every box — on a busy screen (many widgets/app
+  /// icons with different local backgrounds) a single global color clashes
+  /// with most of them.
+  static Color extractRegionColorFromNV21(
+    Uint8List bytes,
+    int imgWidth,
+    int imgHeight,
+    double regionX,
+    double regionY,
+    double regionWidth,
+    double regionHeight,
+  ) {
+    try {
+      if (bytes.length < imgWidth * imgHeight * 1.5 || regionWidth <= 0 || regionHeight <= 0) {
+        return Colors.white;
+      }
+
+      final left = regionX.toInt().clamp(0, imgWidth - 1);
+      final top = regionY.toInt().clamp(0, imgHeight - 1);
+      final right = (regionX + regionWidth).toInt().clamp(left + 1, imgWidth);
+      final bottom = (regionY + regionHeight).toInt().clamp(top + 1, imgHeight);
+
+      const gridSize = 3;
+      int totalR = 0, totalG = 0, totalB = 0, count = 0;
+      for (int i = 0; i < gridSize; i++) {
+        for (int j = 0; j < gridSize; j++) {
+          final sx = left + ((right - left) * (i + 0.5) / gridSize).toInt();
+          final sy = top + ((bottom - top) * (j + 0.5) / gridSize).toInt();
+          final color = _getColorFromBytesNV21(bytes, imgWidth, imgHeight, sx, sy);
+          totalR += color.red;
+          totalG += color.green;
+          totalB += color.blue;
+          count++;
+        }
+      }
+
+      return Color.fromRGBO(totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
+    } catch (e) {
+      print('NV21 region color extraction error: $e');
+      return Colors.white;
+    }
+  }
+
+  /// Same idea as [extractRegionColorFromNV21], for a decoded (JPEG/PNG)
+  /// [img.Image] instead of a raw NV21 camera/screen-capture buffer — used
+  /// by the static "Translate Image" path, which has no NV21 bytes to work
+  /// with.
+  static Color extractRegionColorFromImage(
+    img.Image image,
+    double regionX,
+    double regionY,
+    double regionWidth,
+    double regionHeight,
+  ) {
+    try {
+      if (regionWidth <= 0 || regionHeight <= 0) return Colors.white;
+
+      final left = regionX.toInt().clamp(0, image.width - 1);
+      final top = regionY.toInt().clamp(0, image.height - 1);
+      final right = (regionX + regionWidth).toInt().clamp(left + 1, image.width);
+      final bottom = (regionY + regionHeight).toInt().clamp(top + 1, image.height);
+
+      const gridSize = 3;
+      int totalR = 0, totalG = 0, totalB = 0, count = 0;
+      for (int i = 0; i < gridSize; i++) {
+        for (int j = 0; j < gridSize; j++) {
+          final sx = left + ((right - left) * (i + 0.5) / gridSize).toInt();
+          final sy = top + ((bottom - top) * (j + 0.5) / gridSize).toInt();
+          final pixel = image.getPixel(sx, sy);
+          totalR += pixel.r.toInt();
+          totalG += pixel.g.toInt();
+          totalB += pixel.b.toInt();
+          count++;
+        }
+      }
+
+      return Color.fromRGBO(totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
+    } catch (e) {
+      print('Image region color extraction error: $e');
       return Colors.white;
     }
   }

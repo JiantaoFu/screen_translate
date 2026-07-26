@@ -105,11 +105,13 @@ class TranslationProvider with ChangeNotifier {
   }
 
   void setSourceLanguage(String language) {
+    debugPrint('LangPicker: setSourceLanguage($language) — was $_sourceLanguage, notifying...');
     _sourceLanguage = language;
     notifyListeners();
   }
 
   void setTargetLanguage(String language) {
+    debugPrint('LangPicker: setTargetLanguage($language) — was $_targetLanguage, notifying...');
     _targetLanguage = language;
     notifyListeners();
   }

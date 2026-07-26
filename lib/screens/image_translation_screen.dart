@@ -48,12 +48,14 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
         results = await ocrService.processImage(
           {'bytes': widget.memoryImage, 'width': 0, 'height': 0},
           translationProvider.currentOCRScript,
+          mergeAggressiveness: translationProvider.mergeAggressiveness,
         );
       } else if (widget.imageFile != null) {
         debugPrint('[ImageTranslation] Processing image file via OCR: ${widget.imageFile!.path}');
         results = await ocrService.processFile(
           widget.imageFile!,
           translationProvider.currentOCRScript,
+          mergeAggressiveness: translationProvider.mergeAggressiveness,
         );
       }
 
@@ -171,12 +173,24 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       final result = _ocrResults[i];
       final translatedText = i < _translatedTexts.length ? _translatedTexts[i] : result.text;
 
+      // Pad the overlay slightly beyond the detected/merged bounding box.
+      // OCR block boundaries are sometimes a few pixels tighter than the
+      // actual glyph extents (e.g. a trailing character, or a name on its
+      // own line just past the merged box), which otherwise "peeks out"
+      // from behind the translated text.
+      final padX = result.height * 0.15;
+      final padY = result.height * 0.15;
+      final boxLeft = result.x - padX;
+      final boxTop = result.y - padY;
+      final boxWidth = result.width + padX * 2;
+      final boxHeight = result.height + padY * 2;
+
       overlays.add(
         Positioned(
-          left: offsetX + (result.x * scaleX),
-          top: offsetY + (result.y * scaleY),
-          width: result.width * scaleX,
-          height: result.height * scaleY,
+          left: offsetX + (boxLeft * scaleX),
+          top: offsetY + (boxTop * scaleY),
+          width: boxWidth * scaleX,
+          height: boxHeight * scaleY,
           child: Container(
             color: result.backgroundColor,
             child: AutoSizeText(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
-import 'package:screen_translate/screens/model_management_screen.dart';
 import 'package:screen_translate/screens/translation_settings_screen.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
@@ -41,6 +40,11 @@ class ModelStatusDropdown extends StatefulWidget {
 class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
+  /// Quick-mode (on-device) language codes currently being pre-warmed in the
+  /// background after selection, so their status icon can show a spinner
+  /// instead of silently sitting on the stale download-available icon.
+  final Set<String> _downloadingCodes = {};
+
   @override
   void initState() {
     super.initState();
@@ -57,40 +61,47 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
     super.dispose();
   }
 
-  Future<bool> _checkModelAvailability(String languageCode, TranslationMode mode) async {
-    switch (mode) {
-      case TranslationMode.onDevice:
-        return await ModelDownloadService().isModelDownloaded(languageCode);
-      case TranslationMode.onnx:
-        // Check if either en-zh or ja-zh ONNX model is ready
-        final svc = ModelDownloadService();
-        final enZh = await svc.getOnnxModelStatus('opus-mt-en-zh');
-        final jaZh = await svc.getOnnxModelStatus('opus-mt-jap-zh');
-        return enZh == OnnxModelStatus.ready || jaZh == OnnxModelStatus.ready;
-      case TranslationMode.llm:
-        // For LLM, always consider the language "ready"
-        return true;
-    }
-  }
+  // NOTE: this widget is only used for Quick (on-device) and Cloud (LLM)
+  // modes now — AI (ONNX) mode uses _OnnxPairSelector instead, since ONNX
+  // only supports a small curated set of (source, target) PAIRS, which two
+  // independently-filtered dropdowns can't represent without either
+  // blocking valid combinations (filtering each side against the other's
+  // current value creates unreachable combinations) or offering invalid
+  // ones (listing both sides independently lets you combine two
+  // individually-valid languages into a pair that doesn't actually exist).
+  // A single dropdown over the literal list of valid pairs has neither
+  // problem.
 
   Widget _buildModelStatusIcon(String languageCode, TranslationMode mode) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        return FutureBuilder<bool>(
-          future: _checkModelAvailability(languageCode, mode),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return SizedBox.shrink();
-            }
+        switch (mode) {
+          case TranslationMode.llm:
+            // Cloud AI has no local model to download — always "ready".
+            return Icon(Icons.check_circle, color: Colors.green, size: 16);
 
-            return snapshot.data!
-              ? Icon(Icons.check_circle, color: Colors.green, size: 16)
-              : (mode == TranslationMode.onDevice
-                  ? Icon(Icons.download, color: Colors.orange, size: 16)
-                  : SizedBox.shrink());
-          },
-        );
+          case TranslationMode.onDevice:
+            if (_downloadingCodes.contains(languageCode)) {
+              return const SizedBox(
+                width: 14, height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              );
+            }
+            return FutureBuilder<bool>(
+              future: ModelDownloadService().isModelDownloaded(languageCode),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return SizedBox.shrink();
+                return snapshot.data!
+                    ? Icon(Icons.check_circle, color: Colors.green, size: 16)
+                    : Icon(Icons.download, color: Colors.orange, size: 16);
+              },
+            );
+
+          case TranslationMode.onnx:
+            // Unreachable — this widget isn't used in AI mode anymore.
+            return const SizedBox.shrink();
+        }
       },
     );
   }
@@ -111,6 +122,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
   Widget build(BuildContext context) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
+        final displayCodes = TranslationProvider.supportedLanguages.keys.toList();
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -128,7 +140,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
             underline: SizedBox(), // Remove underline
             icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
             isExpanded: true,
-            items: TranslationProvider.supportedLanguages.keys
+            items: displayCodes
               .map((String code) {
                 return DropdownMenuItem<String>(
                   value: code,
@@ -144,7 +156,7 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                       ),
                       SizedBox(width: 4),
                       // Check download status
-                      _buildModelStatusIcon(code , Provider.of<TranslationProvider>(context).translationMode),
+                      _buildModelStatusIcon(code, provider.translationMode),
                     ],
                   ),
                 );
@@ -161,40 +173,38 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                     backgroundColor: Colors.red,
                   ),
                 );
-              } else {
-                // If in LLM (AI) mode, bypass local model downloads entirely!
-                if (provider.translationMode == TranslationMode.llm) {
-                  if (widget.onChanged != null) {
-                    widget.onChanged!(selectedCode);
-                  }
-                  return;
-                }
-
-                // Check model download status for on-device translation
-                final modelService = ModelDownloadService();
-                modelService.isModelDownloaded(selectedCode!).then((isDownloaded) {
-                  if (!isDownloaded) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChangeNotifierProvider.value(
-                          value: Provider.of<TranslationProvider>(context, listen: false),
-                          child: const TranslationSettingsScreen(),
-                        ),
-                      ),
-                    ).then((_) {
-                      // Re-check model download status upon returning from download screen
-                      modelService.isModelDownloaded(selectedCode).then((nowDownloaded) {
-                        if (nowDownloaded && widget.onChanged != null) {
-                          widget.onChanged!(selectedCode);
-                        }
-                      });
-                    });
-                  } else if (widget.onChanged != null) {
-                    widget.onChanged!(selectedCode);
-                  }
-                });
+                return;
               }
+              final code = selectedCode!;
+
+              // If in LLM (AI) mode, bypass local model downloads entirely!
+              if (provider.translationMode == TranslationMode.llm) {
+                widget.onChanged?.call(code);
+                return;
+              }
+
+              // Quick mode (on-device / Google ML Kit). Apply the selection
+              // immediately — TranslationService.translateText() already
+              // downloads a missing model on demand (with its own progress
+              // toast) the moment it's actually needed, so there's nothing
+              // here that needs to block the pick. We still pre-warm the
+              // download in the background so it's likely ready by the time
+              // they hit translate, showing a per-language spinner instead
+              // of leaving the stale download-available icon showing.
+              widget.onChanged?.call(code);
+              final modelService = ModelDownloadService();
+              modelService.isModelDownloaded(code).then((isDownloaded) async {
+                if (isDownloaded || _downloadingCodes.contains(code)) return;
+                if (mounted) setState(() => _downloadingCodes.add(code));
+                try {
+                  await modelService.downloadModelWithFallback(code);
+                } catch (_) {
+                  // Swallowed — translateText() retries on demand and will
+                  // surface a real error there if it's still unavailable.
+                } finally {
+                  if (mounted) setState(() => _downloadingCodes.remove(code));
+                }
+              });
             },
           ),
         );
@@ -210,13 +220,42 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late StreamSubscription _intentDataStreamSubscription;
+
+  /// AI-mode pair-selector downloads currently in flight: "source|target"
+  /// -> progress (0.0-1.0). The dropdown itself stays interactive the whole
+  /// time — the user can pick a different pair, or leave the screen, without
+  /// waiting on this; it's purely a status overlay on the affected item(s).
+  final Map<String, double> _onnxDownloadProgress = {};
+
+  /// Pairs (by "source|target" key) actively downloading when the app was
+  /// last backgrounded. Android closes the app's raw network sockets a few
+  /// seconds after backgrounding a plain process with no foreground
+  /// service, so these reliably fail shortly after — not from a real
+  /// network problem. Resumed automatically on return instead of leaving a
+  /// dead-end failure the user has to notice and retry manually.
+  final Set<String> _onnxInterruptedByBackground = {};
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);
+    } else if (state == AppLifecycleState.resumed && _onnxInterruptedByBackground.isNotEmpty) {
+      final toResume = _onnxInterruptedByBackground.toList();
+      _onnxInterruptedByBackground.clear();
+      for (final key in toResume) {
+        final parts = key.split('|');
+        _joinOnnxDownload(key, parts[0], parts[1]);
+      }
+    }
   }
 
   void _initSharingIntent() {
@@ -255,6 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _intentDataStreamSubscription.cancel();
     super.dispose();
   }
@@ -416,9 +456,214 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Every (source, target) combination AI mode actually supports, as a
+  /// single unit — direct pairs plus pivots. Selecting a PAIR rather than
+  /// two independent languages avoids two failure modes tried earlier:
+  /// filtering each dropdown against the other's current value can make
+  /// valid combinations unreachable (a deadlock — e.g. default en/zh could
+  /// never reach zh/en, since only one pair targets zh and none targets
+  /// en-from-en), while listing both sides independently lets you combine
+  /// two individually-valid languages into a pair that was never actually
+  /// supported (e.g. Russian source + Chinese target — Russian only pairs
+  /// with English). Neither issue is possible when the pair is the unit of
+  /// selection.
+  List<(String source, String target, String displayName)> _allOnnxPairs() {
+    return [
+      for (final p in kSupportedOnnxPairs) (p.sourceBcp, p.targetBcp, p.displayName),
+      for (final piv in kSupportedOnnxPivotPairs) (piv.sourceBcp, piv.targetBcp, piv.displayName),
+    ];
+  }
+
+  Future<OnnxModelStatus> _onnxPairStatus(String source, String target) async {
+    final svc = ModelDownloadService();
+    final pair = findOnnxPair(source, target);
+    if (pair != null) return svc.getOnnxModelStatus(pair.key);
+    final pivot = findOnnxPivotPair(source, target);
+    if (pivot != null) return svc.getOnnxPivotStatus(pivot);
+    return OnnxModelStatus.notDownloaded; // shouldn't happen — list is curated
+  }
+
+  /// Attaches to a download already in progress (started from this screen's
+  /// own onChanged handler, from Settings, or anywhere else) so this item's
+  /// spinner shows live percentage instead of an indeterminate spinner that
+  /// never changes until the download happens to finish. No-op if already
+  /// attached — ModelDownloadService.downloadOnnxModel() is safe to call
+  /// again mid-download; it registers this onProgress as an extra listener
+  /// on the same underlying operation rather than starting a duplicate one.
+  Future<void> _joinOnnxDownload(String key, String source, String target) async {
+    if (_onnxDownloadProgress.containsKey(key)) return;
+    final pair = findOnnxPair(source, target);
+    final pivot = pair == null ? findOnnxPivotPair(source, target) : null;
+    if (pair == null && pivot == null) return;
+    if (mounted) setState(() => _onnxDownloadProgress[key] = 0.0);
+    final modelService = ModelDownloadService();
+    try {
+      if (pair != null) {
+        await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
+          if (mounted) setState(() => _onnxDownloadProgress[key] = p);
+        });
+      } else {
+        await modelService.downloadOnnxPivot(pivot!, onProgress: (p) {
+          if (mounted) setState(() => _onnxDownloadProgress[key] = p);
+        });
+      }
+    } catch (_) {
+      // This screen only joined to observe — whichever screen actually
+      // started the download owns surfacing the failure to the user.
+    } finally {
+      if (mounted) setState(() => _onnxDownloadProgress.remove(key));
+    }
+  }
+
+  Widget _buildOnnxPairSelector(BuildContext context, TranslationProvider provider) {
+    final pairs = _allOnnxPairs();
+    final currentKey = '${provider.sourceLanguage}|${provider.targetLanguage}';
+    final hasCurrentPair = pairs.any((p) => '${p.$1}|${p.$2}' == currentKey);
+
+    // The dropdown stays interactive at all times, even mid-download — an
+    // earlier version replaced the whole control with a progress-only view
+    // while downloading, which trapped the user with no way to back out or
+    // pick something else until it finished. Instead, an in-progress pack
+    // just shows a live percentage in place of its status icon (including
+    // on the dropdown's own closed face, if it's the currently-selected
+    // pair — DropdownButton renders the selected item's same child there).
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.blue, width: 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButton<String>(
+        value: hasCurrentPair ? currentKey : null,
+        hint: const Text('Select a language pair'),
+        underline: SizedBox(),
+        icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
+        isExpanded: true,
+        items: pairs.map((p) {
+          final key = '${p.$1}|${p.$2}';
+          return DropdownMenuItem<String>(
+            value: key,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(p.$3, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
+                ),
+                SizedBox(width: 4),
+                _onnxDownloadProgress.containsKey(key)
+                    ? SizedBox(
+                        width: 14, height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          value: _onnxDownloadProgress[key],
+                        ),
+                      )
+                    : FutureBuilder<OnnxModelStatus>(
+                        future: _onnxPairStatus(p.$1, p.$2),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return SizedBox.shrink();
+                          if (snapshot.data == OnnxModelStatus.downloading) {
+                            // Started elsewhere (e.g. Settings) — join it
+                            // after this build so the next frame shows live
+                            // percentage instead of this indeterminate spin.
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _joinOnnxDownload(key, p.$1, p.$2);
+                            });
+                            return const SizedBox(
+                              width: 14, height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          }
+                          return snapshot.data == OnnxModelStatus.ready
+                              ? Icon(Icons.check_circle, color: Colors.green, size: 16)
+                              : Icon(Icons.download, color: Colors.orange, size: 16);
+                        },
+                      ),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: (selectedKey) async {
+          final parts = selectedKey!.split('|');
+          final source = parts[0], target = parts[1];
+          final status = await _onnxPairStatus(source, target);
+
+          // Apply the selection immediately either way — if it's already
+          // downloading (started from here or from Settings; both now share
+          // the same tracking, see ModelDownloadService), there's nothing
+          // more to do here but wait for that to finish.
+          provider.setSourceLanguage(source);
+          provider.setTargetLanguage(target);
+          if (status == OnnxModelStatus.ready || status == OnnxModelStatus.downloading) {
+            return;
+          }
+
+          // ONNX packs are large (100s of MB, vs ~30MB for Quick mode) —
+          // after filling a device's storage with these during testing, a
+          // one-tap confirmation is worth keeping. Once confirmed, download
+          // inline with real progress (we have onProgress callbacks here,
+          // unlike Google ML Kit's downloadModel(), which exposes none) —
+          // no need to send the user to Settings and back, and the dropdown
+          // remains free to use for something else in the meantime.
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Download local AI model?'),
+              content: const Text(
+                  'This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes.'),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Download')),
+              ],
+            ),
+          );
+          if (confirmed != true) return;
+
+          setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
+          final modelService = ModelDownloadService();
+          try {
+            final pair = findOnnxPair(source, target);
+            if (pair != null) {
+              await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
+                if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+              });
+            } else {
+              final pivot = findOnnxPivotPair(source, target);
+              if (pivot != null) {
+                await modelService.downloadOnnxPivot(pivot, onProgress: (p) {
+                  if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+                });
+              }
+            }
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${pairs.firstWhere((x) => '${x.$1}|${x.$2}' == selectedKey).$3} ready'), backgroundColor: Colors.green),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Download failed. Please check your connection.'), backgroundColor: Colors.red),
+              );
+            }
+          } finally {
+            if (mounted) setState(() => _onnxDownloadProgress.remove(selectedKey));
+          }
+        },
+      ),
+    );
+  }
+
   Widget _buildLanguageSelector(BuildContext context) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
+        if (provider.translationMode == TranslationMode.onnx) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: _buildOnnxPairSelector(context, provider),
+          );
+        }
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16), // Add some padding
           child: Row(
@@ -536,9 +781,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Check if at least one ONNX model is downloaded
                     final svc = ModelDownloadService();
                     final enZhReady = await svc.getOnnxModelStatus('opus-mt-en-zh');
-                    final jaZhReady = await svc.getOnnxModelStatus('opus-mt-jap-zh');
+                    final jaEnReady = await svc.getOnnxModelStatus('opus-mt-ja-en');
                     final anyReady = enZhReady == OnnxModelStatus.ready ||
-                        jaZhReady == OnnxModelStatus.ready;
+                        jaEnReady == OnnxModelStatus.ready;
 
                     if (!anyReady) {
                       await showDialog(
@@ -558,10 +803,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: const Text('Open Settings'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
+                                  // Show the AI Enhanced section expanded on
+                                  // arrival — that's the pack the user is
+                                  // actually trying to set up, not whatever
+                                  // mode was active before this dialog.
+                                  translationProvider.setTranslationMode(TranslationMode.onnx);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (_) => ChangeNotifierProvider.value(
-                                        value: Provider.of<TranslationProvider>(context, listen: false),
+                                        value: translationProvider,
                                         child: const TranslationSettingsScreen(),
                                       ),
                                     ),
@@ -593,10 +843,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Text(localizations.go_to_settings),
                                 onPressed: () {
                                   Navigator.of(context).pop();
+                                  // Show the Cloud AI section expanded on
+                                  // arrival — that's what the user was
+                                  // trying to set up, not whatever mode was
+                                  // active before this dialog.
+                                  translationProvider.setTranslationMode(TranslationMode.llm);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (_) => ChangeNotifierProvider.value(
-                                        value: Provider.of<TranslationProvider>(context, listen: false),
+                                        value: translationProvider,
                                         child: const TranslationSettingsScreen(),
                                       ),
                                     ),

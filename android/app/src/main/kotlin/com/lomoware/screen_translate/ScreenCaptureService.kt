@@ -127,15 +127,21 @@ class FrameStabilizer(
     }
 
     private fun computeImageHash(bytes: ByteArray): Long {
-        // Sample pixels from different regions of the image
+        // Sample pixels from different regions of the image. `bytes` is the
+        // NV21 buffer produced by imageToBytes(): the Y (luma) plane comes
+        // first, one byte per pixel, tightly packed (no row padding), so it
+        // is indexed directly rather than with an RGBA (*4) stride — using
+        // *4 here previously left the bottom ~63% of the screen unsampled,
+        // meaning content changes there (e.g. turning a page) never
+        // registered as a frame change.
         val sampleSize = 16
-        
+
         var hash: Long = 0
         for (y in 0 until screenHeight step (screenHeight / sampleSize)) {
             for (x in 0 until screenWidth step (screenWidth / sampleSize)) {
-                val index = (y * screenWidth + x) * 4  // RGBA
-                if (index + 3 < bytes.size) {
-                    hash = 31 * hash + bytes[index].toLong()  // Use alpha or a color channel
+                val index = y * screenWidth + x  // Y plane, 1 byte per pixel
+                if (index < bytes.size) {
+                    hash = 31 * hash + bytes[index].toLong()
                 }
             }
         }

@@ -780,10 +780,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   if (index == 1) { // ONNX mode selected
                     // Check if at least one ONNX model is downloaded
                     final svc = ModelDownloadService();
-                    final enZhReady = await svc.getOnnxModelStatus('opus-mt-en-zh');
-                    final jaEnReady = await svc.getOnnxModelStatus('opus-mt-ja-en');
-                    final anyReady = enZhReady == OnnxModelStatus.ready ||
-                        jaEnReady == OnnxModelStatus.ready;
+                    var anyReady = false;
+                    for (final pair in kSupportedOnnxPairs) {
+                      if (await svc.getOnnxModelStatus(pair.key) ==
+                          OnnxModelStatus.ready) {
+                        anyReady = true;
+                        break;
+                      }
+                    }
 
                     if (!anyReady) {
                       await showDialog(

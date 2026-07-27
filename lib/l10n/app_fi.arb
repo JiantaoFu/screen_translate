@@ -132,5 +132,14 @@
   "merge_aggressive": "Aggressiivinen",
   "select_language_pair_hint": "Valitse kielipari",
   "download_ai_model_title": "Ladataanko paikallinen tekoälymalli?",
-  "download_ai_model_description": "Tämä paketti on yleensä 100–500 Mt. Se ladataan taustalla; tämä pari on käyttövalmis, kun lataus on valmis."
+  "download_ai_model_description": "Tämä paketti on yleensä 100–500 Mt. Se ladataan taustalla; tämä pari on käyttövalmis, kun lataus on valmis.",
+  "error_prefix": "Virhe: {error}",
+  "translate_image_button": "Käännä kuva",
+  "choose_translation_text": "Valitse, miten haluat kääntää tekstiä",
+  "download_language_pack_title": "Lataa kielipaketti",
+  "download_language_pack_content": "Käyttääksesi Tekoälyllä parannettu -tilaa, lataa ensin kielipaketti.\n\nSiirry asetuksiin ladataksesi sellaisen.",
+  "cloud_ai_api_key_required_content": "Pilvi-tekoäly vaatii API-avaimen. Määritä se asetuksissa.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Pilvi",
+  "image_translation_title": "Kuvan kääntäminen"
 }

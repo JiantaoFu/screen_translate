@@ -149,5 +149,14 @@
   "merge_aggressive": "Agressiivne",
   "select_language_pair_hint": "Vali keelepaar",
   "download_ai_model_title": "Laadi alla kohalik AI-mudel?",
-  "download_ai_model_description": "See pakett on tavaliselt 100–500 MB. Seda laaditakse alla taustal; see paar on kasutamiseks valmis kohe, kui see on lõpetatud."
+  "download_ai_model_description": "See pakett on tavaliselt 100–500 MB. Seda laaditakse alla taustal; see paar on kasutamiseks valmis kohe, kui see on lõpetatud.",
+  "error_prefix": "Viga: {error}",
+  "translate_image_button": "Tõlgi pilt",
+  "choose_translation_text": "Vali, kuidas soovid teksti tõlkida",
+  "download_language_pack_title": "Laadi alla keelepakett",
+  "download_language_pack_content": "AI-täiustatud režiimi kasutamiseks laadi kõigepealt alla keelepakett.\n\nMine seadetesse, et see alla laadida.",
+  "cloud_ai_api_key_required_content": "Pilve AI vajab API-võtit. Seadista see seadetes.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Pilv",
+  "image_translation_title": "Pildi tõlge"
 }

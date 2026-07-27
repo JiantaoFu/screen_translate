@@ -149,5 +149,14 @@
   "merge_aggressive": "積極的",
   "select_language_pair_hint": "言語ペアを選択",
   "download_ai_model_title": "ローカルAIモデルをダウンロードしますか？",
-  "download_ai_model_description": "このパックは通常100〜500MBです。バックグラウンドでダウンロードされ、完了するとこのペアがすぐに使用可能になります。"
+  "download_ai_model_description": "このパックは通常100〜500MBです。バックグラウンドでダウンロードされ、完了するとこのペアがすぐに使用可能になります。",
+  "error_prefix": "エラー: {error}",
+  "translate_image_button": "画像を翻訳",
+  "choose_translation_text": "テキストの翻訳方法を選択してください",
+  "download_language_pack_title": "言語パックをダウンロード",
+  "download_language_pack_content": "AI強化モードを使用するには、まず言語パックをダウンロードしてください。\n\n設定画面からダウンロードできます。",
+  "cloud_ai_api_key_required_content": "クラウドAIにはAPIキーが必要です。設定で設定してください。",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "クラウド",
+  "image_translation_title": "画像翻訳"
 }

@@ -1063,6 +1063,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes.'**
   String get download_ai_model_description;
+
+  /// No description provided for @error_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String error_prefix(String error);
+
+  /// No description provided for @translate_image_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate Image'**
+  String get translate_image_button;
+
+  /// No description provided for @choose_translation_text.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to translate text'**
+  String get choose_translation_text;
+
+  /// No description provided for @download_language_pack_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a Language Pack'**
+  String get download_language_pack_title;
+
+  /// No description provided for @download_language_pack_content.
+  ///
+  /// In en, this message translates to:
+  /// **'To use AI Enhanced mode, download a language pack first.\n\nGo to Settings to download one.'**
+  String get download_language_pack_content;
+
+  /// No description provided for @cloud_ai_api_key_required_content.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI requires an API key. Set it up in Settings.'**
+  String get cloud_ai_api_key_required_content;
+
+  /// No description provided for @mode_ai_short_label.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get mode_ai_short_label;
+
+  /// No description provided for @mode_cloud_short_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud'**
+  String get mode_cloud_short_label;
+
+  /// No description provided for @image_translation_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Translation'**
+  String get image_translation_title;
 }
 
 class _AppLocalizationsDelegate

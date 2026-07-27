@@ -495,4 +495,35 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'این بسته معمولاً بین ۱۰۰ تا ۵۰۰ مگابایت است. در پس‌زمینه دانلود می‌شود؛ پس از اتمام، این جفت آماده استفاده خواهد بود.';
+
+  @override
+  String error_prefix(String error) {
+    return 'خطا: $error';
+  }
+
+  @override
+  String get translate_image_button => 'ترجمه تصویر';
+
+  @override
+  String get choose_translation_text => 'نحوه ترجمه متن را انتخاب کنید';
+
+  @override
+  String get download_language_pack_title => 'دانلود یک بسته زبان';
+
+  @override
+  String get download_language_pack_content =>
+      'برای استفاده از حالت بهبودیافته با هوش مصنوعی، ابتدا یک بسته زبان دانلود کنید.\n\nبرای دانلود به تنظیمات بروید.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'هوش مصنوعی ابری به یک کلید API نیاز دارد. آن را در تنظیمات راه‌اندازی کنید.';
+
+  @override
+  String get mode_ai_short_label => 'هوش مصنوعی';
+
+  @override
+  String get mode_cloud_short_label => 'ابری';
+
+  @override
+  String get image_translation_title => 'ترجمه تصویر';
 }

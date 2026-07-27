@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresif",
   "select_language_pair_hint": "Bir dil çifti seçin",
   "download_ai_model_title": "Yerel yapay zeka modeli indirilsin mi?",
-  "download_ai_model_description": "Bu paket genellikle 100–500 MB'dir. Arka planda indirilir; bu çift indirme tamamlanır tamamlanmaz kullanıma hazır olacaktır."
+  "download_ai_model_description": "Bu paket genellikle 100–500 MB'dir. Arka planda indirilir; bu çift indirme tamamlanır tamamlanmaz kullanıma hazır olacaktır.",
+  "error_prefix": "Hata: {error}",
+  "translate_image_button": "Görseli Çevir",
+  "choose_translation_text": "Metni nasıl çevirmek istediğinizi seçin",
+  "download_language_pack_title": "Bir Dil Paketi İndir",
+  "download_language_pack_content": "Yapay Zeka ile Geliştirilmiş modunu kullanmak için önce bir dil paketi indirin.\n\nİndirmek için Ayarlar'a gidin.",
+  "cloud_ai_api_key_required_content": "Bulut yapay zeka bir API anahtarı gerektirir. Ayarlar'da kurun.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Bulut",
+  "image_translation_title": "Görsel Çevirisi"
 }

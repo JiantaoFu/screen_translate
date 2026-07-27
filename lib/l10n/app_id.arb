@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresif",
   "select_language_pair_hint": "Pilih pasangan bahasa",
   "download_ai_model_title": "Unduh model AI lokal?",
-  "download_ai_model_description": "Paket ini biasanya berukuran 100–500 MB. File diunduh di latar belakang; pasangan ini akan siap digunakan setelah selesai."
+  "download_ai_model_description": "Paket ini biasanya berukuran 100–500 MB. File diunduh di latar belakang; pasangan ini akan siap digunakan setelah selesai.",
+  "error_prefix": "Kesalahan: {error}",
+  "translate_image_button": "Terjemahkan Gambar",
+  "choose_translation_text": "Pilih cara Anda ingin menerjemahkan teks",
+  "download_language_pack_title": "Unduh Paket Bahasa",
+  "download_language_pack_content": "Untuk menggunakan mode Ditingkatkan AI, unduh paket bahasa terlebih dahulu.\n\nBuka Pengaturan untuk mengunduhnya.",
+  "cloud_ai_api_key_required_content": "AI Cloud memerlukan kunci API. Siapkan di Pengaturan.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Cloud",
+  "image_translation_title": "Terjemahan Gambar"
 }

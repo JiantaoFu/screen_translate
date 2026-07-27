@@ -492,4 +492,35 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Gói này thường có dung lượng 100–500 MB. Gói sẽ được tải xuống trong nền; cặp ngôn ngữ này sẽ sẵn sàng sử dụng ngay khi tải xong.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Lỗi: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Dịch hình ảnh';
+
+  @override
+  String get choose_translation_text => 'Chọn cách bạn muốn dịch văn bản';
+
+  @override
+  String get download_language_pack_title => 'Tải xuống gói ngôn ngữ';
+
+  @override
+  String get download_language_pack_content =>
+      'Để sử dụng chế độ Nâng cao bằng AI, trước tiên hãy tải xuống gói ngôn ngữ.\n\nVào Cài đặt để tải xuống.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'AI đám mây yêu cầu khóa API. Thiết lập trong Cài đặt.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Đám mây';
+
+  @override
+  String get image_translation_title => 'Dịch hình ảnh';
 }

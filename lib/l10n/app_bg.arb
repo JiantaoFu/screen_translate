@@ -149,5 +149,14 @@
   "merge_aggressive": "Агресивно",
   "select_language_pair_hint": "Изберете езикова двойка",
   "download_ai_model_title": "Изтегляне на локален ИИ модел?",
-  "download_ai_model_description": "Този пакет обикновено е 100–500 MB. Изтегля се на заден фон; тази двойка ще бъде готова за употреба след завършване."
+  "download_ai_model_description": "Този пакет обикновено е 100–500 MB. Изтегля се на заден фон; тази двойка ще бъде готова за употреба след завършване.",
+  "error_prefix": "Грешка: {error}",
+  "translate_image_button": "Преведи изображение",
+  "choose_translation_text": "Изберете как искате да превеждате текст",
+  "download_language_pack_title": "Изтегляне на езиков пакет",
+  "download_language_pack_content": "За да използвате режим AI подобрено, първо изтеглете езиков пакет.\n\nОтидете в Настройки, за да изтеглите такъв.",
+  "cloud_ai_api_key_required_content": "Облачният ИИ изисква API ключ. Настройте го в Настройки.",
+  "mode_ai_short_label": "ИИ",
+  "mode_cloud_short_label": "Облак",
+  "image_translation_title": "Превод на изображение"
 }

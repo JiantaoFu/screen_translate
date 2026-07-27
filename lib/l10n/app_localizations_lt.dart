@@ -495,4 +495,36 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Šis paketas paprastai yra 100–500 MB. Jis atsisiunčiamas fone; ši pora bus paruošta naudoti, kai tik baigsis atsisiuntimas.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Klaida: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Versti vaizdą';
+
+  @override
+  String get choose_translation_text =>
+      'Pasirinkite, kaip norite versti tekstą';
+
+  @override
+  String get download_language_pack_title => 'Atsisiųsti kalbos paketą';
+
+  @override
+  String get download_language_pack_content =>
+      'Norėdami naudoti patobulintą DI režimą, pirmiausia atsisiųskite kalbos paketą.\n\nEikite į Nustatymus, kad jį atsisiųstumėte.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Debesijos DI reikalauja API rakto. Nustatykite jį Nustatymuose.';
+
+  @override
+  String get mode_ai_short_label => 'DI';
+
+  @override
+  String get mode_cloud_short_label => 'Debesija';
+
+  @override
+  String get image_translation_title => 'Vaizdo vertimas';
 }

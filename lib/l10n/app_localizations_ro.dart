@@ -496,4 +496,35 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Acest pachet are de obicei 100–500 MB. Se descarcă în fundal; această pereche va fi gata de utilizare imediat ce se termină.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Eroare: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Tradu imaginea';
+
+  @override
+  String get choose_translation_text => 'Alege cum vrei să traduci textul';
+
+  @override
+  String get download_language_pack_title => 'Descarcă un pachet lingvistic';
+
+  @override
+  String get download_language_pack_content =>
+      'Pentru a folosi modul Îmbunătățit cu AI, descarcă mai întâi un pachet lingvistic.\n\nMergi la Setări pentru a descărca unul.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'AI-ul din cloud necesită o cheie API. Configureaz-o în Setări.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Traducerea imaginii';
 }

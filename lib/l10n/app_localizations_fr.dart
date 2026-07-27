@@ -495,4 +495,36 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Ce pack fait généralement entre 100 et 500 Mo. Il se télécharge en arrière-plan ; cette paire sera prête à l\'emploi une fois terminé.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Erreur : $error';
+  }
+
+  @override
+  String get translate_image_button => 'Traduire l\'image';
+
+  @override
+  String get choose_translation_text =>
+      'Choisissez comment vous souhaitez traduire le texte';
+
+  @override
+  String get download_language_pack_title => 'Télécharger un pack de langue';
+
+  @override
+  String get download_language_pack_content =>
+      'Pour utiliser le mode Amélioré par IA, téléchargez d\'abord un pack de langue.\n\nAllez dans les paramètres pour en télécharger un.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'L\'IA Cloud nécessite une clé API. Configurez-la dans les paramètres.';
+
+  @override
+  String get mode_ai_short_label => 'IA';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Traduction d\'image';
 }

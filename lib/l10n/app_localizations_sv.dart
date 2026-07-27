@@ -494,4 +494,35 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Detta paket är vanligtvis 100–500 MB. Det laddas ner i bakgrunden; detta par kommer att vara redo att användas så snart det är klart.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Fel: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Översätt bild';
+
+  @override
+  String get choose_translation_text => 'Välj hur du vill översätta text';
+
+  @override
+  String get download_language_pack_title => 'Ladda ner ett språkpaket';
+
+  @override
+  String get download_language_pack_content =>
+      'För att använda AI-förbättrad-läge, ladda först ner ett språkpaket.\n\nGå till Inställningar för att ladda ner ett.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Moln-AI kräver en API-nyckel. Ställ in den i Inställningar.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Moln';
+
+  @override
+  String get image_translation_title => 'Bildöversättning';
 }

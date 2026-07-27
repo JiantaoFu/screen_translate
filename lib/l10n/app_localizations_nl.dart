@@ -495,4 +495,35 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Dit pakket is doorgaans 100–500 MB. Het wordt op de achtergrond gedownload; dit paar is klaar voor gebruik zodra het klaar is.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Afbeelding vertalen';
+
+  @override
+  String get choose_translation_text => 'Kies hoe je tekst wilt vertalen';
+
+  @override
+  String get download_language_pack_title => 'Download een taalpakket';
+
+  @override
+  String get download_language_pack_content =>
+      'Om de AI-verbeterd modus te gebruiken, download eerst een taalpakket.\n\nGa naar Instellingen om er een te downloaden.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Cloud-AI vereist een API-sleutel. Stel deze in bij Instellingen.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Afbeeldingsvertaling';
 }

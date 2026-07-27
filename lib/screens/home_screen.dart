@@ -9,7 +9,6 @@ import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
-import 'llm_api_config_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -398,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     await _trackTranslationAndPromptReview(context);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Error: ${e.toString()}')),
+                                      SnackBar(content: Text(AppLocalizations.of(context)!.error_prefix(e.toString()))),
                                     );
                                   }
                                 },
@@ -408,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               if (Platform.isAndroid) SizedBox(height: 15),
                               _buildActionButton(
                                 icon: Icons.image,
-                                label: 'Translate Image',
+                                label: AppLocalizations.of(context)!.translate_image_button,
                                 onTap: () async {
                                   final picker = ImagePicker();
                                   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -721,7 +720,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Translation Mode',
+                    localizations.translation_mode_title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -763,7 +762,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ],
               ),
               Text(
-                'Choose how you want to translate text',
+                localizations.choose_translation_text,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -790,17 +789,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Download a Language Pack'),
-                            content: const Text(
-                              'To use AI Enhanced mode, download a language pack first.\n\nGo to Settings to download one.',
+                            title: Text(localizations.download_language_pack_title),
+                            content: Text(
+                              localizations.download_language_pack_content,
                             ),
                             actions: [
                               TextButton(
-                                child: const Text('Cancel'),
+                                child: Text(localizations.cancel),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                               ElevatedButton(
-                                child: const Text('Open Settings'),
+                                child: Text(localizations.go_to_settings),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   // Show the AI Enhanced section expanded on
@@ -832,8 +831,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('API Key Required'),
-                            content: const Text('Cloud AI requires an API key. Set it up in Settings.'),
+                            title: Text(localizations.api_key_required),
+                            content: Text(localizations.cloud_ai_api_key_required_content),
                             actions: [
                               TextButton(
                                 child: Text(localizations.cancel),
@@ -883,21 +882,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.flash_on_rounded, size: 14),
-                        SizedBox(width: 4),
-                        Text('Quick', style: TextStyle(fontSize: 14)),
-                      ],
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.memory_rounded, size: 14),
-                        SizedBox(width: 4),
-                        Text('AI', style: TextStyle(fontSize: 14)),
+                        const Icon(Icons.flash_on_rounded, size: 14),
+                        const SizedBox(width: 4),
+                        Text(localizations.mode_quick_title, style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),
@@ -905,10 +893,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.cloud_rounded, size: 14),
-                        SizedBox(width: 4),
-                        Text('Cloud', style: TextStyle(fontSize: 14)),
+                      children: [
+                        const Icon(Icons.memory_rounded, size: 14),
+                        const SizedBox(width: 4),
+                        Text(localizations.mode_ai_short_label, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.cloud_rounded, size: 14),
+                        const SizedBox(width: 4),
+                        Text(localizations.mode_cloud_short_label, style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),

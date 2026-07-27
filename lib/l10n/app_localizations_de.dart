@@ -500,4 +500,36 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Dieses Paket ist normalerweise 100–500 MB groß. Es wird im Hintergrund heruntergeladen; dieses Paar ist einsatzbereit, sobald der Download abgeschlossen ist.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Bild übersetzen';
+
+  @override
+  String get choose_translation_text =>
+      'Wähle, wie du Text übersetzen möchtest';
+
+  @override
+  String get download_language_pack_title => 'Sprachpaket herunterladen';
+
+  @override
+  String get download_language_pack_content =>
+      'Um den KI-Verbessert-Modus zu nutzen, lade zuerst ein Sprachpaket herunter.\n\nGehe zu den Einstellungen, um eines herunterzuladen.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Cloud-KI benötigt einen API-Schlüssel. Richte ihn in den Einstellungen ein.';
+
+  @override
+  String get mode_ai_short_label => 'KI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Bildübersetzung';
 }

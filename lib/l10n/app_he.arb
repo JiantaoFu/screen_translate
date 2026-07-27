@@ -149,5 +149,14 @@
   "merge_aggressive": "אגרסיבי",
   "select_language_pair_hint": "בחר זוג שפות",
   "download_ai_model_title": "להוריד מודל בינה מלאכותית מקומי?",
-  "download_ai_model_description": "חבילה זו היא בדרך כלל בין 100 ל-500 מגה-בייט. ההורדה מתבצעת ברקע; הזוג הזה יהיה מוכן לשימוש כשההורדה תסתיים."
+  "download_ai_model_description": "חבילה זו היא בדרך כלל בין 100 ל-500 מגה-בייט. ההורדה מתבצעת ברקע; הזוג הזה יהיה מוכן לשימוש כשההורדה תסתיים.",
+  "error_prefix": "שגיאה: {error}",
+  "translate_image_button": "תרגם תמונה",
+  "choose_translation_text": "בחר כיצד ברצונך לתרגם טקסט",
+  "download_language_pack_title": "הורד חבילת שפה",
+  "download_language_pack_content": "כדי להשתמש במצב משופר בבינה מלאכותית, הורד תחילה חבילת שפה.\n\nעבור להגדרות כדי להוריד אחת.",
+  "cloud_ai_api_key_required_content": "בינה מלאכותית בענן דורשת מפתח API. הגדר אותו בהגדרות.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "ענן",
+  "image_translation_title": "תרגום תמונה"
 }

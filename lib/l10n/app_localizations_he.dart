@@ -489,4 +489,35 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'חבילה זו היא בדרך כלל בין 100 ל-500 מגה-בייט. ההורדה מתבצעת ברקע; הזוג הזה יהיה מוכן לשימוש כשההורדה תסתיים.';
+
+  @override
+  String error_prefix(String error) {
+    return 'שגיאה: $error';
+  }
+
+  @override
+  String get translate_image_button => 'תרגם תמונה';
+
+  @override
+  String get choose_translation_text => 'בחר כיצד ברצונך לתרגם טקסט';
+
+  @override
+  String get download_language_pack_title => 'הורד חבילת שפה';
+
+  @override
+  String get download_language_pack_content =>
+      'כדי להשתמש במצב משופר בבינה מלאכותית, הורד תחילה חבילת שפה.\n\nעבור להגדרות כדי להוריד אחת.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'בינה מלאכותית בענן דורשת מפתח API. הגדר אותו בהגדרות.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'ענן';
+
+  @override
+  String get image_translation_title => 'תרגום תמונה';
 }

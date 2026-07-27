@@ -498,4 +498,36 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Bu paket genellikle 100–500 MB\'dir. Arka planda indirilir; bu çift indirme tamamlanır tamamlanmaz kullanıma hazır olacaktır.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Hata: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Görseli Çevir';
+
+  @override
+  String get choose_translation_text =>
+      'Metni nasıl çevirmek istediğinizi seçin';
+
+  @override
+  String get download_language_pack_title => 'Bir Dil Paketi İndir';
+
+  @override
+  String get download_language_pack_content =>
+      'Yapay Zeka ile Geliştirilmiş modunu kullanmak için önce bir dil paketi indirin.\n\nİndirmek için Ayarlar\'a gidin.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Bulut yapay zeka bir API anahtarı gerektirir. Ayarlar\'da kurun.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Bulut';
+
+  @override
+  String get image_translation_title => 'Görsel Çevirisi';
 }

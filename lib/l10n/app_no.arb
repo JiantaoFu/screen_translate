@@ -149,5 +149,14 @@
   "merge_aggressive": "Aggressiv",
   "select_language_pair_hint": "Velg et språkpar",
   "download_ai_model_title": "Laste ned lokal AI-modell?",
-  "download_ai_model_description": "Denne pakken er vanligvis 100–500 MB. Den lastes ned i bakgrunnen; dette paret vil være klart til bruk så snart det er ferdig."
+  "download_ai_model_description": "Denne pakken er vanligvis 100–500 MB. Den lastes ned i bakgrunnen; dette paret vil være klart til bruk så snart det er ferdig.",
+  "error_prefix": "Feil: {error}",
+  "translate_image_button": "Oversett bilde",
+  "choose_translation_text": "Velg hvordan du vil oversette tekst",
+  "download_language_pack_title": "Last ned en språkpakke",
+  "download_language_pack_content": "For å bruke AI-forbedret-modus, last ned en språkpakke først.\n\nGå til Innstillinger for å laste ned en.",
+  "cloud_ai_api_key_required_content": "Sky-AI krever en API-nøkkel. Sett den opp i Innstillinger.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Sky",
+  "image_translation_title": "Bildeoversettelse"
 }

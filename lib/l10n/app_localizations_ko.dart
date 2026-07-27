@@ -483,4 +483,35 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       '이 팩은 보통 100–500MB입니다. 백그라운드에서 다운로드되며, 완료되면 이 언어 쌍을 바로 사용할 수 있습니다.';
+
+  @override
+  String error_prefix(String error) {
+    return '오류: $error';
+  }
+
+  @override
+  String get translate_image_button => '이미지 번역';
+
+  @override
+  String get choose_translation_text => '텍스트를 번역할 방법을 선택하세요';
+
+  @override
+  String get download_language_pack_title => '언어 팩 다운로드';
+
+  @override
+  String get download_language_pack_content =>
+      'AI 강화 모드를 사용하려면 먼저 언어 팩을 다운로드하세요.\n\n설정으로 이동하여 다운로드하세요.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      '클라우드 AI에는 API 키가 필요합니다. 설정에서 구성하세요.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => '클라우드';
+
+  @override
+  String get image_translation_title => '이미지 번역';
 }

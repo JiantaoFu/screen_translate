@@ -496,4 +496,35 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Questo pacchetto è in genere di 100–500 MB. Viene scaricato in background; questa coppia sarà pronta all\'uso non appena terminato.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Errore: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Traduci immagine';
+
+  @override
+  String get choose_translation_text => 'Scegli come vuoi tradurre il testo';
+
+  @override
+  String get download_language_pack_title => 'Scarica un pacchetto linguistico';
+
+  @override
+  String get download_language_pack_content =>
+      'Per usare la modalità Migliorato con IA, scarica prima un pacchetto linguistico.\n\nVai su Impostazioni per scaricarne uno.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'L\'IA Cloud richiede una chiave API. Configurala in Impostazioni.';
+
+  @override
+  String get mode_ai_short_label => 'IA';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Traduzione immagine';
 }

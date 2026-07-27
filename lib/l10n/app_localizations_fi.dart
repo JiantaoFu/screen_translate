@@ -495,4 +495,35 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Tämä paketti on yleensä 100–500 Mt. Se ladataan taustalla; tämä pari on käyttövalmis, kun lataus on valmis.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Virhe: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Käännä kuva';
+
+  @override
+  String get choose_translation_text => 'Valitse, miten haluat kääntää tekstiä';
+
+  @override
+  String get download_language_pack_title => 'Lataa kielipaketti';
+
+  @override
+  String get download_language_pack_content =>
+      'Käyttääksesi Tekoälyllä parannettu -tilaa, lataa ensin kielipaketti.\n\nSiirry asetuksiin ladataksesi sellaisen.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Pilvi-tekoäly vaatii API-avaimen. Määritä se asetuksissa.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Pilvi';
+
+  @override
+  String get image_translation_title => 'Kuvan kääntäminen';
 }

@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresyvus",
   "select_language_pair_hint": "Pasirinkite kalbų porą",
   "download_ai_model_title": "Atsisiųsti vietinį DI modelį?",
-  "download_ai_model_description": "Šis paketas paprastai yra 100–500 MB. Jis atsisiunčiamas fone; ši pora bus paruošta naudoti, kai tik baigsis atsisiuntimas."
+  "download_ai_model_description": "Šis paketas paprastai yra 100–500 MB. Jis atsisiunčiamas fone; ši pora bus paruošta naudoti, kai tik baigsis atsisiuntimas.",
+  "error_prefix": "Klaida: {error}",
+  "translate_image_button": "Versti vaizdą",
+  "choose_translation_text": "Pasirinkite, kaip norite versti tekstą",
+  "download_language_pack_title": "Atsisiųsti kalbos paketą",
+  "download_language_pack_content": "Norėdami naudoti patobulintą DI režimą, pirmiausia atsisiųskite kalbos paketą.\n\nEikite į Nustatymus, kad jį atsisiųstumėte.",
+  "cloud_ai_api_key_required_content": "Debesijos DI reikalauja API rakto. Nustatykite jį Nustatymuose.",
+  "mode_ai_short_label": "DI",
+  "mode_cloud_short_label": "Debesija",
+  "image_translation_title": "Vaizdo vertimas"
 }

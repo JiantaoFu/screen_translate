@@ -149,5 +149,14 @@
   "merge_aggressive": "Agressivo",
   "select_language_pair_hint": "Selecione um par de idiomas",
   "download_ai_model_title": "Baixar modelo de IA local?",
-  "download_ai_model_description": "Este pacote geralmente tem 100–500 MB. Ele é baixado em segundo plano; este par estará pronto para uso assim que terminar."
+  "download_ai_model_description": "Este pacote geralmente tem 100–500 MB. Ele é baixado em segundo plano; este par estará pronto para uso assim que terminar.",
+  "error_prefix": "Erro: {error}",
+  "translate_image_button": "Traduzir imagem",
+  "choose_translation_text": "Escolha como deseja traduzir o texto",
+  "download_language_pack_title": "Baixar um pacote de idioma",
+  "download_language_pack_content": "Para usar o modo Aprimorado por IA, baixe primeiro um pacote de idioma.\n\nVá em Configurações para baixar um.",
+  "cloud_ai_api_key_required_content": "A IA na nuvem requer uma chave de API. Configure-a nas Configurações.",
+  "mode_ai_short_label": "IA",
+  "mode_cloud_short_label": "Nuvem",
+  "image_translation_title": "Tradução de imagem"
 }

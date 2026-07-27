@@ -498,4 +498,36 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Ez a csomag jellemzően 100–500 MB. A háttérben töltődik le; ez a pár a befejezés után azonnal használatra kész lesz.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Hiba: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Kép fordítása';
+
+  @override
+  String get choose_translation_text =>
+      'Válaszd ki, hogyan szeretnéd fordítani a szöveget';
+
+  @override
+  String get download_language_pack_title => 'Nyelvi csomag letöltése';
+
+  @override
+  String get download_language_pack_content =>
+      'Az AI-fejlesztett mód használatához először töltsön le egy nyelvi csomagot.\n\nMenjen a Beállításokba egy letöltéséhez.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'A felhő AI-hoz API-kulcs szükséges. Állítsa be a Beállításokban.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Felhő';
+
+  @override
+  String get image_translation_title => 'Képfordítás';
 }

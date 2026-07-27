@@ -494,4 +494,36 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'यह पैक आमतौर पर 100–500 MB का होता है। यह पृष्ठभूमि में डाउनलोड होता है; पूरा होने पर यह युग्म उपयोग के लिए तैयार हो जाएगा।';
+
+  @override
+  String error_prefix(String error) {
+    return 'त्रुटि: $error';
+  }
+
+  @override
+  String get translate_image_button => 'छवि का अनुवाद करें';
+
+  @override
+  String get choose_translation_text =>
+      'चुनें कि आप टेक्स्ट का अनुवाद कैसे करना चाहते हैं';
+
+  @override
+  String get download_language_pack_title => 'एक भाषा पैक डाउनलोड करें';
+
+  @override
+  String get download_language_pack_content =>
+      'AI-संवर्धित मोड का उपयोग करने के लिए, पहले एक भाषा पैक डाउनलोड करें।\n\nएक डाउनलोड करने के लिए सेटिंग्स में जाएँ।';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'क्लाउड AI को एक API कुंजी की आवश्यकता है। इसे सेटिंग्स में सेट करें।';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'क्लाउड';
+
+  @override
+  String get image_translation_title => 'छवि अनुवाद';
 }

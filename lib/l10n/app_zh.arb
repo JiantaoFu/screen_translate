@@ -149,5 +149,14 @@
   "merge_aggressive": "激进",
   "select_language_pair_hint": "选择语言对",
   "download_ai_model_title": "下载本地AI模型？",
-  "download_ai_model_description": "该模型包通常为100–500MB，将在后台下载；下载完成后即可使用该语言对。"
+  "download_ai_model_description": "该模型包通常为100–500MB，将在后台下载；下载完成后即可使用该语言对。",
+  "error_prefix": "错误：{error}",
+  "translate_image_button": "翻译图片",
+  "choose_translation_text": "选择你想要的翻译方式",
+  "download_language_pack_title": "下载语言包",
+  "download_language_pack_content": "要使用AI增强模式，请先下载语言包。\n\n前往设置下载。",
+  "cloud_ai_api_key_required_content": "云端AI需要API密钥，请在设置中配置。",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "云端",
+  "image_translation_title": "图片翻译"
 }

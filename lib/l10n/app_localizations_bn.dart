@@ -494,4 +494,36 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'এই প্যাকটি সাধারণত ১০০–৫০০ MB এর মতো। এটি ব্যাকগ্রাউন্ডে ডাউনলোড হয়; শেষ হলে এই জোড়াটি ব্যবহারের জন্য প্রস্তুত হবে।';
+
+  @override
+  String error_prefix(String error) {
+    return 'ত্রুটি: $error';
+  }
+
+  @override
+  String get translate_image_button => 'ছবি অনুবাদ করুন';
+
+  @override
+  String get choose_translation_text =>
+      'আপনি কীভাবে টেক্সট অনুবাদ করতে চান তা বেছে নিন';
+
+  @override
+  String get download_language_pack_title => 'একটি ভাষা প্যাক ডাউনলোড করুন';
+
+  @override
+  String get download_language_pack_content =>
+      'AI উন্নত মোড ব্যবহার করতে, প্রথমে একটি ভাষা প্যাক ডাউনলোড করুন।\n\nএকটি ডাউনলোড করতে সেটিংসে যান।';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'ক্লাউড AI-এর জন্য একটি API কী প্রয়োজন। সেটিংসে এটি সেট আপ করুন।';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'ক্লাউড';
+
+  @override
+  String get image_translation_title => 'ছবি অনুবাদ';
 }

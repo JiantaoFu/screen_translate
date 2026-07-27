@@ -496,4 +496,36 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Ta paket je običajno velik 100–500 MB. Prenaša se v ozadju; ta par bo pripravljen za uporabo takoj po zaključku.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Napaka: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Prevedi sliko';
+
+  @override
+  String get choose_translation_text =>
+      'Izberite, kako želite prevajati besedilo';
+
+  @override
+  String get download_language_pack_title => 'Prenesi jezikovni paket';
+
+  @override
+  String get download_language_pack_content =>
+      'Če želite uporabljati način Izboljšano z UI, najprej prenesite jezikovni paket.\n\nPojdite v Nastavitve, da ga prenesete.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Oblačna UI zahteva API-ključ. Nastavite ga v Nastavitvah.';
+
+  @override
+  String get mode_ai_short_label => 'UI';
+
+  @override
+  String get mode_cloud_short_label => 'Oblak';
+
+  @override
+  String get image_translation_title => 'Prevod slike';
 }

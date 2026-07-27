@@ -491,4 +491,35 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'แพ็กนี้มักมีขนาด 100–500 MB โดยจะดาวน์โหลดในพื้นหลัง คู่ภาษานี้จะพร้อมใช้งานทันทีที่ดาวน์โหลดเสร็จ';
+
+  @override
+  String error_prefix(String error) {
+    return 'ข้อผิดพลาด: $error';
+  }
+
+  @override
+  String get translate_image_button => 'แปลภาพ';
+
+  @override
+  String get choose_translation_text => 'เลือกวิธีที่คุณต้องการแปลข้อความ';
+
+  @override
+  String get download_language_pack_title => 'ดาวน์โหลดแพ็กภาษา';
+
+  @override
+  String get download_language_pack_content =>
+      'หากต้องการใช้โหมดปรับปรุงด้วย AI โปรดดาวน์โหลดแพ็กภาษาก่อน\n\nไปที่การตั้งค่าเพื่อดาวน์โหลด';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'AI บนคลาวด์ต้องใช้คีย์ API โปรดตั้งค่าในการตั้งค่า';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'คลาวด์';
+
+  @override
+  String get image_translation_title => 'การแปลภาพ';
 }

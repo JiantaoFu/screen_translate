@@ -493,4 +493,35 @@ class AppLocalizationsNo extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Denne pakken er vanligvis 100–500 MB. Den lastes ned i bakgrunnen; dette paret vil være klart til bruk så snart det er ferdig.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Feil: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Oversett bilde';
+
+  @override
+  String get choose_translation_text => 'Velg hvordan du vil oversette tekst';
+
+  @override
+  String get download_language_pack_title => 'Last ned en språkpakke';
+
+  @override
+  String get download_language_pack_content =>
+      'For å bruke AI-forbedret-modus, last ned en språkpakke først.\n\nGå til Innstillinger for å laste ned en.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Sky-AI krever en API-nøkkel. Sett den opp i Innstillinger.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Sky';
+
+  @override
+  String get image_translation_title => 'Bildeoversettelse';
 }

@@ -493,4 +493,35 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'See pakett on tavaliselt 100–500 MB. Seda laaditakse alla taustal; see paar on kasutamiseks valmis kohe, kui see on lõpetatud.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Viga: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Tõlgi pilt';
+
+  @override
+  String get choose_translation_text => 'Vali, kuidas soovid teksti tõlkida';
+
+  @override
+  String get download_language_pack_title => 'Laadi alla keelepakett';
+
+  @override
+  String get download_language_pack_content =>
+      'AI-täiustatud režiimi kasutamiseks laadi kõigepealt alla keelepakett.\n\nMine seadetesse, et see alla laadida.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Pilve AI vajab API-võtit. Seadista see seadetes.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Pilv';
+
+  @override
+  String get image_translation_title => 'Pildi tõlge';
 }

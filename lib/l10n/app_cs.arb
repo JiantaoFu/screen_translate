@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresivní",
   "select_language_pair_hint": "Vyberte jazykový pár",
   "download_ai_model_title": "Stáhnout lokální AI model?",
-  "download_ai_model_description": "Tento balíček má obvykle 100–500 MB. Stahuje se na pozadí; tento pár bude připraven k použití po dokončení."
+  "download_ai_model_description": "Tento balíček má obvykle 100–500 MB. Stahuje se na pozadí; tento pár bude připraven k použití po dokončení.",
+  "error_prefix": "Chyba: {error}",
+  "translate_image_button": "Přeložit obrázek",
+  "choose_translation_text": "Vyberte, jak chcete překládat text",
+  "download_language_pack_title": "Stáhnout jazykový balíček",
+  "download_language_pack_content": "Pro použití režimu Vylepšeno AI si nejprve stáhněte jazykový balíček.\n\nPřejděte do Nastavení a stáhněte si jej.",
+  "cloud_ai_api_key_required_content": "Cloud AI vyžaduje API klíč. Nastavte jej v Nastavení.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Cloud",
+  "image_translation_title": "Překlad obrázku"
 }

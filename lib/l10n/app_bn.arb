@@ -149,5 +149,14 @@
   "merge_aggressive": "আক্রমণাত্মক",
   "select_language_pair_hint": "একটি ভাষা জোড়া নির্বাচন করুন",
   "download_ai_model_title": "স্থানীয় এআই মডেল ডাউনলোড করবেন?",
-  "download_ai_model_description": "এই প্যাকটি সাধারণত ১০০–৫০০ MB এর মতো। এটি ব্যাকগ্রাউন্ডে ডাউনলোড হয়; শেষ হলে এই জোড়াটি ব্যবহারের জন্য প্রস্তুত হবে।"
+  "download_ai_model_description": "এই প্যাকটি সাধারণত ১০০–৫০০ MB এর মতো। এটি ব্যাকগ্রাউন্ডে ডাউনলোড হয়; শেষ হলে এই জোড়াটি ব্যবহারের জন্য প্রস্তুত হবে।",
+  "error_prefix": "ত্রুটি: {error}",
+  "translate_image_button": "ছবি অনুবাদ করুন",
+  "choose_translation_text": "আপনি কীভাবে টেক্সট অনুবাদ করতে চান তা বেছে নিন",
+  "download_language_pack_title": "একটি ভাষা প্যাক ডাউনলোড করুন",
+  "download_language_pack_content": "AI উন্নত মোড ব্যবহার করতে, প্রথমে একটি ভাষা প্যাক ডাউনলোড করুন।\n\nএকটি ডাউনলোড করতে সেটিংসে যান।",
+  "cloud_ai_api_key_required_content": "ক্লাউড AI-এর জন্য একটি API কী প্রয়োজন। সেটিংসে এটি সেট আপ করুন।",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "ক্লাউড",
+  "image_translation_title": "ছবি অনুবাদ"
 }

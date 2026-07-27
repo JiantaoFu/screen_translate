@@ -149,5 +149,14 @@
   "merge_aggressive": "Agressief",
   "select_language_pair_hint": "Selecteer een taalpaar",
   "download_ai_model_title": "Lokaal AI-model downloaden?",
-  "download_ai_model_description": "Dit pakket is doorgaans 100–500 MB. Het wordt op de achtergrond gedownload; dit paar is klaar voor gebruik zodra het klaar is."
+  "download_ai_model_description": "Dit pakket is doorgaans 100–500 MB. Het wordt op de achtergrond gedownload; dit paar is klaar voor gebruik zodra het klaar is.",
+  "error_prefix": "Fout: {error}",
+  "translate_image_button": "Afbeelding vertalen",
+  "choose_translation_text": "Kies hoe je tekst wilt vertalen",
+  "download_language_pack_title": "Download een taalpakket",
+  "download_language_pack_content": "Om de AI-verbeterd modus te gebruiken, download eerst een taalpakket.\n\nGa naar Instellingen om er een te downloaden.",
+  "cloud_ai_api_key_required_content": "Cloud-AI vereist een API-sleutel. Stel deze in bij Instellingen.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Cloud",
+  "image_translation_title": "Afbeeldingsvertaling"
 }

@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresszív",
   "select_language_pair_hint": "Válasszon nyelvpárt",
   "download_ai_model_title": "Letölti a helyi AI-modellt?",
-  "download_ai_model_description": "Ez a csomag jellemzően 100–500 MB. A háttérben töltődik le; ez a pár a befejezés után azonnal használatra kész lesz."
+  "download_ai_model_description": "Ez a csomag jellemzően 100–500 MB. A háttérben töltődik le; ez a pár a befejezés után azonnal használatra kész lesz.",
+  "error_prefix": "Hiba: {error}",
+  "translate_image_button": "Kép fordítása",
+  "choose_translation_text": "Válaszd ki, hogyan szeretnéd fordítani a szöveget",
+  "download_language_pack_title": "Nyelvi csomag letöltése",
+  "download_language_pack_content": "Az AI-fejlesztett mód használatához először töltsön le egy nyelvi csomagot.\n\nMenjen a Beállításokba egy letöltéséhez.",
+  "cloud_ai_api_key_required_content": "A felhő AI-hoz API-kulcs szükséges. Állítsa be a Beállításokban.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Felhő",
+  "image_translation_title": "Képfordítás"
 }

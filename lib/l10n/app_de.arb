@@ -149,5 +149,14 @@
   "merge_aggressive": "Aggressiv",
   "select_language_pair_hint": "Sprachpaar auswählen",
   "download_ai_model_title": "Lokales KI-Modell herunterladen?",
-  "download_ai_model_description": "Dieses Paket ist normalerweise 100–500 MB groß. Es wird im Hintergrund heruntergeladen; dieses Paar ist einsatzbereit, sobald der Download abgeschlossen ist."
+  "download_ai_model_description": "Dieses Paket ist normalerweise 100–500 MB groß. Es wird im Hintergrund heruntergeladen; dieses Paar ist einsatzbereit, sobald der Download abgeschlossen ist.",
+  "error_prefix": "Fehler: {error}",
+  "translate_image_button": "Bild übersetzen",
+  "choose_translation_text": "Wähle, wie du Text übersetzen möchtest",
+  "download_language_pack_title": "Sprachpaket herunterladen",
+  "download_language_pack_content": "Um den KI-Verbessert-Modus zu nutzen, lade zuerst ein Sprachpaket herunter.\n\nGehe zu den Einstellungen, um eines herunterzuladen.",
+  "cloud_ai_api_key_required_content": "Cloud-KI benötigt einen API-Schlüssel. Richte ihn in den Einstellungen ein.",
+  "mode_ai_short_label": "KI",
+  "mode_cloud_short_label": "Cloud",
+  "image_translation_title": "Bildübersetzung"
 }

@@ -149,5 +149,14 @@
   "merge_aggressive": "تهاجمی",
   "select_language_pair_hint": "یک جفت زبان انتخاب کنید",
   "download_ai_model_title": "دانلود مدل هوش مصنوعی محلی؟",
-  "download_ai_model_description": "این بسته معمولاً بین ۱۰۰ تا ۵۰۰ مگابایت است. در پس‌زمینه دانلود می‌شود؛ پس از اتمام، این جفت آماده استفاده خواهد بود."
+  "download_ai_model_description": "این بسته معمولاً بین ۱۰۰ تا ۵۰۰ مگابایت است. در پس‌زمینه دانلود می‌شود؛ پس از اتمام، این جفت آماده استفاده خواهد بود.",
+  "error_prefix": "خطا: {error}",
+  "translate_image_button": "ترجمه تصویر",
+  "choose_translation_text": "نحوه ترجمه متن را انتخاب کنید",
+  "download_language_pack_title": "دانلود یک بسته زبان",
+  "download_language_pack_content": "برای استفاده از حالت بهبودیافته با هوش مصنوعی، ابتدا یک بسته زبان دانلود کنید.\n\nبرای دانلود به تنظیمات بروید.",
+  "cloud_ai_api_key_required_content": "هوش مصنوعی ابری به یک کلید API نیاز دارد. آن را در تنظیمات راه‌اندازی کنید.",
+  "mode_ai_short_label": "هوش مصنوعی",
+  "mode_cloud_short_label": "ابری",
+  "image_translation_title": "ترجمه تصویر"
 }

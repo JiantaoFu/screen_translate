@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresywne",
   "select_language_pair_hint": "Wybierz parę językową",
   "download_ai_model_title": "Pobrać lokalny model AI?",
-  "download_ai_model_description": "Ten pakiet ma zwykle 100–500 MB. Pobiera się w tle; ta para będzie gotowa do użycia zaraz po zakończeniu."
+  "download_ai_model_description": "Ten pakiet ma zwykle 100–500 MB. Pobiera się w tle; ta para będzie gotowa do użycia zaraz po zakończeniu.",
+  "error_prefix": "Błąd: {error}",
+  "translate_image_button": "Przetłumacz obraz",
+  "choose_translation_text": "Wybierz, jak chcesz tłumaczyć tekst",
+  "download_language_pack_title": "Pobierz pakiet językowy",
+  "download_language_pack_content": "Aby korzystać z trybu Ulepszone przez AI, najpierw pobierz pakiet językowy.\n\nPrzejdź do Ustawień, aby go pobrać.",
+  "cloud_ai_api_key_required_content": "AI w chmurze wymaga klucza API. Skonfiguruj go w Ustawieniach.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Chmura",
+  "image_translation_title": "Tłumaczenie obrazu"
 }

@@ -149,5 +149,14 @@
   "merge_aggressive": "Tích cực",
   "select_language_pair_hint": "Chọn một cặp ngôn ngữ",
   "download_ai_model_title": "Tải xuống mô hình AI cục bộ?",
-  "download_ai_model_description": "Gói này thường có dung lượng 100–500 MB. Gói sẽ được tải xuống trong nền; cặp ngôn ngữ này sẽ sẵn sàng sử dụng ngay khi tải xong."
+  "download_ai_model_description": "Gói này thường có dung lượng 100–500 MB. Gói sẽ được tải xuống trong nền; cặp ngôn ngữ này sẽ sẵn sàng sử dụng ngay khi tải xong.",
+  "error_prefix": "Lỗi: {error}",
+  "translate_image_button": "Dịch hình ảnh",
+  "choose_translation_text": "Chọn cách bạn muốn dịch văn bản",
+  "download_language_pack_title": "Tải xuống gói ngôn ngữ",
+  "download_language_pack_content": "Để sử dụng chế độ Nâng cao bằng AI, trước tiên hãy tải xuống gói ngôn ngữ.\n\nVào Cài đặt để tải xuống.",
+  "cloud_ai_api_key_required_content": "AI đám mây yêu cầu khóa API. Thiết lập trong Cài đặt.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Đám mây",
+  "image_translation_title": "Dịch hình ảnh"
 }

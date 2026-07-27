@@ -149,5 +149,14 @@
   "merge_aggressive": "Επιθετικό",
   "select_language_pair_hint": "Επιλέξτε ζεύγος γλωσσών",
   "download_ai_model_title": "Λήψη τοπικού μοντέλου AI;",
-  "download_ai_model_description": "Αυτό το πακέτο είναι συνήθως 100–500 MB. Κατεβαίνει στο παρασκήνιο· αυτό το ζεύγος θα είναι έτοιμο για χρήση μόλις ολοκληρωθεί."
+  "download_ai_model_description": "Αυτό το πακέτο είναι συνήθως 100–500 MB. Κατεβαίνει στο παρασκήνιο· αυτό το ζεύγος θα είναι έτοιμο για χρήση μόλις ολοκληρωθεί.",
+  "error_prefix": "Σφάλμα: {error}",
+  "translate_image_button": "Μετάφραση εικόνας",
+  "choose_translation_text": "Επιλέξτε πώς θέλετε να μεταφράζετε κείμενο",
+  "download_language_pack_title": "Λήψη γλωσσικού πακέτου",
+  "download_language_pack_content": "Για να χρησιμοποιήσετε τη λειτουργία Βελτιωμένο με AI, κατεβάστε πρώτα ένα γλωσσικό πακέτο.\n\nΠηγαίνετε στις Ρυθμίσεις για να κατεβάσετε ένα.",
+  "cloud_ai_api_key_required_content": "Το AI στο Cloud απαιτεί κλειδί API. Ρυθμίστε το στις Ρυθμίσεις.",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "Cloud",
+  "image_translation_title": "Μετάφραση εικόνας"
 }

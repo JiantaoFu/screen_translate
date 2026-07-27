@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresivo",
   "select_language_pair_hint": "Selecciona un par de idiomas",
   "download_ai_model_title": "¿Descargar modelo de IA local?",
-  "download_ai_model_description": "Este paquete suele pesar entre 100 y 500 MB. Se descarga en segundo plano; este par estará listo para usar en cuanto termine."
+  "download_ai_model_description": "Este paquete suele pesar entre 100 y 500 MB. Se descarga en segundo plano; este par estará listo para usar en cuanto termine.",
+  "error_prefix": "Error: {error}",
+  "translate_image_button": "Traducir imagen",
+  "choose_translation_text": "Elige cómo quieres traducir el texto",
+  "download_language_pack_title": "Descargar un paquete de idioma",
+  "download_language_pack_content": "Para usar el modo Mejorado con IA, primero descarga un paquete de idioma.\n\nVe a Ajustes para descargar uno.",
+  "cloud_ai_api_key_required_content": "La IA en la nube requiere una clave API. Configúrala en Ajustes.",
+  "mode_ai_short_label": "IA",
+  "mode_cloud_short_label": "Nube",
+  "image_translation_title": "Traducción de imagen"
 }

@@ -492,4 +492,35 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Tento balíček má obvykle 100–500 MB. Stahuje se na pozadí; tento pár bude připraven k použití po dokončení.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Chyba: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Přeložit obrázek';
+
+  @override
+  String get choose_translation_text => 'Vyberte, jak chcete překládat text';
+
+  @override
+  String get download_language_pack_title => 'Stáhnout jazykový balíček';
+
+  @override
+  String get download_language_pack_content =>
+      'Pro použití režimu Vylepšeno AI si nejprve stáhněte jazykový balíček.\n\nPřejděte do Nastavení a stáhněte si jej.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Cloud AI vyžaduje API klíč. Nastavte jej v Nastavení.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Překlad obrázku';
 }

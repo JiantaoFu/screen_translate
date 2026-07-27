@@ -492,4 +492,35 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'عادةً ما يكون حجم هذه الحزمة بين 100 و500 ميغابايت. يتم تنزيلها في الخلفية؛ سيكون هذا الزوج جاهزًا للاستخدام بمجرد الانتهاء.';
+
+  @override
+  String error_prefix(String error) {
+    return 'خطأ: $error';
+  }
+
+  @override
+  String get translate_image_button => 'ترجمة صورة';
+
+  @override
+  String get choose_translation_text => 'اختر كيف تريد ترجمة النص';
+
+  @override
+  String get download_language_pack_title => 'تنزيل حزمة لغة';
+
+  @override
+  String get download_language_pack_content =>
+      'لاستخدام وضع الذكاء الاصطناعي المحسّن، قم بتنزيل حزمة لغة أولاً.\n\nاذهب إلى الإعدادات لتنزيل واحدة.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'يتطلب الذكاء الاصطناعي السحابي مفتاح API. قم بإعداده في الإعدادات.';
+
+  @override
+  String get mode_ai_short_label => 'ذكاء اصطناعي';
+
+  @override
+  String get mode_cloud_short_label => 'سحابي';
+
+  @override
+  String get image_translation_title => 'ترجمة الصورة';
 }

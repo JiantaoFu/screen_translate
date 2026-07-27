@@ -149,5 +149,14 @@
   "merge_aggressive": "Agresivno",
   "select_language_pair_hint": "Izberite jezikovni par",
   "download_ai_model_title": "Prenesem lokalni model UI?",
-  "download_ai_model_description": "Ta paket je običajno velik 100–500 MB. Prenaša se v ozadju; ta par bo pripravljen za uporabo takoj po zaključku."
+  "download_ai_model_description": "Ta paket je običajno velik 100–500 MB. Prenaša se v ozadju; ta par bo pripravljen za uporabo takoj po zaključku.",
+  "error_prefix": "Napaka: {error}",
+  "translate_image_button": "Prevedi sliko",
+  "choose_translation_text": "Izberite, kako želite prevajati besedilo",
+  "download_language_pack_title": "Prenesi jezikovni paket",
+  "download_language_pack_content": "Če želite uporabljati način Izboljšano z UI, najprej prenesite jezikovni paket.\n\nPojdite v Nastavitve, da ga prenesete.",
+  "cloud_ai_api_key_required_content": "Oblačna UI zahteva API-ključ. Nastavite ga v Nastavitvah.",
+  "mode_ai_short_label": "UI",
+  "mode_cloud_short_label": "Oblak",
+  "image_translation_title": "Prevod slike"
 }

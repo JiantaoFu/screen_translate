@@ -496,4 +496,36 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Этот пакет обычно весит 100–500 МБ. Загрузка идёт в фоне; эта пара будет готова к использованию сразу после завершения.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Ошибка: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Перевести изображение';
+
+  @override
+  String get choose_translation_text =>
+      'Выберите, как вы хотите переводить текст';
+
+  @override
+  String get download_language_pack_title => 'Скачать языковой пакет';
+
+  @override
+  String get download_language_pack_content =>
+      'Чтобы использовать режим Улучшено ИИ, сначала скачайте языковой пакет.\n\nПерейдите в Настройки, чтобы скачать его.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Облачному ИИ нужен ключ API. Настройте его в Настройках.';
+
+  @override
+  String get mode_ai_short_label => 'ИИ';
+
+  @override
+  String get mode_cloud_short_label => 'Облако';
+
+  @override
+  String get image_translation_title => 'Перевод изображения';
 }

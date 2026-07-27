@@ -149,5 +149,14 @@
   "merge_aggressive": "ก้าวร้าว",
   "select_language_pair_hint": "เลือกคู่ภาษา",
   "download_ai_model_title": "ดาวน์โหลดโมเดล AI ในเครื่องหรือไม่?",
-  "download_ai_model_description": "แพ็กนี้มักมีขนาด 100–500 MB โดยจะดาวน์โหลดในพื้นหลัง คู่ภาษานี้จะพร้อมใช้งานทันทีที่ดาวน์โหลดเสร็จ"
+  "download_ai_model_description": "แพ็กนี้มักมีขนาด 100–500 MB โดยจะดาวน์โหลดในพื้นหลัง คู่ภาษานี้จะพร้อมใช้งานทันทีที่ดาวน์โหลดเสร็จ",
+  "error_prefix": "ข้อผิดพลาด: {error}",
+  "translate_image_button": "แปลภาพ",
+  "choose_translation_text": "เลือกวิธีที่คุณต้องการแปลข้อความ",
+  "download_language_pack_title": "ดาวน์โหลดแพ็กภาษา",
+  "download_language_pack_content": "หากต้องการใช้โหมดปรับปรุงด้วย AI โปรดดาวน์โหลดแพ็กภาษาก่อน\n\nไปที่การตั้งค่าเพื่อดาวน์โหลด",
+  "cloud_ai_api_key_required_content": "AI บนคลาวด์ต้องใช้คีย์ API โปรดตั้งค่าในการตั้งค่า",
+  "mode_ai_short_label": "AI",
+  "mode_cloud_short_label": "คลาวด์",
+  "image_translation_title": "การแปลภาพ"
 }

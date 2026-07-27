@@ -481,4 +481,33 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       '该模型包通常为100–500MB，将在后台下载；下载完成后即可使用该语言对。';
+
+  @override
+  String error_prefix(String error) {
+    return '错误：$error';
+  }
+
+  @override
+  String get translate_image_button => '翻译图片';
+
+  @override
+  String get choose_translation_text => '选择你想要的翻译方式';
+
+  @override
+  String get download_language_pack_title => '下载语言包';
+
+  @override
+  String get download_language_pack_content => '要使用AI增强模式，请先下载语言包。\n\n前往设置下载。';
+
+  @override
+  String get cloud_ai_api_key_required_content => '云端AI需要API密钥，请在设置中配置。';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => '云端';
+
+  @override
+  String get image_translation_title => '图片翻译';
 }

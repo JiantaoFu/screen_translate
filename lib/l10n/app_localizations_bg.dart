@@ -496,4 +496,36 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Този пакет обикновено е 100–500 MB. Изтегля се на заден фон; тази двойка ще бъде готова за употреба след завършване.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Грешка: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Преведи изображение';
+
+  @override
+  String get choose_translation_text =>
+      'Изберете как искате да превеждате текст';
+
+  @override
+  String get download_language_pack_title => 'Изтегляне на езиков пакет';
+
+  @override
+  String get download_language_pack_content =>
+      'За да използвате режим AI подобрено, първо изтеглете езиков пакет.\n\nОтидете в Настройки, за да изтеглите такъв.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Облачният ИИ изисква API ключ. Настройте го в Настройки.';
+
+  @override
+  String get mode_ai_short_label => 'ИИ';
+
+  @override
+  String get mode_cloud_short_label => 'Облак';
+
+  @override
+  String get image_translation_title => 'Превод на изображение';
 }

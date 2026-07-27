@@ -101,7 +101,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.error_prefix(e.toString()))),
         );
       }
     }
@@ -111,7 +111,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Translation'),
+        title: Text(AppLocalizations.of(context)!.image_translation_title),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),

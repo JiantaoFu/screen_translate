@@ -492,4 +492,36 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Paket ini biasanya berukuran 100–500 MB. File diunduh di latar belakang; pasangan ini akan siap digunakan setelah selesai.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Kesalahan: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Terjemahkan Gambar';
+
+  @override
+  String get choose_translation_text =>
+      'Pilih cara Anda ingin menerjemahkan teks';
+
+  @override
+  String get download_language_pack_title => 'Unduh Paket Bahasa';
+
+  @override
+  String get download_language_pack_content =>
+      'Untuk menggunakan mode Ditingkatkan AI, unduh paket bahasa terlebih dahulu.\n\nBuka Pengaturan untuk mengunduhnya.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'AI Cloud memerlukan kunci API. Siapkan di Pengaturan.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Terjemahan Gambar';
 }

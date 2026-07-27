@@ -484,4 +484,35 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'このパックは通常100〜500MBです。バックグラウンドでダウンロードされ、完了するとこのペアがすぐに使用可能になります。';
+
+  @override
+  String error_prefix(String error) {
+    return 'エラー: $error';
+  }
+
+  @override
+  String get translate_image_button => '画像を翻訳';
+
+  @override
+  String get choose_translation_text => 'テキストの翻訳方法を選択してください';
+
+  @override
+  String get download_language_pack_title => '言語パックをダウンロード';
+
+  @override
+  String get download_language_pack_content =>
+      'AI強化モードを使用するには、まず言語パックをダウンロードしてください。\n\n設定画面からダウンロードできます。';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'クラウドAIにはAPIキーが必要です。設定で設定してください。';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'クラウド';
+
+  @override
+  String get image_translation_title => '画像翻訳';
 }

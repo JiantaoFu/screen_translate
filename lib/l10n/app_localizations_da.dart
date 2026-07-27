@@ -492,4 +492,35 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get download_ai_model_description =>
       'Denne pakke er typisk 100–500 MB. Den downloades i baggrunden; dette par vil være klar til brug, når det er færdigt.';
+
+  @override
+  String error_prefix(String error) {
+    return 'Fejl: $error';
+  }
+
+  @override
+  String get translate_image_button => 'Oversæt billede';
+
+  @override
+  String get choose_translation_text => 'Vælg, hvordan du vil oversætte tekst';
+
+  @override
+  String get download_language_pack_title => 'Download en sprogpakke';
+
+  @override
+  String get download_language_pack_content =>
+      'For at bruge AI-forbedret tilstand skal du først downloade en sprogpakke.\n\nGå til Indstillinger for at downloade en.';
+
+  @override
+  String get cloud_ai_api_key_required_content =>
+      'Cloud AI kræver en API-nøgle. Konfigurer den i Indstillinger.';
+
+  @override
+  String get mode_ai_short_label => 'AI';
+
+  @override
+  String get mode_cloud_short_label => 'Cloud';
+
+  @override
+  String get image_translation_title => 'Billedoversættelse';
 }

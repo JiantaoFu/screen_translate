@@ -231,9 +231,12 @@ class OCRService {
             final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
             final distance = sqrt(dx * dx + dy * dy);
 
-            // Estimate font size (min dimension of the block)
-            final fontSizeA = min(a.height, a.width);
-            final fontSizeB = min(b.height, b.width);
+            // Use each block's ORIGINAL glyph size, not recomputed from the
+            // current (possibly already-merged) bounding box — see the
+            // fontSize doc comment on OCRResult for why that recomputation
+            // causes a runaway merge cascade on multi-line paragraphs.
+            final fontSizeA = a.fontSize;
+            final fontSizeB = b.fontSize;
 
             // 智能合并算法 (Smart Merging Algorithm):
             // 如果两个文本块在 X 轴或 Y 轴上投影有重叠 (overlapX 或 overlapY)，说明它们是对齐的（属于同一段落/气泡的概率极大）。
@@ -294,6 +297,7 @@ class OCRService {
                 isLight: a.isLight,
                 imgWidth: a.imgWidth,
                 imgHeight: a.imgHeight,
+                fontSize: min(a.fontSize, b.fontSize),
               );
 
               initialResults.removeAt(j);
@@ -429,8 +433,11 @@ class OCRService {
             final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
             final distance = sqrt(dx * dx + dy * dy);
 
-            final fontSizeA = min(a.height, a.width);
-            final fontSizeB = min(b.height, b.width);
+            // Use each block's ORIGINAL glyph size, not recomputed from the
+            // current (possibly already-merged) bounding box — see the
+            // fontSize doc comment on OCRResult.
+            final fontSizeA = a.fontSize;
+            final fontSizeB = b.fontSize;
 
             final overlapX = dx == 0.0;
             final overlapY = dy == 0.0;
@@ -472,6 +479,7 @@ class OCRService {
                 isLight: a.isLight,
                 imgWidth: a.imgWidth,
                 imgHeight: a.imgHeight,
+                fontSize: min(a.fontSize, b.fontSize),
               );
 
               initialResults.removeAt(j);

@@ -379,4 +379,125 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get close => 'Schließen';
+
+  @override
+  String get translation_settings_title => 'Übersetzungseinstellungen';
+
+  @override
+  String get translation_quality_section => 'ÜBERSETZUNGSQUALITÄT';
+
+  @override
+  String get mode_quick_title => 'Schnell';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Sofort · Immer verfügbar · Keine Einrichtung nötig';
+
+  @override
+  String get mode_ai_enhanced_title => 'KI-Verbessert';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Bessere Qualität · Funktioniert offline · Sprachpaket herunterladen';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloud-KI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Beste Qualität · Internet erforderlich · API-Schlüssel erforderlich';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Sprachpakete  ·  je ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Wird heruntergeladen… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Einsatzbereit';
+
+  @override
+  String get pack_failed_tap_retry => 'Fehlgeschlagen — zum Wiederholen tippen';
+
+  @override
+  String get pack_ready_badge => 'Bereit';
+
+  @override
+  String get retry => 'Wiederholen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name ist bereit!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Download fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.';
+
+  @override
+  String get remove_language_pack_title => 'Sprachpaket entfernen?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Offline-KI-Paket für $name entfernen?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Offline-Schnellübersetzungspaket für $name entfernen?';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'Sprachpaket konnte nicht entfernt werden.';
+
+  @override
+  String get connect_ai_account_title => 'Verbinde dein KI-Konto';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'Hol dir einen kostenlosen API-Schlüssel von ';
+
+  @override
+  String get connect_ai_account_suffix => ' und füge ihn unten ein.';
+
+  @override
+  String get api_key_hint_short => 'Füge deinen API-Schlüssel hier ein';
+
+  @override
+  String get save_and_verify => 'Speichern & Prüfen';
+
+  @override
+  String get cloud_ai_connected => 'Verbunden! Cloud-KI ist bereit.';
+
+  @override
+  String get advanced_section_label => 'Erweitert';
+
+  @override
+  String get text_merge_sensitivity_title =>
+      'Textzusammenführungsempfindlichkeit';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Steuert, wie nahegelegene Textblöcke gruppiert werden. Verringern, wenn die Übersetzungsgenauigkeit sinkt.';
+
+  @override
+  String get merge_precise => 'Präzise';
+
+  @override
+  String get merge_aggressive => 'Aggressiv';
+
+  @override
+  String get select_language_pair_hint => 'Sprachpaar auswählen';
+
+  @override
+  String get download_ai_model_title => 'Lokales KI-Modell herunterladen?';
+
+  @override
+  String get download_ai_model_description =>
+      'Dieses Paket ist normalerweise 100–500 MB groß. Es wird im Hintergrund heruntergeladen; dieses Paar ist einsatzbereit, sobald der Download abgeschlossen ist.';
 }

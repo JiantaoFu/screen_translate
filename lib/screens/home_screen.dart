@@ -536,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
       child: DropdownButton<String>(
         value: hasCurrentPair ? currentKey : null,
-        hint: const Text('Select a language pair'),
+        hint: Text(AppLocalizations.of(context)!.select_language_pair_hint),
         underline: SizedBox(),
         icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
         isExpanded: true,
@@ -606,15 +606,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           // unlike Google ML Kit's downloadModel(), which exposes none) —
           // no need to send the user to Settings and back, and the dropdown
           // remains free to use for something else in the meantime.
+          final localizations = AppLocalizations.of(context)!;
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (_) => AlertDialog(
-              title: const Text('Download local AI model?'),
-              content: const Text(
-                  'This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes.'),
+              title: Text(localizations.download_ai_model_title),
+              content: Text(localizations.download_ai_model_description),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Download')),
+                TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
+                ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(localizations.download_model)),
               ],
             ),
           );
@@ -638,13 +638,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             }
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${pairs.firstWhere((x) => '${x.$1}|${x.$2}' == selectedKey).$3} ready'), backgroundColor: Colors.green),
+                SnackBar(content: Text(localizations.pack_is_ready_snackbar(pairs.firstWhere((x) => '${x.$1}|${x.$2}' == selectedKey).$3)), backgroundColor: Colors.green),
               );
             }
           } catch (e) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Download failed. Please check your connection.'), backgroundColor: Colors.red),
+                SnackBar(content: Text(localizations.download_failed_connection), backgroundColor: Colors.red),
               );
             }
           } finally {

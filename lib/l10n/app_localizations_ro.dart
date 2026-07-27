@@ -376,4 +376,124 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get close => 'Închide';
+
+  @override
+  String get translation_settings_title => 'Setări de traducere';
+
+  @override
+  String get translation_quality_section => 'CALITATEA TRADUCERII';
+
+  @override
+  String get mode_quick_title => 'Rapid';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Instantaneu · Întotdeauna disponibil · Nu necesită configurare';
+
+  @override
+  String get mode_ai_enhanced_title => 'Îmbunătățit cu AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Calitate mai bună · Funcționează offline · Descarcă un pachet lingvistic';
+
+  @override
+  String get mode_cloud_ai_title => 'AI în cloud';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Cea mai bună calitate · Necesită internet · Necesită cheie API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Pachete lingvistice  ·  ~$size fiecare';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Se descarcă… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Gata de utilizare';
+
+  @override
+  String get pack_failed_tap_retry => 'Eșuat — atinge pentru a reîncerca';
+
+  @override
+  String get pack_ready_badge => 'Gata';
+
+  @override
+  String get retry => 'Reîncearcă';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name este gata!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Descărcarea a eșuat. Verifică conexiunea.';
+
+  @override
+  String get remove_language_pack_title => 'Elimini pachetul lingvistic?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Elimini pachetul AI offline pentru $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Elimini pachetul de traducere rapidă offline pentru $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'Eliminarea pachetului lingvistic a eșuat.';
+
+  @override
+  String get connect_ai_account_title => 'Conectează-ți contul AI';
+
+  @override
+  String get connect_ai_account_prefix => 'Obține o cheie API gratuită de la ';
+
+  @override
+  String get connect_ai_account_suffix => ' și lipește-o mai jos.';
+
+  @override
+  String get api_key_hint_short => 'Lipește cheia API aici';
+
+  @override
+  String get save_and_verify => 'Salvează și verifică';
+
+  @override
+  String get cloud_ai_connected => 'Conectat! AI-ul din cloud este gata.';
+
+  @override
+  String get advanced_section_label => 'Avansat';
+
+  @override
+  String get text_merge_sensitivity_title =>
+      'Sensibilitatea îmbinării textului';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Controlează modul în care blocurile de text apropiate sunt grupate. Redu dacă acuratețea traducerii scade.';
+
+  @override
+  String get merge_precise => 'Precis';
+
+  @override
+  String get merge_aggressive => 'Agresiv';
+
+  @override
+  String get select_language_pair_hint => 'Selectează o pereche de limbi';
+
+  @override
+  String get download_ai_model_title => 'Descarci modelul AI local?';
+
+  @override
+  String get download_ai_model_description =>
+      'Acest pachet are de obicei 100–500 MB. Se descarcă în fundal; această pereche va fi gata de utilizare imediat ce se termină.';
 }

@@ -374,4 +374,122 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get close => 'Đóng';
+
+  @override
+  String get translation_settings_title => 'Cài đặt dịch thuật';
+
+  @override
+  String get translation_quality_section => 'CHẤT LƯỢNG DỊCH';
+
+  @override
+  String get mode_quick_title => 'Nhanh';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Tức thì · Luôn sẵn có · Không cần thiết lập';
+
+  @override
+  String get mode_ai_enhanced_title => 'Nâng cao bằng AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Chất lượng tốt hơn · Hoạt động ngoại tuyến · Tải xuống gói ngôn ngữ';
+
+  @override
+  String get mode_cloud_ai_title => 'AI đám mây';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Chất lượng tốt nhất · Cần internet · Cần khóa API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Gói ngôn ngữ  ·  mỗi gói ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Đang tải xuống… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Sẵn sàng sử dụng';
+
+  @override
+  String get pack_failed_tap_retry => 'Thất bại — nhấn để thử lại';
+
+  @override
+  String get pack_ready_badge => 'Sẵn sàng';
+
+  @override
+  String get retry => 'Thử lại';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name đã sẵn sàng!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Tải xuống thất bại. Vui lòng kiểm tra kết nối của bạn.';
+
+  @override
+  String get remove_language_pack_title => 'Xóa gói ngôn ngữ?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Xóa gói AI ngoại tuyến cho $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Xóa gói dịch nhanh ngoại tuyến cho $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Không thể xóa gói ngôn ngữ.';
+
+  @override
+  String get connect_ai_account_title => 'Kết nối tài khoản AI của bạn';
+
+  @override
+  String get connect_ai_account_prefix => 'Nhận khóa API miễn phí tại ';
+
+  @override
+  String get connect_ai_account_suffix => ' và dán vào bên dưới.';
+
+  @override
+  String get api_key_hint_short => 'Dán khóa API của bạn vào đây';
+
+  @override
+  String get save_and_verify => 'Lưu & Xác minh';
+
+  @override
+  String get cloud_ai_connected => 'Đã kết nối! AI đám mây đã sẵn sàng.';
+
+  @override
+  String get advanced_section_label => 'Nâng cao';
+
+  @override
+  String get text_merge_sensitivity_title => 'Độ nhạy gộp văn bản';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Kiểm soát cách các khối văn bản gần nhau được nhóm lại. Giảm nếu độ chính xác dịch giảm.';
+
+  @override
+  String get merge_precise => 'Chính xác';
+
+  @override
+  String get merge_aggressive => 'Tích cực';
+
+  @override
+  String get select_language_pair_hint => 'Chọn một cặp ngôn ngữ';
+
+  @override
+  String get download_ai_model_title => 'Tải xuống mô hình AI cục bộ?';
+
+  @override
+  String get download_ai_model_description =>
+      'Gói này thường có dung lượng 100–500 MB. Gói sẽ được tải xuống trong nền; cặp ngôn ngữ này sẽ sẵn sàng sử dụng ngay khi tải xong.';
 }

@@ -376,4 +376,123 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get close => 'Fermer';
+
+  @override
+  String get translation_settings_title => 'Paramètres de traduction';
+
+  @override
+  String get translation_quality_section => 'QUALITÉ DE TRADUCTION';
+
+  @override
+  String get mode_quick_title => 'Rapide';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Instantané · Toujours disponible · Aucune configuration requise';
+
+  @override
+  String get mode_ai_enhanced_title => 'Amélioré par IA';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Meilleure qualité · Fonctionne hors ligne · Téléchargez un pack de langue';
+
+  @override
+  String get mode_cloud_ai_title => 'IA Cloud';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Meilleure qualité · Nécessite internet · Clé API requise';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Packs de langue  ·  ~$size chacun';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Téléchargement… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Prêt à l\'emploi';
+
+  @override
+  String get pack_failed_tap_retry => 'Échec — appuyez pour réessayer';
+
+  @override
+  String get pack_ready_badge => 'Prêt';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name est prêt !';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Échec du téléchargement. Vérifiez votre connexion.';
+
+  @override
+  String get remove_language_pack_title => 'Supprimer le pack de langue ?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Supprimer le pack IA hors ligne pour $name ?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Supprimer le pack de traduction rapide hors ligne pour $name ?';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'Échec de la suppression du pack de langue.';
+
+  @override
+  String get connect_ai_account_title => 'Connectez votre compte IA';
+
+  @override
+  String get connect_ai_account_prefix => 'Obtenez une clé API gratuite sur ';
+
+  @override
+  String get connect_ai_account_suffix => ' et collez-la ci-dessous.';
+
+  @override
+  String get api_key_hint_short => 'Collez votre clé API ici';
+
+  @override
+  String get save_and_verify => 'Enregistrer et vérifier';
+
+  @override
+  String get cloud_ai_connected => 'Connecté ! L\'IA Cloud est prête.';
+
+  @override
+  String get advanced_section_label => 'Avancé';
+
+  @override
+  String get text_merge_sensitivity_title => 'Sensibilité de fusion du texte';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Contrôle comment les blocs de texte proches sont regroupés. Réduisez si la précision de traduction diminue.';
+
+  @override
+  String get merge_precise => 'Précis';
+
+  @override
+  String get merge_aggressive => 'Agressif';
+
+  @override
+  String get select_language_pair_hint => 'Sélectionnez une paire de langues';
+
+  @override
+  String get download_ai_model_title => 'Télécharger le modèle IA local ?';
+
+  @override
+  String get download_ai_model_description =>
+      'Ce pack fait généralement entre 100 et 500 Mo. Il se télécharge en arrière-plan ; cette paire sera prête à l\'emploi une fois terminé.';
 }

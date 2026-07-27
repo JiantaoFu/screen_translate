@@ -377,4 +377,125 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get close => 'Kapat';
+
+  @override
+  String get translation_settings_title => 'Çeviri Ayarları';
+
+  @override
+  String get translation_quality_section => 'ÇEVİRİ KALİTESİ';
+
+  @override
+  String get mode_quick_title => 'Hızlı';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Anlık · Her zaman kullanılabilir · Kurulum gerekmez';
+
+  @override
+  String get mode_ai_enhanced_title => 'Yapay Zeka ile Geliştirilmiş';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Daha iyi kalite · Çevrimdışı çalışır · Bir dil paketi indirin';
+
+  @override
+  String get mode_cloud_ai_title => 'Bulut Yapay Zeka';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'En iyi kalite · İnternet gerektirir · API anahtarı gerekir';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Dil Paketleri  ·  her biri ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'İndiriliyor… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Kullanıma hazır';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Başarısız oldu — yeniden denemek için dokunun';
+
+  @override
+  String get pack_ready_badge => 'Hazır';
+
+  @override
+  String get retry => 'Yeniden dene';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name hazır!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'İndirme başarısız oldu. Lütfen bağlantınızı kontrol edin.';
+
+  @override
+  String get remove_language_pack_title => 'Dil paketi kaldırılsın mı?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '$name için çevrimdışı yapay zeka paketi kaldırılsın mı?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '$name için çevrimdışı hızlı çeviri paketi kaldırılsın mı?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Dil paketi kaldırılamadı.';
+
+  @override
+  String get connect_ai_account_title => 'Yapay zeka hesabınızı bağlayın';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'Buradan ücretsiz bir API anahtarı alın ';
+
+  @override
+  String get connect_ai_account_suffix => ' ve aşağıya yapıştırın.';
+
+  @override
+  String get api_key_hint_short => 'API anahtarınızı buraya yapıştırın';
+
+  @override
+  String get save_and_verify => 'Kaydet ve Doğrula';
+
+  @override
+  String get cloud_ai_connected => 'Bağlandı! Bulut yapay zeka hazır.';
+
+  @override
+  String get advanced_section_label => 'Gelişmiş';
+
+  @override
+  String get text_merge_sensitivity_title => 'Metin birleştirme hassasiyeti';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Yakındaki metin bloklarının nasıl gruplandırıldığını kontrol eder. Çeviri doğruluğu düşerse azaltın.';
+
+  @override
+  String get merge_precise => 'Hassas';
+
+  @override
+  String get merge_aggressive => 'Agresif';
+
+  @override
+  String get select_language_pair_hint => 'Bir dil çifti seçin';
+
+  @override
+  String get download_ai_model_title =>
+      'Yerel yapay zeka modeli indirilsin mi?';
+
+  @override
+  String get download_ai_model_description =>
+      'Bu paket genellikle 100–500 MB\'dir. Arka planda indirilir; bu çift indirme tamamlanır tamamlanmaz kullanıma hazır olacaktır.';
 }

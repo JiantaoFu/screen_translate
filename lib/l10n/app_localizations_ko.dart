@@ -369,4 +369,118 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get close => '닫기';
+
+  @override
+  String get translation_settings_title => '번역 설정';
+
+  @override
+  String get translation_quality_section => '번역 품질';
+
+  @override
+  String get mode_quick_title => '빠름';
+
+  @override
+  String get mode_quick_subtitle => '즉시 · 항상 사용 가능 · 설정 불필요';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI 강화';
+
+  @override
+  String get mode_ai_enhanced_subtitle => '더 나은 품질 · 오프라인에서 작동 · 언어 팩 다운로드';
+
+  @override
+  String get mode_cloud_ai_title => '클라우드 AI';
+
+  @override
+  String get mode_cloud_ai_subtitle => '최고 품질 · 인터넷 필요 · API 키 필요';
+
+  @override
+  String language_packs_header(String size) {
+    return '언어 팩  ·  각 ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return '다운로드 중… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => '사용 준비 완료';
+
+  @override
+  String get pack_failed_tap_retry => '실패 — 탭하여 다시 시도';
+
+  @override
+  String get pack_ready_badge => '준비 완료';
+
+  @override
+  String get retry => '다시 시도';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name 준비 완료!';
+  }
+
+  @override
+  String get download_failed_connection => '다운로드에 실패했습니다. 연결을 확인해 주세요.';
+
+  @override
+  String get remove_language_pack_title => '언어 팩을 삭제할까요?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '$name의 오프라인 AI 팩을 삭제할까요?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '$name의 오프라인 빠른 번역 팩을 삭제할까요?';
+  }
+
+  @override
+  String get failed_to_remove_pack => '언어 팩 삭제에 실패했습니다.';
+
+  @override
+  String get connect_ai_account_title => 'AI 계정 연결';
+
+  @override
+  String get connect_ai_account_prefix => '여기에서 무료 API 키를 받으세요 ';
+
+  @override
+  String get connect_ai_account_suffix => ', 아래에 붙여넣으세요.';
+
+  @override
+  String get api_key_hint_short => '여기에 API 키를 붙여넣으세요';
+
+  @override
+  String get save_and_verify => '저장 및 확인';
+
+  @override
+  String get cloud_ai_connected => '연결됨! 클라우드 AI가 준비되었습니다.';
+
+  @override
+  String get advanced_section_label => '고급';
+
+  @override
+  String get text_merge_sensitivity_title => '텍스트 병합 민감도';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      '가까운 텍스트 블록이 어떻게 그룹화되는지를 제어합니다. 번역 정확도가 떨어지면 줄이세요.';
+
+  @override
+  String get merge_precise => '정밀';
+
+  @override
+  String get merge_aggressive => '적극적';
+
+  @override
+  String get select_language_pair_hint => '언어 쌍 선택';
+
+  @override
+  String get download_ai_model_title => '로컬 AI 모델을 다운로드할까요?';
+
+  @override
+  String get download_ai_model_description =>
+      '이 팩은 보통 100–500MB입니다. 백그라운드에서 다운로드되며, 완료되면 이 언어 쌍을 바로 사용할 수 있습니다.';
 }

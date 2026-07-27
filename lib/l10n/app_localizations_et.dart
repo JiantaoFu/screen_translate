@@ -374,4 +374,123 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get close => 'Sulge';
+
+  @override
+  String get translation_settings_title => 'Tõlke seaded';
+
+  @override
+  String get translation_quality_section => 'TÕLKE KVALITEET';
+
+  @override
+  String get mode_quick_title => 'Kiire';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Kohene · Alati saadaval · Seadistamist pole vaja';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-täiustatud';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Parem kvaliteet · Töötab võrguühenduseta · Laadi alla keelepakett';
+
+  @override
+  String get mode_cloud_ai_title => 'Pilve AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Parim kvaliteet · Vajab internetti · Vajab API-võtit';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Keelepaketid  ·  igaüks ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Allalaadimine… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Kasutamiseks valmis';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Ebaõnnestus — puuduta uuesti proovimiseks';
+
+  @override
+  String get pack_ready_badge => 'Valmis';
+
+  @override
+  String get retry => 'Proovi uuesti';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name on valmis!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Allalaadimine ebaõnnestus. Palun kontrolli oma ühendust.';
+
+  @override
+  String get remove_language_pack_title => 'Eemalda keelepakett?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Kas eemaldada võrguühenduseta AI-pakett $name jaoks?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Kas eemaldada võrguühenduseta kiirtõlke pakett $name jaoks?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Keelepaketi eemaldamine ebaõnnestus.';
+
+  @override
+  String get connect_ai_account_title => 'Ühenda oma AI-konto';
+
+  @override
+  String get connect_ai_account_prefix => 'Hangi tasuta API-võti aadressilt ';
+
+  @override
+  String get connect_ai_account_suffix => ' ja kleebi see allpool.';
+
+  @override
+  String get api_key_hint_short => 'Kleebi oma API-võti siia';
+
+  @override
+  String get save_and_verify => 'Salvesta ja kontrolli';
+
+  @override
+  String get cloud_ai_connected => 'Ühendatud! Pilve AI on valmis.';
+
+  @override
+  String get advanced_section_label => 'Täpsem';
+
+  @override
+  String get text_merge_sensitivity_title => 'Teksti ühendamise tundlikkus';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Määrab, kuidas lähestikused tekstiplokid rühmitatakse. Vähenda, kui tõlke täpsus langeb.';
+
+  @override
+  String get merge_precise => 'Täpne';
+
+  @override
+  String get merge_aggressive => 'Agressiivne';
+
+  @override
+  String get select_language_pair_hint => 'Vali keelepaar';
+
+  @override
+  String get download_ai_model_title => 'Laadi alla kohalik AI-mudel?';
+
+  @override
+  String get download_ai_model_description =>
+      'See pakett on tavaliselt 100–500 MB. Seda laaditakse alla taustal; see paar on kasutamiseks valmis kohe, kui see on lõpetatud.';
 }

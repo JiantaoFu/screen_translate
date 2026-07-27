@@ -375,4 +375,123 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get close => 'बंद करें';
+
+  @override
+  String get translation_settings_title => 'अनुवाद सेटिंग्स';
+
+  @override
+  String get translation_quality_section => 'अनुवाद गुणवत्ता';
+
+  @override
+  String get mode_quick_title => 'त्वरित';
+
+  @override
+  String get mode_quick_subtitle =>
+      'तुरंत · हमेशा उपलब्ध · सेटअप की आवश्यकता नहीं';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-संवर्धित';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'बेहतर गुणवत्ता · ऑफ़लाइन काम करता है · एक भाषा पैक डाउनलोड करें';
+
+  @override
+  String get mode_cloud_ai_title => 'क्लाउड AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'सर्वोत्तम गुणवत्ता · इंटरनेट आवश्यक · API कुंजी आवश्यक';
+
+  @override
+  String language_packs_header(String size) {
+    return 'भाषा पैक  ·  प्रत्येक ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'डाउनलोड हो रहा है… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'उपयोग के लिए तैयार';
+
+  @override
+  String get pack_failed_tap_retry => 'विफल — पुनः प्रयास के लिए टैप करें';
+
+  @override
+  String get pack_ready_badge => 'तैयार';
+
+  @override
+  String get retry => 'पुनः प्रयास करें';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name तैयार है!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'डाउनलोड विफल हुआ। कृपया अपना कनेक्शन जाँचें।';
+
+  @override
+  String get remove_language_pack_title => 'भाषा पैक हटाएँ?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '$name के लिए ऑफ़लाइन AI पैक हटाएँ?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '$name के लिए ऑफ़लाइन त्वरित-अनुवाद पैक हटाएँ?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'भाषा पैक हटाने में विफल।';
+
+  @override
+  String get connect_ai_account_title => 'अपना AI खाता कनेक्ट करें';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'यहाँ से एक निःशुल्क API कुंजी प्राप्त करें ';
+
+  @override
+  String get connect_ai_account_suffix => ' और इसे नीचे पेस्ट करें।';
+
+  @override
+  String get api_key_hint_short => 'अपनी API कुंजी यहाँ पेस्ट करें';
+
+  @override
+  String get save_and_verify => 'सहेजें और सत्यापित करें';
+
+  @override
+  String get cloud_ai_connected => 'कनेक्ट हो गया! क्लाउड AI तैयार है।';
+
+  @override
+  String get advanced_section_label => 'उन्नत';
+
+  @override
+  String get text_merge_sensitivity_title => 'टेक्स्ट मर्ज संवेदनशीलता';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'नियंत्रित करता है कि नज़दीकी टेक्स्ट ब्लॉक कैसे समूहीकृत होते हैं। यदि अनुवाद सटीकता घटती है तो इसे कम करें।';
+
+  @override
+  String get merge_precise => 'सटीक';
+
+  @override
+  String get merge_aggressive => 'आक्रामक';
+
+  @override
+  String get select_language_pair_hint => 'एक भाषा युग्म चुनें';
+
+  @override
+  String get download_ai_model_title => 'स्थानीय AI मॉडल डाउनलोड करें?';
+
+  @override
+  String get download_ai_model_description =>
+      'यह पैक आमतौर पर 100–500 MB का होता है। यह पृष्ठभूमि में डाउनलोड होता है; पूरा होने पर यह युग्म उपयोग के लिए तैयार हो जाएगा।';
 }

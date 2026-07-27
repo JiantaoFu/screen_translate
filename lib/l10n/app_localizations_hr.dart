@@ -375,4 +375,124 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get close => 'Zatvori';
+
+  @override
+  String get translation_settings_title => 'Postavke prijevoda';
+
+  @override
+  String get translation_quality_section => 'KVALITETA PRIJEVODA';
+
+  @override
+  String get mode_quick_title => 'Brzo';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Trenutno · Uvijek dostupno · Nije potrebno postavljanje';
+
+  @override
+  String get mode_ai_enhanced_title => 'Poboljšano AI-jem';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Bolja kvaliteta · Radi bez interneta · Preuzmite jezični paket';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloud AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Najbolja kvaliteta · Zahtijeva internet · Potreban API ključ';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Jezični paketi  ·  ~$size svaki';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Preuzimanje… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Spremno za upotrebu';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Neuspjelo — dodirnite za ponovni pokušaj';
+
+  @override
+  String get pack_ready_badge => 'Spremno';
+
+  @override
+  String get retry => 'Pokušaj ponovno';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name je spreman!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Preuzimanje nije uspjelo. Provjerite vezu.';
+
+  @override
+  String get remove_language_pack_title => 'Ukloniti jezični paket?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Ukloniti offline AI paket za $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Ukloniti offline paket brzog prijevoda za $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'Uklanjanje jezičnog paketa nije uspjelo.';
+
+  @override
+  String get connect_ai_account_title => 'Povežite svoj AI račun';
+
+  @override
+  String get connect_ai_account_prefix => 'Nabavite besplatni API ključ na ';
+
+  @override
+  String get connect_ai_account_suffix => ' i zalijepite ga ispod.';
+
+  @override
+  String get api_key_hint_short => 'Zalijepite svoj API ključ ovdje';
+
+  @override
+  String get save_and_verify => 'Spremi i potvrdi';
+
+  @override
+  String get cloud_ai_connected => 'Povezano! Cloud AI je spreman.';
+
+  @override
+  String get advanced_section_label => 'Napredno';
+
+  @override
+  String get text_merge_sensitivity_title => 'Osjetljivost spajanja teksta';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Kontrolira kako se obližnji blokovi teksta grupiraju. Smanjite ako točnost prijevoda padne.';
+
+  @override
+  String get merge_precise => 'Precizno';
+
+  @override
+  String get merge_aggressive => 'Agresivno';
+
+  @override
+  String get select_language_pair_hint => 'Odaberite jezični par';
+
+  @override
+  String get download_ai_model_title => 'Preuzeti lokalni AI model?';
+
+  @override
+  String get download_ai_model_description =>
+      'Ovaj paket obično ima 100–500 MB. Preuzima se u pozadini; ovaj par bit će spreman za upotrebu čim završi.';
 }

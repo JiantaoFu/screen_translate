@@ -375,4 +375,122 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get close => 'Lukk';
+
+  @override
+  String get translation_settings_title => 'Oversettelsesinnstillinger';
+
+  @override
+  String get translation_quality_section => 'OVERSETTELSESKVALITET';
+
+  @override
+  String get mode_quick_title => 'Rask';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Umiddelbar · Alltid tilgjengelig · Ingen oppsett nødvendig';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-forbedret';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Bedre kvalitet · Fungerer offline · Last ned en språkpakke';
+
+  @override
+  String get mode_cloud_ai_title => 'Sky-AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Best kvalitet · Krever internett · API-nøkkel kreves';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Språkpakker  ·  ~$size hver';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Laster ned… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Klar til bruk';
+
+  @override
+  String get pack_failed_tap_retry => 'Mislyktes — trykk for å prøve igjen';
+
+  @override
+  String get pack_ready_badge => 'Klar';
+
+  @override
+  String get retry => 'Prøv igjen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name er klar!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Nedlasting mislyktes. Sjekk tilkoblingen din.';
+
+  @override
+  String get remove_language_pack_title => 'Fjerne språkpakke?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Fjerne offline AI-pakken for $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Fjerne offline hurtigoversettelsespakken for $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Kunne ikke fjerne språkpakken.';
+
+  @override
+  String get connect_ai_account_title => 'Koble til AI-kontoen din';
+
+  @override
+  String get connect_ai_account_prefix => 'Få en gratis API-nøkkel fra ';
+
+  @override
+  String get connect_ai_account_suffix => ' og lim den inn nedenfor.';
+
+  @override
+  String get api_key_hint_short => 'Lim inn API-nøkkelen din her';
+
+  @override
+  String get save_and_verify => 'Lagre og verifiser';
+
+  @override
+  String get cloud_ai_connected => 'Tilkoblet! Sky-AI er klar.';
+
+  @override
+  String get advanced_section_label => 'Avansert';
+
+  @override
+  String get text_merge_sensitivity_title => 'Følsomhet for tekstsammenslåing';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Styrer hvordan nærliggende tekstblokker grupperes. Reduser hvis oversettelsesnøyaktigheten synker.';
+
+  @override
+  String get merge_precise => 'Presis';
+
+  @override
+  String get merge_aggressive => 'Aggressiv';
+
+  @override
+  String get select_language_pair_hint => 'Velg et språkpar';
+
+  @override
+  String get download_ai_model_title => 'Laste ned lokal AI-modell?';
+
+  @override
+  String get download_ai_model_description =>
+      'Denne pakken er vanligvis 100–500 MB. Den lastes ned i bakgrunnen; dette paret vil være klart til bruk så snart det er ferdig.';
 }

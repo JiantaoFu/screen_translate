@@ -373,4 +373,120 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get close => 'סגור';
+
+  @override
+  String get translation_settings_title => 'הגדרות תרגום';
+
+  @override
+  String get translation_quality_section => 'איכות תרגום';
+
+  @override
+  String get mode_quick_title => 'מהיר';
+
+  @override
+  String get mode_quick_subtitle => 'מיידי · זמין תמיד · אין צורך בהגדרה';
+
+  @override
+  String get mode_ai_enhanced_title => 'משופר בבינה מלאכותית';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'איכות טובה יותר · עובד ללא חיבור לאינטרנט · הורד חבילת שפה';
+
+  @override
+  String get mode_cloud_ai_title => 'בינה מלאכותית בענן';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'האיכות הטובה ביותר · דורש אינטרנט · נדרש מפתח API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'חבילות שפה  ·  ~$size לכל חבילה';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'מוריד… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'מוכן לשימוש';
+
+  @override
+  String get pack_failed_tap_retry => 'נכשל — הקש כדי לנסות שוב';
+
+  @override
+  String get pack_ready_badge => 'מוכן';
+
+  @override
+  String get retry => 'נסה שוב';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name מוכן!';
+  }
+
+  @override
+  String get download_failed_connection => 'ההורדה נכשלה. בדוק את החיבור שלך.';
+
+  @override
+  String get remove_language_pack_title => 'להסיר את חבילת השפה?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'להסיר את חבילת הבינה המלאכותית הלא מקוונת עבור $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'להסיר את חבילת התרגום המהיר הלא מקוונת עבור $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'הסרת חבילת השפה נכשלה.';
+
+  @override
+  String get connect_ai_account_title => 'חבר את חשבון הבינה המלאכותית שלך';
+
+  @override
+  String get connect_ai_account_prefix => 'קבל מפתח API חינמי מ- ';
+
+  @override
+  String get connect_ai_account_suffix => ' והדבק אותו למטה.';
+
+  @override
+  String get api_key_hint_short => 'הדבק כאן את מפתח ה-API שלך';
+
+  @override
+  String get save_and_verify => 'שמור ואמת';
+
+  @override
+  String get cloud_ai_connected => 'מחובר! הבינה המלאכותית בענן מוכנה.';
+
+  @override
+  String get advanced_section_label => 'מתקדם';
+
+  @override
+  String get text_merge_sensitivity_title => 'רגישות מיזוג טקסט';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'שולט כיצד בלוקי טקסט קרובים מקובצים. הפחת אם דיוק התרגום יורד.';
+
+  @override
+  String get merge_precise => 'מדויק';
+
+  @override
+  String get merge_aggressive => 'אגרסיבי';
+
+  @override
+  String get select_language_pair_hint => 'בחר זוג שפות';
+
+  @override
+  String get download_ai_model_title => 'להוריד מודל בינה מלאכותית מקומי?';
+
+  @override
+  String get download_ai_model_description =>
+      'חבילה זו היא בדרך כלל בין 100 ל-500 מגה-בייט. ההורדה מתבצעת ברקע; הזוג הזה יהיה מוכן לשימוש כשההורדה תסתיים.';
 }

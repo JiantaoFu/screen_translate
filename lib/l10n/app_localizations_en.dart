@@ -375,4 +375,122 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get translation_settings_title => 'Translation Settings';
+
+  @override
+  String get translation_quality_section => 'TRANSLATION QUALITY';
+
+  @override
+  String get mode_quick_title => 'Quick';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Instant · Always available · No setup needed';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI Enhanced';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Better quality · Works offline · Download a language pack';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloud AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Best quality · Requires internet · API key needed';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Language Packs  ·  ~$size each';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Downloading… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Ready to use';
+
+  @override
+  String get pack_failed_tap_retry => 'Failed — tap Retry';
+
+  @override
+  String get pack_ready_badge => 'Ready';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name is ready!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Download failed. Please check your connection.';
+
+  @override
+  String get remove_language_pack_title => 'Remove language pack?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Remove the offline AI pack for $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Remove the offline Quick-translation pack for $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Failed to remove language pack.';
+
+  @override
+  String get connect_ai_account_title => 'Connect your AI account';
+
+  @override
+  String get connect_ai_account_prefix => 'Get a free API key from ';
+
+  @override
+  String get connect_ai_account_suffix => ' and paste it below.';
+
+  @override
+  String get api_key_hint_short => 'Paste your API key here';
+
+  @override
+  String get save_and_verify => 'Save & Verify';
+
+  @override
+  String get cloud_ai_connected => 'Connected! Cloud AI is ready.';
+
+  @override
+  String get advanced_section_label => 'Advanced';
+
+  @override
+  String get text_merge_sensitivity_title => 'Text merge sensitivity';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Controls how nearby text blocks are grouped. Reduce if translation accuracy drops.';
+
+  @override
+  String get merge_precise => 'Precise';
+
+  @override
+  String get merge_aggressive => 'Aggressive';
+
+  @override
+  String get select_language_pair_hint => 'Select a language pair';
+
+  @override
+  String get download_ai_model_title => 'Download local AI model?';
+
+  @override
+  String get download_ai_model_description =>
+      'This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes.';
 }

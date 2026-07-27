@@ -375,4 +375,121 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get close => 'إغلاق';
+
+  @override
+  String get translation_settings_title => 'إعدادات الترجمة';
+
+  @override
+  String get translation_quality_section => 'جودة الترجمة';
+
+  @override
+  String get mode_quick_title => 'سريع';
+
+  @override
+  String get mode_quick_subtitle => 'فوري · متاح دائمًا · لا حاجة للإعداد';
+
+  @override
+  String get mode_ai_enhanced_title => 'محسّن بالذكاء الاصطناعي';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'جودة أفضل · يعمل بلا إنترنت · قم بتنزيل حزمة لغة';
+
+  @override
+  String get mode_cloud_ai_title => 'الذكاء الاصطناعي السحابي';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'أفضل جودة · يتطلب اتصالاً بالإنترنت · يلزم مفتاح API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'حزم اللغات  ·  ~$size لكل حزمة';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'جارٍ التنزيل… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'جاهز للاستخدام';
+
+  @override
+  String get pack_failed_tap_retry => 'فشل — اضغط لإعادة المحاولة';
+
+  @override
+  String get pack_ready_badge => 'جاهز';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name جاهز!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'فشل التنزيل. يرجى التحقق من اتصالك.';
+
+  @override
+  String get remove_language_pack_title => 'إزالة حزمة اللغة؟';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'إزالة حزمة الذكاء الاصطناعي غير المتصلة لـ $name؟';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'إزالة حزمة الترجمة السريعة غير المتصلة لـ $name؟';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'فشلت إزالة حزمة اللغة.';
+
+  @override
+  String get connect_ai_account_title => 'اربط حساب الذكاء الاصطناعي الخاص بك';
+
+  @override
+  String get connect_ai_account_prefix => 'احصل على مفتاح API مجاني من ';
+
+  @override
+  String get connect_ai_account_suffix => ' والصقه أدناه.';
+
+  @override
+  String get api_key_hint_short => 'الصق مفتاح API هنا';
+
+  @override
+  String get save_and_verify => 'حفظ والتحقق';
+
+  @override
+  String get cloud_ai_connected => 'تم الاتصال! الذكاء الاصطناعي السحابي جاهز.';
+
+  @override
+  String get advanced_section_label => 'متقدم';
+
+  @override
+  String get text_merge_sensitivity_title => 'حساسية دمج النص';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'يتحكم في كيفية تجميع كتل النص القريبة. قلله إذا انخفضت دقة الترجمة.';
+
+  @override
+  String get merge_precise => 'دقيق';
+
+  @override
+  String get merge_aggressive => 'قوي';
+
+  @override
+  String get select_language_pair_hint => 'اختر زوج لغات';
+
+  @override
+  String get download_ai_model_title => 'تنزيل نموذج ذكاء اصطناعي محلي؟';
+
+  @override
+  String get download_ai_model_description =>
+      'عادةً ما يكون حجم هذه الحزمة بين 100 و500 ميغابايت. يتم تنزيلها في الخلفية؛ سيكون هذا الزوج جاهزًا للاستخدام بمجرد الانتهاء.';
 }

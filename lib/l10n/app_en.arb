@@ -27,7 +27,6 @@
   "overlay_permission_required": "Overlay Permission Required",
   "overlay_permission_required_content": "This app needs permission to draw over other apps.",
   "grant_permission": "Grant Permission",
-  "cancel": "Cancel",
   "language_afrikaans": "Afrikaans",
   "language_albanian": "Albanian",
   "language_arabic": "Arabic",
@@ -116,5 +115,74 @@
   "translation_mode_title": "Translation Mode",
   "translation_mode_on_device_label": "On-Device",
   "translation_mode_ai_label": "AI",
-  "close": "Close"
+  "close": "Close",
+  "translation_settings_title": "Translation Settings",
+  "translation_quality_section": "TRANSLATION QUALITY",
+  "mode_quick_title": "Quick",
+  "mode_quick_subtitle": "Instant · Always available · No setup needed",
+  "mode_ai_enhanced_title": "AI Enhanced",
+  "mode_ai_enhanced_subtitle": "Better quality · Works offline · Download a language pack",
+  "mode_cloud_ai_title": "Cloud AI",
+  "mode_cloud_ai_subtitle": "Best quality · Requires internet · API key needed",
+  "language_packs_header": "Language Packs  ·  ~{size} each",
+  "@language_packs_header": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "pack_downloading_progress": "Downloading… {percent}%",
+  "@pack_downloading_progress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "pack_ready_to_use": "Ready to use",
+  "pack_failed_tap_retry": "Failed — tap Retry",
+  "pack_ready_badge": "Ready",
+  "retry": "Retry",
+  "pack_is_ready_snackbar": "{name} is ready!",
+  "@pack_is_ready_snackbar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "download_failed_connection": "Download failed. Please check your connection.",
+  "remove_language_pack_title": "Remove language pack?",
+  "remove_ai_pack_confirm": "Remove the offline AI pack for {name}?",
+  "@remove_ai_pack_confirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remove_quick_pack_confirm": "Remove the offline Quick-translation pack for {name}?",
+  "@remove_quick_pack_confirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "failed_to_remove_pack": "Failed to remove language pack.",
+  "connect_ai_account_title": "Connect your AI account",
+  "connect_ai_account_prefix": "Get a free API key from ",
+  "connect_ai_account_suffix": " and paste it below.",
+  "api_key_hint_short": "Paste your API key here",
+  "save_and_verify": "Save & Verify",
+  "cloud_ai_connected": "Connected! Cloud AI is ready.",
+  "advanced_section_label": "Advanced",
+  "text_merge_sensitivity_title": "Text merge sensitivity",
+  "text_merge_sensitivity_description": "Controls how nearby text blocks are grouped. Reduce if translation accuracy drops.",
+  "merge_precise": "Precise",
+  "merge_aggressive": "Aggressive",
+  "select_language_pair_hint": "Select a language pair",
+  "download_ai_model_title": "Download local AI model?",
+  "download_ai_model_description": "This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes."
 }

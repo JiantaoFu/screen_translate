@@ -375,4 +375,123 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get close => 'Stäng';
+
+  @override
+  String get translation_settings_title => 'Översättningsinställningar';
+
+  @override
+  String get translation_quality_section => 'ÖVERSÄTTNINGSKVALITET';
+
+  @override
+  String get mode_quick_title => 'Snabb';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Direkt · Alltid tillgänglig · Ingen konfiguration behövs';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-förbättrad';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Bättre kvalitet · Fungerar offline · Ladda ner ett språkpaket';
+
+  @override
+  String get mode_cloud_ai_title => 'Moln-AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Bästa kvalitet · Kräver internet · API-nyckel krävs';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Språkpaket  ·  ~$size vardera';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Laddar ner… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Redo att användas';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Misslyckades — tryck för att försöka igen';
+
+  @override
+  String get pack_ready_badge => 'Klar';
+
+  @override
+  String get retry => 'Försök igen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name är klar!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Nedladdningen misslyckades. Kontrollera din anslutning.';
+
+  @override
+  String get remove_language_pack_title => 'Ta bort språkpaket?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Ta bort det offline AI-paketet för $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Ta bort det offline snabböversättningspaketet för $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Det gick inte att ta bort språkpaketet.';
+
+  @override
+  String get connect_ai_account_title => 'Anslut ditt AI-konto';
+
+  @override
+  String get connect_ai_account_prefix => 'Skaffa en gratis API-nyckel från ';
+
+  @override
+  String get connect_ai_account_suffix => ' och klistra in den nedan.';
+
+  @override
+  String get api_key_hint_short => 'Klistra in din API-nyckel här';
+
+  @override
+  String get save_and_verify => 'Spara och verifiera';
+
+  @override
+  String get cloud_ai_connected => 'Ansluten! Moln-AI är redo.';
+
+  @override
+  String get advanced_section_label => 'Avancerat';
+
+  @override
+  String get text_merge_sensitivity_title => 'Textsammanslagningskänslighet';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Styr hur närliggande textblock grupperas. Minska om översättningsnoggrannheten sjunker.';
+
+  @override
+  String get merge_precise => 'Exakt';
+
+  @override
+  String get merge_aggressive => 'Aggressiv';
+
+  @override
+  String get select_language_pair_hint => 'Välj ett språkpar';
+
+  @override
+  String get download_ai_model_title => 'Ladda ner lokal AI-modell?';
+
+  @override
+  String get download_ai_model_description =>
+      'Detta paket är vanligtvis 100–500 MB. Det laddas ner i bakgrunden; detta par kommer att vara redo att användas så snart det är klart.';
 }

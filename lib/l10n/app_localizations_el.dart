@@ -377,4 +377,124 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get close => 'Κλείσιμο';
+
+  @override
+  String get translation_settings_title => 'Ρυθμίσεις Μετάφρασης';
+
+  @override
+  String get translation_quality_section => 'ΠΟΙΟΤΗΤΑ ΜΕΤΑΦΡΑΣΗΣ';
+
+  @override
+  String get mode_quick_title => 'Γρήγορο';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Άμεσο · Πάντα διαθέσιμο · Δεν απαιτείται ρύθμιση';
+
+  @override
+  String get mode_ai_enhanced_title => 'Βελτιωμένο με AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Καλύτερη ποιότητα · Λειτουργεί εκτός σύνδεσης · Κατεβάστε ένα γλωσσικό πακέτο';
+
+  @override
+  String get mode_cloud_ai_title => 'AI στο Cloud';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Καλύτερη ποιότητα · Απαιτεί σύνδεση στο διαδίκτυο · Απαιτείται κλειδί API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Γλωσσικά πακέτα  ·  ~$size το καθένα';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Λήψη… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Έτοιμο για χρήση';
+
+  @override
+  String get pack_failed_tap_retry => 'Απέτυχε — πατήστε για επανάληψη';
+
+  @override
+  String get pack_ready_badge => 'Έτοιμο';
+
+  @override
+  String get retry => 'Επανάληψη';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return 'Το $name είναι έτοιμο!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Η λήψη απέτυχε. Ελέγξτε τη σύνδεσή σας.';
+
+  @override
+  String get remove_language_pack_title => 'Αφαίρεση γλωσσικού πακέτου;';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Αφαίρεση του πακέτου AI εκτός σύνδεσης για $name;';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Αφαίρεση του πακέτου γρήγορης μετάφρασης εκτός σύνδεσης για $name;';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'Η αφαίρεση του γλωσσικού πακέτου απέτυχε.';
+
+  @override
+  String get connect_ai_account_title => 'Συνδέστε τον λογαριασμό AI σας';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'Αποκτήστε ένα δωρεάν κλειδί API από ';
+
+  @override
+  String get connect_ai_account_suffix => ' και επικολλήστε το παρακάτω.';
+
+  @override
+  String get api_key_hint_short => 'Επικολλήστε το κλειδί API σας εδώ';
+
+  @override
+  String get save_and_verify => 'Αποθήκευση & Επαλήθευση';
+
+  @override
+  String get cloud_ai_connected => 'Συνδέθηκε! Το Cloud AI είναι έτοιμο.';
+
+  @override
+  String get advanced_section_label => 'Σύνθετες ρυθμίσεις';
+
+  @override
+  String get text_merge_sensitivity_title => 'Ευαισθησία συγχώνευσης κειμένου';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Ελέγχει τον τρόπο ομαδοποίησης κοντινών τμημάτων κειμένου. Μειώστε την αν πέσει η ακρίβεια μετάφρασης.';
+
+  @override
+  String get merge_precise => 'Ακριβές';
+
+  @override
+  String get merge_aggressive => 'Επιθετικό';
+
+  @override
+  String get select_language_pair_hint => 'Επιλέξτε ζεύγος γλωσσών';
+
+  @override
+  String get download_ai_model_title => 'Λήψη τοπικού μοντέλου AI;';
+
+  @override
+  String get download_ai_model_description =>
+      'Αυτό το πακέτο είναι συνήθως 100–500 MB. Κατεβαίνει στο παρασκήνιο· αυτό το ζεύγος θα είναι έτοιμο για χρήση μόλις ολοκληρωθεί.';
 }

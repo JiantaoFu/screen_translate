@@ -376,4 +376,122 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get close => 'বন্ধ';
+
+  @override
+  String get translation_settings_title => 'অনুবাদ সেটিংস';
+
+  @override
+  String get translation_quality_section => 'অনুবাদের মান';
+
+  @override
+  String get mode_quick_title => 'দ্রুত';
+
+  @override
+  String get mode_quick_subtitle =>
+      'তাৎক্ষণিক · সবসময় উপলব্ধ · সেটআপের প্রয়োজন নেই';
+
+  @override
+  String get mode_ai_enhanced_title => 'এআই উন্নত';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'উন্নত মান · অফলাইনে কাজ করে · একটি ভাষা প্যাক ডাউনলোড করুন';
+
+  @override
+  String get mode_cloud_ai_title => 'ক্লাউড এআই';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'সেরা মান · ইন্টারনেট প্রয়োজন · এপিআই কী প্রয়োজন';
+
+  @override
+  String language_packs_header(String size) {
+    return 'ভাষা প্যাক  ·  প্রতিটি ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'ডাউনলোড হচ্ছে… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'ব্যবহারের জন্য প্রস্তুত';
+
+  @override
+  String get pack_failed_tap_retry => 'ব্যর্থ — পুনরায় চেষ্টা করতে ট্যাপ করুন';
+
+  @override
+  String get pack_ready_badge => 'প্রস্তুত';
+
+  @override
+  String get retry => 'পুনরায় চেষ্টা করুন';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name প্রস্তুত!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'ডাউনলোড ব্যর্থ হয়েছে। আপনার সংযোগ পরীক্ষা করুন।';
+
+  @override
+  String get remove_language_pack_title => 'ভাষা প্যাক সরাবেন?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '$name-এর জন্য অফলাইন এআই প্যাক সরাবেন?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '$name-এর জন্য অফলাইন দ্রুত-অনুবাদ প্যাক সরাবেন?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'ভাষা প্যাক সরাতে ব্যর্থ হয়েছে।';
+
+  @override
+  String get connect_ai_account_title => 'আপনার এআই অ্যাকাউন্ট সংযুক্ত করুন';
+
+  @override
+  String get connect_ai_account_prefix => 'থেকে একটি বিনামূল্যে এপিআই কী নিন ';
+
+  @override
+  String get connect_ai_account_suffix => ' এবং নিচে পেস্ট করুন।';
+
+  @override
+  String get api_key_hint_short => 'আপনার এপিআই কী এখানে পেস্ট করুন';
+
+  @override
+  String get save_and_verify => 'সংরক্ষণ ও যাচাই করুন';
+
+  @override
+  String get cloud_ai_connected => 'সংযুক্ত! ক্লাউড এআই প্রস্তুত।';
+
+  @override
+  String get advanced_section_label => 'উন্নত';
+
+  @override
+  String get text_merge_sensitivity_title => 'টেক্সট মার্জ সংবেদনশীলতা';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'কাছাকাছি টেক্সট ব্লকগুলো কীভাবে গোষ্ঠীবদ্ধ হয় তা নিয়ন্ত্রণ করে। অনুবাদের নির্ভুলতা কমে গেলে কমিয়ে দিন।';
+
+  @override
+  String get merge_precise => 'নিখুঁত';
+
+  @override
+  String get merge_aggressive => 'আক্রমণাত্মক';
+
+  @override
+  String get select_language_pair_hint => 'একটি ভাষা জোড়া নির্বাচন করুন';
+
+  @override
+  String get download_ai_model_title => 'স্থানীয় এআই মডেল ডাউনলোড করবেন?';
+
+  @override
+  String get download_ai_model_description =>
+      'এই প্যাকটি সাধারণত ১০০–৫০০ MB এর মতো। এটি ব্যাকগ্রাউন্ডে ডাউনলোড হয়; শেষ হলে এই জোড়াটি ব্যবহারের জন্য প্রস্তুত হবে।';
 }

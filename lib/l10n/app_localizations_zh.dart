@@ -367,4 +367,118 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get close => '关闭';
+
+  @override
+  String get translation_settings_title => '翻译设置';
+
+  @override
+  String get translation_quality_section => '翻译质量';
+
+  @override
+  String get mode_quick_title => '快速';
+
+  @override
+  String get mode_quick_subtitle => '即时 · 始终可用 · 无需设置';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI增强';
+
+  @override
+  String get mode_ai_enhanced_subtitle => '更高质量 · 离线可用 · 下载语言包';
+
+  @override
+  String get mode_cloud_ai_title => '云端AI';
+
+  @override
+  String get mode_cloud_ai_subtitle => '最佳质量 · 需要联网 · 需要API密钥';
+
+  @override
+  String language_packs_header(String size) {
+    return '语言包  ·  每个约$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return '下载中… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => '可以使用';
+
+  @override
+  String get pack_failed_tap_retry => '失败 — 点击重试';
+
+  @override
+  String get pack_ready_badge => '已就绪';
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name已就绪！';
+  }
+
+  @override
+  String get download_failed_connection => '下载失败，请检查网络连接。';
+
+  @override
+  String get remove_language_pack_title => '删除语言包？';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '删除$name的离线AI包？';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '删除$name的离线快速翻译包？';
+  }
+
+  @override
+  String get failed_to_remove_pack => '删除语言包失败。';
+
+  @override
+  String get connect_ai_account_title => '连接你的AI账户';
+
+  @override
+  String get connect_ai_account_prefix => '从这里获取免费的API密钥 ';
+
+  @override
+  String get connect_ai_account_suffix => '，然后粘贴到下方。';
+
+  @override
+  String get api_key_hint_short => '在此粘贴你的API密钥';
+
+  @override
+  String get save_and_verify => '保存并验证';
+
+  @override
+  String get cloud_ai_connected => '已连接！云端AI已就绪。';
+
+  @override
+  String get advanced_section_label => '高级';
+
+  @override
+  String get text_merge_sensitivity_title => '文本合并灵敏度';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      '控制相邻文本块的分组方式。如果翻译准确度下降，请降低此值。';
+
+  @override
+  String get merge_precise => '精确';
+
+  @override
+  String get merge_aggressive => '激进';
+
+  @override
+  String get select_language_pair_hint => '选择语言对';
+
+  @override
+  String get download_ai_model_title => '下载本地AI模型？';
+
+  @override
+  String get download_ai_model_description =>
+      '该模型包通常为100–500MB，将在后台下载；下载完成后即可使用该语言对。';
 }

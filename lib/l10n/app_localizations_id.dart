@@ -374,4 +374,122 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get close => 'Tutup';
+
+  @override
+  String get translation_settings_title => 'Pengaturan Terjemahan';
+
+  @override
+  String get translation_quality_section => 'KUALITAS TERJEMAHAN';
+
+  @override
+  String get mode_quick_title => 'Cepat';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Instan · Selalu tersedia · Tidak perlu pengaturan';
+
+  @override
+  String get mode_ai_enhanced_title => 'Ditingkatkan AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Kualitas lebih baik · Berfungsi offline · Unduh paket bahasa';
+
+  @override
+  String get mode_cloud_ai_title => 'AI Cloud';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Kualitas terbaik · Membutuhkan internet · Perlu kunci API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Paket Bahasa  ·  ~$size masing-masing';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Mengunduh… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Siap digunakan';
+
+  @override
+  String get pack_failed_tap_retry => 'Gagal — ketuk untuk mencoba lagi';
+
+  @override
+  String get pack_ready_badge => 'Siap';
+
+  @override
+  String get retry => 'Coba lagi';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name sudah siap!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Unduhan gagal. Periksa koneksi Anda.';
+
+  @override
+  String get remove_language_pack_title => 'Hapus paket bahasa?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Hapus paket AI offline untuk $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Hapus paket terjemahan cepat offline untuk $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Gagal menghapus paket bahasa.';
+
+  @override
+  String get connect_ai_account_title => 'Hubungkan akun AI Anda';
+
+  @override
+  String get connect_ai_account_prefix => 'Dapatkan kunci API gratis dari ';
+
+  @override
+  String get connect_ai_account_suffix => ' dan tempel di bawah ini.';
+
+  @override
+  String get api_key_hint_short => 'Tempel kunci API Anda di sini';
+
+  @override
+  String get save_and_verify => 'Simpan & Verifikasi';
+
+  @override
+  String get cloud_ai_connected => 'Terhubung! AI Cloud siap.';
+
+  @override
+  String get advanced_section_label => 'Lanjutan';
+
+  @override
+  String get text_merge_sensitivity_title => 'Sensitivitas penggabungan teks';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Mengontrol cara blok teks yang berdekatan dikelompokkan. Kurangi jika akurasi terjemahan menurun.';
+
+  @override
+  String get merge_precise => 'Presisi';
+
+  @override
+  String get merge_aggressive => 'Agresif';
+
+  @override
+  String get select_language_pair_hint => 'Pilih pasangan bahasa';
+
+  @override
+  String get download_ai_model_title => 'Unduh model AI lokal?';
+
+  @override
+  String get download_ai_model_description =>
+      'Paket ini biasanya berukuran 100–500 MB. File diunduh di latar belakang; pasangan ini akan siap digunakan setelah selesai.';
 }

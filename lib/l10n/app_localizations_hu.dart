@@ -377,4 +377,125 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get close => 'Bezárás';
+
+  @override
+  String get translation_settings_title => 'Fordítási beállítások';
+
+  @override
+  String get translation_quality_section => 'FORDÍTÁS MINŐSÉGE';
+
+  @override
+  String get mode_quick_title => 'Gyors';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Azonnali · Mindig elérhető · Nincs szükség beállításra';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-fejlesztett';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Jobb minőség · Offline is működik · Nyelvi csomag letöltése';
+
+  @override
+  String get mode_cloud_ai_title => 'Felhő AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Legjobb minőség · Internet szükséges · API-kulcs szükséges';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Nyelvi csomagok  ·  ~$size egyenként';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Letöltés… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Használatra kész';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Sikertelen — koppintson az újrapróbálkozáshoz';
+
+  @override
+  String get pack_ready_badge => 'Kész';
+
+  @override
+  String get retry => 'Újra';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name kész!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'A letöltés sikertelen. Ellenőrizze a kapcsolatot.';
+
+  @override
+  String get remove_language_pack_title => 'Nyelvi csomag eltávolítása?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Eltávolítja az offline AI csomagot ehhez: $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Eltávolítja az offline gyorsfordítási csomagot ehhez: $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack =>
+      'A nyelvi csomag eltávolítása sikertelen.';
+
+  @override
+  String get connect_ai_account_title => 'Csatlakoztassa AI-fiókját';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'Szerezzen ingyenes API-kulcsot innen: ';
+
+  @override
+  String get connect_ai_account_suffix => ' és illessze be alább.';
+
+  @override
+  String get api_key_hint_short => 'Illessze be ide az API-kulcsát';
+
+  @override
+  String get save_and_verify => 'Mentés és ellenőrzés';
+
+  @override
+  String get cloud_ai_connected => 'Csatlakozva! A felhő AI készen áll.';
+
+  @override
+  String get advanced_section_label => 'Speciális';
+
+  @override
+  String get text_merge_sensitivity_title => 'Szövegösszevonási érzékenység';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Szabályozza, hogyan csoportosulnak a közeli szövegblokkok. Csökkentse, ha romlik a fordítás pontossága.';
+
+  @override
+  String get merge_precise => 'Precíz';
+
+  @override
+  String get merge_aggressive => 'Agresszív';
+
+  @override
+  String get select_language_pair_hint => 'Válasszon nyelvpárt';
+
+  @override
+  String get download_ai_model_title => 'Letölti a helyi AI-modellt?';
+
+  @override
+  String get download_ai_model_description =>
+      'Ez a csomag jellemzően 100–500 MB. A háttérben töltődik le; ez a pár a befejezés után azonnal használatra kész lesz.';
 }

@@ -374,4 +374,122 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get close => 'Luk';
+
+  @override
+  String get translation_settings_title => 'Oversættelsesindstillinger';
+
+  @override
+  String get translation_quality_section => 'OVERSÆTTELSESKVALITET';
+
+  @override
+  String get mode_quick_title => 'Hurtig';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Øjeblikkelig · Altid tilgængelig · Ingen opsætning nødvendig';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-forbedret';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Bedre kvalitet · Fungerer offline · Download en sprogpakke';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloud AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Bedste kvalitet · Kræver internet · API-nøgle påkrævet';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Sprogpakker  ·  ~$size hver';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Downloader… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Klar til brug';
+
+  @override
+  String get pack_failed_tap_retry => 'Mislykkedes — tryk for at prøve igen';
+
+  @override
+  String get pack_ready_badge => 'Klar';
+
+  @override
+  String get retry => 'Prøv igen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name er klar!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Download mislykkedes. Tjek din forbindelse.';
+
+  @override
+  String get remove_language_pack_title => 'Fjern sprogpakke?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Fjern offline AI-pakken til $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Fjern offline hurtig-oversættelsespakken til $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Kunne ikke fjerne sprogpakken.';
+
+  @override
+  String get connect_ai_account_title => 'Forbind din AI-konto';
+
+  @override
+  String get connect_ai_account_prefix => 'Få en gratis API-nøgle fra ';
+
+  @override
+  String get connect_ai_account_suffix => ' og indsæt den nedenfor.';
+
+  @override
+  String get api_key_hint_short => 'Indsæt din API-nøgle her';
+
+  @override
+  String get save_and_verify => 'Gem og verificér';
+
+  @override
+  String get cloud_ai_connected => 'Forbundet! Cloud AI er klar.';
+
+  @override
+  String get advanced_section_label => 'Avanceret';
+
+  @override
+  String get text_merge_sensitivity_title => 'Tekstsammenlægningsfølsomhed';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Styrer hvordan nærliggende tekstblokke grupperes. Reducér hvis oversættelsesnøjagtigheden falder.';
+
+  @override
+  String get merge_precise => 'Præcis';
+
+  @override
+  String get merge_aggressive => 'Aggressiv';
+
+  @override
+  String get select_language_pair_hint => 'Vælg et sprogpar';
+
+  @override
+  String get download_ai_model_title => 'Download lokal AI-model?';
+
+  @override
+  String get download_ai_model_description =>
+      'Denne pakke er typisk 100–500 MB. Den downloades i baggrunden; dette par vil være klar til brug, når det er færdigt.';
 }

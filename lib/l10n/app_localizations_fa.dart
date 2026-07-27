@@ -376,4 +376,123 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get close => 'بستن';
+
+  @override
+  String get translation_settings_title => 'تنظیمات ترجمه';
+
+  @override
+  String get translation_quality_section => 'کیفیت ترجمه';
+
+  @override
+  String get mode_quick_title => 'سریع';
+
+  @override
+  String get mode_quick_subtitle =>
+      'فوری · همیشه در دسترس · نیازی به راه‌اندازی نیست';
+
+  @override
+  String get mode_ai_enhanced_title => 'بهبودیافته با هوش مصنوعی';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'کیفیت بهتر · به‌صورت آفلاین کار می‌کند · یک بسته زبان دانلود کنید';
+
+  @override
+  String get mode_cloud_ai_title => 'هوش مصنوعی ابری';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'بهترین کیفیت · نیاز به اینترنت · نیاز به کلید API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'بسته‌های زبان  ·  هر کدام ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'در حال دانلود… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'آماده استفاده';
+
+  @override
+  String get pack_failed_tap_retry => 'ناموفق — برای تلاش مجدد ضربه بزنید';
+
+  @override
+  String get pack_ready_badge => 'آماده';
+
+  @override
+  String get retry => 'تلاش مجدد';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name آماده است!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'دانلود ناموفق بود. لطفاً اتصال خود را بررسی کنید.';
+
+  @override
+  String get remove_language_pack_title => 'حذف بسته زبان؟';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'حذف بسته هوش مصنوعی آفلاین برای $name؟';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'حذف بسته ترجمه سریع آفلاین برای $name؟';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'حذف بسته زبان ناموفق بود.';
+
+  @override
+  String get connect_ai_account_title => 'حساب هوش مصنوعی خود را متصل کنید';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'یک کلید API رایگان از اینجا دریافت کنید ';
+
+  @override
+  String get connect_ai_account_suffix => ' و آن را در زیر جای‌گذاری کنید.';
+
+  @override
+  String get api_key_hint_short => 'کلید API خود را اینجا جای‌گذاری کنید';
+
+  @override
+  String get save_and_verify => 'ذخیره و تأیید';
+
+  @override
+  String get cloud_ai_connected => 'متصل شد! هوش مصنوعی ابری آماده است.';
+
+  @override
+  String get advanced_section_label => 'پیشرفته';
+
+  @override
+  String get text_merge_sensitivity_title => 'حساسیت ادغام متن';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'نحوه گروه‌بندی بلوک‌های متنی نزدیک به هم را کنترل می‌کند. اگر دقت ترجمه کاهش یافت، آن را کاهش دهید.';
+
+  @override
+  String get merge_precise => 'دقیق';
+
+  @override
+  String get merge_aggressive => 'تهاجمی';
+
+  @override
+  String get select_language_pair_hint => 'یک جفت زبان انتخاب کنید';
+
+  @override
+  String get download_ai_model_title => 'دانلود مدل هوش مصنوعی محلی؟';
+
+  @override
+  String get download_ai_model_description =>
+      'این بسته معمولاً بین ۱۰۰ تا ۵۰۰ مگابایت است. در پس‌زمینه دانلود می‌شود؛ پس از اتمام، این جفت آماده استفاده خواهد بود.';
 }

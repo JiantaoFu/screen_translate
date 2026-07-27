@@ -375,4 +375,124 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get close => 'Sulje';
+
+  @override
+  String get translation_settings_title => 'Käännösasetukset';
+
+  @override
+  String get translation_quality_section => 'KÄÄNNÖKSEN LAATU';
+
+  @override
+  String get mode_quick_title => 'Nopea';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Välitön · Aina saatavilla · Ei vaadi asennusta';
+
+  @override
+  String get mode_ai_enhanced_title => 'Tekoälyllä parannettu';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Parempi laatu · Toimii offline · Lataa kielipaketti';
+
+  @override
+  String get mode_cloud_ai_title => 'Pilvi-tekoäly';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Paras laatu · Vaatii internetin · API-avain vaaditaan';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Kielipaketit  ·  ~$size kukin';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Ladataan… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Käyttövalmis';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Epäonnistui — yritä uudelleen napauttamalla';
+
+  @override
+  String get pack_ready_badge => 'Valmis';
+
+  @override
+  String get retry => 'Yritä uudelleen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name on valmis!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Lataus epäonnistui. Tarkista yhteytesi.';
+
+  @override
+  String get remove_language_pack_title => 'Poistetaanko kielipaketti?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Poistetaanko offline-tekoälypaketti kielelle $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Poistetaanko offline-pikakäännöspaketti kielelle $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Kielipaketin poistaminen epäonnistui.';
+
+  @override
+  String get connect_ai_account_title => 'Yhdistä tekoälytilisi';
+
+  @override
+  String get connect_ai_account_prefix =>
+      'Hanki ilmainen API-avain osoitteesta ';
+
+  @override
+  String get connect_ai_account_suffix => ' ja liitä se alle.';
+
+  @override
+  String get api_key_hint_short => 'Liitä API-avaimesi tähän';
+
+  @override
+  String get save_and_verify => 'Tallenna ja vahvista';
+
+  @override
+  String get cloud_ai_connected => 'Yhdistetty! Pilvi-tekoäly on valmis.';
+
+  @override
+  String get advanced_section_label => 'Lisäasetukset';
+
+  @override
+  String get text_merge_sensitivity_title => 'Tekstin yhdistämisen herkkyys';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Määrittää, miten lähekkäiset tekstilohkot ryhmitellään. Pienennä, jos käännöstarkkuus heikkenee.';
+
+  @override
+  String get merge_precise => 'Tarkka';
+
+  @override
+  String get merge_aggressive => 'Aggressiivinen';
+
+  @override
+  String get select_language_pair_hint => 'Valitse kielipari';
+
+  @override
+  String get download_ai_model_title => 'Ladataanko paikallinen tekoälymalli?';
+
+  @override
+  String get download_ai_model_description =>
+      'Tämä paketti on yleensä 100–500 Mt. Se ladataan taustalla; tämä pari on käyttövalmis, kun lataus on valmis.';
 }

@@ -376,4 +376,123 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get close => 'Uždaryti';
+
+  @override
+  String get translation_settings_title => 'Vertimo nustatymai';
+
+  @override
+  String get translation_quality_section => 'VERTIMO KOKYBĖ';
+
+  @override
+  String get mode_quick_title => 'Greitas';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Momentinis · Visada pasiekiamas · Nereikia jokio nustatymo';
+
+  @override
+  String get mode_ai_enhanced_title => 'Patobulintas DI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Geresnė kokybė · Veikia neprisijungus · Atsisiųskite kalbos paketą';
+
+  @override
+  String get mode_cloud_ai_title => 'Debesijos DI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Geriausia kokybė · Reikalingas internetas · Reikalingas API raktas';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Kalbų paketai  ·  po ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Atsisiunčiama… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Paruošta naudoti';
+
+  @override
+  String get pack_failed_tap_retry =>
+      'Nepavyko — bakstelėkite, kad bandytumėte dar kartą';
+
+  @override
+  String get pack_ready_badge => 'Paruošta';
+
+  @override
+  String get retry => 'Bandyti dar kartą';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name paruoštas!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Atsisiuntimas nepavyko. Patikrinkite ryšį.';
+
+  @override
+  String get remove_language_pack_title => 'Pašalinti kalbos paketą?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Pašalinti neprisijungimo DI paketą, skirtą $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Pašalinti neprisijungimo greito vertimo paketą, skirtą $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Nepavyko pašalinti kalbos paketo.';
+
+  @override
+  String get connect_ai_account_title => 'Prijunkite savo DI paskyrą';
+
+  @override
+  String get connect_ai_account_prefix => 'Gaukite nemokamą API raktą iš ';
+
+  @override
+  String get connect_ai_account_suffix => ' ir įklijuokite jį žemiau.';
+
+  @override
+  String get api_key_hint_short => 'Įklijuokite savo API raktą čia';
+
+  @override
+  String get save_and_verify => 'Išsaugoti ir patvirtinti';
+
+  @override
+  String get cloud_ai_connected => 'Prisijungta! Debesijos DI paruoštas.';
+
+  @override
+  String get advanced_section_label => 'Papildoma';
+
+  @override
+  String get text_merge_sensitivity_title => 'Teksto sujungimo jautrumas';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Valdo, kaip grupuojami netoliese esantys teksto blokai. Sumažinkite, jei sumažėja vertimo tikslumas.';
+
+  @override
+  String get merge_precise => 'Tikslus';
+
+  @override
+  String get merge_aggressive => 'Agresyvus';
+
+  @override
+  String get select_language_pair_hint => 'Pasirinkite kalbų porą';
+
+  @override
+  String get download_ai_model_title => 'Atsisiųsti vietinį DI modelį?';
+
+  @override
+  String get download_ai_model_description =>
+      'Šis paketas paprastai yra 100–500 MB. Jis atsisiunčiamas fone; ši pora bus paruošta naudoti, kai tik baigsis atsisiuntimas.';
 }

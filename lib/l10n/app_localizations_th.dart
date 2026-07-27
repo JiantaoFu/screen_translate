@@ -374,4 +374,121 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get close => 'ปิด';
+
+  @override
+  String get translation_settings_title => 'การตั้งค่าการแปล';
+
+  @override
+  String get translation_quality_section => 'คุณภาพการแปล';
+
+  @override
+  String get mode_quick_title => 'ด่วน';
+
+  @override
+  String get mode_quick_subtitle => 'ทันที · พร้อมใช้งานเสมอ · ไม่ต้องตั้งค่า';
+
+  @override
+  String get mode_ai_enhanced_title => 'ปรับปรุงด้วย AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'คุณภาพดีขึ้น · ทำงานแบบออฟไลน์ได้ · ดาวน์โหลดแพ็กภาษา';
+
+  @override
+  String get mode_cloud_ai_title => 'AI บนคลาวด์';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'คุณภาพดีที่สุด · ต้องใช้อินเทอร์เน็ต · ต้องใช้คีย์ API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'แพ็กภาษา  ·  แพ็กละ ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'กำลังดาวน์โหลด… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'พร้อมใช้งาน';
+
+  @override
+  String get pack_failed_tap_retry => 'ล้มเหลว — แตะเพื่อลองใหม่';
+
+  @override
+  String get pack_ready_badge => 'พร้อม';
+
+  @override
+  String get retry => 'ลองใหม่';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name พร้อมแล้ว!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'ดาวน์โหลดล้มเหลว โปรดตรวจสอบการเชื่อมต่อของคุณ';
+
+  @override
+  String get remove_language_pack_title => 'ลบแพ็กภาษาหรือไม่?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'ลบแพ็ก AI แบบออฟไลน์สำหรับ $name หรือไม่?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'ลบแพ็กแปลด่วนแบบออฟไลน์สำหรับ $name หรือไม่?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'ลบแพ็กภาษาไม่สำเร็จ';
+
+  @override
+  String get connect_ai_account_title => 'เชื่อมต่อบัญชี AI ของคุณ';
+
+  @override
+  String get connect_ai_account_prefix => 'รับคีย์ API ฟรีได้ที่ ';
+
+  @override
+  String get connect_ai_account_suffix => ' แล้ววางไว้ด้านล่าง';
+
+  @override
+  String get api_key_hint_short => 'วางคีย์ API ของคุณที่นี่';
+
+  @override
+  String get save_and_verify => 'บันทึกและยืนยัน';
+
+  @override
+  String get cloud_ai_connected => 'เชื่อมต่อแล้ว! AI บนคลาวด์พร้อมใช้งาน';
+
+  @override
+  String get advanced_section_label => 'ขั้นสูง';
+
+  @override
+  String get text_merge_sensitivity_title => 'ความไวในการรวมข้อความ';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'ควบคุมวิธีการจัดกลุ่มบล็อกข้อความที่อยู่ใกล้กัน ลดค่านี้หากความแม่นยำในการแปลลดลง';
+
+  @override
+  String get merge_precise => 'แม่นยำ';
+
+  @override
+  String get merge_aggressive => 'ก้าวร้าว';
+
+  @override
+  String get select_language_pair_hint => 'เลือกคู่ภาษา';
+
+  @override
+  String get download_ai_model_title => 'ดาวน์โหลดโมเดล AI ในเครื่องหรือไม่?';
+
+  @override
+  String get download_ai_model_description =>
+      'แพ็กนี้มักมีขนาด 100–500 MB โดยจะดาวน์โหลดในพื้นหลัง คู่ภาษานี้จะพร้อมใช้งานทันทีที่ดาวน์โหลดเสร็จ';
 }

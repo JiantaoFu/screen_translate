@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/app_localizations.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import '../services/model_download_service.dart';
@@ -231,7 +232,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packProgress.remove(lp.key);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${lp.displayName} is ready!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(lp.displayName)), backgroundColor: Colors.green),
         );
       }
     } catch (e, stack) {
@@ -243,24 +244,25 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packProgress.remove(lp.key);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Download failed. Please check your connection.'), backgroundColor: Colors.red),
+          SnackBar(content: Text(AppLocalizations.of(context)!.download_failed_connection), backgroundColor: Colors.red),
         );
       }
     }
   }
 
   Future<void> _deletePack(_LanguagePack lp) async {
+    final localizations = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Remove language pack?'),
-        content: Text('Remove the offline AI pack for ${lp.displayName}?'),
+        title: Text(localizations.remove_language_pack_title),
+        content: Text(localizations.remove_ai_pack_confirm(lp.displayName)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Remove'),
+            child: Text(localizations.remove),
           ),
         ],
       ),
@@ -306,7 +308,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${TranslationProvider.supportedLanguages[code] ?? code} is ready!'),
+            content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(TranslationProvider.supportedLanguages[code] ?? code)),
             backgroundColor: Colors.green,
           ),
         );
@@ -320,25 +322,26 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _quickProgress.remove(code);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Download failed. Please check your connection.'), backgroundColor: Colors.red),
+          SnackBar(content: Text(AppLocalizations.of(context)!.download_failed_connection), backgroundColor: Colors.red),
         );
       }
     }
   }
 
   Future<void> _deleteQuickLang(String code) async {
+    final localizations = AppLocalizations.of(context)!;
     final name = TranslationProvider.supportedLanguages[code] ?? code;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Remove language pack?'),
-        content: Text('Remove the offline Quick-translation pack for $name?'),
+        title: Text(localizations.remove_language_pack_title),
+        content: Text(localizations.remove_quick_pack_confirm(name)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Remove'),
+            child: Text(localizations.remove),
           ),
         ],
       ),
@@ -349,7 +352,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
       setState(() => _quickDownloaded[code] = !success);
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to remove language pack.'), backgroundColor: Colors.red),
+          SnackBar(content: Text(localizations.failed_to_remove_pack), backgroundColor: Colors.red),
         );
       }
     }
@@ -358,10 +361,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   // ── API Key ──────────────────────────────────────────────────────────────────
 
   Future<void> _saveApiKey() async {
+    final localizations = AppLocalizations.of(context)!;
     final key = _apiKeyController.text.trim();
     if (key.length < 10) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid API key.'), backgroundColor: Colors.red),
+        SnackBar(content: Text(localizations.api_key_input_error), backgroundColor: Colors.red),
       );
       return;
     }
@@ -373,14 +377,14 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     setState(() => _isSavingApiKey = false);
     if (valid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Connected! Cloud AI is ready.'), backgroundColor: Colors.green),
+        SnackBar(content: Text(localizations.cloud_ai_connected), backgroundColor: Colors.green),
       );
       Provider.of<TranslationProvider>(context, listen: false).setTranslationMode(TranslationMode.llm);
     } else {
       await svc.clearApiKey();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid API key. Please check and try again.'), backgroundColor: Colors.red),
+        SnackBar(content: Text(localizations.api_key_save_error), backgroundColor: Colors.red),
       );
     }
   }
@@ -391,10 +395,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
-        title: const Text('Translation Settings'),
+        title: Text(localizations.translation_settings_title),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -405,7 +410,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
             children: [
-              _sectionLabel('TRANSLATION QUALITY'),
+              _sectionLabel(localizations.translation_quality_section),
               const SizedBox(height: 10),
 
               // ── Quick ──────────────────────────────────────────────────────
@@ -414,8 +419,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 selected: provider.translationMode == TranslationMode.onDevice,
                 icon: Icons.flash_on_rounded,
                 iconColor: const Color(0xFFFF8C00),
-                title: 'Quick',
-                subtitle: 'Instant · Always available · No setup needed',
+                title: localizations.mode_quick_title,
+                subtitle: localizations.mode_quick_subtitle,
                 provider: provider,
               ),
               if (provider.translationMode == TranslationMode.onDevice)
@@ -428,8 +433,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 selected: provider.translationMode == TranslationMode.onnx,
                 icon: Icons.memory_rounded,
                 iconColor: const Color(0xFF4F46E5),
-                title: 'AI Enhanced',
-                subtitle: 'Better quality · Works offline · Download a language pack',
+                title: localizations.mode_ai_enhanced_title,
+                subtitle: localizations.mode_ai_enhanced_subtitle,
                 provider: provider,
               ),
               if (provider.translationMode == TranslationMode.onnx)
@@ -443,8 +448,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 selected: provider.translationMode == TranslationMode.llm,
                 icon: Icons.cloud_rounded,
                 iconColor: const Color(0xFF0D9488),
-                title: 'Cloud AI',
-                subtitle: 'Best quality · Requires internet · API key needed',
+                title: localizations.mode_cloud_ai_title,
+                subtitle: localizations.mode_cloud_ai_subtitle,
                 provider: provider,
               ),
               if (provider.translationMode == TranslationMode.llm)
@@ -562,12 +567,12 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Row(
-              children: const [
-                Icon(Icons.download_for_offline_outlined, color: indigo, size: 16),
-                SizedBox(width: 6),
+              children: [
+                const Icon(Icons.download_for_offline_outlined, color: indigo, size: 16),
+                const SizedBox(width: 6),
                 Text(
-                  'Language Packs  ·  ~50 MB each',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: indigo),
+                  AppLocalizations.of(context)!.language_packs_header('50 MB'),
+                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: indigo),
                 ),
               ],
             ),
@@ -581,6 +586,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   Widget _buildPackTile(_LanguagePack lp) {
     const indigo = Color(0xFF4F46E5);
+    final localizations = AppLocalizations.of(context)!;
     final status = _packStatus[lp.key] ?? OnnxModelStatus.notDownloaded;
     final progress = _packProgress[lp.key];
     final isReady = status == OnnxModelStatus.ready;
@@ -613,13 +619,13 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                       Text(lp.displayName,
                           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
                       if (isDownloading)
-                        Text('Downloading… ${((progress ?? 0) * 100).toStringAsFixed(0)}%',
+                        Text(localizations.pack_downloading_progress(((progress ?? 0) * 100).toStringAsFixed(0)),
                             style: const TextStyle(fontSize: 11, color: indigo))
                       else if (isReady)
-                        Text('Ready to use',
+                        Text(localizations.pack_ready_to_use,
                             style: TextStyle(fontSize: 11, color: Colors.green[600]))
                       else if (isError)
-                        Text('Failed — tap Retry',
+                        Text(localizations.pack_failed_tap_retry,
                             style: TextStyle(fontSize: 11, color: Colors.red[400])),
                     ],
                   ),
@@ -645,7 +651,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 14),
                         const SizedBox(width: 4),
-                        Text('Ready',
+                        Text(localizations.pack_ready_badge,
                             style: TextStyle(color: Colors.green[700], fontSize: 12,
                                 fontWeight: FontWeight.w600)),
                       ]),
@@ -664,7 +670,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                         Icon(isError ? Icons.refresh : Icons.download_rounded,
                             color: Colors.white, size: 14),
                         const SizedBox(width: 4),
-                        Text(isError ? 'Retry' : 'Download',
+                        Text(isError ? localizations.retry : localizations.download_model,
                             style: const TextStyle(color: Colors.white, fontSize: 12,
                                 fontWeight: FontWeight.w600)),
                       ]),
@@ -709,12 +715,12 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Row(
-              children: const [
-                Icon(Icons.download_for_offline_outlined, color: orange, size: 16),
-                SizedBox(width: 6),
+              children: [
+                const Icon(Icons.download_for_offline_outlined, color: orange, size: 16),
+                const SizedBox(width: 6),
                 Text(
-                  'Language Packs  ·  ~30 MB each',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: orange),
+                  AppLocalizations.of(context)!.language_packs_header('30 MB'),
+                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: orange),
                 ),
               ],
             ),
@@ -728,6 +734,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   Widget _buildQuickLangTile(String code) {
     const orange = Color(0xFFFF8C00);
+    final localizations = AppLocalizations.of(context)!;
     final isReady = _quickDownloaded[code] ?? false;
     final isDownloading = _quickDownloading.contains(code);
     final isError = _quickError.contains(code);
@@ -752,10 +759,10 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 children: [
                   Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
                   if (isDownloading)
-                    Text('Downloading… ${((progress ?? 0) * 100).toStringAsFixed(0)}%',
+                    Text(localizations.pack_downloading_progress(((progress ?? 0) * 100).toStringAsFixed(0)),
                         style: const TextStyle(fontSize: 11, color: orange))
                   else if (isError)
-                    Text('Failed — tap Retry', style: TextStyle(fontSize: 11, color: Colors.red[400])),
+                    Text(localizations.pack_failed_tap_retry, style: TextStyle(fontSize: 11, color: Colors.red[400])),
                 ],
               ),
             ),
@@ -777,7 +784,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 14),
                     const SizedBox(width: 4),
-                    Text('Ready',
+                    Text(localizations.pack_ready_badge,
                         style: TextStyle(color: Colors.green[700], fontSize: 12,
                             fontWeight: FontWeight.w600)),
                   ]),
@@ -796,7 +803,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                     Icon(isError ? Icons.refresh : Icons.download_rounded,
                         color: Colors.white, size: 14),
                     const SizedBox(width: 4),
-                    Text(isError ? 'Retry' : 'Download',
+                    Text(isError ? localizations.retry : localizations.download_model,
                         style: const TextStyle(color: Colors.white, fontSize: 12,
                             fontWeight: FontWeight.w600)),
                   ]),
@@ -812,6 +819,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   Widget _cloudAiSection() {
     const teal = Color(0xFF0D9488);
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEFFEFD),
@@ -825,14 +833,14 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Connect your AI account',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: teal)),
+          Text(localizations.connect_ai_account_title,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: teal)),
           const SizedBox(height: 4),
           RichText(
             text: TextSpan(
               style: TextStyle(fontSize: 12.5, color: Colors.grey[600], height: 1.4),
               children: [
-                const TextSpan(text: 'Get a free API key from '),
+                TextSpan(text: localizations.connect_ai_account_prefix),
                 TextSpan(
                   text: 'BigModel.cn',
                   style: const TextStyle(color: teal, decoration: TextDecoration.underline),
@@ -842,7 +850,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                           mode: LaunchMode.externalApplication,
                         ),
                 ),
-                const TextSpan(text: ' and paste it below.'),
+                TextSpan(text: localizations.connect_ai_account_suffix),
               ],
             ),
           ),
@@ -851,7 +859,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             controller: _apiKeyController,
             obscureText: _apiKeyObscured,
             decoration: InputDecoration(
-              hintText: 'Paste your API key here',
+              hintText: localizations.api_key_hint_short,
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
               filled: true,
               fillColor: Colors.white,
@@ -891,8 +899,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   ? const SizedBox(
                       height: 18, width: 18,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Save & Verify',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  : Text(localizations.save_and_verify,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ),
         ],
@@ -903,6 +911,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   // ── Advanced ─────────────────────────────────────────────────────────────────
 
   Widget _advancedSection(TranslationProvider provider) {
+    final localizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -910,7 +919,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           onTap: () => setState(() => _showAdvanced = !_showAdvanced),
           child: Row(
             children: [
-              Text('Advanced',
+              Text(localizations.advanced_section_label,
                   style: TextStyle(
                       fontSize: 12.5, fontWeight: FontWeight.w600,
                       color: Colors.grey[400], letterSpacing: 0.4)),
@@ -936,12 +945,12 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Text merge sensitivity',
+                Text(localizations.text_merge_sensitivity_title,
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14,
                         color: Colors.grey[800])),
                 const SizedBox(height: 4),
                 Text(
-                  'Controls how nearby text blocks are grouped. Reduce if translation accuracy drops.',
+                  localizations.text_merge_sensitivity_description,
                   style: TextStyle(fontSize: 12, color: Colors.grey[500], height: 1.4),
                 ),
                 Slider(
@@ -954,11 +963,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Precise', style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+                    Text(localizations.merge_precise, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
                     Text('${provider.mergeAggressiveness.toStringAsFixed(1)}×',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
                             color: Colors.blueGrey[600])),
-                    Text('Aggressive', style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+                    Text(localizations.merge_aggressive, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
                   ],
                 ),
               ],

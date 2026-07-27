@@ -859,6 +859,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @translation_settings_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation Settings'**
+  String get translation_settings_title;
+
+  /// No description provided for @translation_quality_section.
+  ///
+  /// In en, this message translates to:
+  /// **'TRANSLATION QUALITY'**
+  String get translation_quality_section;
+
+  /// No description provided for @mode_quick_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick'**
+  String get mode_quick_title;
+
+  /// No description provided for @mode_quick_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant · Always available · No setup needed'**
+  String get mode_quick_subtitle;
+
+  /// No description provided for @mode_ai_enhanced_title.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Enhanced'**
+  String get mode_ai_enhanced_title;
+
+  /// No description provided for @mode_ai_enhanced_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Better quality · Works offline · Download a language pack'**
+  String get mode_ai_enhanced_subtitle;
+
+  /// No description provided for @mode_cloud_ai_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI'**
+  String get mode_cloud_ai_title;
+
+  /// No description provided for @mode_cloud_ai_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best quality · Requires internet · API key needed'**
+  String get mode_cloud_ai_subtitle;
+
+  /// No description provided for @language_packs_header.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Packs  ·  ~{size} each'**
+  String language_packs_header(String size);
+
+  /// No description provided for @pack_downloading_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading… {percent}%'**
+  String pack_downloading_progress(String percent);
+
+  /// No description provided for @pack_ready_to_use.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to use'**
+  String get pack_ready_to_use;
+
+  /// No description provided for @pack_failed_tap_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed — tap Retry'**
+  String get pack_failed_tap_retry;
+
+  /// No description provided for @pack_ready_badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get pack_ready_badge;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @pack_is_ready_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is ready!'**
+  String pack_is_ready_snackbar(String name);
+
+  /// No description provided for @download_failed_connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed. Please check your connection.'**
+  String get download_failed_connection;
+
+  /// No description provided for @remove_language_pack_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove language pack?'**
+  String get remove_language_pack_title;
+
+  /// No description provided for @remove_ai_pack_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the offline AI pack for {name}?'**
+  String remove_ai_pack_confirm(String name);
+
+  /// No description provided for @remove_quick_pack_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the offline Quick-translation pack for {name}?'**
+  String remove_quick_pack_confirm(String name);
+
+  /// No description provided for @failed_to_remove_pack.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove language pack.'**
+  String get failed_to_remove_pack;
+
+  /// No description provided for @connect_ai_account_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your AI account'**
+  String get connect_ai_account_title;
+
+  /// No description provided for @connect_ai_account_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a free API key from '**
+  String get connect_ai_account_prefix;
+
+  /// No description provided for @connect_ai_account_suffix.
+  ///
+  /// In en, this message translates to:
+  /// **' and paste it below.'**
+  String get connect_ai_account_suffix;
+
+  /// No description provided for @api_key_hint_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste your API key here'**
+  String get api_key_hint_short;
+
+  /// No description provided for @save_and_verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Verify'**
+  String get save_and_verify;
+
+  /// No description provided for @cloud_ai_connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected! Cloud AI is ready.'**
+  String get cloud_ai_connected;
+
+  /// No description provided for @advanced_section_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get advanced_section_label;
+
+  /// No description provided for @text_merge_sensitivity_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Text merge sensitivity'**
+  String get text_merge_sensitivity_title;
+
+  /// No description provided for @text_merge_sensitivity_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Controls how nearby text blocks are grouped. Reduce if translation accuracy drops.'**
+  String get text_merge_sensitivity_description;
+
+  /// No description provided for @merge_precise.
+  ///
+  /// In en, this message translates to:
+  /// **'Precise'**
+  String get merge_precise;
+
+  /// No description provided for @merge_aggressive.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive'**
+  String get merge_aggressive;
+
+  /// No description provided for @select_language_pair_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a language pair'**
+  String get select_language_pair_hint;
+
+  /// No description provided for @download_ai_model_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Download local AI model?'**
+  String get download_ai_model_title;
+
+  /// No description provided for @download_ai_model_description.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack is typically 100–500MB. It downloads in the background; this pair will be ready to use once it finishes.'**
+  String get download_ai_model_description;
 }
 
 class _AppLocalizationsDelegate

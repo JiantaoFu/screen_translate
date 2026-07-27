@@ -370,4 +370,118 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get close => '閉じる';
+
+  @override
+  String get translation_settings_title => '翻訳設定';
+
+  @override
+  String get translation_quality_section => '翻訳品質';
+
+  @override
+  String get mode_quick_title => 'クイック';
+
+  @override
+  String get mode_quick_subtitle => '即時 · 常に利用可能 · 設定不要';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI強化';
+
+  @override
+  String get mode_ai_enhanced_subtitle => 'より高品質 · オフラインで動作 · 言語パックをダウンロード';
+
+  @override
+  String get mode_cloud_ai_title => 'クラウドAI';
+
+  @override
+  String get mode_cloud_ai_subtitle => '最高品質 · インターネット接続が必要 · APIキーが必要';
+
+  @override
+  String language_packs_header(String size) {
+    return '言語パック  ·  各約$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'ダウンロード中… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => '使用準備完了';
+
+  @override
+  String get pack_failed_tap_retry => '失敗 — タップして再試行';
+
+  @override
+  String get pack_ready_badge => '準備完了';
+
+  @override
+  String get retry => '再試行';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$nameの準備ができました！';
+  }
+
+  @override
+  String get download_failed_connection => 'ダウンロードに失敗しました。接続を確認してください。';
+
+  @override
+  String get remove_language_pack_title => '言語パックを削除しますか？';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return '$nameのオフラインAIパックを削除しますか？';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return '$nameのオフラインクイック翻訳パックを削除しますか？';
+  }
+
+  @override
+  String get failed_to_remove_pack => '言語パックの削除に失敗しました。';
+
+  @override
+  String get connect_ai_account_title => 'AIアカウントを接続';
+
+  @override
+  String get connect_ai_account_prefix => 'こちらから無料のAPIキーを取得してください ';
+
+  @override
+  String get connect_ai_account_suffix => '、下に貼り付けてください。';
+
+  @override
+  String get api_key_hint_short => 'ここにAPIキーを貼り付けてください';
+
+  @override
+  String get save_and_verify => '保存して確認';
+
+  @override
+  String get cloud_ai_connected => '接続しました！クラウドAIの準備ができました。';
+
+  @override
+  String get advanced_section_label => '詳細設定';
+
+  @override
+  String get text_merge_sensitivity_title => 'テキスト結合の感度';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      '近くのテキストブロックがどのようにグループ化されるかを制御します。翻訳精度が低下する場合は下げてください。';
+
+  @override
+  String get merge_precise => '精密';
+
+  @override
+  String get merge_aggressive => '積極的';
+
+  @override
+  String get select_language_pair_hint => '言語ペアを選択';
+
+  @override
+  String get download_ai_model_title => 'ローカルAIモデルをダウンロードしますか？';
+
+  @override
+  String get download_ai_model_description =>
+      'このパックは通常100〜500MBです。バックグラウンドでダウンロードされ、完了するとこのペアがすぐに使用可能になります。';
 }

@@ -377,4 +377,123 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get close => 'Закрыть';
+
+  @override
+  String get translation_settings_title => 'Настройки перевода';
+
+  @override
+  String get translation_quality_section => 'КАЧЕСТВО ПЕРЕВОДА';
+
+  @override
+  String get mode_quick_title => 'Быстрый';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Мгновенно · Всегда доступно · Настройка не требуется';
+
+  @override
+  String get mode_ai_enhanced_title => 'Улучшено ИИ';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Лучшее качество · Работает офлайн · Скачайте языковой пакет';
+
+  @override
+  String get mode_cloud_ai_title => 'Облачный ИИ';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Лучшее качество · Требуется интернет · Требуется ключ API';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Языковые пакеты  ·  по ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Загрузка… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Готово к использованию';
+
+  @override
+  String get pack_failed_tap_retry => 'Ошибка — нажмите, чтобы повторить';
+
+  @override
+  String get pack_ready_badge => 'Готово';
+
+  @override
+  String get retry => 'Повторить';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name готов!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Загрузка не удалась. Проверьте подключение.';
+
+  @override
+  String get remove_language_pack_title => 'Удалить языковой пакет?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Удалить офлайн-пакет ИИ для $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Удалить офлайн-пакет быстрого перевода для $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Не удалось удалить языковой пакет.';
+
+  @override
+  String get connect_ai_account_title => 'Подключите свой аккаунт ИИ';
+
+  @override
+  String get connect_ai_account_prefix => 'Получите бесплатный ключ API на ';
+
+  @override
+  String get connect_ai_account_suffix => ' и вставьте его ниже.';
+
+  @override
+  String get api_key_hint_short => 'Вставьте сюда ваш ключ API';
+
+  @override
+  String get save_and_verify => 'Сохранить и проверить';
+
+  @override
+  String get cloud_ai_connected => 'Подключено! Облачный ИИ готов.';
+
+  @override
+  String get advanced_section_label => 'Дополнительно';
+
+  @override
+  String get text_merge_sensitivity_title =>
+      'Чувствительность объединения текста';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Определяет, как группируются близлежащие текстовые блоки. Уменьшите, если точность перевода снижается.';
+
+  @override
+  String get merge_precise => 'Точно';
+
+  @override
+  String get merge_aggressive => 'Агрессивно';
+
+  @override
+  String get select_language_pair_hint => 'Выберите языковую пару';
+
+  @override
+  String get download_ai_model_title => 'Скачать локальную модель ИИ?';
+
+  @override
+  String get download_ai_model_description =>
+      'Этот пакет обычно весит 100–500 МБ. Загрузка идёт в фоне; эта пара будет готова к использованию сразу после завершения.';
 }

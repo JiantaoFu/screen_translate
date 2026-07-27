@@ -376,4 +376,122 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get close => 'Zavrieť';
+
+  @override
+  String get translation_settings_title => 'Nastavenia prekladu';
+
+  @override
+  String get translation_quality_section => 'KVALITA PREKLADU';
+
+  @override
+  String get mode_quick_title => 'Rýchly';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Okamžité · Vždy dostupné · Nie je potrebné nastavenie';
+
+  @override
+  String get mode_ai_enhanced_title => 'Vylepšené AI';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Lepšia kvalita · Funguje offline · Stiahnite si jazykový balík';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloudové AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Najlepšia kvalita · Vyžaduje internet · Vyžaduje API kľúč';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Jazykové balíky  ·  ~$size každý';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Sťahovanie… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Pripravené na použitie';
+
+  @override
+  String get pack_failed_tap_retry => 'Zlyhalo — ťuknutím skúste znova';
+
+  @override
+  String get pack_ready_badge => 'Pripravené';
+
+  @override
+  String get retry => 'Skúsiť znova';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name je pripravený!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Sťahovanie zlyhalo. Skontrolujte pripojenie.';
+
+  @override
+  String get remove_language_pack_title => 'Odstrániť jazykový balík?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Odstrániť offline AI balík pre $name?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Odstrániť offline balík rýchleho prekladu pre $name?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Odstránenie jazykového balíka zlyhalo.';
+
+  @override
+  String get connect_ai_account_title => 'Pripojte svoj AI účet';
+
+  @override
+  String get connect_ai_account_prefix => 'Získajte bezplatný API kľúč na ';
+
+  @override
+  String get connect_ai_account_suffix => ' a vložte ho nižšie.';
+
+  @override
+  String get api_key_hint_short => 'Vložte sem svoj API kľúč';
+
+  @override
+  String get save_and_verify => 'Uložiť a overiť';
+
+  @override
+  String get cloud_ai_connected => 'Pripojené! Cloudové AI je pripravené.';
+
+  @override
+  String get advanced_section_label => 'Pokročilé';
+
+  @override
+  String get text_merge_sensitivity_title => 'Citlivosť zlučovania textu';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Určuje, ako sa zlučujú blízke textové bloky. Znížte, ak presnosť prekladu klesne.';
+
+  @override
+  String get merge_precise => 'Presné';
+
+  @override
+  String get merge_aggressive => 'Agresívne';
+
+  @override
+  String get select_language_pair_hint => 'Vyberte jazykový pár';
+
+  @override
+  String get download_ai_model_title => 'Stiahnuť lokálny AI model?';
+
+  @override
+  String get download_ai_model_description =>
+      'Tento balík má zvyčajne 100 – 500 MB. Sťahuje sa na pozadí; tento pár bude pripravený na použitie hneď po dokončení.';
 }

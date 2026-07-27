@@ -377,4 +377,122 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get close => 'Sluiten';
+
+  @override
+  String get translation_settings_title => 'Vertaalinstellingen';
+
+  @override
+  String get translation_quality_section => 'VERTAALKWALITEIT';
+
+  @override
+  String get mode_quick_title => 'Snel';
+
+  @override
+  String get mode_quick_subtitle =>
+      'Direct · Altijd beschikbaar · Geen installatie nodig';
+
+  @override
+  String get mode_ai_enhanced_title => 'AI-verbeterd';
+
+  @override
+  String get mode_ai_enhanced_subtitle =>
+      'Betere kwaliteit · Werkt offline · Download een taalpakket';
+
+  @override
+  String get mode_cloud_ai_title => 'Cloud-AI';
+
+  @override
+  String get mode_cloud_ai_subtitle =>
+      'Beste kwaliteit · Internet vereist · API-sleutel vereist';
+
+  @override
+  String language_packs_header(String size) {
+    return 'Taalpakketten  ·  elk ~$size';
+  }
+
+  @override
+  String pack_downloading_progress(String percent) {
+    return 'Downloaden… $percent%';
+  }
+
+  @override
+  String get pack_ready_to_use => 'Klaar voor gebruik';
+
+  @override
+  String get pack_failed_tap_retry => 'Mislukt — tik om opnieuw te proberen';
+
+  @override
+  String get pack_ready_badge => 'Klaar';
+
+  @override
+  String get retry => 'Opnieuw proberen';
+
+  @override
+  String pack_is_ready_snackbar(String name) {
+    return '$name is klaar!';
+  }
+
+  @override
+  String get download_failed_connection =>
+      'Download mislukt. Controleer je verbinding.';
+
+  @override
+  String get remove_language_pack_title => 'Taalpakket verwijderen?';
+
+  @override
+  String remove_ai_pack_confirm(String name) {
+    return 'Het offline AI-pakket voor $name verwijderen?';
+  }
+
+  @override
+  String remove_quick_pack_confirm(String name) {
+    return 'Het offline snelvertaalpakket voor $name verwijderen?';
+  }
+
+  @override
+  String get failed_to_remove_pack => 'Verwijderen van taalpakket mislukt.';
+
+  @override
+  String get connect_ai_account_title => 'Verbind je AI-account';
+
+  @override
+  String get connect_ai_account_prefix => 'Haal een gratis API-sleutel op bij ';
+
+  @override
+  String get connect_ai_account_suffix => ' en plak deze hieronder.';
+
+  @override
+  String get api_key_hint_short => 'Plak hier je API-sleutel';
+
+  @override
+  String get save_and_verify => 'Opslaan & verifiëren';
+
+  @override
+  String get cloud_ai_connected => 'Verbonden! Cloud-AI is klaar.';
+
+  @override
+  String get advanced_section_label => 'Geavanceerd';
+
+  @override
+  String get text_merge_sensitivity_title => 'Tekstsamenvoegingsgevoeligheid';
+
+  @override
+  String get text_merge_sensitivity_description =>
+      'Bepaalt hoe nabijgelegen tekstblokken worden gegroepeerd. Verlaag dit als de vertaalnauwkeurigheid afneemt.';
+
+  @override
+  String get merge_precise => 'Precies';
+
+  @override
+  String get merge_aggressive => 'Agressief';
+
+  @override
+  String get select_language_pair_hint => 'Selecteer een taalpaar';
+
+  @override
+  String get download_ai_model_title => 'Lokaal AI-model downloaden?';
+
+  @override
+  String get download_ai_model_description =>
+      'Dit pakket is doorgaans 100–500 MB. Het wordt op de achtergrond gedownload; dit paar is klaar voor gebruik zodra het klaar is.';
 }

@@ -611,8 +611,14 @@ class OverlayService : Service() {
                 setText(text)
 
                 val overlayTextColor = if (isLight) Color.WHITE else Color.BLACK
+                // Fully opaque — a translucent background here let the
+                // original on-screen text bleed through the translated
+                // overlay, which looked messy especially where the source
+                // glyph color didn't match the sampled background. The
+                // static "Translate Image" screen already paints fully
+                // opaque; match that here.
                 val overlayBackgroundColor = Color.argb(
-                    220, // Slightly more opaque for better readability
+                    255,
                     Color.red(overlayColor),
                     Color.green(overlayColor),
                     Color.blue(overlayColor)

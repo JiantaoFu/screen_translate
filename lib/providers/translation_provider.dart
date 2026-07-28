@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
@@ -66,6 +67,77 @@ class TranslationProvider with ChangeNotifier {
       if (dx > 12 || dy > 12 || dw > 12 || dh > 12) return false;
     }
     return true;
+  }
+
+  /// Pad each box slightly and push down anything still overlapping a
+  /// neighbor, mirroring image_translation_screen.dart's overlay layout —
+  /// the live overlay renders each box as an independent native floating
+  /// window with no shared parent to catch collisions, so without this any
+  /// two OCR boxes left close together by the merge step render as
+  /// literally overlapping translucent rectangles.
+  List<Rect> _computeDisplayBoxes(List<OCRResult> results) {
+    final baseBoxes = results.map((r) => Rect.fromLTWH(r.x, r.y, r.width, r.height)).toList();
+
+    final paddedBoxes = <Rect>[];
+    for (int i = 0; i < results.length; i++) {
+      final result = results[i];
+      final base = baseBoxes[i];
+      final desiredPad = result.height * 0.15;
+
+      double padTop = desiredPad;
+      double padBottom = desiredPad;
+      for (int j = 0; j < baseBoxes.length; j++) {
+        if (j == i) continue;
+        final other = baseBoxes[j];
+        final horizontalOverlap = base.left < other.right && base.right > other.left;
+        if (!horizontalOverlap) continue;
+        if (other.bottom <= base.top) {
+          padTop = min(padTop, max(0.0, (base.top - other.bottom) / 2));
+        } else if (other.top >= base.bottom) {
+          padBottom = min(padBottom, max(0.0, (other.top - base.bottom) / 2));
+        }
+      }
+
+      paddedBoxes.add(Rect.fromLTWH(
+        base.left - desiredPad, base.top - padTop,
+        base.width + desiredPad * 2, base.height + padTop + padBottom,
+      ));
+    }
+
+    return _resolveOverlaps(paddedBoxes);
+  }
+
+  /// Pushes boxes down (reading order) just enough that none of them
+  /// overlaps a box above/left of it that shares horizontal space.
+  List<Rect> _resolveOverlaps(List<Rect> boxes) {
+    final order = List<int>.generate(boxes.length, (i) => i)
+      ..sort((a, b) {
+        final byTop = boxes[a].top.compareTo(boxes[b].top);
+        if (byTop != 0) return byTop;
+        return boxes[a].left.compareTo(boxes[b].left);
+      });
+
+    final result = List<Rect>.from(boxes);
+    final finalized = <int>[];
+
+    for (final i in order) {
+      var box = result[i];
+      double minTop = box.top;
+      for (final j in finalized) {
+        final other = result[j];
+        final horizontalOverlap = box.left < other.right && box.right > other.left;
+        if (horizontalOverlap) {
+          minTop = max(minTop, other.bottom);
+        }
+      }
+      if (minTop != box.top) {
+        box = Rect.fromLTWH(box.left, minTop, box.width, box.height);
+        result[i] = box;
+      }
+      finalized.add(i);
+    }
+
+    return result;
   }
 
   TranslationProvider(
@@ -213,15 +285,25 @@ class TranslationProvider with ChangeNotifier {
               // Bump token so any in-flight translation from a previous cycle becomes stale
               final myToken = ++_translationToken;
 
+              // Pad and de-overlap boxes before handing them to the native
+              // overlay — each box here becomes its own independent floating
+              // window with no shared parent to catch collisions, unlike the
+              // static "Translate Image" screen's Stack. Without this, any
+              // two OCR boxes left close together by the merge step (e.g. a
+              // caption nested near a paragraph's edge) render as literally
+              // overlapping translucent rectangles.
+              final displayBoxes = _computeDisplayBoxes(ocrResults);
+
               // ── Show "Translating..." placeholders immediately ───────────────────
               // Only for ONNX/LLM which can take noticeable time; on-device is instant.
               if (_translationMode == TranslationMode.onnx || _translationMode == TranslationMode.llm) {
                 for (var i = 0; i < ocrResults.length; i++) {
                   final r = ocrResults[i];
+                  final box = displayBoxes[i];
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
                       '…', i,
-                      x: r.x, y: r.y, width: r.width, height: r.height,
+                      x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: r.overlayColor, backgroundColor: r.backgroundColor,
                       isLight: r.isLight, imgWidth: r.imgWidth, imgHeight: r.imgHeight,
                     );
@@ -255,11 +337,12 @@ class TranslationProvider with ChangeNotifier {
                 stopwatch.reset();
                 for (var i = 0; i < ocrResults.length; i++) {
                   final ocrResult = ocrResults[i];
+                  final box = displayBoxes[i];
                   translatedTexts.add(batchResults[i]); // Keep history
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
                       batchResults[i], i,
-                      x: ocrResult.x, y: ocrResult.y, width: ocrResult.width, height: ocrResult.height,
+                      x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
                     );
                   }
@@ -290,11 +373,12 @@ class TranslationProvider with ChangeNotifier {
                     return;
                   }
 
+                  final box = displayBoxes[i];
                   final rWatch = Stopwatch()..start();
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
                       translatedText, i,
-                      x: ocrResult.x, y: ocrResult.y, width: ocrResult.width, height: ocrResult.height,
+                      x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
                     );
                   }

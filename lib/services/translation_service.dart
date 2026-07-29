@@ -78,13 +78,17 @@ class TranslationService {
       // Start the translation
       final translationFuture = _translator!.translateText(text).then((translatedText) {
         print('Translation: Translated text: $translatedText');
-        completer.complete(translatedText);
+        // isCompleted guard: cancelTranslation()/cancelAllTranslations() may
+        // have already completed this same completer (with the original
+        // text) while this call was in flight — completing it again here
+        // would throw "Bad state: Future already completed".
+        if (!completer.isCompleted) completer.complete(translatedText);
         _translations.remove(taskKey);
         _translationCompleters.remove(taskKey);
         return translatedText;
       }).catchError((error) {
         print('Translation Error: $error');
-        completer.completeError(error);
+        if (!completer.isCompleted) completer.completeError(error);
         _translations.remove(taskKey);
         _translationCompleters.remove(taskKey);
         return text;
@@ -96,7 +100,7 @@ class TranslationService {
       return await completer.future;
     } catch (e) {
       print('Translation Error: $e');
-      completer.complete(text);
+      if (!completer.isCompleted) completer.complete(text);
       _translations.remove(taskKey);
       _translationCompleters.remove(taskKey);
       return text;

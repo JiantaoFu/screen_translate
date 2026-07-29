@@ -550,7 +550,10 @@ class OnnxTranslationService {
     // Look up the language-prefix token ID for this model pair (may be null).
     final langPrefixId = _kLangPrefixTokenId[pair.key];
     return _runInference(
-        bundle: bundle, sourceText: text, langPrefixId: langPrefixId);
+        bundle: bundle,
+        sourceText: text,
+        langPrefixId: langPrefixId,
+        isEnglishSource: pair.sourceBcp == 'en');
   }
 
   // ── Encoder-decoder loop ──────────────────────────────────────────────────
@@ -559,13 +562,20 @@ class OnnxTranslationService {
     required _OnnxModelBundle bundle,
     required String sourceText,
     int? langPrefixId,
+    required bool isEnglishSource,
   }) async {
     final sw = Stopwatch()..start();
     debugPrint('[ONNX] Translating "$sourceText"');
 
     // ── 1. Tokenize source ────────────────────────────────────────────────────
-    // Moses pre-tokenize first (sacremoses normalization for English)
-    final preprocessed = _mosesTokenizeEnglish(sourceText);
+    // Moses pre-tokenize first (sacremoses normalization for English) — only
+    // valid for an actual English source. Applying English punctuation-
+    // splitting/contraction rules to e.g. Chinese or Japanese source text
+    // (whenever it contains ordinary ASCII punctuation, which real
+    // screenshots do constantly) feeds the model an input outside its
+    // training distribution and silently degrades translation quality with
+    // no visible error.
+    final preprocessed = isEnglishSource ? _mosesTokenizeEnglish(sourceText) : sourceText;
     debugPrint('[ONNX] Moses pre-tokenized: "$preprocessed"');
 
     final pieces = bundle.sourceTokenizer.tokenize(preprocessed);

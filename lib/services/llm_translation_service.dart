@@ -189,7 +189,7 @@ class LLMTranslationService {
 
     // If task was cancelled during queuing, skip it
     if (task.isCancelled) {
-      task.completer.complete(task.text);
+      if (!task.completer.isCompleted) task.completer.complete(task.text);
       _processTranslationQueue();
       return;
     }
@@ -203,23 +203,31 @@ class LLMTranslationService {
         targetLanguage: task.targetLanguage,
       );
 
-      if (!task.isCancelled) {
-        task.completer.complete(translatedText);
-      } else {
-        task.completer.complete(task.text);
+      // isCompleted guards below: cancelAllTranslations() may have already
+      // completed this task (with '') while the await above was in flight —
+      // without the guard, completing it again here throws "Bad state:
+      // Future already completed".
+      if (!task.completer.isCompleted) {
+        if (!task.isCancelled) {
+          task.completer.complete(translatedText);
+        } else {
+          task.completer.complete(task.text);
+        }
       }
     } catch (e) {
       if (e is StateError && e.message.contains('Rate limit exceeded')) {
         // For rate limit errors, put the task back in the queue
         print('Rate limit hit. Requeuing translation task.');
         _translationQueue.addFirst(task);
-        
+
         // Add a small delay before retrying to avoid immediate re-hitting the rate limit
         await Future.delayed(Duration(milliseconds: 100));
-      } else if (!task.isCancelled) {
-        task.completer.completeError(e);
-      } else {
-        task.completer.complete(task.text);
+      } else if (!task.completer.isCompleted) {
+        if (!task.isCancelled) {
+          task.completer.completeError(e);
+        } else {
+          task.completer.complete(task.text);
+        }
       }
     } finally {
       _activeTranslations.remove(task);
@@ -462,12 +470,18 @@ Maintain the exact same array length. DO NOT output any markdown blocks or expla
   Future<void> cancelAllTranslations() async {
     for (var task in _translationQueue) {
       task.isCancelled = true;
-      task.completer.complete('');
+      if (!task.completer.isCompleted) task.completer.complete('');
     }
-    
+
     for (var task in _activeTranslations) {
       task.isCancelled = true;
-      task.completer.complete('');
+      // isCompleted guard: an active task's HTTP call is still running in
+      // _processTranslationQueue's try/await, and that call's own completion
+      // handler also completes this same completer once it returns (see the
+      // matching guard there) — without checking isCompleted on both sides,
+      // whichever one runs second throws "Bad state: Future already
+      // completed".
+      if (!task.completer.isCompleted) task.completer.complete('');
     }
 
     _translationQueue.clear();

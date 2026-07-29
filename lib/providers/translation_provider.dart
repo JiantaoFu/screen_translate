@@ -411,9 +411,7 @@ class TranslationProvider with ChangeNotifier {
                 translationType: _translationMode.name,
               );
 
-              if (!_isManualTranslationRequested) {
-                _previousOcrResults = ocrResults;
-              }
+              _previousOcrResults = ocrResults;
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
@@ -423,9 +421,6 @@ class TranslationProvider with ChangeNotifier {
               print('Timer: captureScreen returned null or not translating, skipping');
             }
           }
-
-          // Reset manual translation flag after processing
-          _isManualTranslationRequested = false;
         } else {
           print('Timer: skipping - mode=$translationMode, isManualRequested=$_isManualTranslationRequested');
         }
@@ -434,6 +429,15 @@ class TranslationProvider with ChangeNotifier {
         print('Stack trace: $stackTrace');
       } finally {
         _isProcessingCapture = false; // Always release guard
+        // Always clear here (not inline after a successful cycle) so a
+        // manual request that gets abandoned mid-cycle — e.g. the user taps
+        // "Stop Translation" while an LLM/ONNX call is still in flight, which
+        // trips the staleness check above and returns early — doesn't leave
+        // this stuck true. A stuck flag makes every future tick look like a
+        // fresh manual request, bypassing the "screen unchanged, skip"
+        // optimization (an extra, avoidable LLM API call/battery hit) until
+        // it happens to complete one cycle uninterrupted.
+        _isManualTranslationRequested = false;
       }
     });
   }
@@ -448,6 +452,7 @@ class TranslationProvider with ChangeNotifier {
   Future<void> stopTranslation() async {
     _isTranslating = false;
     _isProcessingCapture = false;
+    _isManualTranslationRequested = false;
     _previousOcrResults = [];
     _captureTimer?.cancel();
     _captureTimer = null;
@@ -586,6 +591,7 @@ class TranslationProvider with ChangeNotifier {
     _captureTimer?.cancel();
     _ocrService.dispose();
     _onnxTranslationService.dispose();
+    _llmTranslationService.dispose();
     super.dispose();
   }
 

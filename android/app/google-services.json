@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "123456789012",
+    "project_number": "47662042278",
     "project_id": "screentranslation-cff83",
-    "storage_bucket": "screentranslation-cff83.appspot.com"
+    "storage_bucket": "screentranslation-cff83.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:1234567890123456",
+        "mobilesdk_app_id": "1:47662042278:android:0c6f39c3e4a3b4c0c7f867",
         "android_client_info": {
           "package_name": "com.lomoware.screen_translate"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "dummy-api-key"
+          "current_key": "AIzaSyCBq6mwB0Kcc9A5AX9SPWvhPgItCo_u4Go"
         }
       ],
       "services": {

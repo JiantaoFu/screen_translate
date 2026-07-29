@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAnalyticsService {
@@ -130,10 +131,13 @@ class FirebaseAnalyticsService {
     }
   }
 
-  /// Track error
+  /// Track error — also forwarded to Crashlytics as a non-fatal record so
+  /// it shows up with a real stack trace and groups with related crashes,
+  /// instead of living only as a bare type/message pair in Analytics.
   Future<void> trackError({
     required String errorType,
     required String errorMessage,
+    StackTrace? stackTrace,
   }) async {
     try {
       await logEvent(
@@ -142,6 +146,12 @@ class FirebaseAnalyticsService {
           'error_type': errorType,
           'error_message': errorMessage,
         },
+      );
+      await FirebaseCrashlytics.instance.recordError(
+        errorMessage,
+        stackTrace,
+        reason: errorType,
+        fatal: false,
       );
     } catch (e) {
       _logger.severe('Error logging error event: $e');

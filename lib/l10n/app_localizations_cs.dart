@@ -523,4 +523,24 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Překlad obrázku';
+
+  @override
+  String get send_feedback => 'Odeslat zpětnou vazbu';
+
+  @override
+  String get send_feedback_subtitle => 'Nahlásit chybu nebo navrhnout funkci';
+
+  @override
+  String get ai_pair_unsupported_title => 'Jazyk zatím není podporován';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Režim AI zatím nemá model pro tuto jazykovou dvojici. Dejte nám vědět, že o ni máte zájem — pomůže nám to rozhodnout, co vyvíjet dál.';
+
+  @override
+  String get request_language_pair => 'Vyžádat tento jazyk';
+
+  @override
+  String get language_request_sent =>
+      'Děkujeme! Váš požadavek jsme zaznamenali.';
 }

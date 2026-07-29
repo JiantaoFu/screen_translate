@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Cloud-AI vereist een API-sleutel. Stel deze in bij Instellingen.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Afbeeldingsvertaling"
+  "image_translation_title": "Afbeeldingsvertaling",
+  "send_feedback": "Feedback versturen",
+  "send_feedback_subtitle": "Meld een bug of stel een functie voor",
+  "ai_pair_unsupported_title": "Taal nog niet ondersteund",
+  "ai_pair_unsupported_content": "AI-modus heeft nog geen model voor dit taalpaar. Laat ons weten dat je het wilt — dat helpt ons te bepalen wat we hierna gaan bouwen.",
+  "request_language_pair": "Deze taal aanvragen",
+  "language_request_sent": "Bedankt! We hebben je verzoek genoteerd."
 }

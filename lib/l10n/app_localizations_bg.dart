@@ -528,4 +528,24 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Превод на изображение';
+
+  @override
+  String get send_feedback => 'Изпращане на обратна връзка';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Докладвайте грешка или предложете функция';
+
+  @override
+  String get ai_pair_unsupported_title => 'Езикът все още не се поддържа';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Режим AI все още няма модел за тази езикова двойка. Уведомете ни, ако я желаете — това ни помага да решим какво да разработим след това.';
+
+  @override
+  String get request_language_pair => 'Заявка за този език';
+
+  @override
+  String get language_request_sent => 'Благодарим! Регистрирахме заявката ви.';
 }

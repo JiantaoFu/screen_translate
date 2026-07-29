@@ -523,4 +523,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Dịch hình ảnh';
+
+  @override
+  String get send_feedback => 'Gửi phản hồi';
+
+  @override
+  String get send_feedback_subtitle => 'Báo lỗi hoặc đề xuất tính năng';
+
+  @override
+  String get ai_pair_unsupported_title => 'Ngôn ngữ chưa được hỗ trợ';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Chế độ AI chưa có mô hình cho cặp ngôn ngữ này. Hãy cho chúng tôi biết bạn muốn có nó — điều này giúp chúng tôi quyết định nên phát triển gì tiếp theo.';
+
+  @override
+  String get request_language_pair => 'Yêu cầu ngôn ngữ này';
+
+  @override
+  String get language_request_sent =>
+      'Cảm ơn! Chúng tôi đã ghi nhận yêu cầu của bạn.';
 }

@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "A felhő AI-hoz API-kulcs szükséges. Állítsa be a Beállításokban.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Felhő",
-  "image_translation_title": "Képfordítás"
+  "image_translation_title": "Képfordítás",
+  "send_feedback": "Visszajelzés küldése",
+  "send_feedback_subtitle": "Hiba jelentése vagy funkció javaslása",
+  "ai_pair_unsupported_title": "A nyelv még nem támogatott",
+  "ai_pair_unsupported_content": "Az AI mód még nem rendelkezik modellel ehhez a nyelvpárhoz. Jelezd, hogy szeretnéd — ez segít eldönteni, mit fejlesszünk legközelebb.",
+  "request_language_pair": "Ezen nyelv kérése",
+  "language_request_sent": "Köszönjük! Rögzítettük a kérésedet."
 }

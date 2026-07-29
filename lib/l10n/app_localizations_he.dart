@@ -520,4 +520,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get image_translation_title => 'תרגום תמונה';
+
+  @override
+  String get send_feedback => 'שליחת משוב';
+
+  @override
+  String get send_feedback_subtitle => 'דיווח על באג או הצעת תכונה';
+
+  @override
+  String get ai_pair_unsupported_title => 'השפה עדיין לא נתמכת';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'למצב ה-AI עדיין אין מודל לזוג השפות הזה. ספרו לנו שאתם רוצים אותו — זה עוזר לנו להחליט מה לפתח הלאה.';
+
+  @override
+  String get request_language_pair => 'בקשת שפה זו';
+
+  @override
+  String get language_request_sent => 'תודה! רשמנו את הבקשה שלך.';
 }

@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "בינה מלאכותית בענן דורשת מפתח API. הגדר אותו בהגדרות.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "ענן",
-  "image_translation_title": "תרגום תמונה"
+  "image_translation_title": "תרגום תמונה",
+  "send_feedback": "שליחת משוב",
+  "send_feedback_subtitle": "דיווח על באג או הצעת תכונה",
+  "ai_pair_unsupported_title": "השפה עדיין לא נתמכת",
+  "ai_pair_unsupported_content": "למצב ה-AI עדיין אין מודל לזוג השפות הזה. ספרו לנו שאתם רוצים אותו — זה עוזר לנו להחליט מה לפתח הלאה.",
+  "request_language_pair": "בקשת שפה זו",
+  "language_request_sent": "תודה! רשמנו את הבקשה שלך."
 }

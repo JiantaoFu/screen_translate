@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Cloud AI kræver en API-nøgle. Konfigurer den i Indstillinger.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Billedoversættelse"
+  "image_translation_title": "Billedoversættelse",
+  "send_feedback": "Send feedback",
+  "send_feedback_subtitle": "Rapportér en fejl eller foreslå en funktion",
+  "ai_pair_unsupported_title": "Sproget understøttes endnu ikke",
+  "ai_pair_unsupported_content": "AI-tilstand har endnu ikke en model til dette sprogpar. Fortæl os, at du gerne vil have det — det hjælper os med at beslutte, hvad vi skal bygge næste gang.",
+  "request_language_pair": "Anmod om dette sprog",
+  "language_request_sent": "Tak! Vi har noteret din anmodning."
 }

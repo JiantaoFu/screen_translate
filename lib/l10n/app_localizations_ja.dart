@@ -515,4 +515,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get image_translation_title => '画像翻訳';
+
+  @override
+  String get send_feedback => 'フィードバックを送信';
+
+  @override
+  String get send_feedback_subtitle => 'バグを報告するか機能を提案する';
+
+  @override
+  String get ai_pair_unsupported_title => 'この言語はまだサポートされていません';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AIモードにはこの言語ペアのモデルがまだありません。ご要望をお知らせください — 次に何を開発するかの判断に役立ちます。';
+
+  @override
+  String get request_language_pair => 'この言語をリクエスト';
+
+  @override
+  String get language_request_sent => 'ありがとうございます！ご要望を記録しました。';
 }

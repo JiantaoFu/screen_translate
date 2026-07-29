@@ -527,4 +527,24 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Traducerea imaginii';
+
+  @override
+  String get send_feedback => 'Trimite feedback';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Raportează o eroare sau sugerează o funcție';
+
+  @override
+  String get ai_pair_unsupported_title => 'Limba nu este încă acceptată';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Modul AI nu are încă un model pentru această pereche de limbi. Anunță-ne că îl dorești — asta ne ajută să decidem ce să dezvoltăm în continuare.';
+
+  @override
+  String get request_language_pair => 'Solicită această limbă';
+
+  @override
+  String get language_request_sent => 'Mulțumim! Am notat solicitarea ta.';
 }

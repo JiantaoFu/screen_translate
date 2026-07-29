@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "AI Cloud memerlukan kunci API. Siapkan di Pengaturan.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Terjemahan Gambar"
+  "image_translation_title": "Terjemahan Gambar",
+  "send_feedback": "Kirim Masukan",
+  "send_feedback_subtitle": "Laporkan bug atau sarankan fitur",
+  "ai_pair_unsupported_title": "Bahasa Belum Didukung",
+  "ai_pair_unsupported_content": "Mode AI belum memiliki model untuk pasangan bahasa ini. Beri tahu kami jika Anda menginginkannya — ini membantu kami memutuskan apa yang akan dikembangkan selanjutnya.",
+  "request_language_pair": "Minta Bahasa Ini",
+  "language_request_sent": "Terima kasih! Permintaan Anda telah kami catat."
 }

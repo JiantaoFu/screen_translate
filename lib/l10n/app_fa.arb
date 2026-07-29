@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "هوش مصنوعی ابری به یک کلید API نیاز دارد. آن را در تنظیمات راه‌اندازی کنید.",
   "mode_ai_short_label": "هوش مصنوعی",
   "mode_cloud_short_label": "ابری",
-  "image_translation_title": "ترجمه تصویر"
+  "image_translation_title": "ترجمه تصویر",
+  "send_feedback": "ارسال بازخورد",
+  "send_feedback_subtitle": "گزارش یک اشکال یا پیشنهاد یک ویژگی",
+  "ai_pair_unsupported_title": "این زبان هنوز پشتیبانی نمی‌شود",
+  "ai_pair_unsupported_content": "حالت هوش مصنوعی هنوز مدلی برای این جفت زبان ندارد. به ما بگویید که آن را می‌خواهید — این به ما کمک می‌کند تصمیم بگیریم که بعد چه چیزی بسازیم.",
+  "request_language_pair": "درخواست این زبان",
+  "language_request_sent": "متشکریم! درخواست شما ثبت شد."
 }

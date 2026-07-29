@@ -523,4 +523,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get image_translation_title => 'ترجمة الصورة';
+
+  @override
+  String get send_feedback => 'إرسال ملاحظات';
+
+  @override
+  String get send_feedback_subtitle => 'الإبلاغ عن خطأ أو اقتراح ميزة';
+
+  @override
+  String get ai_pair_unsupported_title => 'اللغة غير مدعومة بعد';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'وضع الذكاء الاصطناعي لا يحتوي على نموذج لهذا الزوج اللغوي بعد. أخبرنا برغبتك فيه — سيساعدنا ذلك في تحديد ما سنطوره تاليًا.';
+
+  @override
+  String get request_language_pair => 'طلب هذه اللغة';
+
+  @override
+  String get language_request_sent => 'شكرًا! لقد سجّلنا طلبك.';
 }

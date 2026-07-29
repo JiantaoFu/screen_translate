@@ -526,4 +526,24 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get image_translation_title => 'छवि अनुवाद';
+
+  @override
+  String get send_feedback => 'फ़ीडबैक भेजें';
+
+  @override
+  String get send_feedback_subtitle => 'बग की रिपोर्ट करें या फ़ीचर सुझाएं';
+
+  @override
+  String get ai_pair_unsupported_title => 'भाषा अभी समर्थित नहीं है';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI मोड में अभी इस भाषा जोड़े के लिए कोई मॉडल नहीं है। हमें बताएं कि आप इसे चाहते हैं — इससे हमें यह तय करने में मदद मिलती है कि आगे क्या बनाना है।';
+
+  @override
+  String get request_language_pair => 'यह भाषा माँगें';
+
+  @override
+  String get language_request_sent =>
+      'धन्यवाद! हमने आपका अनुरोध दर्ज कर लिया है।';
 }

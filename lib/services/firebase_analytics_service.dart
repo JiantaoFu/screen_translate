@@ -157,6 +157,27 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Track a request for an AI-mode language pair we don't support yet —
+  /// the passive demand signal for "which model should we build next",
+  /// logged from the exact point a user hits that wall rather than relying
+  /// on them finding a separate feedback channel.
+  Future<void> trackLanguagePairRequest({
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async {
+    try {
+      await logEvent(
+        'ai_language_pair_requested',
+        {
+          'source_language': sourceLanguage,
+          'target_language': targetLanguage,
+        },
+      );
+    } catch (e) {
+      _logger.severe('Error tracking language pair request: $e');
+    }
+  }
+
   /// Set user ID for tracking
   Future<void> setUserId(String userId) async {
     try {

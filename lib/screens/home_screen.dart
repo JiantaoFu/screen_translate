@@ -9,6 +9,7 @@ import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
+import '../services/firebase_analytics_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -504,11 +505,54 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ) async {
     if (provider.translationMode != TranslationMode.onnx) return true;
 
-    final status = await _onnxPairStatus(provider.sourceLanguage, provider.targetLanguage);
+    final source = provider.sourceLanguage;
+    final target = provider.targetLanguage;
+    final localizations = AppLocalizations.of(context)!;
+
+    // A pair with no curated ONNX pair AND no pivot route is not just
+    // "not downloaded" — no download would ever satisfy it. Showing the
+    // same "download a pack" prompt here is actively misleading: the user
+    // goes to Settings, downloads something, comes back, and it still
+    // doesn't work with no explanation why. This is also the one place we
+    // actually learn which language pairs people want that we don't have
+    // yet, so surface a way to tell us instead of a dead-end prompt.
+    if (findOnnxPair(source, target) == null && findOnnxPivotPair(source, target) == null) {
+      if (!context.mounted) return false;
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(localizations.ai_pair_unsupported_title),
+            content: Text(localizations.ai_pair_unsupported_content),
+            actions: [
+              TextButton(
+                child: Text(localizations.cancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              ElevatedButton(
+                child: Text(localizations.request_language_pair),
+                onPressed: () {
+                  FirebaseAnalyticsService().trackLanguagePairRequest(
+                    sourceLanguage: source,
+                    targetLanguage: target,
+                  );
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(localizations.language_request_sent)),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return false;
+    }
+
+    final status = await _onnxPairStatus(source, target);
     if (status == OnnxModelStatus.ready) return true;
     if (!context.mounted) return false;
 
-    final localizations = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       builder: (BuildContext context) {

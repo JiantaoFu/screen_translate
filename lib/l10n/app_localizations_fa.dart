@@ -526,4 +526,23 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get image_translation_title => 'ترجمه تصویر';
+
+  @override
+  String get send_feedback => 'ارسال بازخورد';
+
+  @override
+  String get send_feedback_subtitle => 'گزارش یک اشکال یا پیشنهاد یک ویژگی';
+
+  @override
+  String get ai_pair_unsupported_title => 'این زبان هنوز پشتیبانی نمی‌شود';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'حالت هوش مصنوعی هنوز مدلی برای این جفت زبان ندارد. به ما بگویید که آن را می‌خواهید — این به ما کمک می‌کند تصمیم بگیریم که بعد چه چیزی بسازیم.';
+
+  @override
+  String get request_language_pair => 'درخواست این زبان';
+
+  @override
+  String get language_request_sent => 'متشکریم! درخواست شما ثبت شد.';
 }

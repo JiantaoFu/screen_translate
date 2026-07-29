@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "AI w chmurze wymaga klucza API. Skonfiguruj go w Ustawieniach.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Chmura",
-  "image_translation_title": "Tłumaczenie obrazu"
+  "image_translation_title": "Tłumaczenie obrazu",
+  "send_feedback": "Wyślij opinię",
+  "send_feedback_subtitle": "Zgłoś błąd lub zaproponuj funkcję",
+  "ai_pair_unsupported_title": "Język nie jest jeszcze obsługiwany",
+  "ai_pair_unsupported_content": "Tryb AI nie ma jeszcze modelu dla tej pary językowej. Daj nam znać, że go chcesz — pomoże nam to zdecydować, co rozwijać dalej.",
+  "request_language_pair": "Poproś o ten język",
+  "language_request_sent": "Dziękujemy! Zarejestrowaliśmy Twoją prośbę."
 }

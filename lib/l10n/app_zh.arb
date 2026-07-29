@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "云端AI需要API密钥，请在设置中配置。",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "云端",
-  "image_translation_title": "图片翻译"
+  "image_translation_title": "图片翻译",
+  "send_feedback": "发送反馈",
+  "send_feedback_subtitle": "报告问题或提出功能建议",
+  "ai_pair_unsupported_title": "暂不支持该语言",
+  "ai_pair_unsupported_content": "AI 模式目前还没有这个语言对的模型。告诉我们你需要它——这能帮助我们决定接下来开发什么。",
+  "request_language_pair": "请求支持此语言",
+  "language_request_sent": "谢谢！我们已记录你的请求。"
 }

@@ -527,4 +527,24 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Vaizdo vertimas';
+
+  @override
+  String get send_feedback => 'Siųsti atsiliepimą';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Pranešti apie klaidą arba pasiūlyti funkciją';
+
+  @override
+  String get ai_pair_unsupported_title => 'Kalba dar nepalaikoma';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI režimas dar neturi modelio šiai kalbų porai. Praneškite mums, kad jos norite — tai padeda mums nuspręsti, ką kurti toliau.';
+
+  @override
+  String get request_language_pair => 'Užklausti šios kalbos';
+
+  @override
+  String get language_request_sent => 'Ačiū! Užregistravome jūsų užklausą.';
 }

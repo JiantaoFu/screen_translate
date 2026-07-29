@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Debesijos DI reikalauja API rakto. Nustatykite jį Nustatymuose.",
   "mode_ai_short_label": "DI",
   "mode_cloud_short_label": "Debesija",
-  "image_translation_title": "Vaizdo vertimas"
+  "image_translation_title": "Vaizdo vertimas",
+  "send_feedback": "Siųsti atsiliepimą",
+  "send_feedback_subtitle": "Pranešti apie klaidą arba pasiūlyti funkciją",
+  "ai_pair_unsupported_title": "Kalba dar nepalaikoma",
+  "ai_pair_unsupported_content": "AI režimas dar neturi modelio šiai kalbų porai. Praneškite mums, kad jos norite — tai padeda mums nuspręsti, ką kurti toliau.",
+  "request_language_pair": "Užklausti šios kalbos",
+  "language_request_sent": "Ačiū! Užregistravome jūsų užklausą."
 }

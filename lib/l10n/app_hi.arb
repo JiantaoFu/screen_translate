@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "क्लाउड AI को एक API कुंजी की आवश्यकता है। इसे सेटिंग्स में सेट करें।",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "क्लाउड",
-  "image_translation_title": "छवि अनुवाद"
+  "image_translation_title": "छवि अनुवाद",
+  "send_feedback": "फ़ीडबैक भेजें",
+  "send_feedback_subtitle": "बग की रिपोर्ट करें या फ़ीचर सुझाएं",
+  "ai_pair_unsupported_title": "भाषा अभी समर्थित नहीं है",
+  "ai_pair_unsupported_content": "AI मोड में अभी इस भाषा जोड़े के लिए कोई मॉडल नहीं है। हमें बताएं कि आप इसे चाहते हैं — इससे हमें यह तय करने में मदद मिलती है कि आगे क्या बनाना है।",
+  "request_language_pair": "यह भाषा माँगें",
+  "language_request_sent": "धन्यवाद! हमने आपका अनुरोध दर्ज कर लिया है।"
 }

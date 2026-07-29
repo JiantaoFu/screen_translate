@@ -1117,6 +1117,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Image Translation'**
   String get image_translation_title;
+
+  /// No description provided for @send_feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback'**
+  String get send_feedback;
+
+  /// No description provided for @send_feedback_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a bug or suggest a feature'**
+  String get send_feedback_subtitle;
+
+  /// No description provided for @ai_pair_unsupported_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Not Supported Yet'**
+  String get ai_pair_unsupported_title;
+
+  /// No description provided for @ai_pair_unsupported_content.
+  ///
+  /// In en, this message translates to:
+  /// **'AI mode doesn\'t have a model for this language pair yet. Let us know you\'d like it — it helps us decide what to build next.'**
+  String get ai_pair_unsupported_content;
+
+  /// No description provided for @request_language_pair.
+  ///
+  /// In en, this message translates to:
+  /// **'Request This Language'**
+  String get request_language_pair;
+
+  /// No description provided for @language_request_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! We\'ve noted your request.'**
+  String get language_request_sent;
 }
 
 class _AppLocalizationsDelegate

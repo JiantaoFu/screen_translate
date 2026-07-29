@@ -526,4 +526,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Tradução de imagem';
+
+  @override
+  String get send_feedback => 'Enviar feedback';
+
+  @override
+  String get send_feedback_subtitle => 'Reportar um bug ou sugerir um recurso';
+
+  @override
+  String get ai_pair_unsupported_title => 'Idioma ainda não suportado';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'O modo IA ainda não tem um modelo para este par de idiomas. Avise-nos que você o deseja — isso nos ajuda a decidir o que desenvolver a seguir.';
+
+  @override
+  String get request_language_pair => 'Solicitar este idioma';
+
+  @override
+  String get language_request_sent => 'Obrigado! Registramos sua solicitação.';
 }

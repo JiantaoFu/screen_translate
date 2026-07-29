@@ -529,4 +529,25 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Μετάφραση εικόνας';
+
+  @override
+  String get send_feedback => 'Αποστολή σχολίων';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Αναφορά σφάλματος ή πρόταση λειτουργίας';
+
+  @override
+  String get ai_pair_unsupported_title => 'Η γλώσσα δεν υποστηρίζεται ακόμη';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Η λειτουργία AI δεν διαθέτει ακόμη μοντέλο για αυτό το ζεύγος γλωσσών. Ενημερώστε μας ότι το θέλετε — αυτό μας βοηθά να αποφασίσουμε τι θα αναπτύξουμε στη συνέχεια.';
+
+  @override
+  String get request_language_pair => 'Αίτημα για αυτή τη γλώσσα';
+
+  @override
+  String get language_request_sent =>
+      'Ευχαριστούμε! Καταγράψαμε το αίτημά σας.';
 }

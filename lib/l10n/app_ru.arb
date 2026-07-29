@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Облачному ИИ нужен ключ API. Настройте его в Настройках.",
   "mode_ai_short_label": "ИИ",
   "mode_cloud_short_label": "Облако",
-  "image_translation_title": "Перевод изображения"
+  "image_translation_title": "Перевод изображения",
+  "send_feedback": "Отправить отзыв",
+  "send_feedback_subtitle": "Сообщить об ошибке или предложить функцию",
+  "ai_pair_unsupported_title": "Язык пока не поддерживается",
+  "ai_pair_unsupported_content": "В режиме ИИ пока нет модели для этой языковой пары. Сообщите нам, что она вам нужна — это поможет нам решить, что разрабатывать дальше.",
+  "request_language_pair": "Запросить этот язык",
+  "language_request_sent": "Спасибо! Мы зафиксировали ваш запрос."
 }

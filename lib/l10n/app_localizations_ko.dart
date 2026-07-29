@@ -514,4 +514,23 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get image_translation_title => '이미지 번역';
+
+  @override
+  String get send_feedback => '피드백 보내기';
+
+  @override
+  String get send_feedback_subtitle => '버그 신고 또는 기능 제안';
+
+  @override
+  String get ai_pair_unsupported_title => '아직 지원되지 않는 언어입니다';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI 모드에는 아직 이 언어 쌍에 대한 모델이 없습니다. 원하신다면 알려주세요 — 다음에 무엇을 개발할지 결정하는 데 도움이 됩니다.';
+
+  @override
+  String get request_language_pair => '이 언어 요청하기';
+
+  @override
+  String get language_request_sent => '감사합니다! 요청이 접수되었습니다.';
 }

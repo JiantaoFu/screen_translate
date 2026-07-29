@@ -141,5 +141,11 @@
   "cloud_ai_api_key_required_content": "Pilvi-tekoäly vaatii API-avaimen. Määritä se asetuksissa.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Pilvi",
-  "image_translation_title": "Kuvan kääntäminen"
+  "image_translation_title": "Kuvan kääntäminen",
+  "send_feedback": "Lähetä palautetta",
+  "send_feedback_subtitle": "Ilmoita virheestä tai ehdota ominaisuutta",
+  "ai_pair_unsupported_title": "Kieltä ei vielä tueta",
+  "ai_pair_unsupported_content": "Tekoälytilassa ei ole vielä mallia tälle kieliparille. Kerro meille, että haluat sen — se auttaa meitä päättämään, mitä kehitämme seuraavaksi.",
+  "request_language_pair": "Pyydä tätä kieltä",
+  "language_request_sent": "Kiitos! Merkitsimme pyyntösi muistiin."
 }

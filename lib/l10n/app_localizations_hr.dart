@@ -526,4 +526,23 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Prijevod slike';
+
+  @override
+  String get send_feedback => 'Pošalji povratne informacije';
+
+  @override
+  String get send_feedback_subtitle => 'Prijavi grešku ili predloži značajku';
+
+  @override
+  String get ai_pair_unsupported_title => 'Jezik još nije podržan';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI način rada još nema model za ovaj jezični par. Javite nam da ga želite — to nam pomaže odlučiti što razviti sljedeće.';
+
+  @override
+  String get request_language_pair => 'Zatraži ovaj jezik';
+
+  @override
+  String get language_request_sent => 'Hvala! Zabilježili smo vaš zahtjev.';
 }

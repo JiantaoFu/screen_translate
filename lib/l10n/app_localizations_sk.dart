@@ -525,4 +525,23 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Preklad obrázka';
+
+  @override
+  String get send_feedback => 'Odoslať spätnú väzbu';
+
+  @override
+  String get send_feedback_subtitle => 'Nahlásiť chybu alebo navrhnúť funkciu';
+
+  @override
+  String get ai_pair_unsupported_title => 'Jazyk zatiaľ nie je podporovaný';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Režim AI zatiaľ nemá model pre tento jazykový pár. Dajte nám vedieť, že oň máte záujem — pomôže nám to rozhodnúť, čo vyvíjať ďalej.';
+
+  @override
+  String get request_language_pair => 'Vyžiadať tento jazyk';
+
+  @override
+  String get language_request_sent => 'Ďakujeme! Vašu žiadosť sme zaznamenali.';
 }

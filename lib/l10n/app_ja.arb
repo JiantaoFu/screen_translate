@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "クラウドAIにはAPIキーが必要です。設定で設定してください。",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "クラウド",
-  "image_translation_title": "画像翻訳"
+  "image_translation_title": "画像翻訳",
+  "send_feedback": "フィードバックを送信",
+  "send_feedback_subtitle": "バグを報告するか機能を提案する",
+  "ai_pair_unsupported_title": "この言語はまだサポートされていません",
+  "ai_pair_unsupported_content": "AIモードにはこの言語ペアのモデルがまだありません。ご要望をお知らせください — 次に何を開発するかの判断に役立ちます。",
+  "request_language_pair": "この言語をリクエスト",
+  "language_request_sent": "ありがとうございます！ご要望を記録しました。"
 }

@@ -526,4 +526,24 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Kuvan kääntäminen';
+
+  @override
+  String get send_feedback => 'Lähetä palautetta';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Ilmoita virheestä tai ehdota ominaisuutta';
+
+  @override
+  String get ai_pair_unsupported_title => 'Kieltä ei vielä tueta';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Tekoälytilassa ei ole vielä mallia tälle kieliparille. Kerro meille, että haluat sen — se auttaa meitä päättämään, mitä kehitämme seuraavaksi.';
+
+  @override
+  String get request_language_pair => 'Pyydä tätä kieltä';
+
+  @override
+  String get language_request_sent => 'Kiitos! Merkitsimme pyyntösi muistiin.';
 }

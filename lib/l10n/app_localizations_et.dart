@@ -524,4 +524,23 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Pildi tõlge';
+
+  @override
+  String get send_feedback => 'Saada tagasisidet';
+
+  @override
+  String get send_feedback_subtitle => 'Teata veast või soovita funktsiooni';
+
+  @override
+  String get ai_pair_unsupported_title => 'Keelt ei toetata veel';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI-reżiimil pole selle keelepaari jaoks veel mudelit. Anna meile teada, et soovid seda — see aitab meil otsustada, mida järgmisena arendada.';
+
+  @override
+  String get request_language_pair => 'Taotle seda keelt';
+
+  @override
+  String get language_request_sent => 'Aitäh! Oleme su taotluse kirja pannud.';
 }

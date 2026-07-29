@@ -524,4 +524,24 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Terjemahan Gambar';
+
+  @override
+  String get send_feedback => 'Kirim Masukan';
+
+  @override
+  String get send_feedback_subtitle => 'Laporkan bug atau sarankan fitur';
+
+  @override
+  String get ai_pair_unsupported_title => 'Bahasa Belum Didukung';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Mode AI belum memiliki model untuk pasangan bahasa ini. Beri tahu kami jika Anda menginginkannya — ini membantu kami memutuskan apa yang akan dikembangkan selanjutnya.';
+
+  @override
+  String get request_language_pair => 'Minta Bahasa Ini';
+
+  @override
+  String get language_request_sent =>
+      'Terima kasih! Permintaan Anda telah kami catat.';
 }

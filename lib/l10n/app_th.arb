@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "AI บนคลาวด์ต้องใช้คีย์ API โปรดตั้งค่าในการตั้งค่า",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "คลาวด์",
-  "image_translation_title": "การแปลภาพ"
+  "image_translation_title": "การแปลภาพ",
+  "send_feedback": "ส่งความคิดเห็น",
+  "send_feedback_subtitle": "รายงานข้อบกพร่องหรือแนะนำฟีเจอร์",
+  "ai_pair_unsupported_title": "ยังไม่รองรับภาษานี้",
+  "ai_pair_unsupported_content": "โหมด AI ยังไม่มีโมเดลสำหรับคู่ภาษานี้ แจ้งให้เราทราบว่าคุณต้องการ — จะช่วยให้เราตัดสินใจได้ว่าจะพัฒนาอะไรต่อไป",
+  "request_language_pair": "ขอภาษานี้",
+  "language_request_sent": "ขอบคุณ! เราบันทึกคำขอของคุณแล้ว"
 }

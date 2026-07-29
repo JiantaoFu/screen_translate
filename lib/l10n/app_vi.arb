@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "AI đám mây yêu cầu khóa API. Thiết lập trong Cài đặt.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Đám mây",
-  "image_translation_title": "Dịch hình ảnh"
+  "image_translation_title": "Dịch hình ảnh",
+  "send_feedback": "Gửi phản hồi",
+  "send_feedback_subtitle": "Báo lỗi hoặc đề xuất tính năng",
+  "ai_pair_unsupported_title": "Ngôn ngữ chưa được hỗ trợ",
+  "ai_pair_unsupported_content": "Chế độ AI chưa có mô hình cho cặp ngôn ngữ này. Hãy cho chúng tôi biết bạn muốn có nó — điều này giúp chúng tôi quyết định nên phát triển gì tiếp theo.",
+  "request_language_pair": "Yêu cầu ngôn ngữ này",
+  "language_request_sent": "Cảm ơn! Chúng tôi đã ghi nhận yêu cầu của bạn."
 }

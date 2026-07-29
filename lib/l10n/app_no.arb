@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Sky-AI krever en API-nøkkel. Sett den opp i Innstillinger.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Sky",
-  "image_translation_title": "Bildeoversettelse"
+  "image_translation_title": "Bildeoversettelse",
+  "send_feedback": "Send tilbakemelding",
+  "send_feedback_subtitle": "Rapporter en feil eller foreslå en funksjon",
+  "ai_pair_unsupported_title": "Språket støttes ikke ennå",
+  "ai_pair_unsupported_content": "AI-modus har ennå ikke en modell for dette språkparet. Gi oss beskjed om at du vil ha det — det hjelper oss å bestemme hva vi skal bygge videre.",
+  "request_language_pair": "Be om dette språket",
+  "language_request_sent": "Takk! Vi har registrert forespørselen din."
 }

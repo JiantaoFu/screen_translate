@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "ক্লাউড AI-এর জন্য একটি API কী প্রয়োজন। সেটিংসে এটি সেট আপ করুন।",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "ক্লাউড",
-  "image_translation_title": "ছবি অনুবাদ"
+  "image_translation_title": "ছবি অনুবাদ",
+  "send_feedback": "মতামত পাঠান",
+  "send_feedback_subtitle": "একটি বাগ রিপোর্ট করুন বা একটি ফিচার প্রস্তাব করুন",
+  "ai_pair_unsupported_title": "ভাষাটি এখনো সমর্থিত নয়",
+  "ai_pair_unsupported_content": "AI মোডে এই ভাষা জোড়ার জন্য এখনো কোনো মডেল নেই। আমাদের জানান আপনি এটি চান — এটি আমাদের পরবর্তী কী তৈরি করব তা ঠিক করতে সাহায্য করে।",
+  "request_language_pair": "এই ভাষার অনুরোধ করুন",
+  "language_request_sent": "ধন্যবাদ! আমরা আপনার অনুরোধ নথিভুক্ত করেছি।"
 }

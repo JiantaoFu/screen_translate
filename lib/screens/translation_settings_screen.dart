@@ -455,6 +455,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               if (provider.translationMode == TranslationMode.llm)
                 _cloudAiSection(),
 
+              const SizedBox(height: 10),
+              _feedbackSection(),
+
               const SizedBox(height: 32),
               _advancedSection(provider),
             ],
@@ -904,6 +907,57 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Feedback ─────────────────────────────────────────────────────────────────
+
+  Widget _feedbackSection() {
+    final localizations = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: () => launchUrl(
+        Uri(
+          scheme: 'mailto',
+          path: 'support@wtao.top',
+          query: 'subject=${Uri.encodeComponent(localizations.send_feedback)}',
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4F46E5).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.feedback_outlined, color: Color(0xFF4F46E5), size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(localizations.send_feedback,
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.grey[800])),
+                  const SizedBox(height: 2),
+                  Text(localizations.send_feedback_subtitle,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
+          ],
+        ),
       ),
     );
   }

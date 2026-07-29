@@ -525,4 +525,24 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Bildöversättning';
+
+  @override
+  String get send_feedback => 'Skicka feedback';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Rapportera ett fel eller föreslå en funktion';
+
+  @override
+  String get ai_pair_unsupported_title => 'Språket stöds inte än';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI-läget har ännu ingen modell för detta språkpar. Låt oss veta att du vill ha det — det hjälper oss att bestämma vad vi ska bygga härnäst.';
+
+  @override
+  String get request_language_pair => 'Begär detta språk';
+
+  @override
+  String get language_request_sent => 'Tack! Vi har noterat din begäran.';
 }

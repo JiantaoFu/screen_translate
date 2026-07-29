@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Pilve AI vajab API-võtit. Seadista see seadetes.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Pilv",
-  "image_translation_title": "Pildi tõlge"
+  "image_translation_title": "Pildi tõlge",
+  "send_feedback": "Saada tagasisidet",
+  "send_feedback_subtitle": "Teata veast või soovita funktsiooni",
+  "ai_pair_unsupported_title": "Keelt ei toetata veel",
+  "ai_pair_unsupported_content": "AI-reżiimil pole selle keelepaari jaoks veel mudelit. Anna meile teada, et soovid seda — see aitab meil otsustada, mida järgmisena arendada.",
+  "request_language_pair": "Taotle seda keelt",
+  "language_request_sent": "Aitäh! Oleme su taotluse kirja pannud."
 }

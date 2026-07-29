@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Bulut yapay zeka bir API anahtarı gerektirir. Ayarlar'da kurun.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Bulut",
-  "image_translation_title": "Görsel Çevirisi"
+  "image_translation_title": "Görsel Çevirisi",
+  "send_feedback": "Geri Bildirim Gönder",
+  "send_feedback_subtitle": "Bir hata bildirin veya özellik önerin",
+  "ai_pair_unsupported_title": "Dil Henüz Desteklenmiyor",
+  "ai_pair_unsupported_content": "AI modu bu dil çifti için henüz bir modele sahip değil. İstediğinizi bize bildirin — bu, sıradaki geliştirmeye karar vermemize yardımcı olur.",
+  "request_language_pair": "Bu Dili İste",
+  "language_request_sent": "Teşekkürler! Talebinizi kaydettik."
 }

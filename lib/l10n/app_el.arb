@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Το AI στο Cloud απαιτεί κλειδί API. Ρυθμίστε το στις Ρυθμίσεις.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Μετάφραση εικόνας"
+  "image_translation_title": "Μετάφραση εικόνας",
+  "send_feedback": "Αποστολή σχολίων",
+  "send_feedback_subtitle": "Αναφορά σφάλματος ή πρόταση λειτουργίας",
+  "ai_pair_unsupported_title": "Η γλώσσα δεν υποστηρίζεται ακόμη",
+  "ai_pair_unsupported_content": "Η λειτουργία AI δεν διαθέτει ακόμη μοντέλο για αυτό το ζεύγος γλωσσών. Ενημερώστε μας ότι το θέλετε — αυτό μας βοηθά να αποφασίσουμε τι θα αναπτύξουμε στη συνέχεια.",
+  "request_language_pair": "Αίτημα για αυτή τη γλώσσα",
+  "language_request_sent": "Ευχαριστούμε! Καταγράψαμε το αίτημά σας."
 }

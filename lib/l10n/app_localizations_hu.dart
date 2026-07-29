@@ -530,4 +530,23 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Képfordítás';
+
+  @override
+  String get send_feedback => 'Visszajelzés küldése';
+
+  @override
+  String get send_feedback_subtitle => 'Hiba jelentése vagy funkció javaslása';
+
+  @override
+  String get ai_pair_unsupported_title => 'A nyelv még nem támogatott';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Az AI mód még nem rendelkezik modellel ehhez a nyelvpárhoz. Jelezd, hogy szeretnéd — ez segít eldönteni, mit fejlesszünk legközelebb.';
+
+  @override
+  String get request_language_pair => 'Ezen nyelv kérése';
+
+  @override
+  String get language_request_sent => 'Köszönjük! Rögzítettük a kérésedet.';
 }

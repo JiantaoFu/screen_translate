@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "يتطلب الذكاء الاصطناعي السحابي مفتاح API. قم بإعداده في الإعدادات.",
   "mode_ai_short_label": "ذكاء اصطناعي",
   "mode_cloud_short_label": "سحابي",
-  "image_translation_title": "ترجمة الصورة"
+  "image_translation_title": "ترجمة الصورة",
+  "send_feedback": "إرسال ملاحظات",
+  "send_feedback_subtitle": "الإبلاغ عن خطأ أو اقتراح ميزة",
+  "ai_pair_unsupported_title": "اللغة غير مدعومة بعد",
+  "ai_pair_unsupported_content": "وضع الذكاء الاصطناعي لا يحتوي على نموذج لهذا الزوج اللغوي بعد. أخبرنا برغبتك فيه — سيساعدنا ذلك في تحديد ما سنطوره تاليًا.",
+  "request_language_pair": "طلب هذه اللغة",
+  "language_request_sent": "شكرًا! لقد سجّلنا طلبك."
 }

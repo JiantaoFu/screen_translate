@@ -510,4 +510,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get image_translation_title => '图片翻译';
+
+  @override
+  String get send_feedback => '发送反馈';
+
+  @override
+  String get send_feedback_subtitle => '报告问题或提出功能建议';
+
+  @override
+  String get ai_pair_unsupported_title => '暂不支持该语言';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI 模式目前还没有这个语言对的模型。告诉我们你需要它——这能帮助我们决定接下来开发什么。';
+
+  @override
+  String get request_language_pair => '请求支持此语言';
+
+  @override
+  String get language_request_sent => '谢谢！我们已记录你的请求。';
 }

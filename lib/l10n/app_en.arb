@@ -200,5 +200,11 @@
   "cloud_ai_api_key_required_content": "Cloud AI requires an API key. Set it up in Settings.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Image Translation"
+  "image_translation_title": "Image Translation",
+  "send_feedback": "Send Feedback",
+  "send_feedback_subtitle": "Report a bug or suggest a feature",
+  "ai_pair_unsupported_title": "Language Not Supported Yet",
+  "ai_pair_unsupported_content": "AI mode doesn't have a model for this language pair yet. Let us know you'd like it — it helps us decide what to build next.",
+  "request_language_pair": "Request This Language",
+  "language_request_sent": "Thanks! We've noted your request."
 }

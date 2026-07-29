@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Moln-AI kräver en API-nyckel. Ställ in den i Inställningar.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Moln",
-  "image_translation_title": "Bildöversättning"
+  "image_translation_title": "Bildöversättning",
+  "send_feedback": "Skicka feedback",
+  "send_feedback_subtitle": "Rapportera ett fel eller föreslå en funktion",
+  "ai_pair_unsupported_title": "Språket stöds inte än",
+  "ai_pair_unsupported_content": "AI-läget har ännu ingen modell för detta språkpar. Låt oss veta att du vill ha det — det hjälper oss att bestämma vad vi ska bygga härnäst.",
+  "request_language_pair": "Begär detta språk",
+  "language_request_sent": "Tack! Vi har noterat din begäran."
 }

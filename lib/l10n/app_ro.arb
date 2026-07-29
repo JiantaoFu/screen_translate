@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "AI-ul din cloud necesită o cheie API. Configureaz-o în Setări.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Traducerea imaginii"
+  "image_translation_title": "Traducerea imaginii",
+  "send_feedback": "Trimite feedback",
+  "send_feedback_subtitle": "Raportează o eroare sau sugerează o funcție",
+  "ai_pair_unsupported_title": "Limba nu este încă acceptată",
+  "ai_pair_unsupported_content": "Modul AI nu are încă un model pentru această pereche de limbi. Anunță-ne că îl dorești — asta ne ajută să decidem ce să dezvoltăm în continuare.",
+  "request_language_pair": "Solicită această limbă",
+  "language_request_sent": "Mulțumim! Am notat solicitarea ta."
 }

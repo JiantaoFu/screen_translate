@@ -523,4 +523,24 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Billedoversættelse';
+
+  @override
+  String get send_feedback => 'Send feedback';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Rapportér en fejl eller foreslå en funktion';
+
+  @override
+  String get ai_pair_unsupported_title => 'Sproget understøttes endnu ikke';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI-tilstand har endnu ikke en model til dette sprogpar. Fortæl os, at du gerne vil have det — det hjælper os med at beslutte, hvad vi skal bygge næste gang.';
+
+  @override
+  String get request_language_pair => 'Anmod om dette sprog';
+
+  @override
+  String get language_request_sent => 'Tak! Vi har noteret din anmodning.';
 }

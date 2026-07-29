@@ -526,4 +526,24 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Tłumaczenie obrazu';
+
+  @override
+  String get send_feedback => 'Wyślij opinię';
+
+  @override
+  String get send_feedback_subtitle => 'Zgłoś błąd lub zaproponuj funkcję';
+
+  @override
+  String get ai_pair_unsupported_title => 'Język nie jest jeszcze obsługiwany';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'Tryb AI nie ma jeszcze modelu dla tej pary językowej. Daj nam znać, że go chcesz — pomoże nam to zdecydować, co rozwijać dalej.';
+
+  @override
+  String get request_language_pair => 'Poproś o ten język';
+
+  @override
+  String get language_request_sent =>
+      'Dziękujemy! Zarejestrowaliśmy Twoją prośbę.';
 }

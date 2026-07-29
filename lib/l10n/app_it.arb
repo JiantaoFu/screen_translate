@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "L'IA Cloud richiede una chiave API. Configurala in Impostazioni.",
   "mode_ai_short_label": "IA",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Traduzione immagine"
+  "image_translation_title": "Traduzione immagine",
+  "send_feedback": "Invia feedback",
+  "send_feedback_subtitle": "Segnala un bug o suggerisci una funzionalità",
+  "ai_pair_unsupported_title": "Lingua non ancora supportata",
+  "ai_pair_unsupported_content": "La modalità IA non ha ancora un modello per questa coppia di lingue. Faccelo sapere se la desideri — ci aiuta a decidere cosa sviluppare in seguito.",
+  "request_language_pair": "Richiedi questa lingua",
+  "language_request_sent": "Grazie! Abbiamo registrato la tua richiesta."
 }

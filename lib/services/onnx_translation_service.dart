@@ -462,15 +462,30 @@ class OnnxTranslationService {
     final dir = await _modelDir(langPairKey);
     final ort = OnnxRuntime();
 
+    // XNNPACK is a CPU-optimized kernel backend that's a reliable win for
+    // already-quantized (int8) models like ours — unlike NNAPI, which
+    // delegates to whatever NPU/GPU driver the device ships and can
+    // silently fall back to (slower) per-node CPU execution, or even
+    // underperform outright, on transformer graphs many OEM drivers don't
+    // fully support. Listing CPU after it is just the required fallback
+    // for any op XNNPACK itself doesn't implement — ORT handles that
+    // per-node automatically.
+    final sessionOptions = OrtSessionOptions(
+      providers: [OrtProvider.XNNPACK, OrtProvider.CPU],
+    );
+
     // createSession(path) is the correct API for file-system paths
     final encoder = await ort.createSession(
       p.join(dir.path, 'encoder_model.onnx'),
+      options: sessionOptions,
     );
     final decoder = await ort.createSession(
       p.join(dir.path, 'decoder_model.onnx'),
+      options: sessionOptions,
     );
     final decoderWithPast = await ort.createSession(
       p.join(dir.path, 'decoder_with_past_model.onnx'),
+      options: sessionOptions,
     );
 
     // source.spm is used only for *segmentation* into pieces (strings); the

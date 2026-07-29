@@ -530,4 +530,23 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Görsel Çevirisi';
+
+  @override
+  String get send_feedback => 'Geri Bildirim Gönder';
+
+  @override
+  String get send_feedback_subtitle => 'Bir hata bildirin veya özellik önerin';
+
+  @override
+  String get ai_pair_unsupported_title => 'Dil Henüz Desteklenmiyor';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI modu bu dil çifti için henüz bir modele sahip değil. İstediğinizi bize bildirin — bu, sıradaki geliştirmeye karar vermemize yardımcı olur.';
+
+  @override
+  String get request_language_pair => 'Bu Dili İste';
+
+  @override
+  String get language_request_sent => 'Teşekkürler! Talebinizi kaydettik.';
 }

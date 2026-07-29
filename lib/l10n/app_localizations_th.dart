@@ -522,4 +522,23 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get image_translation_title => 'การแปลภาพ';
+
+  @override
+  String get send_feedback => 'ส่งความคิดเห็น';
+
+  @override
+  String get send_feedback_subtitle => 'รายงานข้อบกพร่องหรือแนะนำฟีเจอร์';
+
+  @override
+  String get ai_pair_unsupported_title => 'ยังไม่รองรับภาษานี้';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'โหมด AI ยังไม่มีโมเดลสำหรับคู่ภาษานี้ แจ้งให้เราทราบว่าคุณต้องการ — จะช่วยให้เราตัดสินใจได้ว่าจะพัฒนาอะไรต่อไป';
+
+  @override
+  String get request_language_pair => 'ขอภาษานี้';
+
+  @override
+  String get language_request_sent => 'ขอบคุณ! เราบันทึกคำขอของคุณแล้ว';
 }

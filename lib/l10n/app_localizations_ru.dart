@@ -528,4 +528,24 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Перевод изображения';
+
+  @override
+  String get send_feedback => 'Отправить отзыв';
+
+  @override
+  String get send_feedback_subtitle =>
+      'Сообщить об ошибке или предложить функцию';
+
+  @override
+  String get ai_pair_unsupported_title => 'Язык пока не поддерживается';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'В режиме ИИ пока нет модели для этой языковой пары. Сообщите нам, что она вам нужна — это поможет нам решить, что разрабатывать дальше.';
+
+  @override
+  String get request_language_pair => 'Запросить этот язык';
+
+  @override
+  String get language_request_sent => 'Спасибо! Мы зафиксировали ваш запрос.';
 }

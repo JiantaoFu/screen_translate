@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Cloud AI zahtijeva API ključ. Postavite ga u Postavkama.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Prijevod slike"
+  "image_translation_title": "Prijevod slike",
+  "send_feedback": "Pošalji povratne informacije",
+  "send_feedback_subtitle": "Prijavi grešku ili predloži značajku",
+  "ai_pair_unsupported_title": "Jezik još nije podržan",
+  "ai_pair_unsupported_content": "AI način rada još nema model za ovaj jezični par. Javite nam da ga želite — to nam pomaže odlučiti što razviti sljedeće.",
+  "request_language_pair": "Zatraži ovaj jezik",
+  "language_request_sent": "Hvala! Zabilježili smo vaš zahtjev."
 }

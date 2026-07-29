@@ -526,4 +526,25 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get image_translation_title => 'ছবি অনুবাদ';
+
+  @override
+  String get send_feedback => 'মতামত পাঠান';
+
+  @override
+  String get send_feedback_subtitle =>
+      'একটি বাগ রিপোর্ট করুন বা একটি ফিচার প্রস্তাব করুন';
+
+  @override
+  String get ai_pair_unsupported_title => 'ভাষাটি এখনো সমর্থিত নয়';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI মোডে এই ভাষা জোড়ার জন্য এখনো কোনো মডেল নেই। আমাদের জানান আপনি এটি চান — এটি আমাদের পরবর্তী কী তৈরি করব তা ঠিক করতে সাহায্য করে।';
+
+  @override
+  String get request_language_pair => 'এই ভাষার অনুরোধ করুন';
+
+  @override
+  String get language_request_sent =>
+      'ধন্যবাদ! আমরা আপনার অনুরোধ নথিভুক্ত করেছি।';
 }

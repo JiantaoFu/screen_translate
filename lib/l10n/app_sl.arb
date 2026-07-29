@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Oblačna UI zahteva API-ključ. Nastavite ga v Nastavitvah.",
   "mode_ai_short_label": "UI",
   "mode_cloud_short_label": "Oblak",
-  "image_translation_title": "Prevod slike"
+  "image_translation_title": "Prevod slike",
+  "send_feedback": "Pošlji povratne informacije",
+  "send_feedback_subtitle": "Prijavi napako ali predlagaj funkcijo",
+  "ai_pair_unsupported_title": "Jezik še ni podprt",
+  "ai_pair_unsupported_content": "Način AI še nima modela za ta jezikovni par. Sporočite nam, da si ga želite — to nam pomaga odločiti, kaj razviti naslednje.",
+  "request_language_pair": "Zahtevaj ta jezik",
+  "language_request_sent": "Hvala! Vašo zahtevo smo zabeležili."
 }

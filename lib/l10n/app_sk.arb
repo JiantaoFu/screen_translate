@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Cloudové AI vyžaduje API kľúč. Nastavte ho v Nastaveniach.",
   "mode_ai_short_label": "AI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Preklad obrázka"
+  "image_translation_title": "Preklad obrázka",
+  "send_feedback": "Odoslať spätnú väzbu",
+  "send_feedback_subtitle": "Nahlásiť chybu alebo navrhnúť funkciu",
+  "ai_pair_unsupported_title": "Jazyk zatiaľ nie je podporovaný",
+  "ai_pair_unsupported_content": "Režim AI zatiaľ nemá model pre tento jazykový pár. Dajte nám vedieť, že oň máte záujem — pomôže nám to rozhodnúť, čo vyvíjať ďalej.",
+  "request_language_pair": "Vyžiadať tento jazyk",
+  "language_request_sent": "Ďakujeme! Vašu žiadosť sme zaznamenali."
 }

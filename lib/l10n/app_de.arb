@@ -158,5 +158,11 @@
   "cloud_ai_api_key_required_content": "Cloud-KI benötigt einen API-Schlüssel. Richte ihn in den Einstellungen ein.",
   "mode_ai_short_label": "KI",
   "mode_cloud_short_label": "Cloud",
-  "image_translation_title": "Bildübersetzung"
+  "image_translation_title": "Bildübersetzung",
+  "send_feedback": "Feedback senden",
+  "send_feedback_subtitle": "Einen Fehler melden oder ein Feature vorschlagen",
+  "ai_pair_unsupported_title": "Sprache wird noch nicht unterstützt",
+  "ai_pair_unsupported_content": "Der KI-Modus hat noch kein Modell für dieses Sprachpaar. Lass uns wissen, dass du es möchtest — das hilft uns zu entscheiden, was wir als Nächstes entwickeln.",
+  "request_language_pair": "Diese Sprache anfordern",
+  "language_request_sent": "Danke! Wir haben deine Anfrage vermerkt."
 }

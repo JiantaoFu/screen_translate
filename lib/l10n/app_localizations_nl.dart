@@ -526,4 +526,24 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get image_translation_title => 'Afbeeldingsvertaling';
+
+  @override
+  String get send_feedback => 'Feedback versturen';
+
+  @override
+  String get send_feedback_subtitle => 'Meld een bug of stel een functie voor';
+
+  @override
+  String get ai_pair_unsupported_title => 'Taal nog niet ondersteund';
+
+  @override
+  String get ai_pair_unsupported_content =>
+      'AI-modus heeft nog geen model voor dit taalpaar. Laat ons weten dat je het wilt — dat helpt ons te bepalen wat we hierna gaan bouwen.';
+
+  @override
+  String get request_language_pair => 'Deze taal aanvragen';
+
+  @override
+  String get language_request_sent =>
+      'Bedankt! We hebben je verzoek genoteerd.';
 }

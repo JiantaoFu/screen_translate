@@ -392,6 +392,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     if (provider.isTranslating) {
                                       provider.stopTranslation();
                                     } else {
+                                      if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
+                                        return;
+                                      }
                                       await provider.startTranslation();
                                     }
                                     await _trackTranslationAndPromptReview(context);
@@ -409,6 +412,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 icon: Icons.image,
                                 label: AppLocalizations.of(context)!.translate_image_button,
                                 onTap: () async {
+                                  if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
+                                    return;
+                                  }
                                   final picker = ImagePicker();
                                   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
                                   if (pickedFile != null) {
@@ -480,6 +486,59 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final pivot = findOnnxPivotPair(source, target);
     if (pivot != null) return svc.getOnnxPivotStatus(pivot);
     return OnnxModelStatus.notDownloaded; // shouldn't happen — list is curated
+  }
+
+  /// The AI-mode toggle only checks that *some* ONNX pair is downloaded
+  /// before letting the user switch into AI mode at all — so switching the
+  /// source/target languages afterward to a pair with no downloaded model
+  /// leaves "Translate Screen"/"Translate Image" clickable with nothing to
+  /// back it. translateText() silently falls back to Quick-mode ML Kit
+  /// quality per-block in that case (a reasonable safety net once a session
+  /// is already running), but silently downgrading a session the user
+  /// explicitly started in AI mode isn't better than just asking up front,
+  /// same as the mode-toggle gate already does. Returns false (and shows
+  /// the same download prompt) when the action should be blocked.
+  Future<bool> _ensureOnnxModelReadyForCurrentPair(
+    BuildContext context,
+    TranslationProvider provider,
+  ) async {
+    if (provider.translationMode != TranslationMode.onnx) return true;
+
+    final status = await _onnxPairStatus(provider.sourceLanguage, provider.targetLanguage);
+    if (status == OnnxModelStatus.ready) return true;
+    if (!context.mounted) return false;
+
+    final localizations = AppLocalizations.of(context)!;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localizations.download_language_pack_title),
+          content: Text(localizations.download_language_pack_content),
+          actions: [
+            TextButton(
+              child: Text(localizations.cancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ElevatedButton(
+              child: Text(localizations.go_to_settings),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: provider,
+                      child: const TranslationSettingsScreen(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+    return false;
   }
 
   /// Attaches to a download already in progress (started from this screen's

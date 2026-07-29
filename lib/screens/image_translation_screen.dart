@@ -249,6 +249,11 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
                 _manualOffsets[i] = (_manualOffsets[i] ?? Offset.zero) + details.delta;
               });
             },
+            // Matches the live "Screen Translate" overlay's double-tap
+            // expand — the box's own font can be scaled down to the 6sp
+            // floor when a translation runs much longer than its source
+            // line, so this is the escape hatch to actually read it.
+            onDoubleTap: () => _showExpandedText(translatedText, result.isLight),
             child: Container(
               // Container.clipBehavior only takes effect with a decoration —
               // color: alone takes a fast path (ColoredBox) that ignores it.
@@ -277,6 +282,51 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       );
     }
     return overlays;
+  }
+
+  /// Full-text popup for a box whose translation got scaled down to (or
+  /// past) legibility — mirrors OverlayService.kt's showExpandedTextDialog
+  /// on the live overlay: dimmed background, tap-outside to dismiss,
+  /// selectable text, capped height with its own scroll so a very long
+  /// translation doesn't overflow the screen.
+  void _showExpandedText(String text, bool isLight) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.78),
+      builder: (dialogContext) => Dialog(
+        backgroundColor: isLight ? Colors.grey[800] : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(dialogContext).size.height * 0.7,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: SelectableText(
+                      text,
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: isLight ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Tap outside to close',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Pushes boxes down (in image-space, reading order) just enough that

@@ -265,6 +265,11 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
               // overlay sits below it, undoing the overlap-avoidance layout
               // above even though the boxes themselves never touch.
               clipBehavior: Clip.hardEdge,
+              // A little breathing room so text doesn't touch the box edges
+              // — matches the live "Screen Translate" overlay. The box stays
+              // sized to the original text's bounds, so AutoSizeText just
+              // shrinks the font slightly more to make room for this.
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               child: AutoSizeText(
                 translatedText,
                 style: TextStyle(

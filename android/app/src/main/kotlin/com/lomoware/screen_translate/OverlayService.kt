@@ -659,8 +659,11 @@ class OverlayService : Service() {
                 val exactWidth = if (transformedWidth > 0) transformedWidth.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
                 val exactHeight = if (transformedHeight > 0) transformedHeight.toInt() else WindowManager.LayoutParams.WRAP_CONTENT
 
-                // Minimal padding to maximize text space inside the precise bounding box
-                setPadding(2, 1, 2, 1)
+                // A little breathing room so text doesn't touch the box
+                // edges — the box itself stays sized to the original text's
+                // bounds, so autosize just shrinks the font slightly more to
+                // make room for this.
+                setPadding(4.dpToPx(), 2.dpToPx(), 4.dpToPx(), 2.dpToPx())
                 setSingleLine(false)
 
                 // Cap vertical growth so pathologically long translations

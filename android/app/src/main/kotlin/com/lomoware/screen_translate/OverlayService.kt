@@ -30,6 +30,7 @@ import android.view.Surface
 import com.lomoware.screen_translate.LocalizationHelper
 import android.util.DisplayMetrics
 import android.graphics.drawable.GradientDrawable
+import android.text.TextUtils
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import io.flutter.embedding.engine.FlutterEngine
@@ -638,13 +639,22 @@ class OverlayService : Service() {
                 setPadding(2, 1, 2, 1)
                 setSingleLine(false)
 
+                // Cap growth and ellipsize instead of letting autosize hit its
+                // floor and still overflow the fixed-height box — matches the
+                // static "Translate Image" screen's AutoSizeText(maxLines: 15,
+                // overflow: TextOverflow.ellipsis) so very long translations
+                // truncate cleanly instead of drawing a raw cut-off last line.
+                maxLines = 15
+                ellipsize = TextUtils.TruncateAt.END
+
                 setAutoSizeTextTypeUniformWithConfiguration(
                     6, 100, 1, TypedValue.COMPLEX_UNIT_SP
                 )
                 gravity = Gravity.CENTER
             }
+            containerLayout.clipChildren = true
             containerLayout.addView(overlayView, FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, 
+                FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             ))
             containerLayout

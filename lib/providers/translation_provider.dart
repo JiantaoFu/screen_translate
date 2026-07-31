@@ -199,17 +199,28 @@ class TranslationProvider with ChangeNotifier {
     if (Platform.isAndroid) {
       try {
         if (await _overlayService.ensureOverlayPermission(_context!)) {
+          // Request MediaProjection consent BEFORE showing the floating
+          // control overlay. If the user backs out of (or denies) that
+          // system dialog, requestScreenCapture() returns false here and we
+          // bail without ever starting the overlay — previously the overlay
+          // was started first, so a denied/cancelled consent dialog left a
+          // floating button on screen with no active capture behind it.
+          final captureGranted = await _startAndroidScreenCapture();
+          if (!captureGranted) {
+            print('Screen capture permission denied or cancelled, not starting translation');
+            return;
+          }
+
           _isTranslating = true;
-          
+
           FirebaseAnalyticsService().trackTranslation(
             sourceLanguage: _sourceLanguage,
             targetLanguage: _targetLanguage,
             translationType: 'screen_${_translationMode.name}',
           );
-          
+
           notifyListeners();
           await _overlayService.start();
-          await _startAndroidScreenCapture();
           _startPeriodicCapture();
         }
       } catch (e) {
@@ -442,11 +453,11 @@ class TranslationProvider with ChangeNotifier {
     });
   }
 
-  Future<void> _startAndroidScreenCapture() async {
+  Future<bool> _startAndroidScreenCapture() async {
     if (_androidScreenCaptureService == null) {
       throw Exception('Android screen capture service not initialized');
     }
-    await _androidScreenCaptureService?.requestScreenCapture();
+    return await _androidScreenCaptureService!.requestScreenCapture();
   }
 
   Future<void> stopTranslation() async {

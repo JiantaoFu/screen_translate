@@ -30,7 +30,6 @@ import android.view.Surface
 import com.lomoware.screen_translate.LocalizationHelper
 import android.util.DisplayMetrics
 import android.graphics.drawable.GradientDrawable
-import android.text.TextUtils
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import io.flutter.embedding.engine.FlutterEngine
@@ -518,6 +517,31 @@ class OverlayService : Service() {
         ).toInt()
     }
 
+    // Each translated text box is added as its own TYPE_APPLICATION_OVERLAY
+    // window, and newly-added windows of that type draw on top of
+    // previously-added ones. The control/translate buttons are created once
+    // when translation starts, so any text box added afterwards — including
+    // ones the OCR happens to position near the button's corner — silently
+    // draws over it, making it look like the button vanished. Re-adding the
+    // buttons after every new text box keeps them on top of whatever content
+    // is currently on screen.
+    private fun bringControlButtonsToFront() {
+        controlButton?.let { button ->
+            if (button.isAttachedToWindow) {
+                val params = button.layoutParams as WindowManager.LayoutParams
+                windowManager?.removeView(button)
+                windowManager?.addView(button, params)
+            }
+        }
+        translateButton?.let { button ->
+            if (button.isAttachedToWindow) {
+                val params = button.layoutParams as WindowManager.LayoutParams
+                windowManager?.removeView(button)
+                windowManager?.addView(button, params)
+            }
+        }
+    }
+
     private fun showOverlay(id: Int, text: String, x: Float = -1f, y: Float = -1f, width: Float = -1f, height: Float = -1f, overlayColor: Int = -1, backgroundColor: Int = -1, isLight: Boolean = false, imgWidth: Float = -1f, imgHeight: Float = -1f) {
         if (!hasOverlayPermission(this)) {
             print("Cannot show overlay: permission not granted")
@@ -639,13 +663,18 @@ class OverlayService : Service() {
                 setPadding(2, 1, 2, 1)
                 setSingleLine(false)
 
-                // Cap growth and ellipsize instead of letting autosize hit its
-                // floor and still overflow the fixed-height box — matches the
-                // static "Translate Image" screen's AutoSizeText(maxLines: 15,
-                // overflow: TextOverflow.ellipsis) so very long translations
-                // truncate cleanly instead of drawing a raw cut-off last line.
+                // Cap vertical growth so pathologically long translations
+                // can't push the box far past its original bounds — but do
+                // NOT set ellipsize here: Android's TextView autosizing
+                // (setAutoSizeTextTypeUniformWithConfiguration below) is
+                // documented to conflict with ellipsize, and combining them
+                // was found to break autosizing outright, leaving text
+                // rendered past the box's right/bottom edge where
+                // clipChildren then silently discarded it instead of
+                // shrinking to fit. maxLines alone is compatible with
+                // autosize — the sizing algorithm treats it as an available
+                // space constraint.
                 maxLines = 15
-                ellipsize = TextUtils.TruncateAt.END
 
                 setAutoSizeTextTypeUniformWithConfiguration(
                     6, 100, 1, TypedValue.COMPLEX_UNIT_SP
@@ -729,6 +758,7 @@ class OverlayService : Service() {
 
         windowManager?.addView(finalView, layoutParams)
         Log.d(TAG, "Overlay $id added to window manager at (${layoutParams.x}, ${layoutParams.y}), displayMode=$displayMode")
+        bringControlButtonsToFront()
 
         updateOverlayVisibility(id)
     }

@@ -608,8 +608,30 @@ class OverlayService : Service() {
             transformedY = y * scale
         }
 
-        val transformedWidth = width * scale
-        val transformedHeight = height * scale
+        var transformedWidth = width * scale
+        var transformedHeight = height * scale
+
+        // Clamp the box fully inside the screen. OCR/coordinate-mapping
+        // rounding can put x + width a few px past the right edge (or
+        // y + height past the bottom); WindowManager doesn't reflow an
+        // overlay window that extends past the display, so the TextView
+        // wraps its lines at the box's *declared* width while the part
+        // beyond the physical screen is simply never drawn — the visible
+        // effect is translated text looking cut off on the right even
+        // though nothing was actually clipped by our own view code. Shift
+        // the box left/up first so its full width/height stays visible;
+        // only shrink it as a last resort for boxes wider/taller than the
+        // screen itself.
+        if (transformedX + transformedWidth > screenWidth) {
+            transformedX = (screenWidth - transformedWidth).coerceAtLeast(0f)
+            if (transformedWidth > screenWidth) transformedWidth = screenWidth.toFloat()
+        }
+        if (transformedX < 0f) transformedX = 0f
+        if (transformedY + transformedHeight > screenHeight) {
+            transformedY = (screenHeight - transformedHeight).coerceAtLeast(0f)
+            if (transformedHeight > screenHeight) transformedHeight = screenHeight.toFloat()
+        }
+        if (transformedY < 0f) transformedY = 0f
 
         Log.d(TAG, "Original box (x:$x, y:$y, w:$width, h:$height) on image ($imgWidth x $imgHeight)")
         Log.d(TAG, "Transformed box (x:$transformedX, y:$transformedY, w:$transformedWidth, h:$transformedHeight) for screen ($screenWidth x $screenHeight) with status bar: $statusBarHeight")

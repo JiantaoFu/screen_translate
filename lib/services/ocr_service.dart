@@ -82,6 +82,146 @@ class OCRService {
     return _textRecognizer!;
   }
 
+  /// Iteratively merges spatially-close OCR blocks into paragraphs. Shared
+  /// by processImage() (live screen capture) and processFile() (static
+  /// image translation) — previously duplicated in both, which is exactly
+  /// how a threshold tweak meant for both paths could end up applied to
+  /// only one.
+  List<OCRResult> _mergeNearbyBlocks(
+    List<OCRResult> initialResults,
+    TextRecognitionScript script,
+    double mergeAggressiveness,
+  ) {
+    // Busy/cluttered screens (e.g. a home screen full of widgets and app
+    // icons) produce many small, unrelated text blocks that happen to sit
+    // close together in a tight grid. Merging those the same way we'd
+    // merge lines of a real paragraph glues unrelated labels into
+    // nonsense (e.g. "Battery Scale Your Social Eana"). A genuinely
+    // translatable passage (game UI, comic bubble, document) rarely
+    // produces more than a couple dozen blocks per screen, so scale
+    // aggressiveness down as block count rises.
+    final effectiveMergeAggressiveness = initialResults.length > 25
+        ? mergeAggressiveness * 0.4
+        : initialResults.length > 15
+            ? mergeAggressiveness * 0.7
+            : mergeAggressiveness;
+
+    // Spatial Block Merging Algorithm
+    // Iteratively merge blocks that are spatially close to each other
+    bool merged;
+    do {
+      merged = false;
+      for (int i = 0; i < initialResults.length; i++) {
+        for (int j = i + 1; j < initialResults.length; j++) {
+          final a = initialResults[i];
+          final b = initialResults[j];
+
+          // Calculate distance between bounding boxes
+          final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
+          final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
+          final distance = sqrt(dx * dx + dy * dy);
+
+          // Use each block's ORIGINAL glyph size, not recomputed from the
+          // current (possibly already-merged) bounding box — see the
+          // fontSize doc comment on OCRResult for why that recomputation
+          // causes a runaway merge cascade on multi-line paragraphs.
+          final fontSizeA = a.fontSize;
+          final fontSizeB = b.fontSize;
+
+          // 智能合并算法 (Smart Merging Algorithm):
+          // 如果两个文本块在 X 轴上投影有重叠 (overlapX)，说明它们垂直堆叠，
+          // 是"段内换行"还是"两个段落"的候选。如果在 Y 轴上重叠 (overlapY)，
+          // 说明它们左右相邻，通常是 ML Kit 因字体/样式变化把同一行拆成了
+          // 两块。如果完全对角线 (无任何轴向重叠)，大概率属于两个不同的
+          // 相邻气泡，此时大幅度收紧合并阈值。
+          final overlapX = dx == 0.0;
+          final overlapY = dy == 0.0;
+
+          // Vertical stacking (overlapX) gets its own, tighter multiplier
+          // instead of sharing the same generous one as horizontal
+          // same-line fragments. Typical intra-paragraph line spacing
+          // (the gap between two wrapped lines of the same paragraph) is
+          // well under one line height, while a genuine paragraph break
+          // usually adds at least a full extra line's worth of space —
+          // the old shared threshold (up to 1.5x line height either way)
+          // was loose enough to glue separate paragraphs together
+          // whenever a layout's paragraph spacing happened to be modest.
+          // Same-row fragments keep the full aggressiveness since ML
+          // Kit's mid-line splits are normally just a few pixels apart.
+          final double thresholdMultiplier;
+          if (overlapX) {
+            thresholdMultiplier = effectiveMergeAggressiveness * 0.6;
+          } else if (overlapY) {
+            thresholdMultiplier = effectiveMergeAggressiveness;
+          } else {
+            thresholdMultiplier = effectiveMergeAggressiveness * 0.3;
+          }
+          final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
+
+          // Refuse to merge across a visible background change — this is
+          // what actually separates chat bubbles (e.g. alternating
+          // sender colors) or comic speech bubbles from each other even
+          // when they're spatially close enough to otherwise pass as one
+          // paragraph. Without this, a busy chat screen merges fragments
+          // of unrelated messages into nonsense (confirmed from a real
+          // screenshot: "O quê? Sentindo-se inseguro ab qual show você
+          // assistência" is two different messages glued together).
+          final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
+
+          if (distance < threshold && sameBackground) {
+            // Merge these two blocks!
+            String mergedText;
+
+            // Determine concatenation order
+            if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
+              // Vertical alignment: top-to-bottom
+              mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+            } else {
+              // Horizontal alignment:
+              // For Japanese/Chinese manga, vertical text reads Right-to-Left
+              // So if it's primarily vertical script (height > width), smaller X means it comes AFTER larger X.
+              // We'll use a simple heuristic: if a is to the left of b, and it's CJK, it might be R-to-L.
+              // But appending with a space is safest.
+              if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
+                 mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+              } else {
+                 mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
+              }
+            }
+
+            final newLeft = min(a.x, b.x);
+            final newTop = min(a.y, b.y);
+            final newRight = max(a.x + a.width, b.x + b.width);
+            final newBottom = max(a.y + a.height, b.y + b.height);
+
+            _logger.info('Merging blocks: {${a.text}} and {${b.text}} -> {${mergedText}}');
+
+            initialResults[i] = OCRResult(
+              text: mergedText,
+              x: newLeft,
+              y: newTop,
+              width: newRight - newLeft,
+              height: newBottom - newTop,
+              overlayColor: a.overlayColor,
+              backgroundColor: a.backgroundColor,
+              isLight: a.isLight,
+              imgWidth: a.imgWidth,
+              imgHeight: a.imgHeight,
+              fontSize: min(a.fontSize, b.fontSize),
+            );
+
+            initialResults.removeAt(j);
+            merged = true;
+            break; // Break inner loop to restart with new boundaries
+          }
+        }
+        if (merged) break; // Break outer loop to restart
+      }
+    } while (merged);
+
+    return initialResults;
+  }
+
   Future<List<OCRResult>> processImage(
     Map<String, dynamic> imageData,
     TextRecognitionScript script,
@@ -202,114 +342,7 @@ class OCRService {
         }
       }
 
-      // Busy/cluttered screens (e.g. a home screen full of widgets and app
-      // icons) produce many small, unrelated text blocks that happen to sit
-      // close together in a tight grid. Merging those the same way we'd
-      // merge lines of a real paragraph glues unrelated labels into
-      // nonsense (e.g. "Battery Scale Your Social Eana"). A genuinely
-      // translatable passage (game UI, comic bubble, document) rarely
-      // produces more than a couple dozen blocks per screen, so scale
-      // aggressiveness down as block count rises.
-      final effectiveMergeAggressiveness = initialResults.length > 25
-          ? mergeAggressiveness * 0.4
-          : initialResults.length > 15
-              ? mergeAggressiveness * 0.7
-              : mergeAggressiveness;
-
-      // Spatial Block Merging Algorithm
-      // Iteratively merge blocks that are spatially close to each other
-      bool merged;
-      do {
-        merged = false;
-        for (int i = 0; i < initialResults.length; i++) {
-          for (int j = i + 1; j < initialResults.length; j++) {
-            final a = initialResults[i];
-            final b = initialResults[j];
-
-            // Calculate distance between bounding boxes
-            final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
-            final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
-            final distance = sqrt(dx * dx + dy * dy);
-
-            // Use each block's ORIGINAL glyph size, not recomputed from the
-            // current (possibly already-merged) bounding box — see the
-            // fontSize doc comment on OCRResult for why that recomputation
-            // causes a runaway merge cascade on multi-line paragraphs.
-            final fontSizeA = a.fontSize;
-            final fontSizeB = b.fontSize;
-
-            // 智能合并算法 (Smart Merging Algorithm):
-            // 如果两个文本块在 X 轴或 Y 轴上投影有重叠 (overlapX 或 overlapY)，说明它们是对齐的（属于同一段落/气泡的概率极大）。
-            // 如果它们处于完全对角线位置 (无任何轴向重叠)，它们大概率属于两个不同的相邻气泡，此时我们大幅度收紧合并阈值。
-            final overlapX = dx == 0.0;
-            final overlapY = dy == 0.0;
-            final isAligned = overlapX || overlapY;
-
-            final thresholdMultiplier = isAligned ? effectiveMergeAggressiveness : (effectiveMergeAggressiveness * 0.3);
-            final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
-
-            // Refuse to merge across a visible background change — this is
-            // what actually separates chat bubbles (e.g. alternating
-            // sender colors) or comic speech bubbles from each other even
-            // when they're spatially close enough to otherwise pass as one
-            // paragraph. Without this, a busy chat screen merges fragments
-            // of unrelated messages into nonsense (confirmed from a real
-            // screenshot: "O quê? Sentindo-se inseguro ab qual show você
-            // assistência" is two different messages glued together).
-            final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
-
-            if (distance < threshold && sameBackground) {
-              // Merge these two blocks!
-              String mergedText;
-
-              // Determine concatenation order
-              if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
-                // Vertical alignment: top-to-bottom
-                mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
-              } else {
-                // Horizontal alignment:
-                // For Japanese/Chinese manga, vertical text reads Right-to-Left
-                // So if it's primarily vertical script (height > width), smaller X means it comes AFTER larger X.
-                // We'll use a simple heuristic: if a is to the left of b, and it's CJK, it might be R-to-L.
-                // But appending with a space is safest.
-                if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
-                   mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
-                } else {
-                   mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
-                }
-              }
-
-              final newLeft = min(a.x, b.x);
-              final newTop = min(a.y, b.y);
-              final newRight = max(a.x + a.width, b.x + b.width);
-              final newBottom = max(a.y + a.height, b.y + b.height);
-
-              _logger.info('Merging blocks: {${a.text}} and {${b.text}} -> {${mergedText}}');
-
-              initialResults[i] = OCRResult(
-                text: mergedText,
-                x: newLeft,
-                y: newTop,
-                width: newRight - newLeft,
-                height: newBottom - newTop,
-                overlayColor: a.overlayColor,
-                backgroundColor: a.backgroundColor,
-                isLight: a.isLight,
-                imgWidth: a.imgWidth,
-                imgHeight: a.imgHeight,
-                fontSize: min(a.fontSize, b.fontSize),
-              );
-
-              initialResults.removeAt(j);
-              merged = true;
-              break; // Break inner loop to restart with new boundaries
-            }
-          }
-          if (merged) break; // Break outer loop to restart
-        }
-      } while (merged);
-
-      final results = initialResults;
+      final results = _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
 
       // Sample each final (post-merge) box's own background locally rather
       // than using one dominant color for the whole screen — a home screen
@@ -409,94 +442,14 @@ class OCRService {
         }
       }
 
-      // We should ideally extract the merging algorithm into a shared private method,
-      // but for now, we'll just return the raw blocks or copy the merging logic.
-      // Let's do the same merging logic:
-      // Same busy-screen dampening as processImage() above — a screenshot
-      // of a cluttered UI (home screen, app grid) shouldn't merge nearby
-      // unrelated labels as readily as a real paragraph would.
-      final effectiveMergeAggressiveness = initialResults.length > 25
-          ? mergeAggressiveness * 0.4
-          : initialResults.length > 15
-              ? mergeAggressiveness * 0.7
-              : mergeAggressiveness;
-
-      bool merged;
-      do {
-        merged = false;
-        for (int i = 0; i < initialResults.length; i++) {
-          for (int j = i + 1; j < initialResults.length; j++) {
-            final a = initialResults[i];
-            final b = initialResults[j];
-
-            final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
-            final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
-            final distance = sqrt(dx * dx + dy * dy);
-
-            // Use each block's ORIGINAL glyph size, not recomputed from the
-            // current (possibly already-merged) bounding box — see the
-            // fontSize doc comment on OCRResult.
-            final fontSizeA = a.fontSize;
-            final fontSizeB = b.fontSize;
-
-            final overlapX = dx == 0.0;
-            final overlapY = dy == 0.0;
-            final isAligned = overlapX || overlapY;
-
-            final thresholdMultiplier = isAligned ? effectiveMergeAggressiveness : (effectiveMergeAggressiveness * 0.3);
-            final threshold = min(fontSizeA, fontSizeB) * thresholdMultiplier;
-
-            // Same background-change gate as processImage() above — stops
-            // e.g. a chat screenshot's alternating message-bubble colors
-            // from being glued into one nonsensical block.
-            final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
-
-            if (distance < threshold && sameBackground) {
-              String mergedText;
-              if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
-                mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
-              } else {
-                if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
-                   mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
-                } else {
-                   mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
-                }
-              }
-
-              final newLeft = min(a.x, b.x);
-              final newTop = min(a.y, b.y);
-              final newRight = max(a.x + a.width, b.x + b.width);
-              final newBottom = max(a.y + a.height, b.y + b.height);
-
-              initialResults[i] = OCRResult(
-                text: mergedText,
-                x: newLeft,
-                y: newTop,
-                width: newRight - newLeft,
-                height: newBottom - newTop,
-                overlayColor: a.overlayColor,
-                backgroundColor: a.backgroundColor,
-                isLight: a.isLight,
-                imgWidth: a.imgWidth,
-                imgHeight: a.imgHeight,
-                fontSize: min(a.fontSize, b.fontSize),
-              );
-
-              initialResults.removeAt(j);
-              merged = true;
-              break;
-            }
-          }
-          if (merged) break;
-        }
-      } while (merged);
+      final results = _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
 
       // Resample each final (post-merge) box's own background locally,
       // same as processImage() above — a fresh sample of the whole merged
       // box gives a more representative color than just inheriting the
       // first sub-block's single sample.
       if (decodedForColor != null) {
-        for (final result in initialResults) {
+        for (final result in results) {
           final localColor = ColorUtils.extractRegionColorFromImage(
             decodedForColor, result.x, result.y, result.width, result.height,
           );
@@ -506,7 +459,7 @@ class OCRService {
         }
       }
 
-      return initialResults;
+      return results;
     } catch (e) {
       _logger.severe('OCR File Error: $e');
       return [];

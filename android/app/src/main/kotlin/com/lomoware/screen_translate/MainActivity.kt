@@ -168,6 +168,18 @@ class MainActivity: FlutterActivity() {
                     startService(intent)
                     result.success(true)
                 }
+                "hideTranslationOverlayById" -> {
+                    val id = call.argument<Number>("id")?.toInt()
+                    if (id != null) {
+                        val intent = Intent(this, OverlayService::class.java)
+                        intent.action = "hideOne"
+                        intent.putExtra("id", id)
+                        startService(intent)
+                        result.success(true)
+                    } else {
+                        result.error("INVALID_ARGUMENT", "id argument is required", null)
+                    }
+                }
                 "stopTranslationOverlay" -> {
                     val intent = Intent(this, OverlayService::class.java)
                     intent.action = "stop"

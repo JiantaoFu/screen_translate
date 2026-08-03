@@ -116,6 +116,22 @@ class OverlayService {
     }
   }
 
+  // Hide a single overlay box by id, leaving the others on screen — used to
+  // clear just the boxes that disappeared between capture ticks instead of
+  // tearing down and rebuilding everything on every change.
+  Future<bool> hideTranslationOverlayById(int id) async {
+    try {
+      final bool hidden = await _channel.invokeMethod('hideTranslationOverlayById', {'id': id});
+      return hidden;
+    } on PlatformException catch (e) {
+      print('Error hiding translation overlay $id: ${e.message}');
+      return false;
+    } catch (e) {
+      print('Unexpected error hiding translation overlay $id: $e');
+      return false;
+    }
+  }
+
   Future<bool> start() async {
     try {
       final bool succ = await _channel.invokeMethod('startTranslationOverlay');

@@ -22,6 +22,15 @@ extension StringExtension on String {
   }
 }
 
+/// A translated box currently shown on screen, tracked by a stable id that
+/// survives across capture ticks (unlike its position in the OCR results
+/// list, which shifts whenever a box is added/removed elsewhere on screen).
+class _DisplayedOverlay {
+  final OCRResult ocrResult;
+  final String translatedText;
+  _DisplayedOverlay(this.ocrResult, this.translatedText);
+}
+
 enum TranslationMode {
   /// Google ML Kit on-device translation (always available, fallback)
   onDevice,
@@ -50,23 +59,29 @@ class TranslationProvider with ChangeNotifier {
       MethodChannel('com.lomoware.screen_translate/translationService');
   TranslationMode _translationMode = TranslationMode.onDevice;
   bool _isProcessingCapture = false;
-  List<OCRResult> _previousOcrResults = [];
+  final Map<int, _DisplayedOverlay> _displayedOverlays = {};
+  int _nextOverlayId = 0;
   double _mergeAggressiveness = 1.5;
 
-  bool _areOcrResultsIdentical(List<OCRResult> a, List<OCRResult> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i].text != b[i].text) return false;
-      
-      // Allow a small tolerance of 12 physical pixels for screen coordinate noise
-      final dx = (a[i].x - b[i].x).abs();
-      final dy = (a[i].y - b[i].y).abs();
-      final dw = (a[i].width - b[i].width).abs();
-      final dh = (a[i].height - b[i].height).abs();
-      
-      if (dx > 12 || dy > 12 || dw > 12 || dh > 12) return false;
+  // Same box, allowing a small tolerance of 12 physical pixels for screen
+  // coordinate noise between ticks.
+  bool _sameBox(OCRResult a, OCRResult b) {
+    if (a.text != b.text) return false;
+    final dx = (a.x - b.x).abs();
+    final dy = (a.y - b.y).abs();
+    final dw = (a.width - b.width).abs();
+    final dh = (a.height - b.height).abs();
+    return dx <= 12 && dy <= 12 && dw <= 12 && dh <= 12;
+  }
+
+  // Cleans up "…" placeholders (onnx/llm modes) that were shown before a
+  // stale-token abort but never made it into _displayedOverlays — without
+  // this they'd never be hidden or reused since Dart has no record of them.
+  Future<void> _hidePlaceholders(Iterable<int> ids) async {
+    if (!Platform.isAndroid) return;
+    for (final id in ids) {
+      await _overlayService.hideTranslationOverlayById(id);
     }
-    return true;
   }
 
   /// Pad each box slightly and push down anything still overlapping a
@@ -276,22 +291,67 @@ class TranslationProvider with ChangeNotifier {
               );
               final ocrMs = stopwatch.elapsedMilliseconds;
               print('Timer: OCR found ${ocrResults.length} text blocks in ${ocrMs}ms');
-              
-              // Change Detection Check - but always honor manual translation requests
-              if (!_isManualTranslationRequested && _areOcrResultsIdentical(ocrResults, _previousOcrResults)) {
-                // Skip processing as screen is unchanged
-                print('OCR: Screen unchanged (${ocrResults.length} blocks), skipping translation');
-                return;
+
+              // ── Match against currently-displayed overlays ──────────────
+              // Each box gets a STABLE id that survives across ticks (unlike
+              // its position in this cycle's list, which shifts whenever a
+              // box is added/removed elsewhere on screen). Boxes whose text
+              // and position are unchanged are left alone entirely — no
+              // hide, no re-translate, no re-show. This matters most for
+              // game/app UIs where most of the screen (HUD, menu labels) is
+              // static and only one region (a dialogue box) actually
+              // changes: previously ANY change anywhere on screen hid EVERY
+              // overlay and retranslated EVERY block every 500ms tick,
+              // causing visible flicker and, for cloud/LLM mode, repeated
+              // paid API calls for text that hadn't changed at all.
+              final matchedIdForIndex = <int, int>{};
+              if (!_isManualTranslationRequested) {
+                final remainingOldIds = _displayedOverlays.keys.toList();
+                for (var i = 0; i < ocrResults.length; i++) {
+                  final newResult = ocrResults[i];
+                  for (final oldId in remainingOldIds) {
+                    if (_sameBox(_displayedOverlays[oldId]!.ocrResult, newResult)) {
+                      matchedIdForIndex[i] = oldId;
+                      remainingOldIds.remove(oldId);
+                      break;
+                    }
+                  }
+                }
+
+                // Nothing changed at all: same boxes, same text, nothing
+                // added or removed — skip this tick entirely.
+                if (remainingOldIds.isEmpty &&
+                    matchedIdForIndex.length == ocrResults.length &&
+                    matchedIdForIndex.length == _displayedOverlays.length) {
+                  print('OCR: Screen unchanged (${ocrResults.length} blocks), skipping translation');
+                  return;
+                }
+
+                // Boxes that were shown before but aren't on screen anymore.
+                for (final goneId in remainingOldIds) {
+                  if (Platform.isAndroid) await _overlayService.hideTranslationOverlayById(goneId);
+                  _displayedOverlays.remove(goneId);
+                }
+
+                // Refresh the stored position for matched boxes (it may have
+                // drifted a few px within tolerance) without touching their
+                // native view or re-translating them.
+                matchedIdForIndex.forEach((i, id) {
+                  _displayedOverlays[id] = _DisplayedOverlay(ocrResults[i], _displayedOverlays[id]!.translatedText);
+                });
+              } else {
+                // Manual translation always does a full rebuild — the user
+                // explicitly asked for a fresh pass, and auto-capture may
+                // have been paused (mode=manual/original) for a while, so
+                // the previous overlay state can't be trusted.
+                if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                _displayedOverlays.clear();
               }
 
-              // Screen has changed (e.g., user is scrolling). Immediately hide old overlays so they don't stick to the text.
-              if (!_isManualTranslationRequested) {
-                _overlayService.hideTranslationOverlay();
-                print('Overlay: Screen changed, immediately hiding old overlays');
-              } else {
-                // For manual translation, we clear here right before generating new ones
-                _overlayService.hideTranslationOverlay();
-              }
+              final newIndices = [
+                for (var i = 0; i < ocrResults.length; i++)
+                  if (!matchedIdForIndex.containsKey(i)) i
+              ];
 
               // Bump token so any in-flight translation from a previous cycle becomes stale
               final myToken = ++_translationToken;
@@ -302,18 +362,26 @@ class TranslationProvider with ChangeNotifier {
               // static "Translate Image" screen's Stack. Without this, any
               // two OCR boxes left close together by the merge step (e.g. a
               // caption nested near a paragraph's edge) render as literally
-              // overlapping translucent rectangles.
+              // overlapping translucent rectangles. Computed for the full
+              // list (cheap, pure layout math) so de-overlap still accounts
+              // for boxes we're not re-translating this tick.
               final displayBoxes = _computeDisplayBoxes(ocrResults);
+
+              final idForIndex = <int, int>{
+                for (final i in newIndices) i: _nextOverlayId++,
+              };
 
               // ── Show "Translating..." placeholders immediately ───────────────────
               // Only for ONNX/LLM which can take noticeable time; on-device is instant.
+              // Only for new/changed boxes — untouched ones keep showing their
+              // existing translation instead of flashing to a placeholder.
               if (_translationMode == TranslationMode.onnx || _translationMode == TranslationMode.llm) {
-                for (var i = 0; i < ocrResults.length; i++) {
+                for (final i in newIndices) {
                   final r = ocrResults[i];
                   final box = displayBoxes[i];
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
-                      '…', i,
+                      '…', idForIndex[i]!,
                       x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: r.overlayColor, backgroundColor: r.backgroundColor,
                       isLight: r.isLight, imgWidth: r.imgWidth, imgHeight: r.imgHeight,
@@ -322,65 +390,80 @@ class TranslationProvider with ChangeNotifier {
                 }
               }
 
-              // Translate blocks and render (Streaming for on-device to minimize perceived latency)
-              print('Timer: translating ${ocrResults.length} blocks (mode=$_translationMode)...');
-              final List<String> translatedTexts = [];
+              // Translate only the new/changed blocks and render (Streaming for on-device to minimize perceived latency)
+              print('Timer: translating ${newIndices.length} new/changed of ${ocrResults.length} total blocks (mode=$_translationMode)...');
               stopwatch.reset();
               var translateMs = 0;
               var renderMs = 0;
-              
-              if (_translationMode == TranslationMode.llm) {
-                final textsToTranslate = ocrResults.map((r) => r.text).toList();
+
+              if (newIndices.isEmpty) {
+                // Only removals happened this cycle — nothing left to translate.
+              } else if (_translationMode == TranslationMode.llm) {
+                final textsToTranslate = [for (final i in newIndices) ocrResults[i].text];
                 final batchResults = await _llmTranslationService.translateBatch(
                   texts: textsToTranslate,
                   sourceLanguage: _sourceLanguage,
                   targetLanguage: _targetLanguage,
                 );
                 translateMs = stopwatch.elapsedMilliseconds;
-                
+
                 // Stale check: if the user has scrolled/changed page, discard results
                 if (!_isTranslating || myToken != _translationToken) {
                   print('Overlay: Translation stale or stopped (token mismatch), aborting');
-                  if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                  await _hidePlaceholders(newIndices.map((i) => idForIndex[i]!));
                   return;
                 }
-                
+
                 stopwatch.reset();
-                for (var i = 0; i < ocrResults.length; i++) {
+                for (var k = 0; k < newIndices.length; k++) {
+                  final i = newIndices[k];
                   final ocrResult = ocrResults[i];
                   final box = displayBoxes[i];
-                  translatedTexts.add(batchResults[i]); // Keep history
+                  final id = idForIndex[i]!;
+                  final translated = batchResults[k];
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
-                      batchResults[i], i,
+                      translated, id,
                       x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
                     );
                   }
+                  _displayedOverlays[id] = _DisplayedOverlay(ocrResult, translated);
                 }
                 renderMs = stopwatch.elapsedMilliseconds;
               } else {
                 // Streaming mode for On-Device / ONNX (one block at a time)
                 var tMs = 0;
                 var rMs = 0;
-                for (var i = 0; i < ocrResults.length; i++) {
+                // ONNX pre-shows "…" placeholders for every new/changed
+                // block above; on-device is fast enough that it never does.
+                // An abort partway through this loop must clean up the
+                // placeholders for blocks not yet reached, or they'd be
+                // stuck on screen with no Dart-side record of their id.
+                final placeholdersPending = _translationMode == TranslationMode.onnx;
+                for (var k = 0; k < newIndices.length; k++) {
+                  final i = newIndices[k];
                   // Stale check on each block: abort if user has navigated away
                   if (!_isTranslating || myToken != _translationToken) {
                     print('Overlay: Translation stale at block $i (token mismatch), aborting');
-                    if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                    if (placeholdersPending) {
+                      await _hidePlaceholders(newIndices.sublist(k).map((j) => idForIndex[j]!));
+                    }
                     return;
                   }
                   final ocrResult = ocrResults[i];
-                  
+                  final id = idForIndex[i]!;
+
                   final tWatch = Stopwatch()..start();
                   final translatedText = await translateText(ocrResult.text);
                   tMs += tWatch.elapsedMilliseconds;
-                  translatedTexts.add(translatedText);
-                  
+
                   // Stale check again after the (potentially slow) translation call
                   if (myToken != _translationToken) {
                     print('Overlay: Translation stale after block $i, discarding');
-                    if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                    if (placeholdersPending) {
+                      await _hidePlaceholders(newIndices.sublist(k).map((j) => idForIndex[j]!));
+                    }
                     return;
                   }
 
@@ -388,19 +471,20 @@ class TranslationProvider with ChangeNotifier {
                   final rWatch = Stopwatch()..start();
                   if (Platform.isAndroid) {
                     await _overlayService.showTranslationOverlay(
-                      translatedText, i,
+                      translatedText, id,
                       x: box.left, y: box.top, width: box.width, height: box.height,
                       overlayColor: ocrResult.overlayColor, backgroundColor: ocrResult.backgroundColor, isLight: ocrResult.isLight, imgWidth: ocrResult.imgWidth, imgHeight: ocrResult.imgHeight,
                     );
                   }
                   rMs += rWatch.elapsedMilliseconds;
+                  _displayedOverlays[id] = _DisplayedOverlay(ocrResult, translatedText);
                 }
                 translateMs = tMs;
                 renderMs = rMs;
               }
 
-              print('Overlay: Translations complete (${translatedTexts.length} blocks)');
-              
+              print('Overlay: Translations complete (${newIndices.length} new/changed, ${matchedIdForIndex.length} reused)');
+
               // -------------------------------------------------------------
               // SUMMARY METRICS
               // -------------------------------------------------------------
@@ -421,8 +505,6 @@ class TranslationProvider with ChangeNotifier {
                 totalMs: totalMs,
                 translationType: _translationMode.name,
               );
-
-              _previousOcrResults = ocrResults;
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
@@ -464,7 +546,8 @@ class TranslationProvider with ChangeNotifier {
     _isTranslating = false;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;
-    _previousOcrResults = [];
+    _displayedOverlays.clear();
+    _nextOverlayId = 0;
     _captureTimer?.cancel();
     _captureTimer = null;
     if (Platform.isAndroid) {
@@ -506,7 +589,7 @@ class TranslationProvider with ChangeNotifier {
               cancelTranslation(_lastTranslatedText, _sourceLanguage, _targetLanguage);
               _translationService.cancelAllTranslations();
               _overlayService.hideTranslationOverlay();
-              _previousOcrResults.clear();
+              _displayedOverlays.clear();
               break;
             default:
               throw MissingPluginException();

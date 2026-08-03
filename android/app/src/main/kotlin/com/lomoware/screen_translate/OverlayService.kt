@@ -834,6 +834,23 @@ class OverlayService : Service() {
         originalPositions.clear()
     }
 
+    // Removes a single overlay by id, leaving the rest untouched — used when
+    // only one translated box has changed/disappeared instead of the whole
+    // screen, so unrelated boxes don't flicker out and back on every tick.
+    private fun hideOverlay(id: Int) {
+        overlayViews[id]?.let { view ->
+            try {
+                windowManager?.removeView(view)
+                Log.d(TAG, "hideOverlay: removed overlay $id")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error removing view $id: ${e.message}")
+            }
+        }
+        overlayViews.remove(id)
+        overlayParams.remove(id)
+        originalPositions.remove(id)
+    }
+
     private fun showExpandedTextDialog(text: String, isLight: Boolean) {
         val container = FrameLayout(this).apply {
             setBackgroundColor(Color.argb(200, 0, 0, 0)) // Semi-transparent dim background
@@ -952,6 +969,10 @@ class OverlayService : Service() {
             }
             "hideAll" -> {
                 hideAllOverlays()
+            }
+            "hideOne" -> {
+                val id = intent.getIntExtra("id", -1)
+                if (id >= 0) hideOverlay(id)
             }
             "stop" -> {
                 isStopped = true

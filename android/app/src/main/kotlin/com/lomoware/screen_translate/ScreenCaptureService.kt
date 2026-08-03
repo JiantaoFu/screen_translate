@@ -254,10 +254,20 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         Log.d(TAG, "Screen metrics (real): $screenWidth x $screenHeight @ $screenDensity")
 
         frameStabilizer = FrameStabilizer(screenWidth, screenHeight) {
-            val intent = Intent(context, OverlayService::class.java)
-            intent.action = "hideAll"
-            context.startService(intent)
-            cancelAllTranslations()
+            // This fires synchronously from onNewFrame() on the
+            // imageReaderHandler background thread, but cancelAllTranslations()
+            // goes through a Flutter MethodChannel, which requires the main
+            // thread and throws otherwise. That exception used to escape
+            // onNewFrame() uncaught, aborting it before it could reschedule
+            // the stabilization timer — so on almost every frame where
+            // anything changed, no new frame ever made it into the capture
+            // queue. Posting to the main thread keeps this from throwing.
+            mainHandler.post {
+                val intent = Intent(context, OverlayService::class.java)
+                intent.action = "hideAll"
+                context.startService(intent)
+                cancelAllTranslations()
+            }
         }
 
         // Register scroll detection receiver during initialization

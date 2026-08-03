@@ -23,6 +23,18 @@ class ForegroundService : Service() {
         private const val CHANNEL_ID = "screen_translate_channel"
         private const val NOTIFICATION_ID = 1
         private const val TAG = "ForegroundService"
+
+        // Android 14+ requires startForeground() to have actually completed
+        // before MediaProjectionManager.getMediaProjection() is called, or it
+        // throws SecurityException. Callers must wait for this callback
+        // instead of guessing with a fixed delay.
+        @Volatile
+        private var onForegroundReady: (() -> Unit)? = null
+
+        fun startAndAwaitForeground(context: Context, onReady: () -> Unit) {
+            onForegroundReady = onReady
+            context.startForegroundService(Intent(context, ForegroundService::class.java))
+        }
     }
 
     // Configuration change receiver
@@ -60,6 +72,9 @@ class ForegroundService : Service() {
             .build()
 
         startForeground(NOTIFICATION_ID, notification)
+
+        onForegroundReady?.invoke()
+        onForegroundReady = null
 
         return START_NOT_STICKY
     }

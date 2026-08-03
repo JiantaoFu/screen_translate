@@ -4,7 +4,6 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 
@@ -13,7 +12,6 @@ class AccessibilityPermissionDialog(private val context: Context) {
     companion object {
         private const val TAG = "AccessibilityPermissionDialog"
         private const val PREFS_NAME = "AccessibilityPrefs"
-        private const val PREF_FIRST_LAUNCH = "first_launch"
         private const val PREF_ACCESSIBILITY_PROMPTED = "accessibility_prompted"
     }
 
@@ -21,12 +19,14 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
     fun show(forceShow: Boolean = false) {
         try {
-            // Check if we should show the dialog
-            val shouldShowDialog = forceShow || 
-                                   isFirstLaunch() || 
-                                   !isAccessibilityServiceEnabled() || 
-                                   isAccessibilityPermissionDenied()
-            
+            // Show once: on first launch, or any time the service isn't
+            // enabled and we haven't already asked. Most users have zero
+            // accessibility services enabled by default, so treating "none
+            // enabled" as "denied" (as this used to) made the dialog pop up
+            // on every cold start even after the user dismissed it.
+            val shouldShowDialog = forceShow ||
+                                   (!isAccessibilityServiceEnabled() && !isAccessibilityPrompted())
+
             if (!shouldShowDialog) {
                 Log.d(TAG, "Dialog should not be shown")
                 return
@@ -71,51 +71,6 @@ class AccessibilityPermissionDialog(private val context: Context) {
             Log.e(TAG, "Error checking accessibility service", e)
             false
         }
-    }
-
-    // Determine if we should show the dialog
-    private fun shouldShowDialog(): Boolean {
-        // Always show on first launch
-        if (isFirstLaunch()) {
-            Log.d(TAG, "First launch detected")
-            markFirstLaunchComplete()
-            return true
-        }
-
-        // Check if accessibility service is not enabled
-        val shouldShow = !isAccessibilityServiceEnabled()
-        
-        Log.d(TAG, "Should show dialog: $shouldShow")
-        return shouldShow
-    }
-
-    // Method to check if accessibility permission is explicitly denied
-    fun isAccessibilityPermissionDenied(): Boolean {
-        return try {
-            val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-            
-            // Get all accessibility services
-            val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-            
-            // If no services are enabled, it might mean the user explicitly denied the permission
-            val isDenied = enabledServices.isEmpty()
-            
-            Log.d(TAG, "Accessibility permission explicitly denied: $isDenied")
-            isDenied
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking accessibility permission status", e)
-            false
-        }
-    }
-
-    // Check if this is the first launch of the app
-    private fun isFirstLaunch(): Boolean {
-        return prefs.getBoolean(PREF_FIRST_LAUNCH, true)
-    }
-
-    // Mark first launch as complete
-    private fun markFirstLaunchComplete() {
-        prefs.edit().putBoolean(PREF_FIRST_LAUNCH, false).apply()
     }
 
     // Check if user has been prompted about accessibility before

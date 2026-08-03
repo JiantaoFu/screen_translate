@@ -271,10 +271,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         try {
             Log.d(TAG, "Starting projection with result code: $resultCode")
 
-            val serviceIntent = Intent(context, ForegroundService::class.java)
-            context.startForegroundService(serviceIntent)
-            
-            mainHandler.postDelayed({
+            ForegroundService.startAndAwaitForeground(context) {
                 try {
                     Log.d(TAG, "Creating MediaProjection...")
                     val mpManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -294,7 +291,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                         val error = "Failed to create MediaProjection"
                         Log.e(TAG, error)
                         result.error("PROJECTION_ERROR", error, null)
-                        return@postDelayed
+                        return@startAndAwaitForeground
                     }
                     
                     Log.d(TAG, "MediaProjection created successfully")
@@ -306,7 +303,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     result.error("PROJECTION_ERROR", "Error creating MediaProjection: ${e.message}", null)
                     cleanup()
                 }
-            }, 500)
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error starting projection", e)
             result.error("PROJECTION_ERROR", "Error starting projection: ${e.message}", null)

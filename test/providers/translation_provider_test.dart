@@ -1,109 +1,129 @@
-import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:screen_translate/models/ocr_result.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
-import 'package:screen_translate/services/android_screen_capture_service.dart';
-import 'package:screen_translate/services/ocr_service.dart';
 
-// Mock Platform to test iOS and Android specific code
-class MockAndroidScreenCaptureService extends AndroidScreenCaptureService {
-  bool captureStarted = false;
-  Uint8List mockImageData = Uint8List(0);
+import '../mocks/fake_services.dart';
 
-  @override
-  Future<bool> requestScreenCapture() async {
-    captureStarted = true;
-    return true;
-  }
+OCRResult _box(String text, double x, double y, double w, double h) => OCRResult(
+      text: text, x: x, y: y, width: w, height: h,
+      imgWidth: 1080, imgHeight: 2400,
+    );
 
-  @override
-  Future<void> stopScreenCapture() async {
-    captureStarted = false;
-  }
-
-  @override
-  Future<Uint8List?> captureScreen() async {
-    return mockImageData;
-  }
-}
-
-class MockOCRService extends OCRService {
-  String mockText = '';
-
-  @override
-  Future<String> processImage(Uint8List imageBytes) async {
-    return mockText;
-  }
-}
-
-class MockTranslationProvider extends TranslationProvider {
-  final bool mockIsAndroid;
-  final bool mockIsIOS;
-  final MockAndroidScreenCaptureService mockAndroidService;
-  final MockOCRService mockOcrService;
-
-  MockTranslationProvider({
-    this.mockIsAndroid = false,
-    this.mockIsIOS = false,
-  })  : mockAndroidService = MockAndroidScreenCaptureService(),
-        mockOcrService = MockOCRService();
-
-  @override
-  Future<bool> requestPermissions() async {
-    return false; // Mock permissions denied for testing
-  }
-
-  @override
-  Future<void> _startAndroidScreenCapture() async {
-    // Mock implementation
-  }
-
-  @override
-  Future<void> _startIOSScreenCapture() async {
-    // Mock implementation
-  }
-}
+bool _overlaps(Rect a, Rect b) =>
+    a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
 void main() {
-  late MockTranslationProvider provider;
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late TranslationProvider provider;
 
   setUp(() {
-    provider = MockTranslationProvider();
+    SharedPreferences.setMockInitialValues({});
+    provider = TranslationProvider(
+      null,
+      FakeOCRService(),
+      FakeTranslationService(),
+      FakeOverlayService(),
+      llmTranslationService: FakeLLMTranslationService(),
+      onnxTranslationService: FakeOnnxTranslationService(),
+    );
   });
 
-  group('TranslationProvider', () {
+  group('TranslationProvider state', () {
     test('initial values are correct', () {
       expect(provider.isTranslating, false);
       expect(provider.lastTranslatedText, '');
       expect(provider.sourceLanguage, 'en');
       expect(provider.targetLanguage, 'zh');
+      expect(provider.translationMode, TranslationMode.onDevice);
     });
 
-    test('setLanguages updates language values', () {
-      provider.setLanguages('ja', 'ko');
+    test('setters update languages and mode, and notify listeners', () {
+      var notifications = 0;
+      provider.addListener(() => notifications++);
+
+      provider.setSourceLanguage('ja');
+      provider.setTargetLanguage('ko');
+      provider.setTranslationMode(TranslationMode.llm);
+
       expect(provider.sourceLanguage, 'ja');
       expect(provider.targetLanguage, 'ko');
+      expect(provider.translationMode, TranslationMode.llm);
+      expect(notifications, 3);
     });
 
-    test('updateTranslatedText updates last translated text', () {
-      const testText = 'Hello World';
-      provider.updateTranslatedText(testText);
-      expect(provider.lastTranslatedText, testText);
+    test('swapLanguages swaps source and target', () {
+      provider.swapLanguages();
+      expect(provider.sourceLanguage, 'zh');
+      expect(provider.targetLanguage, 'en');
+      expect(provider.isChineseToEnglish, true);
     });
 
-    test('stopTranslation sets isTranslating to false', () {
-      provider.stopTranslation();
+    test('merge aggressiveness is loaded from and persisted to preferences', () async {
+      SharedPreferences.setMockInitialValues({'mergeAggressiveness': 2.5});
+      final p = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+      );
+      await pumpEventQueue();
+      expect(p.mergeAggressiveness, 2.5);
+
+      await p.setMergeAggressiveness(0.5);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getDouble('mergeAggressiveness'), 0.5);
+    });
+
+    test('stopTranslation leaves provider inactive', () async {
+      await provider.stopTranslation();
       expect(provider.isTranslating, false);
     });
 
-    test('startTranslation throws exception when permissions denied', () async {
-      expect(
-        () => provider.startTranslation(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Required permissions were denied'),
-        )),
-      );
+    test('supportedLanguages includes common codes', () {
+      final langs = TranslationProvider.supportedLanguages;
+      expect(langs.keys, containsAll(['en', 'zh', 'ja']));
+    });
+  });
+
+  group('computeDisplayBoxes', () {
+    test('pads an isolated box on every side', () {
+      final boxes = provider.computeDisplayBoxesForTest([_box('a', 100, 100, 200, 40)]);
+      const pad = 40 * 0.15;
+      expect(boxes.single, const Rect.fromLTWH(100 - pad, 100 - pad, 200 + pad * 2, 40 + pad * 2));
+    });
+
+    test('same-row neighbors with a small gap do not overlap or get pushed down', () {
+      // Two adjacent tabs 4px apart — less than the 2 × 6px default side pad.
+      final left = _box('Home', 100, 100, 100, 40);
+      final right = _box('Settings', 204, 100, 100, 40);
+      final boxes = provider.computeDisplayBoxesForTest([left, right]);
+
+      expect(_overlaps(boxes[0], boxes[1]), false);
+      // Neither was shoved a row down by overlap resolution.
+      expect(boxes[0].top, boxes[1].top);
+      expect(boxes[1].top, lessThan(100));
+    });
+
+    test('stacked neighbors split the vertical gap instead of overlapping', () {
+      final top = _box('line 1', 100, 100, 200, 40);
+      final bottom = _box('line 2', 100, 144, 200, 40);
+      final boxes = provider.computeDisplayBoxesForTest([top, bottom]);
+
+      expect(_overlaps(boxes[0], boxes[1]), false);
+      expect(boxes[0].bottom, lessThanOrEqualTo(142));
+      expect(boxes[1].top, greaterThanOrEqualTo(142));
+    });
+
+    test('overlapping OCR boxes are pushed apart', () {
+      final a = _box('a', 100, 100, 200, 40);
+      final b = _box('b', 120, 120, 200, 40);
+      final boxes = provider.computeDisplayBoxesForTest([a, b]);
+      expect(_overlaps(boxes[0], boxes[1]), false);
     });
   });
 }

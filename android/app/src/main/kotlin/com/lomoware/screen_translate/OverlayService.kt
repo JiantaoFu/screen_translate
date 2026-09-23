@@ -51,6 +51,17 @@ class OverlayService : Service() {
     private var originalY = 0
     private var tooltipHideRunnable: Runnable? = null
     private val handler = Handler()
+    private var isTouchingControlButtons = false
+    private var bringToFrontPending = false
+    private val bringToFrontRunnable = Runnable {
+        if (isTouchingControlButtons) {
+            // Re-adding a window mid-gesture cancels the drag and snaps the
+            // button back — wait until the finger lifts.
+            bringToFrontPending = true
+        } else {
+            bringControlButtonsToFrontNow()
+        }
+    }
     private var screenWidth: Int = 0
     private var screenHeight: Int = 0
     private var oldScreenWidth: Int = 0
@@ -324,6 +335,7 @@ class OverlayService : Service() {
             setPadding(padding, padding, padding, padding)
 
             setOnTouchListener { view, event ->
+                trackControlButtonTouch(event)
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         view.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).start()
@@ -409,6 +421,7 @@ class OverlayService : Service() {
             var isDragging = false
 
             setOnTouchListener { view, event ->
+                trackControlButtonTouch(event)
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         lastTouchX = event.rawX
@@ -525,7 +538,29 @@ class OverlayService : Service() {
     // draws over it, making it look like the button vanished. Re-adding the
     // buttons after every new text box keeps them on top of whatever content
     // is currently on screen.
+    //
+    // A single tick can add many boxes, so this is debounced to one re-add
+    // after the burst instead of tearing the button windows down and
+    // rebuilding them once per box.
     private fun bringControlButtonsToFront() {
+        handler.removeCallbacks(bringToFrontRunnable)
+        handler.postDelayed(bringToFrontRunnable, 100)
+    }
+
+    private fun trackControlButtonTouch(event: MotionEvent) {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> isTouchingControlButtons = true
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                isTouchingControlButtons = false
+                if (bringToFrontPending) {
+                    bringToFrontPending = false
+                    bringControlButtonsToFront()
+                }
+            }
+        }
+    }
+
+    private fun bringControlButtonsToFrontNow() {
         controlButton?.let { button ->
             if (button.isAttachedToWindow) {
                 val params = button.layoutParams as WindowManager.LayoutParams
@@ -976,6 +1011,8 @@ class OverlayService : Service() {
             }
             "stop" -> {
                 isStopped = true
+                handler.removeCallbacks(bringToFrontRunnable)
+                bringToFrontPending = false
                 hideAllOverlays()
                 removeOverlayButtons()
             }

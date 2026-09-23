@@ -253,22 +253,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         screenDensity = metrics.densityDpi
         Log.d(TAG, "Screen metrics (real): $screenWidth x $screenHeight @ $screenDensity")
 
-        frameStabilizer = FrameStabilizer(screenWidth, screenHeight) {
-            // This fires synchronously from onNewFrame() on the
-            // imageReaderHandler background thread, but cancelAllTranslations()
-            // goes through a Flutter MethodChannel, which requires the main
-            // thread and throws otherwise. That exception used to escape
-            // onNewFrame() uncaught, aborting it before it could reschedule
-            // the stabilization timer — so on almost every frame where
-            // anything changed, no new frame ever made it into the capture
-            // queue. Posting to the main thread keeps this from throwing.
-            mainHandler.post {
-                val intent = Intent(context, OverlayService::class.java)
-                intent.action = "hideAll"
-                context.startService(intent)
-                cancelAllTranslations()
-            }
-        }
+        frameStabilizer = createFrameStabilizer()
 
         // Register scroll detection receiver during initialization
         registerScrollDetectionReceiver()
@@ -356,12 +341,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     Log.d(TAG, "Screen rotation detected! Updating dimensions: ${screenWidth}x${screenHeight} -> ${currentW}x${currentH}")
                     screenWidth = currentW
                     screenHeight = currentH
-                    frameStabilizer = FrameStabilizer(screenWidth, screenHeight) {
-                        val intent = Intent(context, OverlayService::class.java)
-                        intent.action = "hideAll"
-                        context.startService(intent)
-                        cancelAllTranslations()
-                    }
+                    frameStabilizer = createFrameStabilizer()
                     setupVirtualDisplay()
                 }
             } catch (rotationEx: Exception) {
@@ -645,6 +625,25 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         } catch (e: Exception) {
             Log.e(TAG, "Error converting image to bytes", e)
             return null
+        }
+    }
+
+    private fun createFrameStabilizer(): FrameStabilizer {
+        return FrameStabilizer(screenWidth, screenHeight) {
+            // This fires synchronously from onNewFrame() on the
+            // imageReaderHandler background thread, but cancelAllTranslations()
+            // goes through a Flutter MethodChannel, which requires the main
+            // thread and throws otherwise. That exception used to escape
+            // onNewFrame() uncaught, aborting it before it could reschedule
+            // the stabilization timer — so on almost every frame where
+            // anything changed, no new frame ever made it into the capture
+            // queue. Posting to the main thread keeps this from throwing.
+            mainHandler.post {
+                val intent = Intent(context, OverlayService::class.java)
+                intent.action = "hideAll"
+                context.startService(intent)
+                cancelAllTranslations()
+            }
         }
     }
 

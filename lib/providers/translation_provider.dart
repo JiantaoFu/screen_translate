@@ -304,6 +304,10 @@ class TranslationProvider with ChangeNotifier {
       // abort or an unexpected exception — gets hidden in `finally`, since
       // Dart has no other record of them.
       final pendingPlaceholders = <int>{};
+      // Set when this tick abandons its frame because a cancel arrived
+      // mid-cycle. On a static screen no further frame would ever be
+      // queued, so `finally` asks native for a fresh one.
+      var droppedStale = false;
 
       try {
         // Check translation mode from Android service
@@ -415,6 +419,7 @@ class TranslationProvider with ChangeNotifier {
               // match by text/position and never re-translate.
               if (!_isTranslating || tickToken != _translationToken) {
                 print('Overlay: Cancelled during capture/OCR, dropping frame');
+                droppedStale = true;
                 return;
               }
 
@@ -428,7 +433,10 @@ class TranslationProvider with ChangeNotifier {
                 final i = e.key;
                 final id = e.value;
                 final old = _displayedOverlays[id];
-                if (old == null || myToken != _translationToken) return;
+                if (old == null || myToken != _translationToken) {
+                  droppedStale = true;
+                  return;
+                }
                 var drawn = old.drawnRect;
                 if (_rectMoved(drawn, displayBoxes[i])) {
                   drawn = displayBoxes[i];
@@ -489,6 +497,7 @@ class TranslationProvider with ChangeNotifier {
                 // Stale check: if the user has scrolled/changed page, discard results
                 if (!_isTranslating || myToken != _translationToken) {
                   print('Overlay: Translation stale or stopped (token mismatch), aborting');
+                  droppedStale = true;
                   return;
                 }
 
@@ -519,6 +528,7 @@ class TranslationProvider with ChangeNotifier {
                   // Stale check on each block: abort if user has navigated away
                   if (!_isTranslating || myToken != _translationToken) {
                     print('Overlay: Translation stale at block $i (token mismatch), aborting');
+                    droppedStale = true;
                     return;
                   }
                   final ocrResult = ocrResults[i];
@@ -531,6 +541,7 @@ class TranslationProvider with ChangeNotifier {
                   // Stale check again after the (potentially slow) translation call
                   if (myToken != _translationToken) {
                     print('Overlay: Translation stale after block $i, discarding');
+                    droppedStale = true;
                     return;
                   }
 
@@ -595,6 +606,9 @@ class TranslationProvider with ChangeNotifier {
           } catch (e) {
             print('Error hiding leftover placeholders: $e');
           }
+        }
+        if (droppedStale && _isTranslating) {
+          await _androidScreenCaptureService?.requestFreshFrame();
         }
         _isProcessingCapture = false; // Always release guard
         // Always clear here (not inline after a successful cycle) so a

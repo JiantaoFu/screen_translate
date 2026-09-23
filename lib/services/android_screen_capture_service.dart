@@ -53,6 +53,16 @@ class AndroidScreenCaptureService {
     }
   }
 
+  /// Ask native to queue the current screen again once it's quiet, even if
+  /// nothing changes — used after dropping a frame as stale.
+  Future<void> requestFreshFrame() async {
+    try {
+      await _channel.invokeMethod('requestFreshFrame');
+    } on PlatformException catch (e) {
+      print('Error requesting fresh frame: ${e.message}');
+    }
+  }
+
   Future<String> getTranslationMode() async {
     try {
       final result = await _channel.invokeMethod('getTranslationMode');

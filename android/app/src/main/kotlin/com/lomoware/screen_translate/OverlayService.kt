@@ -247,6 +247,7 @@ class OverlayService : Service() {
             }
         }
 
+        OverlayRegions.track(newTooltip)
         windowManager?.addView(newTooltip, params)
 
         // Quick pop animation
@@ -381,6 +382,7 @@ class OverlayService : Service() {
             y = resources.displayMetrics.heightPixels / 3
         }
 
+        controlButton?.let { OverlayRegions.track(it) }
         windowManager?.addView(controlButton, params)
         showTooltip(displayMode.getLocalizedLabel(this))
     }
@@ -479,6 +481,7 @@ class OverlayService : Service() {
         }
 
         translateButton?.visibility = View.GONE
+        translateButton?.let { OverlayRegions.track(it) }
         windowManager?.addView(translateButton, translateButtonParams)
     }
 
@@ -816,6 +819,7 @@ class OverlayService : Service() {
             }
         }
 
+        OverlayRegions.track(finalView)
         windowManager?.addView(finalView, layoutParams)
         Log.d(TAG, "Overlay $id added to window manager at (${layoutParams.x}, ${layoutParams.y}), displayMode=$displayMode")
         bringControlButtonsToFront()
@@ -957,6 +961,7 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
+        OverlayRegions.track(container)
         windowManager?.addView(container, layoutParams)
     }
 

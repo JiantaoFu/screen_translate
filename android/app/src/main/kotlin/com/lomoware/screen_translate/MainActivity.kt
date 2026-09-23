@@ -83,6 +83,10 @@ class MainActivity: FlutterActivity() {
                 "captureScreen" -> {
                     screenCaptureService?.captureScreen(result)
                 }
+                "requestFreshFrame" -> {
+                    screenCaptureService?.requestFreshFrame()
+                    result.success(null)
+                }
                 "getTranslationMode" -> {
                     val translationMode = OverlayService.getInstance()?.getCurrentTranslationMode() ?: "auto"
                     result.success(translationMode)

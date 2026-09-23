@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.Image
@@ -73,128 +74,137 @@ data class CapturedFrame(
 }
 
 class FrameStabilizer(
-    private var screenWidth: Int, 
-    private var screenHeight: Int,
+    private val screenWidth: Int,
+    private val screenHeight: Int,
+    // Rows above this are the status bar — its clock and the screen-capture
+    // indicator's running timer change every second and aren't content.
+    private val ignoreTopPx: Int,
     private val onMotionDetected: () -> Unit
 ) {
+    private companion object {
+        const val GRID = 32 // GRID x GRID luma sample points
+        const val LUMA_TOLERANCE = 16 // ignore compression/dither noise
+        const val MIN_CHANGED_SAMPLES = 3 // ignore a single blinking cursor
+        const val STABILIZATION_DELAY_MS = 300L // quiet time before translating
+    }
+
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
     private var stabilizationTimer: Timer? = null
-    private val stabilizationDelay = 300L // ms to wait before translating
+    private var stabilizationPending = false
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var lastImageHash: Long = 0
-    private var consecutiveScrollFrames = 0
-    private val MAX_CONSECUTIVE_SCROLL_FRAMES = 1
-    private val scrollDetectionThreshold = 0.4
 
-    fun detectScrolling(currentFrame: ByteArray): Boolean {
-        lastFrame?.let { previous ->
-            if (previous.size == currentFrame.size) {
-                val pixelDifference = computePixelDifference(previous, currentFrame)
-                Log.d("FrameStabilizer", "Scrolling detected: $pixelDifference")
-                
-                if (pixelDifference > scrollDetectionThreshold) {
-                    consecutiveScrollFrames++
-                    
-                    if (consecutiveScrollFrames >= MAX_CONSECUTIVE_SCROLL_FRAMES) {
-                        lastFrame = currentFrame.clone()
-                        return true
-                    }
-                } else {
-                    consecutiveScrollFrames = 0
-                }
-            }
-        }
-        
-        lastFrame = currentFrame.clone()
-        return false
+    private var lastSamples: IntArray? = null
+    private var lastMask: List<Rect> = emptyList()
+    // Most recent frame regardless of whether it counted as a change, and
+    // the consumer it was delivered with — used by requestFreshFrame().
+    private var latestFrame: ByteArray? = null
+    private var latestOnStable: ((ByteArray) -> Unit)? = null
+
+    private val sampleXs = IntArray(GRID) { (screenWidth * (2 * it + 1)) / (2 * GRID) }
+    private val sampleYs = IntArray(GRID) {
+        ignoreTopPx + ((screenHeight - ignoreTopPx) * (2 * it + 1)) / (2 * GRID)
     }
 
-    private fun computePixelDifference(frame1: ByteArray, frame2: ByteArray): Double {
-        var differentPixels = 0
-        val totalPixels = frame1.size / 4 // Assuming RGBA
-
-        for (i in frame1.indices step 4) {
-            // Compare color channels, ignore alpha
-            val isDifferent = (0..2).any { channel -> 
-                abs(frame1[i + channel].toInt() - frame2[i + channel].toInt()) > 20 
-            }
-            
-            if (isDifferent) differentPixels++
-        }
-
-        return differentPixels.toDouble() / totalPixels
-    }
-
-    private fun computeImageHash(bytes: ByteArray): Long {
-        // Sample pixels from different regions of the image. `bytes` is the
-        // NV21 buffer produced by imageToBytes(): the Y (luma) plane comes
-        // first, one byte per pixel, tightly packed (no row padding), so it
-        // is indexed directly rather than with an RGBA (*4) stride — using
-        // *4 here previously left the bottom ~63% of the screen unsampled,
-        // meaning content changes there (e.g. turning a page) never
-        // registered as a frame change.
-        val sampleSize = 16
-
-        var hash: Long = 0
-        for (y in 0 until screenHeight step (screenHeight / sampleSize)) {
-            for (x in 0 until screenWidth step (screenWidth / sampleSize)) {
-                val index = y * screenWidth + x  // Y plane, 1 byte per pixel
-                if (index < bytes.size) {
-                    hash = 31 * hash + bytes[index].toLong()
-                }
+    // `bytes` is the NV21 buffer produced by imageToBytes(): the Y (luma)
+    // plane comes first, one byte per pixel, tightly packed (no row
+    // padding), so it is indexed directly.
+    private fun sample(bytes: ByteArray): IntArray {
+        val out = IntArray(GRID * GRID)
+        for (row in 0 until GRID) {
+            val rowBase = sampleYs[row] * screenWidth
+            for (col in 0 until GRID) {
+                val index = rowBase + sampleXs[col]
+                out[row * GRID + col] = if (index < bytes.size) bytes[index].toInt() and 0xFF else 0
             }
         }
-        return hash
+        return out
     }
 
+    private fun countChanged(prev: IntArray, cur: IntArray, mask: List<Rect>): Int {
+        var changed = 0
+        for (row in 0 until GRID) {
+            val y = sampleYs[row]
+            for (col in 0 until GRID) {
+                val i = row * GRID + col
+                if (abs(prev[i] - cur[i]) <= LUMA_TOLERANCE) continue
+                val x = sampleXs[col]
+                if (mask.any { it.contains(x, y) }) continue
+                changed++
+            }
+        }
+        return changed
+    }
+
+    @Synchronized
     fun onNewFrame(currentFrame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
-        // Compute hash of current frame
-        val currentImageHash = computeImageHash(currentFrame)
+        latestFrame = currentFrame
+        latestOnStable = onStable
+        val samples = sample(currentFrame)
+        val mask = OverlayRegions.snapshot()
+        val prev = lastSamples
+        // Ignore regions covered by our own windows in EITHER frame: one
+        // just added/moved/removed changes pixels in both its old and new
+        // spot without the underlying content having changed.
+        val changed = if (prev == null) 0 else countChanged(prev, samples, lastMask + mask)
+        lastSamples = samples
+        lastMask = mask
 
-        // Always proceed on first frame or after screen rotation
-        val shouldProcess = currentImageHash != lastImageHash
+        val isFirstFrame = prev == null
+        if (!isFirstFrame && changed < MIN_CHANGED_SAMPLES) {
+            // Not a content change — but if we're already waiting for the
+            // screen to settle, prefer the newest frame: right after a
+            // real change our overlays are being torn down, and the queued
+            // frame must not still contain them (OCR would read our own
+            // translations back as source text).
+            if (stabilizationPending) lastFrame = currentFrame
+            return
+        }
 
-        if (shouldProcess) {
-            Log.d("FrameStabilizer", "Processing frame, last hash: $lastImageHash, current hash: $currentImageHash")
-            
-            // Motion detected - trigger callback immediately to clear overlays
-            if (lastImageHash != 0L) {
-                onMotionDetected()
-            }
+        Log.d("FrameStabilizer", "Content change: $changed samples differ")
+        if (!isFirstFrame) onMotionDetected()
+        scheduleStable(currentFrame, currentTime, onStable)
+    }
 
-            // Cancel previous timer
-            stabilizationTimer?.cancel()
+    /**
+     * Queue the current screen again once it has been quiet for the
+     * stabilization delay, even though nothing changed. Needed after an
+     * external cancel (scroll/window-change event): Dart drops whatever
+     * frame it was processing, and on a static screen no content change
+     * would ever produce another one, leaving the screen untranslated.
+     */
+    @Synchronized
+    fun requestFreshFrame() {
+        val frame = latestFrame ?: return
+        val onStable = latestOnStable ?: return
+        scheduleStable(frame, System.currentTimeMillis(), onStable)
+    }
 
-            // Always update last frame
-            lastFrame = currentFrame
-            lastFrameTime = currentTime
-            lastImageHash = currentImageHash
+    private fun scheduleStable(frame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
+        stabilizationTimer?.cancel()
+        lastFrame = frame
+        lastFrameTime = currentTime
+        stabilizationPending = true
 
-            // Start a new timer
-            stabilizationTimer = Timer().apply {
-                schedule(object : TimerTask() {
-                    override fun run() {
-                        synchronized(this@FrameStabilizer) {
-                            // Check if no new frame has arrived since scheduling this timer
-                            if (currentTime == lastFrameTime) {
-                                lastFrame?.let { stableFrame ->
-                                    // Post to main handler to ensure thread safety
-                                    mainHandler.post {
-                                        Log.d("FrameStabilizer", "Frame stabilized after $stabilizationDelay ms")
-                                        onStable(stableFrame)
-                                        lastFrame = null
-                                    }
-                                }
-                            }
+        stabilizationTimer = Timer().apply {
+            schedule(object : TimerTask() {
+                override fun run() {
+                    synchronized(this@FrameStabilizer) {
+                        // Only fire if no content change has arrived since scheduling
+                        if (currentTime != lastFrameTime) return
+                        stabilizationPending = false
+                        val stableFrame = lastFrame ?: return
+                        lastFrame = null
+                        mainHandler.post {
+                            Log.d("FrameStabilizer", "Frame stabilized after $STABILIZATION_DELAY_MS ms")
+                            onStable(stableFrame)
                         }
                     }
-                }, stabilizationDelay)
-            }
+                }
+            }, STABILIZATION_DELAY_MS)
         }
     }
 }
-
 
 class ScreenCaptureService(private val context: Context, private val activity: Activity) {
     private var mediaProjection: MediaProjection? = null
@@ -509,12 +519,6 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
                         val bytes = imageToBytes(image)
                         if (bytes != null) {
-                            // if (frameStabilizer.detectScrolling(bytes)) {
-                            //     // Clear translation overlay
-                            //     val intent = Intent(context, OverlayService::class.java)
-                            //     intent.action = "hideAll"
-                            //     context.startService(intent)
-                            // }
                             val currentTime = System.currentTimeMillis()
                             // Pass a callback to process the stable frame
                             frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
@@ -628,8 +632,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // Called by Dart after it drops a frame as stale (a cancel arrived
+    // while it was processing), so the current screen gets queued again
+    // even if nothing on it changes afterwards.
+    fun requestFreshFrame() {
+        if (::frameStabilizer.isInitialized) frameStabilizer.requestFreshFrame()
+    }
+
     private fun createFrameStabilizer(): FrameStabilizer {
-        return FrameStabilizer(screenWidth, screenHeight) {
+        return FrameStabilizer(screenWidth, screenHeight, statusBarHeight()) {
             // This fires synchronously from onNewFrame() on the
             // imageReaderHandler background thread, but cancelAllTranslations()
             // goes through a Flutter MethodChannel, which requires the main
@@ -645,6 +656,11 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 cancelAllTranslations()
             }
         }
+    }
+
+    private fun statusBarHeight(): Int {
+        val id = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (id > 0) context.resources.getDimensionPixelSize(id) else 0
     }
 
     private fun cancelAllTranslations() {
@@ -695,6 +711,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                             context.startService(overlayIntent)
 
                             cancelAllTranslations()
+                            frameStabilizer.requestFreshFrame()
                         }
                         ScrollDetectionAccessibilityService.WINDOW_CHANGED_ACTION -> {
                             val packageName = intent.getStringExtra("package") ?: "unknown"
@@ -710,6 +727,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                             context.startService(overlayIntent)
 
                             cancelAllTranslations()
+                            frameStabilizer.requestFreshFrame()
                         }
                         else -> {
                             Log.w(TAG, "Unexpected intent action: ${intent.action}")

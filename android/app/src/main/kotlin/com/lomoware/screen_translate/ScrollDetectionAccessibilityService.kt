@@ -73,6 +73,14 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
         val packageName = event.packageName?.toString() ?: return
         val currentTime = System.currentTimeMillis()
 
+        // Our own floating windows (translated boxes, buttons, tooltips)
+        // report TYPE_WINDOW_STATE_CHANGED under our package when added.
+        // Treating that as "user switched apps" hid every overlay the
+        // moment the first translated box was drawn. Only our activity
+        // coming to the foreground is a real window change.
+        if (packageName == this.packageName &&
+            event.className?.toString()?.endsWith("Activity") != true) return
+
         if (packageName == lastForegroundPackage) return
         if (currentTime - lastWindowChangeTimestamp < 300) return
 
@@ -115,8 +123,10 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
             abs(scrollYDelta) > 50
 
         val isSystemPackage = packageName == "com.android.systemui"
+        // e.g. scrolling our own expanded-text dialog isn't a content change
+        val isOwnPackage = packageName == this.packageName
 
-        if (isSignificantScroll && !isSystemPackage) {
+        if (isSignificantScroll && !isSystemPackage && !isOwnPackage) {
             // Update scroll state
             scrollState.lastScrollX = event.scrollX
             scrollState.lastScrollY = event.scrollY

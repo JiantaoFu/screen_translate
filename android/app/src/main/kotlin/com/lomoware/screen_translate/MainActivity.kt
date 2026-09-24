@@ -21,14 +21,20 @@ class MainActivity: FlutterActivity() {
     private val OVERLAY_CHANNEL = "com.lomoware.screen_translate/overlay"
 
     companion object {
-        lateinit var binaryMessenger: BinaryMessenger
+        // Null until the Flutter engine is attached. Services can be started
+        // by the system without this Activity ever being created (e.g. a
+        // pending start intent re-delivered after the process was killed in
+        // the background), so callers must handle null instead of crashing.
+        @Volatile
+        var binaryMessenger: BinaryMessenger? = null
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
+        Companion.binaryMessenger = binaryMessenger
         screenCaptureService = ScreenCaptureService(context, this)
-        binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
 
         MethodChannel(binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {

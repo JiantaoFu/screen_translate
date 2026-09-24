@@ -35,9 +35,38 @@ void main() {
     test('initial values are correct', () {
       expect(provider.isTranslating, false);
       expect(provider.lastTranslatedText, '');
-      expect(provider.sourceLanguage, 'en');
-      expect(provider.targetLanguage, 'zh');
+      // Test locale is en-US: translate *into* English, from Japanese.
+      expect(provider.sourceLanguage, 'ja');
+      expect(provider.targetLanguage, 'en');
       expect(provider.translationMode, TranslationMode.onDevice);
+    });
+
+    test('default pair targets the device language', () {
+      expect(TranslationProvider.defaultLanguagePairFor('pt'), ('en', 'pt'));
+      expect(TranslationProvider.defaultLanguagePairFor('th'), ('en', 'th'));
+      expect(TranslationProvider.defaultLanguagePairFor('zh'), ('en', 'zh'));
+      expect(TranslationProvider.defaultLanguagePairFor('en'), ('ja', 'en'));
+      // Legacy Android codes are mapped; unsupported ones fall back to English.
+      expect(TranslationProvider.defaultLanguagePairFor('in'), ('en', 'id'));
+      expect(TranslationProvider.defaultLanguagePairFor('xx'), ('ja', 'en'));
+    });
+
+    test('language pair is persisted and restored', () async {
+      provider.setSourceLanguage('ko');
+      provider.setTargetLanguage('vi');
+      await pumpEventQueue();
+
+      final restored = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+      );
+      await pumpEventQueue();
+      expect(restored.sourceLanguage, 'ko');
+      expect(restored.targetLanguage, 'vi');
     });
 
     test('setters update languages and mode, and notify listeners', () {
@@ -55,6 +84,8 @@ void main() {
     });
 
     test('swapLanguages swaps source and target', () {
+      provider.setSourceLanguage('en');
+      provider.setTargetLanguage('zh');
       provider.swapLanguages();
       expect(provider.sourceLanguage, 'zh');
       expect(provider.targetLanguage, 'en');
@@ -87,6 +118,91 @@ void main() {
     test('supportedLanguages includes common codes', () {
       final langs = TranslationProvider.supportedLanguages;
       expect(langs.keys, containsAll(['en', 'zh', 'ja']));
+    });
+  });
+
+  group('withoutOwnOverlayText', () {
+    test('drops text read back from our own overlays and reports them', () {
+      final ownTranslation = _box('天気がいい', 40, 190, 900, 80);
+      final newSubtitle = _box('Hello there', 100, 800, 600, 50);
+      final covered = <int>{};
+      final kept = TranslationProvider.withoutOwnOverlayText(
+        [ownTranslation, newSubtitle],
+        {7: const Rect.fromLTWH(30, 180, 920, 100)},
+        covered,
+      );
+      expect(kept, [newSubtitle]);
+      expect(covered, {7});
+    });
+
+    test('a block OCR merged across two of our boxes covers both', () {
+      // Our boxes for two paragraphs, and OCR reading them back as one block
+      // whose centre falls in the gap between them.
+      final merged = _box('段落一 段落二', 30, 180, 920, 250);
+      final covered = <int>{};
+      final kept = TranslationProvider.withoutOwnOverlayText(
+        [merged],
+        {
+          1: const Rect.fromLTWH(30, 180, 920, 110),
+          2: const Rect.fromLTWH(30, 320, 920, 110),
+        },
+        covered,
+      );
+      expect(kept, isEmpty);
+      expect(covered, {1, 2});
+    });
+
+    test('text only partly under a box is not ours', () {
+      final covered = <int>{};
+      final r = _box('new caption', 0, 0, 400, 100);
+      final kept = TranslationProvider.withoutOwnOverlayText(
+          [r], {1: const Rect.fromLTWH(300, 0, 400, 100)}, covered);
+      expect(kept, [r]);
+      expect(covered, isEmpty);
+    });
+
+    test('keeps everything when no overlays are shown', () {
+      final covered = <int>{};
+      final all = [_box('a', 0, 0, 10, 10), _box('b', 50, 50, 10, 10)];
+      expect(TranslationProvider.withoutOwnOverlayText(all, {}, covered), all);
+      expect(covered, isEmpty);
+    });
+  });
+
+  group('continuesText', () {
+    // Our box over the first half of a typed-out dialogue line (55px line).
+    const box = Rect.fromLTWH(90, 2080, 780, 66);
+
+    test('the rest of the same line right after the box', () {
+      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(880, 2086, 90, 55)), isTrue);
+    });
+
+    test('the next line at the same indent', () {
+      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(95, 2150, 800, 55)), isTrue);
+    });
+
+    test('text far along the same row is not a continuation', () {
+      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(1000, 2086, 60, 55)), isFalse);
+    });
+
+    test('text just below but not aligned (e.g. read off a video) is not', () {
+      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(400, 2160, 200, 40)), isFalse);
+    });
+
+    test('text well below the box is not', () {
+      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(95, 2300, 800, 55)), isFalse);
+    });
+  });
+
+  group('hasTranslatableText', () {
+    test('skips clocks and counters, keeps text in any script', () {
+      bool t(String s) => TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10));
+      expect(t('01:52'), isFalse);
+      expect(t('12,345 / 99%'), isFalse);
+      expect(t('Hello'), isTrue);
+      expect(t('こんにちは'), isTrue);
+      expect(t('안녕 3'), isTrue);
+      expect(t('Привет'), isTrue);
     });
   });
 

@@ -44,6 +44,7 @@ class OverlayService : Service() {
     private var translateButton: ImageButton? = null
     private var translateButtonParams: WindowManager.LayoutParams? = null
     private var tooltipView: TextView? = null
+    private var expandedTextView: View? = null
     private var displayMode = DisplayMode.AUTO
     private var lastTouchX = 0f
     private var lastTouchY = 0f
@@ -126,10 +127,53 @@ class OverlayService : Service() {
         }
 
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 5469
+
+        // Android refuses to add more than ~30 TYPE_APPLICATION_OVERLAY
+        // windows per app ("excessive same type windows" BadTokenException,
+        // which crashed dense manga/game pages). The control button,
+        // translate button, tooltip and expanded-text dialog need room too.
+        private const val MAX_TEXT_OVERLAYS = 24
+
+        // See showOverlay(): must stay translucent enough for
+        // FrameStabilizer's under-box change detection.
+        private const val BOX_BACKGROUND_ALPHA = 250
     }
 
     private lateinit var displayMetrics: DisplayMetrics
     private var windowManagerInstance: WindowManager? = null
+
+    // When the screen rotates (e.g. a landscape game comes to the front),
+    // keep the floating buttons at the same relative spot. Positions are
+    // absolute pixels, so the default right-edge spot in portrait landed in
+    // the middle of a landscape screen — on top of the game's dialogue.
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val metrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
+        windowManager?.defaultDisplay?.getRealMetrics(metrics)
+        val newW = metrics.widthPixels
+        val newH = metrics.heightPixels
+        val oldW = buttonLayoutWidth
+        val oldH = buttonLayoutHeight
+        buttonLayoutWidth = newW
+        buttonLayoutHeight = newH
+        if (oldW <= 0 || oldH <= 0 || (oldW == newW && oldH == newH)) return
+        val button = controlButton ?: return
+        val params = button.layoutParams as? WindowManager.LayoutParams ?: return
+        val size = 48.dpToPx()
+        params.x = (params.x * newW / oldW).coerceIn(0, maxOf(0, newW - size))
+        params.y = (params.y * newH / oldH).coerceIn(0, maxOf(0, newH - size))
+        try {
+            windowManager?.updateViewLayout(button, params)
+            updateTranslateButtonPosition(params.x, params.y)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Control button not attached", e)
+        }
+    }
+
+    // Screen size the button positions were laid out for.
+    private var buttonLayoutWidth = 0
+    private var buttonLayoutHeight = 0
 
     override fun onCreate() {
         super.onCreate()
@@ -188,12 +232,37 @@ class OverlayService : Service() {
         controlButton?.setImageResource(displayMode.icon)
     }
 
+    // removeView() throws if the view was already detached (e.g. the tooltip
+    // was torn down by "stop" while its reference was still held), which
+    // crashed the app the next time translation was started.
+    private fun safeRemoveView(view: View?) {
+        if (view == null || !view.isAttachedToWindow) return
+        try {
+            windowManager?.removeView(view)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "View already detached from window manager", e)
+        }
+    }
+
+    // addView() can throw BadTokenException (window limit, overlay permission
+    // revoked mid-session) — losing one overlay is fine, crashing is not.
+    private fun safeAddView(view: View, params: WindowManager.LayoutParams): Boolean {
+        return try {
+            windowManager?.addView(view, params)
+            true
+        } catch (e: WindowManager.BadTokenException) {
+            Log.e(TAG, "Unable to add overlay window", e)
+            false
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Overlay window already added", e)
+            false
+        }
+    }
+
     private fun showTooltip(text: String) {
         // Remove existing tooltip if any
-        tooltipView?.let {
-            windowManager?.removeView(it)
-            tooltipView = null
-        }
+        safeRemoveView(tooltipView)
+        tooltipView = null
 
         // Create new tooltip
         val newTooltip = TextView(this).apply {
@@ -247,8 +316,11 @@ class OverlayService : Service() {
             }
         }
 
-        OverlayRegions.track(newTooltip)
-        windowManager?.addView(newTooltip, params)
+        OverlayRegions.track(newTooltip, isControl = true)
+        if (!safeAddView(newTooltip, params)) {
+            tooltipView = null
+            return
+        }
 
         // Quick pop animation
         newTooltip.alpha = 0f
@@ -274,16 +346,9 @@ class OverlayService : Service() {
                     .scaleY(0.9f)
                     .setDuration(150)
                     .withEndAction {
-                        if (currentTooltip != null && currentTooltip.isAttachedToWindow) {
-                            try {
-                                windowManager?.removeView(currentTooltip)
-                                if (tooltipView == currentTooltip) {
-                                    tooltipView = null
-                                }
-                            } catch (e: IllegalArgumentException) {
-                                // Log the error or handle it gracefully
-                                Log.e("OverlayService", "Error removing tooltip view", e)
-                            }
+                        safeRemoveView(currentTooltip)
+                        if (tooltipView == currentTooltip) {
+                            tooltipView = null
                         }
                     }
                     .start()
@@ -325,6 +390,13 @@ class OverlayService : Service() {
 
     private fun createControlButton() {
         controlButton = ImageView(this).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                setOnApplyWindowInsetsListener { _, insets ->
+                    OverlayRegions.statusBarVisible =
+                        insets.isVisible(android.view.WindowInsets.Type.statusBars())
+                    insets
+                }
+            }
             setImageResource(displayMode.icon)
             background = ContextCompat.getDrawable(context, R.drawable.floating_button_bg)
             elevation = 8f
@@ -382,8 +454,18 @@ class OverlayService : Service() {
             y = resources.displayMetrics.heightPixels / 3
         }
 
-        controlButton?.let { OverlayRegions.track(it) }
-        windowManager?.addView(controlButton, params)
+        val metrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
+        windowManager?.defaultDisplay?.getRealMetrics(metrics)
+        buttonLayoutWidth = metrics.widthPixels
+        buttonLayoutHeight = metrics.heightPixels
+        controlButton?.let { button ->
+            OverlayRegions.track(button, isControl = true)
+            if (!safeAddView(button, params)) {
+                controlButton = null
+                return
+            }
+        }
         showTooltip(displayMode.getLocalizedLabel(this))
     }
 
@@ -481,8 +563,10 @@ class OverlayService : Service() {
         }
 
         translateButton?.visibility = View.GONE
-        translateButton?.let { OverlayRegions.track(it) }
-        windowManager?.addView(translateButton, translateButtonParams)
+        translateButton?.let { button ->
+            OverlayRegions.track(button, isControl = true)
+            if (!safeAddView(button, translateButtonParams!!)) translateButton = null
+        }
     }
 
     // Update method to sync translate button position with control button
@@ -508,6 +592,7 @@ class OverlayService : Service() {
         if (displayMode == DisplayMode.MANUAL) {
             Log.d(TAG, "Manually triggering translation")
 
+            if (!::methodChannel.isInitialized) return
             // Send method call to Flutter side to request manual translation
             methodChannel.invokeMethod("requestManualTranslation", null, object : MethodChannel.Result {
                 override fun success(result: Any?) {
@@ -567,15 +652,15 @@ class OverlayService : Service() {
         controlButton?.let { button ->
             if (button.isAttachedToWindow) {
                 val params = button.layoutParams as WindowManager.LayoutParams
-                windowManager?.removeView(button)
-                windowManager?.addView(button, params)
+                safeRemoveView(button)
+                safeAddView(button, params)
             }
         }
         translateButton?.let { button ->
             if (button.isAttachedToWindow) {
                 val params = button.layoutParams as WindowManager.LayoutParams
-                windowManager?.removeView(button)
-                windowManager?.addView(button, params)
+                safeRemoveView(button)
+                safeAddView(button, params)
             }
         }
     }
@@ -602,15 +687,13 @@ class OverlayService : Service() {
         }
 
         if (overlayViews.containsKey(id)) {
-            try {
-                val existingView = overlayViews[id]
-                windowManager?.removeView(existingView)
-                overlayViews.remove(id)
-                overlayParams.remove(id)
-                originalPositions.remove(id)
-            } catch (e: Exception) {
-                print("Error removing existing overlay: ${e.message}")
-            }
+            safeRemoveView(overlayViews[id])
+            overlayViews.remove(id)
+            overlayParams.remove(id)
+            originalPositions.remove(id)
+        } else if (overlayViews.size >= MAX_TEXT_OVERLAYS) {
+            Log.w(TAG, "showOverlay: skipping box $id, already showing ${overlayViews.size} boxes")
+            return
         }
 
         // Get status bar height
@@ -696,14 +779,15 @@ class OverlayService : Service() {
                 setText(text)
 
                 val overlayTextColor = if (isLight) Color.WHITE else Color.BLACK
-                // Fully opaque — a translucent background here let the
-                // original on-screen text bleed through the translated
-                // overlay, which looked messy especially where the source
-                // glyph color didn't match the sampled background. The
-                // static "Translate Image" screen already paints fully
-                // opaque; match that here.
+                // Nearly opaque. A clearly translucent background let the
+                // original text bleed through and looked messy, but a small
+                // bleed (~2%) is invisible in practice and is what lets
+                // FrameStabilizer notice the text UNDER a box changing (the
+                // next dialogue line in the same game text box): screen
+                // capture sees our boxes too, so a fully opaque box hid any
+                // change beneath it and left a stale translation on screen.
                 val overlayBackgroundColor = Color.argb(
-                    255,
+                    BOX_BACKGROUND_ALPHA,
                     Color.red(overlayColor),
                     Color.green(overlayColor),
                     Color.blue(overlayColor)
@@ -768,10 +852,6 @@ class OverlayService : Service() {
             this.y = transformedY.toInt()
         }
 
-        originalPositions[id] = Pair(layoutParams.x, layoutParams.y)
-        overlayViews[id] = finalView
-        overlayParams[id] = layoutParams
-
         var initialX = 0f
         var initialY = 0f
         var initialTouchX = 0f
@@ -820,7 +900,10 @@ class OverlayService : Service() {
         }
 
         OverlayRegions.track(finalView)
-        windowManager?.addView(finalView, layoutParams)
+        if (!safeAddView(finalView, layoutParams)) return
+        originalPositions[id] = Pair(layoutParams.x, layoutParams.y)
+        overlayViews[id] = finalView
+        overlayParams[id] = layoutParams
         Log.d(TAG, "Overlay $id added to window manager at (${layoutParams.x}, ${layoutParams.y}), displayMode=$displayMode")
         bringControlButtonsToFront()
 
@@ -890,17 +973,20 @@ class OverlayService : Service() {
         originalPositions.remove(id)
     }
 
+    private fun dismissExpandedTextDialog() {
+        safeRemoveView(expandedTextView)
+        expandedTextView = null
+    }
+
     private fun showExpandedTextDialog(text: String, isLight: Boolean) {
+        // Only one at a time: each is a full-screen window, and repeated
+        // double-taps used to stack them toward the per-app window limit.
+        dismissExpandedTextDialog()
         val container = FrameLayout(this).apply {
             setBackgroundColor(Color.argb(200, 0, 0, 0)) // Semi-transparent dim background
-            setOnClickListener {
-                try {
-                    windowManager?.removeView(this)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error removing expanded text dialog: ${e.message}")
-                }
-            }
+            setOnClickListener { dismissExpandedTextDialog() }
         }
+        expandedTextView = container
 
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -961,8 +1047,8 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
-        OverlayRegions.track(container)
-        windowManager?.addView(container, layoutParams)
+        OverlayRegions.track(container, isControl = true)
+        if (!safeAddView(container, layoutParams)) expandedTextView = null
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -972,12 +1058,22 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             "start" -> {
+                // The system can re-deliver this start intent after killing
+                // the process in the background (seen on Vivo/Oppo/Android
+                // 16), with no Activity and hence no Flutter engine. There
+                // is no translation session to attach to — just go away.
+                val messenger = MainActivity.binaryMessenger
+                if (messenger == null) {
+                    Log.w(TAG, "start: Flutter engine not attached, stopping")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
                 // Reset stopped flag when starting the service
                 isStopped = false
-                // Initialize MethodChannel here to ensure binaryMessenger is available
-                methodChannel = MethodChannel(MainActivity.binaryMessenger, "com.lomoware.screen_translate/translationService")
-                createControlButton()
-                createTranslateButton()
+                methodChannel = MethodChannel(messenger, "com.lomoware.screen_translate/translationService")
+                // A repeated start must not stack a second set of buttons.
+                if (controlButton == null) createControlButton()
+                if (translateButton == null) createTranslateButton()
                 Log.d(TAG, "Service started, reset stopped flag")
             }
             "show" -> {
@@ -1060,14 +1156,12 @@ class OverlayService : Service() {
             translateButton = null
         }
 
-        tooltipView?.let {
-            try {
-                windowManager?.removeView(it)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error removing tooltip view: ${e.message}", e)
-            }
-        }
+        safeRemoveView(tooltipView)
+        tooltipView = null
         tooltipHideRunnable?.let { handler.removeCallbacks(it) }
+        // A full-screen dialog left behind after stopping would swallow
+        // every touch until the user found the (now invisible) way out.
+        dismissExpandedTextDialog()
     }
 
     override fun onDestroy() {

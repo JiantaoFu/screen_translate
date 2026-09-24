@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
@@ -222,6 +223,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late StreamSubscription _intentDataStreamSubscription;
+  bool _isPickingImage = false;
 
   /// AI-mode pair-selector downloads currently in flight: "source|target"
   /// -> progress (0.0-1.0). The dropdown itself stays interactive the whole
@@ -367,8 +369,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             // Attractive header
             _buildHeader(context),
 
-            // Main action buttons
+            // Main action buttons. Scrollable so the Translate buttons stay
+            // reachable in landscape (games) and on small screens, where the
+            // fixed column overflowed and pushed them off-screen; centered
+            // vertically whenever it does fit.
             Expanded(
+              child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -391,14 +400,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 onTap: () async {
                                   try {
                                     if (provider.isTranslating) {
+                                      final worked = provider.sessionProducedTranslations;
                                       provider.stopTranslation();
+                                      // Only count sessions that actually
+                                      // showed translations — asking a user
+                                      // whose capture just failed to rate the
+                                      // app invites a 1-star review.
+                                      if (worked) {
+                                        await _trackTranslationAndPromptReview(context);
+                                      }
                                     } else {
                                       if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
                                         return;
                                       }
                                       await provider.startTranslation();
                                     }
-                                    await _trackTranslationAndPromptReview(context);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text(AppLocalizations.of(context)!.error_prefix(e.toString()))),
@@ -413,13 +429,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 icon: Icons.image,
                                 label: AppLocalizations.of(context)!.translate_image_button,
                                 onTap: () async {
-                                  if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
-                                    return;
-                                  }
-                                  final picker = ImagePicker();
-                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                                  if (pickedFile != null) {
-                                    _navigateToImageTranslation(File(pickedFile.path));
+                                  // A second tap while the gallery is still
+                                  // opening throws PlatformException(already_active).
+                                  if (_isPickingImage) return;
+                                  _isPickingImage = true;
+                                  try {
+                                    if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
+                                      return;
+                                    }
+                                    final picker = ImagePicker();
+                                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                    if (pickedFile != null) {
+                                      _navigateToImageTranslation(File(pickedFile.path));
+                                    }
+                                  } on PlatformException catch (e) {
+                                    debugPrint('Image picker failed: $e');
+                                  } finally {
+                                    _isPickingImage = false;
                                   }
                                 },
                                 context: context,
@@ -439,6 +465,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   ],
                 ),
+              ),
+              ),
+              ),
               ),
             ),
           ],

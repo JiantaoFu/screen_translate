@@ -19,6 +19,7 @@ import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
+import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Surface
@@ -84,9 +85,43 @@ class FrameStabilizer(
     private companion object {
         const val GRID = 32 // GRID x GRID luma sample points
         const val LUMA_TOLERANCE = 16 // ignore compression/dither noise
-        const val MIN_CHANGED_SAMPLES = 3 // ignore a single blinking cursor
+        // Any difference above this counts as movement for learning where the
+        // screen animates (slow fades/pans move a few luma levels per frame).
+        const val MOTION_TOLERANCE = 2
         const val STABILIZATION_DELAY_MS = 300L // quiet time before translating
+        // While something keeps animating (video, game scene) the static text
+        // around it is re-read this often, so subtitles/typed-out dialogue in
+        // or over the animated area still get picked up.
+        const val ANIMATION_REFRESH_MS = 2500L
+        // Time for a newly added/moved box to be fully drawn before its
+        // look is recorded as the reference for under-box changes.
+        const val BOX_SETTLE_MS = 400L
+        // BoxWatch sampling: every STEP px inside a box; MIN_PIXELS differing
+        // pixels is a few glyphs rather than noise. Through a ~98% opaque
+        // box, full-contrast text beneath shifts luma by ~4-5; a static
+        // screen capture is pixel-exact (0-1).
+        const val STEP = 4
+        const val MIN_PIXELS = 12
+        const val CHANGE_TOLERANCE = 2
+        const val MOVE_TOLERANCE = 1
     }
+
+    private val classifier = MotionClassifier(GRID, GRID)
+    // Samples of the content last translated (or last content change): slow
+    // changes such as typed-out dialogue stay under the per-frame threshold
+    // but add up against this.
+    private var baseline: IntArray? = null
+    private var baselineMask: List<Rect> = emptyList()
+    private var pendingSamples: IntArray? = null
+    private var lastDeliveredAt = 0L
+
+    @Volatile private var disposed = false
+
+    // Watches the content under each of our translated boxes (see
+    // BoxWatch). Rebuilt whenever our windows change.
+    private var boxVersion = -1L
+    private var boxWatches: List<BoxWatch> = emptyList()
+    private var boxBaselineDueAt = 0L
 
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
@@ -121,49 +156,197 @@ class FrameStabilizer(
         return out
     }
 
-    private fun countChanged(prev: IntArray, cur: IntArray, mask: List<Rect>): Int {
-        var changed = 0
+    private fun changedSamples(
+        prev: IntArray, cur: IntArray, mask: List<Rect>, tolerance: Int = LUMA_TOLERANCE
+    ): BooleanArray {
+        val changed = BooleanArray(GRID * GRID)
         for (row in 0 until GRID) {
             val y = sampleYs[row]
             for (col in 0 until GRID) {
                 val i = row * GRID + col
-                if (abs(prev[i] - cur[i]) <= LUMA_TOLERANCE) continue
+                if (abs(prev[i] - cur[i]) <= tolerance) continue
                 val x = sampleXs[col]
                 if (mask.any { it.contains(x, y) }) continue
-                changed++
+                changed[i] = true
             }
         }
         return changed
     }
 
+    /**
+     * The content under one of our translated boxes. Screen capture sees our
+     * own boxes, so a change beneath one (the next line in a game's dialogue
+     * box, a new page with the same layout) was invisible and its stale
+     * translation stayed up. The boxes are drawn ~98% opaque, so what's
+     * beneath shows through at a few luma levels — below what the eye
+     * notices, but measurable. Text strokes are thin, so this samples the
+     * box densely (the coarse screen grid landed between strokes).
+     */
+    private inner class BoxWatch(private val rect: Rect) {
+        private val xs = (rect.left + STEP / 2 until rect.right step STEP)
+            .filter { it in 0 until screenWidth }.toIntArray()
+        private val ys = (rect.top + STEP / 2 until rect.bottom step STEP)
+            .filter { it in 0 until screenHeight }.toIntArray()
+        private val size = xs.size * ys.size
+        // Enough differing pixels to be a few glyphs, not noise.
+        private val threshold = maxOf(MIN_PIXELS, size / 250)
+        private var baseline: IntArray? = null
+        private var prev: IntArray? = null
+        private var moveStreak = 0
+        private var lastMove = Long.MIN_VALUE / 2
+
+        private fun read(frame: ByteArray): IntArray {
+            val out = IntArray(size)
+            var k = 0
+            for (y in ys) {
+                val row = y * screenWidth
+                for (x in xs) {
+                    val idx = row + x
+                    out[k++] = if (idx < frame.size) frame[idx].toInt() and 0xFF else 0
+                }
+            }
+            return out
+        }
+
+        private fun count(a: IntArray, b: IntArray, tolerance: Int) =
+            a.indices.count { abs(a[it] - b[it]) > tolerance }
+
+        fun captureBaseline(frame: ByteArray) {
+            baseline = read(frame).also { prev = it }
+        }
+
+        /** True when the content under this box changed since its baseline. */
+        fun changed(frame: ByteArray, now: Long): Boolean {
+            val base = baseline ?: return false
+            if (size == 0) return false
+            val cur = read(frame)
+            val last = prev ?: cur
+            prev = cur
+            // Only a change that has settled counts: something that keeps
+            // moving under the box (a video under a subtitle) never settles,
+            // while a new dialogue line changes once and then holds.
+            val moving = count(cur, last, MOVE_TOLERANCE) >= threshold
+            if (moving) {
+                moveStreak = if (now - lastMove <= MotionClassifier.STREAK_GAP_MS) moveStreak + 1 else 1
+                lastMove = now
+                return false
+            }
+            val animated = moveStreak >= MotionClassifier.ANIMATION_STREAK &&
+                now - lastMove <= MotionClassifier.STREAK_GAP_MS
+            if (animated) return false
+            if (count(cur, base, CHANGE_TOLERANCE) < threshold) return false
+            baseline = cur // acknowledged; the boxes get cleared next
+            return true
+        }
+    }
+
+    private fun drift(base: IntArray, cur: IntArray, mask: List<Rect>, now: Long): Int {
+        val changed = changedSamples(base, cur, mask)
+        return changed.indices.count { changed[it] && !classifier.isAnimated(it, now) }
+    }
+
     @Synchronized
     fun onNewFrame(currentFrame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
+        if (disposed) return
         latestFrame = currentFrame
         latestOnStable = onStable
         val samples = sample(currentFrame)
         val mask = OverlayRegions.snapshot()
         val prev = lastSamples
-        // Ignore regions covered by our own windows in EITHER frame: one
-        // just added/moved/removed changes pixels in both its old and new
-        // spot without the underlying content having changed.
-        val changed = if (prev == null) 0 else countChanged(prev, samples, lastMask + mask)
+        val prevMask = lastMask
         lastSamples = samples
         lastMask = mask
 
-        val isFirstFrame = prev == null
-        if (!isFirstFrame && changed < MIN_CHANGED_SAMPLES) {
-            // Not a content change — but if we're already waiting for the
-            // screen to settle, prefer the newest frame: right after a
-            // real change our overlays are being torn down, and the queued
-            // frame must not still contain them (OCR would read our own
-            // translations back as source text).
-            if (stabilizationPending) lastFrame = currentFrame
+        val version = OverlayRegions.version()
+        val boxesStable = version == boxVersion
+        if (!boxesStable) {
+            boxVersion = version
+            // Like the rest of change detection, leave the status bar out:
+            // its clock and the screen-sharing timer tick on their own.
+            boxWatches = OverlayRegions.textBoxRects()
+                .filter { it.top >= ignoreTopPx }
+                .map { BoxWatch(it) }
+            boxBaselineDueAt = currentTime + BOX_SETTLE_MS
+        } else if (boxBaselineDueAt > 0 && currentTime >= boxBaselineDueAt) {
+            boxWatches.forEach { it.captureBaseline(currentFrame) }
+            boxBaselineDueAt = 0
+        }
+
+        if (prev == null) {
+            baseline = samples
+            baselineMask = mask
+            scheduleStable(currentFrame, samples, currentTime, onStable)
             return
         }
 
-        Log.d("FrameStabilizer", "Content change: $changed samples differ")
-        if (!isFirstFrame) onMotionDetected()
-        scheduleStable(currentFrame, currentTime, onStable)
+        // Ignore regions covered by our own windows in EITHER frame: one
+        // just added/moved/removed changes pixels in both its old and new
+        // spot without the underlying content having changed.
+        val frameMask = prevMask + mask
+        var change = classifier.classify(
+            changedSamples(prev, samples, frameMask),
+            changedSamples(prev, samples, frameMask, MOTION_TOLERANCE),
+            currentTime
+        )
+        var reason = "frame"
+        val base = baseline
+        if (change != FrameChange.CONTENT && base != null &&
+            drift(base, samples, baselineMask + mask, currentTime) >= MotionClassifier.MIN_CHANGED_SAMPLES) {
+            change = FrameChange.CONTENT
+            reason = "drift"
+        }
+        if (boxesStable && boxBaselineDueAt == 0L) {
+            // Evaluate every box (not short-circuiting) so each keeps its
+            // own motion history up to date.
+            val underChanged = boxWatches.map { it.changed(currentFrame, currentTime) }.any { it }
+            if (change != FrameChange.CONTENT && underChanged) {
+                change = FrameChange.CONTENT
+                reason = "under our boxes"
+            }
+        }
+
+        when (change) {
+            FrameChange.CONTENT -> {
+                Log.d("FrameStabilizer", "Content change ($reason)")
+                baseline = samples
+                baselineMask = mask
+                onMotionDetected()
+                scheduleStable(currentFrame, samples, currentTime, onStable)
+            }
+            FrameChange.ANIMATION -> {
+                // Animation must neither clear the translations of the static
+                // text around it nor postpone translating it.
+                if (stabilizationPending) {
+                    lastFrame = currentFrame
+                    pendingSamples = samples
+                } else if (currentTime - lastDeliveredAt >= ANIMATION_REFRESH_MS) {
+                    Log.d("FrameStabilizer", "Animation only, refreshing")
+                    scheduleStable(currentFrame, samples, currentTime, onStable)
+                }
+            }
+            FrameChange.NONE -> {
+                // If we're already waiting for the screen to settle, prefer
+                // the newest frame: right after a real change our overlays
+                // are being torn down, and the queued frame must not still
+                // contain them (OCR would read our own translations back).
+                if (stabilizationPending) {
+                    lastFrame = currentFrame
+                    pendingSamples = samples
+                }
+            }
+        }
+    }
+
+    /** Stops any pending delivery; the instance must not be used afterwards. */
+    @Synchronized
+    fun dispose() {
+        disposed = true
+        stabilizationTimer?.cancel()
+        stabilizationTimer = null
+        stabilizationPending = false
+        lastFrame = null
+        latestFrame = null
+        latestOnStable = null
     }
 
     /**
@@ -175,14 +358,16 @@ class FrameStabilizer(
      */
     @Synchronized
     fun requestFreshFrame() {
+        if (disposed) return
         val frame = latestFrame ?: return
         val onStable = latestOnStable ?: return
-        scheduleStable(frame, System.currentTimeMillis(), onStable)
+        scheduleStable(frame, lastSamples, System.currentTimeMillis(), onStable)
     }
 
-    private fun scheduleStable(frame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
+    private fun scheduleStable(frame: ByteArray, samples: IntArray?, currentTime: Long, onStable: (ByteArray) -> Unit) {
         stabilizationTimer?.cancel()
         lastFrame = frame
+        pendingSamples = samples
         lastFrameTime = currentTime
         stabilizationPending = true
 
@@ -195,7 +380,15 @@ class FrameStabilizer(
                         stabilizationPending = false
                         val stableFrame = lastFrame ?: return
                         lastFrame = null
+                        pendingSamples?.let {
+                            baseline = it
+                            baselineMask = lastMask
+                        }
+                        lastDeliveredAt = System.currentTimeMillis()
                         mainHandler.post {
+                            // Disposed (screen rotated) since this was posted:
+                            // the frame has the old orientation.
+                            if (disposed) return@post
                             Log.d("FrameStabilizer", "Frame stabilized after $STABILIZATION_DELAY_MS ms")
                             onStable(stableFrame)
                         }
@@ -229,13 +422,14 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private var currentRotation: Int = 0
     private val methodChannel: MethodChannel by lazy {
         val messenger = MainActivity.binaryMessenger
-        if (messenger != null) {
-            MethodChannel(messenger, "com.lomoware.screen_translate/translationService")
-        } else {
-            Log.e(TAG, "Cannot create method channel: Binary messenger is null")
-            throw IllegalStateException("Binary messenger is not available")
-        }
+            ?: throw IllegalStateException("Binary messenger is not available")
+        MethodChannel(messenger, "com.lomoware.screen_translate/translationService")
     }
+
+    // Reused across frames: a full-screen RGBA buffer is ~10MB, and
+    // allocating a fresh one for every ImageReader frame was OOM-ing
+    // low-memory devices. Only touched on the ImageReader thread.
+    private var rgbaScratch: ByteArray? = null
 
     companion object {
         private const val PREF_TRANSLATION_MODE = "translation_mode"
@@ -251,16 +445,10 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         Log.d(TAG, "Context: $context")
         Log.d(TAG, "Context class: ${context.javaClass.name}")
         
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val metrics = DisplayMetrics()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            wm.defaultDisplay.getRealMetrics(metrics)
-        } else {
-            wm.defaultDisplay.getMetrics(metrics)
-        }
-        screenWidth = metrics.widthPixels
-        screenHeight = metrics.heightPixels
-        screenDensity = metrics.densityDpi
+        val (w, h) = currentScreenSize()
+        screenWidth = w
+        screenHeight = h
+        screenDensity = context.resources.displayMetrics.densityDpi
         Log.d(TAG, "Screen metrics (real): $screenWidth x $screenHeight @ $screenDensity")
 
         frameStabilizer = createFrameStabilizer()
@@ -302,6 +490,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                     Log.d(TAG, "MediaProjection created successfully")
                     setupVirtualDisplay()
                     isCapturing.set(true) // Set capturing to true when projection starts
+                    displayManager()?.registerDisplayListener(displayListener, mainHandler)
                     result.success(true)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error creating MediaProjection", e)
@@ -329,6 +518,74 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // The screen's real size in its CURRENT orientation. Deliberately not
+    // read through the Activity's WindowManager: on Android 14+ that reports
+    // the Activity's own window configuration, which stays portrait while
+    // our (backgrounded) app is portrait and the game in front runs
+    // landscape — so rotation was never detected in exactly that case, and
+    // landscape games were captured squeezed into a portrait frame.
+    private fun currentScreenSize(): Pair<Int, Int> {
+        val appContext = context.applicationContext ?: context
+        val display = (appContext.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager)
+            ?.getDisplay(android.view.Display.DEFAULT_DISPLAY)
+        if (display == null) {
+            val m = context.resources.displayMetrics
+            return m.widthPixels to m.heightPixels
+        }
+        val metrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
+        display.getRealMetrics(metrics)
+        var w = metrics.widthPixels
+        var h = metrics.heightPixels
+        // Cross-check against the display's actual rotation.
+        val mode = display.mode
+        val naturalLandscape = mode.physicalWidth > mode.physicalHeight
+        val rotated = display.rotation == Surface.ROTATION_90 || display.rotation == Surface.ROTATION_270
+        val landscapeNow = rotated != naturalLandscape
+        if ((landscapeNow && w < h) || (!landscapeNow && w > h)) {
+            val t = w; w = h; h = t
+        }
+        return w to h
+    }
+
+    // Rotation (e.g. a landscape game coming to the front). Must run on the
+    // main thread.
+    private fun handleScreenSizeChange() {
+        if (!isCapturing.get()) return
+        try {
+            val (currentW, currentH) = currentScreenSize()
+            if (currentW == screenWidth && currentH == screenHeight) return
+            Log.d(TAG, "Screen rotation detected! Updating dimensions: ${screenWidth}x${screenHeight} -> ${currentW}x${currentH}")
+            screenWidth = currentW
+            screenHeight = currentH
+            // A frame the old stabilizer is still waiting on has the old
+            // orientation; it must not be delivered after this.
+            frameStabilizer.dispose()
+            frameStabilizer = createFrameStabilizer()
+            resizeVirtualDisplay()
+            // Everything on screen moved: boxes placed for the old
+            // orientation are wrong now, and so is any OCR still in flight.
+            cancelAllTranslations()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling screen size change", e)
+        }
+    }
+
+    // Reacts to rotation immediately. Detecting it only when Dart next polled
+    // captureScreen() let an OCR cycle already running on an old-orientation
+    // frame (Dart doesn't poll while processing) draw its boxes, misplaced,
+    // on the rotated screen before they were cleared.
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) {}
+        override fun onDisplayRemoved(displayId: Int) {}
+        override fun onDisplayChanged(displayId: Int) {
+            if (displayId == android.view.Display.DEFAULT_DISPLAY) handleScreenSizeChange()
+        }
+    }
+
+    private fun displayManager(): DisplayManager? =
+        (context.applicationContext ?: context).getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+
     fun captureScreen(result: MethodChannel.Result) {
         try {
             if (!isCapturing.get()) {
@@ -336,27 +593,9 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                 return
             }
 
-            // Check if screen orientation changed dynamically!
-            try {
-                val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                val metrics = DisplayMetrics()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    wm.defaultDisplay.getRealMetrics(metrics)
-                } else {
-                    wm.defaultDisplay.getMetrics(metrics)
-                }
-                val currentW = metrics.widthPixels
-                val currentH = metrics.heightPixels
-                if (currentW != screenWidth || currentH != screenHeight) {
-                    Log.d(TAG, "Screen rotation detected! Updating dimensions: ${screenWidth}x${screenHeight} -> ${currentW}x${currentH}")
-                    screenWidth = currentW
-                    screenHeight = currentH
-                    frameStabilizer = createFrameStabilizer()
-                    setupVirtualDisplay()
-                }
-            } catch (rotationEx: Exception) {
-                Log.e(TAG, "Error checking screen rotation in captureScreen: ${rotationEx.message}", rotationEx)
-            }
+            // Normally handled as it happens by displayListener; checked here
+            // too in case a display change was missed.
+            handleScreenSizeChange()
            
             val frame = imageQueue.pollLast() // Atomically peek and remove
             if (frame != null) {
@@ -443,9 +682,47 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // Android 14+ allows only one createVirtualDisplay() per MediaProjection;
+    // re-running setupVirtualDisplay() on rotation threw SecurityException
+    // and killed capture the moment a user turned the phone to landscape —
+    // i.e. in almost every game. Resize the existing display and point it at
+    // a new, correctly-sized ImageReader instead.
+    private fun resizeVirtualDisplay() {
+        val display = virtualDisplay
+        if (display == null) {
+            setupVirtualDisplay()
+            return
+        }
+        try {
+            val newReader = ImageReader.newInstance(
+                screenWidth, screenHeight,
+                PixelFormat.RGBA_8888, 4
+            ).apply {
+                setOnImageAvailableListener(createImageAvailableListener(), imageReaderHandler)
+            }
+            // Surface first, then resize: the system recomputes how the
+            // mirrored screen is scaled into our buffer when it handles the
+            // resize, reading the display's CURRENT surface size. Resizing
+            // first raced with setSurface — when the old (other-orientation)
+            // surface was still attached, the screen got mapped at the wrong
+            // scale/offset (e.g. portrait content shrunk into the right edge)
+            // and stayed that way until the next rotation.
+            display.surface = newReader.surface
+            display.resize(screenWidth, screenHeight, screenDensity)
+            safeCloseImageReader()
+            imageReader = newReader
+            // Frames queued before the swap have the old dimensions.
+            imageQueue.clear()
+            Log.d(TAG, "Virtual display resized to ${screenWidth}x${screenHeight}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error resizing virtual display", e)
+        }
+    }
+
     private fun cleanup() {
         try {
             Log.d(TAG, "Starting cleanup")
+            displayManager()?.unregisterDisplayListener(displayListener)
             imageQueue.clear()
             frameCount.set(0)
             virtualDisplay?.release()
@@ -473,12 +750,13 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private fun safeCloseImageReader() {
         val localImageReader = imageReader
         if (localImageReader != null) {
-            synchronized(localImageReader) {
+            synchronized(imageLock) {
                 try {
                     Log.d(TAG, "Attempting to close ImageReader")
                     
                     // Remove listener to prevent new callbacks
                     localImageReader.setOnImageAvailableListener(null, null)
+                    dropHeldImageLocked()
                     
                     // Close any remaining images
                     var image: Image?
@@ -499,45 +777,87 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // Reading an Image's pixels (getPlanes) locks its buffer for the CPU,
+    // which costs a full-screen copy + conversion and, on some graphics
+    // drivers (seen on the emulator), leaks one sync-fence fd per locked
+    // frame until the process hits its fd limit and aborts. Video/animation
+    // produces 30-60 frames/s, but change detection only needs a few, so
+    // pixels are read at most once per MIN_READ_INTERVAL_MS. Frames in
+    // between are dropped without being read — except the newest one,
+    // which is held and read when the interval elapses, so the screen's
+    // final state after motion stops is never missed.
+    private val MIN_READ_INTERVAL_MS = 120L
+    private var lastReadAt = 0L
+    private var heldImage: Image? = null
+    // Guards reading/holding/closing captured Images and closing readers.
+    // Deliberately NOT the ImageReader itself: ImageReader locks its own
+    // monitor internally when releasing an Image, so sharing it deadlocked
+    // (image thread closing an old reader's held Image under the NEW
+    // reader's monitor vs. the main thread closing the old reader on
+    // rotation). Everything below takes this lock first.
+    private val imageLock = Any()
+    private val readHeld = Runnable {
+        synchronized(imageLock) { readHeldLocked() }
+    }
+
+    private fun readHeldLocked() {
+        val image = heldImage ?: return
+        heldImage = null
+        lastReadAt = SystemClock.uptimeMillis()
+        try {
+            image.use { processImage(it) }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error processing captured frame", e)
+        }
+    }
+
+    // Must be called with imageLock held.
+    private fun dropHeldImageLocked() {
+        imageReaderHandler.removeCallbacks(readHeld)
+        heldImage?.close()
+        heldImage = null
+    }
+
     private fun createImageAvailableListener(): ImageReader.OnImageAvailableListener {
         return ImageReader.OnImageAvailableListener { reader ->
             try {
                 frameCount.incrementAndGet()
-                // Log.d(TAG, "onImageAvailable called, frame #${frameCount.get()}")
-                        
-                // Synchronized using the specific reader instance
-                synchronized(reader) {
-                    val image = reader.acquireLatestImage()
-                    if (image != null) {
-                        val width = image.width
-                        val height = image.height
-                        // Log.d(TAG, "Captured image dimensions: ${width}x${height}")
-                        // saveImagePreview(image, width, height, currentRotation)
-
-                        // val dominantColor = image.extractDominantColor()
-                        // Log.d(TAG, "Captured image dominant color: ${String.format("#%06X", 0xFFFFFF and dominantColor)}")
-
-                        val bytes = imageToBytes(image)
-                        if (bytes != null) {
-                            val currentTime = System.currentTimeMillis()
-                            // Pass a callback to process the stable frame
-                            frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
-                                // Remove old frames if queue is too large
-                                while (imageQueue.size >= MAX_QUEUE_SIZE) {
-                                    imageQueue.removeFirst()
-                                }
-                                imageQueue.addLast(CapturedFrame(stableFrame, currentTime, width, height))
-                                Log.d(TAG, "New frame queued, queue size: ${imageQueue.size}")
-                            }
-                        } else {
-                            Log.e(TAG, "Failed to convert image to bytes")
-                        }
-                        image.close()
-                    }
+                synchronized(imageLock) {
+                    // Newer frame supersedes the one we were holding.
+                    dropHeldImageLocked()
+                    val image = reader.acquireLatestImage() ?: return@synchronized
+                    heldImage = image
+                    val wait = lastReadAt + MIN_READ_INTERVAL_MS - SystemClock.uptimeMillis()
+                    if (wait <= 0) readHeldLocked()
+                    else imageReaderHandler.postDelayed(readHeld, wait)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Unexpected error in image available listener", e)
             }
+        }
+    }
+
+    private fun processImage(image: Image) {
+        val width = image.width
+        val height = image.height
+        val bytes = imageToBytes(image)
+        if (bytes == null) {
+            Log.e(TAG, "Failed to convert image to bytes")
+            return
+        }
+        val currentTime = System.currentTimeMillis()
+        frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
+            // Our buttons, and the status bar while it's shown (its clock and
+            // the screen-sharing timer aren't content and tick constantly).
+            val hidden = OverlayRegions.controlRects().toMutableList()
+            if (OverlayRegions.statusBarVisible) hidden += Rect(0, 0, width, statusBarHeight())
+            blankRects(stableFrame, width, height, hidden)
+            // Remove old frames if queue is too large
+            while (imageQueue.size >= MAX_QUEUE_SIZE) {
+                imageQueue.removeFirst()
+            }
+            imageQueue.addLast(CapturedFrame(stableFrame, currentTime, width, height))
+            Log.d(TAG, "New frame queued, queue size: ${imageQueue.size}")
         }
     }
 
@@ -572,6 +892,24 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // Paints [rects] flat grey in an NV21 frame so OCR can't read them.
+    private fun blankRects(nv21: ByteArray, width: Int, height: Int, rects: List<Rect>) {
+        val grey = 0x80.toByte()
+        for (r in rects) {
+            val l = r.left.coerceIn(0, width)
+            val rt = r.right.coerceIn(0, width)
+            val t = r.top.coerceIn(0, height)
+            val b = r.bottom.coerceIn(0, height)
+            if (l >= rt || t >= b) continue
+            for (y in t until b) java.util.Arrays.fill(nv21, y * width + l, y * width + rt, grey)
+            val uvBase = width * height
+            for (y in t / 2 until (b + 1) / 2) {
+                val row = uvBase + y * width
+                java.util.Arrays.fill(nv21, (row + (l and 1.inv())).coerceAtMost(nv21.size), (row + rt).coerceAtMost(nv21.size), grey)
+            }
+        }
+    }
+
     fun imageToBytes(image: Image): ByteArray? {
         try {
             val width = image.width
@@ -582,7 +920,8 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             val rowStride = planes[0].rowStride
 
             // 1. Read entire buffer to a fast local array to eliminate JNI crossing overhead
-            val bufferBytes = ByteArray(buffer.capacity())
+            val bufferBytes = rgbaScratch?.takeIf { it.size == buffer.capacity() }
+                ?: ByteArray(buffer.capacity()).also { rgbaScratch = it }
             buffer.position(0)
             buffer.get(bufferBytes)
 
@@ -628,6 +967,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             return nv21Bytes
         } catch (e: Exception) {
             Log.e(TAG, "Error converting image to bytes", e)
+            return null
+        } catch (e: OutOfMemoryError) {
+            // Drop this frame rather than the whole process; the next
+            // frame retries once the GC has caught up.
+            Log.e(TAG, "Out of memory converting image, dropping frame", e)
+            rgbaScratch = null
             return null
         }
     }

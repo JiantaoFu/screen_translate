@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/foundation.dart';
 import 'package:screen_translate/services/android_screen_capture_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
@@ -49,8 +50,13 @@ class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
   int _translationToken = 0; // Bumped each capture cycle to detect stale results
   String _lastTranslatedText = '';
-  String _sourceLanguage = 'en';
-  String _targetLanguage = 'zh';
+  // Whether the current/last live session rendered at least one translated
+  // box — used to only ask for a store review after the app actually worked.
+  bool _sessionProducedTranslations = false;
+  // Defaults follow the device language (see _defaultLanguagePair) and are
+  // then overridden by the user's saved choice in _initPreferences.
+  late String _sourceLanguage = _defaultLanguagePair().$1;
+  late String _targetLanguage = _defaultLanguagePair().$2;
   AndroidScreenCaptureService? _androidScreenCaptureService;
   Timer? _captureTimer;
   final OCRService _ocrService;
@@ -67,6 +73,64 @@ class TranslationProvider with ChangeNotifier {
   final Map<int, _DisplayedOverlay> _displayedOverlays = {};
   int _nextOverlayId = 0;
   double _mergeAggressiveness = 1.5;
+
+  /// [results] minus the blocks that are mostly covered by our own
+  /// displayed overlays ([drawn]: overlay id -> drawn rect, in the same image
+  /// space as the OCR results); the ids of those overlays are added to
+  /// [covered]. Judged by covered area rather than a single point because OCR
+  /// often merges two neighbouring boxes of ours into one block whose centre
+  /// falls in the gap between them. See the call site for why.
+  @visibleForTesting
+  static List<OCRResult> withoutOwnOverlayText(
+      List<OCRResult> results, Map<int, Rect> drawn, Set<int> covered) {
+    if (drawn.isEmpty) return results;
+    return results.where((r) {
+      final box = Rect.fromLTWH(r.x, r.y, r.width, r.height);
+      final area = box.width * box.height;
+      if (area <= 0) return true;
+      var coveredArea = 0.0;
+      final touching = <int>[];
+      for (final e in drawn.entries) {
+        final overlap = box.intersect(e.value);
+        if (overlap.width > 0 && overlap.height > 0) {
+          coveredArea += overlap.width * overlap.height;
+          touching.add(e.key);
+        }
+      }
+      if (coveredArea >= area * 0.6) {
+        covered.addAll(touching);
+        return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  /// Whether new OCR text [next] reads as a continuation of the text under
+  /// our box [box]: on the same line right after it, or on the next line
+  /// starting at the same indent. Deliberately strict so unrelated text
+  /// merely near a box (e.g. something read off a video frame just below a
+  /// post) doesn't trigger a rebuild.
+  @visibleForTesting
+  static bool continuesText(Rect box, Rect next) {
+    final lineHeight = min(box.height, next.height);
+    if (lineHeight <= 0) return false;
+    final verticalOverlap = min(box.bottom, next.bottom) - max(box.top, next.top);
+    final sameLine = verticalOverlap >= 0.6 * lineHeight &&
+        next.left >= box.left &&
+        next.left - box.right <= 1.5 * lineHeight;
+    final nextLine = next.top >= box.bottom - 0.3 * lineHeight &&
+        next.top - box.bottom <= 0.8 * lineHeight &&
+        (next.left - box.left).abs() <= 0.8 * lineHeight;
+    return sameLine || nextLine;
+  }
+
+  /// Whether OCR'd [r] contains any letter at all. Clocks, counters and the
+  /// system screen-recording timer ("01:52") read as text but there is
+  /// nothing to translate — and since they tick, they churned a box on every
+  /// refresh.
+  @visibleForTesting
+  static bool hasTranslatableText(OCRResult r) => _letter.hasMatch(r.text);
+  static final _letter = RegExp(r'\p{L}', unicode: true);
 
   // Same box, allowing a small tolerance of 12 physical pixels for screen
   // coordinate noise between ticks.
@@ -205,6 +269,7 @@ class TranslationProvider with ChangeNotifier {
 
   bool get isTranslating => _isTranslating;
   String get lastTranslatedText => _lastTranslatedText;
+  bool get sessionProducedTranslations => _sessionProducedTranslations;
   String get sourceLanguage => _sourceLanguage;
   String get targetLanguage => _targetLanguage;
   TranslationMode get translationMode => _translationMode;
@@ -213,7 +278,44 @@ class TranslationProvider with ChangeNotifier {
   Future<void> _initPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     _mergeAggressiveness = prefs.getDouble('mergeAggressiveness') ?? 1.5;
+    final savedSource = prefs.getString(_prefSourceLanguage);
+    final savedTarget = prefs.getString(_prefTargetLanguage);
+    final supported = supportedLanguages;
+    if (savedSource != null && savedTarget != null && savedSource != savedTarget &&
+        supported.containsKey(savedSource) && supported.containsKey(savedTarget)) {
+      _sourceLanguage = savedSource;
+      _targetLanguage = savedTarget;
+    }
     notifyListeners();
+  }
+
+  static const _prefSourceLanguage = 'sourceLanguage';
+  static const _prefTargetLanguage = 'targetLanguage';
+
+  // Android still reports a few legacy ISO-639 codes.
+  static const _legacyLanguageCodes = {'in': 'id', 'iw': 'he', 'ji': 'yi', 'nb': 'no'};
+
+  // Buyers come from dozens of locales (TH, VN, KR, ID, BR, MX, ...); a
+  // hardcoded en->zh default meant most of them got Chinese output on their
+  // first try. Translate *into* the device language, and *from* English —
+  // or from Japanese for English-locale users, since manga/games are the
+  // main use case.
+  static (String, String) _defaultLanguagePair() =>
+      defaultLanguagePairFor(PlatformDispatcher.instance.locale.languageCode);
+
+  @visibleForTesting
+  static (String, String) defaultLanguagePairFor(String languageCode) {
+    final raw = languageCode.toLowerCase();
+    final device = _legacyLanguageCodes[raw] ?? raw;
+    final target = supportedLanguages.containsKey(device) ? device : 'en';
+    final source = target == 'en' ? 'ja' : 'en';
+    return (source, target);
+  }
+
+  Future<void> _saveLanguagePair() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefSourceLanguage, _sourceLanguage);
+    await prefs.setString(_prefTargetLanguage, _targetLanguage);
   }
 
   Future<void> setMergeAggressiveness(double value) async {
@@ -226,12 +328,14 @@ class TranslationProvider with ChangeNotifier {
   void setSourceLanguage(String language) {
     debugPrint('LangPicker: setSourceLanguage($language) — was $_sourceLanguage, notifying...');
     _sourceLanguage = language;
+    _saveLanguagePair();
     notifyListeners();
   }
 
   void setTargetLanguage(String language) {
     debugPrint('LangPicker: setTargetLanguage($language) — was $_targetLanguage, notifying...');
     _targetLanguage = language;
+    _saveLanguagePair();
     notifyListeners();
   }
 
@@ -259,6 +363,7 @@ class TranslationProvider with ChangeNotifier {
           }
 
           _isTranslating = true;
+          _sessionProducedTranslations = false;
 
           FirebaseAnalyticsService().trackTranslation(
             sourceLanguage: _sourceLanguage,
@@ -329,14 +434,30 @@ class TranslationProvider with ChangeNotifier {
             if (imageData != null && _isTranslating) {
               print('Timer: running OCR...');
               stopwatch.reset();
-              final ocrResults = await _ocrService.processImage(
+              final rawOcrResults = await _ocrService.processImage(
                 imageData,
                 currentOCRScript,
                 minTextLength: 1, // Ignore blocks that have only 1 character
                 mergeAggressiveness: _mergeAggressiveness,
               );
               final ocrMs = stopwatch.elapsedMilliseconds;
-              print('Timer: OCR found ${ocrResults.length} text blocks in ${ocrMs}ms');
+              print('Timer: OCR found ${rawOcrResults.length} text blocks in ${ocrMs}ms');
+
+              // While part of the screen keeps animating (a video in a feed,
+              // a game scene) the native side re-captures periodically
+              // WITHOUT clearing our overlays first, so the frame contains our
+              // own translated boxes. Reading those back as source text made
+              // every refresh drop and redraw every box (and "translate" our
+              // translations). Anything inside a box we're showing is ours:
+              // drop it and keep that box as is.
+              final coveredIds = <int>{};
+              final ocrResults = withoutOwnOverlayText(
+                rawOcrResults.where(hasTranslatableText).toList(),
+                _isManualTranslationRequested
+                    ? const <int, Rect>{}
+                    : {for (final e in _displayedOverlays.entries) e.key: e.value.drawnRect},
+                coveredIds,
+              );
 
               // Pad and de-overlap boxes before handing them to the native
               // overlay — each box here becomes its own independent floating
@@ -364,7 +485,8 @@ class TranslationProvider with ChangeNotifier {
               // paid API calls for text that hadn't changed at all.
               final matchedIdForIndex = <int, int>{};
               if (!_isManualTranslationRequested) {
-                final remainingOldIds = _displayedOverlays.keys.toList();
+                final remainingOldIds =
+                    _displayedOverlays.keys.where((id) => !coveredIds.contains(id)).toList();
                 for (var i = 0; i < ocrResults.length; i++) {
                   final newResult = ocrResults[i];
                   for (final oldId in remainingOldIds) {
@@ -382,12 +504,41 @@ class TranslationProvider with ChangeNotifier {
                 final anyMoved = matchedIdForIndex.entries.any((e) =>
                     _rectMoved(_displayedOverlays[e.value]!.drawnRect, displayBoxes[e.key]));
 
+                // A frame only arrives while boxes are still on screen when
+                // something else on screen is animating (a content change
+                // clears every box first). Our boxes hide the text under them
+                // (changes there are caught natively, see BoxWatch), and OCR
+                // often can't read our own translation back (wrong script
+                // model), so "not matched" is no evidence the text is gone —
+                // dropping those made boxes blink out every refresh. Only
+                // replace a box when new text shows up overlapping it.
+                final newTextRects = [
+                  for (var i = 0; i < ocrResults.length; i++)
+                    if (!matchedIdForIndex.containsKey(i)) displayBoxes[i]
+                ];
+
+                // New text continuing right after one of our boxes means the
+                // text we translated has grown (dialogue being typed out):
+                // the start of it is hidden under our box, so patching in a
+                // box for just the visible tail left stacks of half-sentence
+                // fragments. Clear everything and re-read a clean frame.
+                final grown = newTextRects.any((r) =>
+                    _displayedOverlays.values.any((o) => continuesText(o.drawnRect, r)));
+                if (grown) {
+                  print('OCR: text grew past our boxes, re-reading without them');
+                  if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
+                  _displayedOverlays.clear();
+                  droppedStale = true;
+                  return;
+                }
+                remainingOldIds.removeWhere((id) => !newTextRects
+                    .any((r) => r.overlaps(_displayedOverlays[id]!.drawnRect)));
+
                 // Nothing changed at all: same boxes, same text, same place,
                 // nothing added or removed — skip this tick entirely.
                 if (remainingOldIds.isEmpty &&
                     !anyMoved &&
-                    matchedIdForIndex.length == ocrResults.length &&
-                    matchedIdForIndex.length == _displayedOverlays.length) {
+                    matchedIdForIndex.length == ocrResults.length) {
                   print('OCR: Screen unchanged (${ocrResults.length} blocks), skipping translation');
                   return;
                 }
@@ -587,6 +738,7 @@ class TranslationProvider with ChangeNotifier {
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
+                _sessionProducedTranslations = true;
                 notifyListeners();
               }
             } else {
@@ -656,6 +808,7 @@ class TranslationProvider with ChangeNotifier {
     _sourceLanguage = _targetLanguage;
     _targetLanguage = temp;
     print('Translation direction switched: $_sourceLanguage -> $_targetLanguage');
+    _saveLanguagePair();
     notifyListeners();
   }
 

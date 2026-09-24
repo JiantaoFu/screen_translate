@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'firebase_remote_config_service.dart';
 
 /// Metadata about a sampled OCR image for analysis
@@ -110,6 +111,9 @@ class OCRSamplingService {
 
   /// Determine if this image should be sampled based on sampling rate
   bool shouldSample() {
+    // Dev/emulator sessions were a large share of recent samples and
+    // drowned out real-user data.
+    if (kDebugMode) return false;
     final remoteConfig = FirebaseRemoteConfigService();
     final samplingRate = remoteConfig.getOcrSamplingRate();
     final rand = Random().nextDouble();

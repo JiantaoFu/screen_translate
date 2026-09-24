@@ -1,12 +1,8 @@
 package com.lomoware.screen_translate
 
 import android.app.Activity
-import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
 import android.media.Image
-import android.media.ImageReader
-import android.util.DisplayMetrics
 import com.lomoware.screen_translate.utils.ColorUtils
 import org.junit.Before
 import org.junit.Test
@@ -16,36 +12,20 @@ import org.robolectric.shadows.ShadowLog
 import java.nio.ByteBuffer
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.experimental.and
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class ImageConverterTest {
     
-    private lateinit var mockContext: Context
-    private lateinit var mockActivity: Activity
-    private lateinit var mockResources: Resources
-    private lateinit var mockDisplayMetrics: DisplayMetrics
     private lateinit var service: ScreenCaptureService
-    
+
     @Before
     fun setup() {
         ShadowLog.stream = System.out
-        
-        // Create mocks
-        mockContext = mock(Context::class.java)
-        mockActivity = mock(Activity::class.java)
-        mockResources = mock(Resources::class.java)
-        mockDisplayMetrics = DisplayMetrics().apply {
-            widthPixels = 1080
-            heightPixels = 2400
-            densityDpi = 420
-        }
-        
-        // Set up context to return resources
-        `when`(mockContext.resources).thenReturn(mockResources)
-        `when`(mockResources.displayMetrics).thenReturn(mockDisplayMetrics)
-        
-        service = ScreenCaptureService(mockContext, mockActivity)
+        // A real (Robolectric) application context: the service looks up
+        // WindowManager, registers receivers and reads prefs on construction,
+        // none of which a bare Context mock can provide.
+        service = ScreenCaptureService(RuntimeEnvironment.getApplication(), mock(Activity::class.java))
     }
 
     private fun createMockImage(width: Int, height: Int, pixelStride: Int, rowStride: Int, data: ByteArray): Image {

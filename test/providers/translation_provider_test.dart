@@ -194,6 +194,32 @@ void main() {
     });
   });
 
+  group('staleOverlayIds', () {
+    // Our box over the first line of a dialogue box, and another one far up.
+    const dialogueBox = Rect.fromLTWH(90, 2080, 780, 66);
+    const titleBox = Rect.fromLTWH(40, 200, 900, 70);
+    final drawn = {1: dialogueBox, 2: titleBox};
+
+    test('new text overlapping a box marks just that box', () {
+      // OCR read lines 1-3 of the dialogue as one block, partly under box 1.
+      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(80, 2070, 800, 220)]), {1});
+    });
+
+    test('new text continuing past a box marks it', () {
+      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(95, 2150, 800, 55)]), {1});
+    });
+
+    test('new text directly above a box (text growing upward) marks it', () {
+      // A bottom-anchored line wrapped: the earlier line moved up above box 1.
+      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(95, 2020, 800, 55)]), {1});
+    });
+
+    test('unrelated new text marks nothing', () {
+      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(100, 1200, 600, 60)]), isEmpty);
+      expect(TranslationProvider.staleOverlayIds(drawn, const []), isEmpty);
+    });
+  });
+
   group('hasTranslatableText', () {
     test('skips clocks and counters, keeps text in any script', () {
       bool t(String s) => TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10));

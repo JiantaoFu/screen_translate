@@ -105,6 +105,23 @@ class TranslationProvider with ChangeNotifier {
     }).toList();
   }
 
+  /// Ids of our boxes ([drawn]: id -> drawn rect) whose underlying text has
+  /// evidently changed: some new OCR text ([newText]) overlaps the box or
+  /// directly adjoins it as part of the same text — after it, or before it,
+  /// since text that grows upward (bottom-anchored chat bubbles, subtitles,
+  /// dialogue) pushes earlier lines up above the box.
+  @visibleForTesting
+  static Set<int> staleOverlayIds(Map<int, Rect> drawn, List<Rect> newText) => {
+        for (final e in drawn.entries)
+          if (newText.any((r) => _touchesText(e.value, r))) e.key
+      };
+
+  static bool _touchesText(Rect box, Rect r) =>
+      r.overlaps(box) || continuesText(box, r) || continuesText(r, box);
+
+  static const _staleRereadInterval = Duration(seconds: 5);
+  DateTime _lastStaleRereadAt = DateTime.fromMillisecondsSinceEpoch(0);
+
   /// Whether new OCR text [next] reads as a continuation of the text under
   /// our box [box]: on the same line right after it, or on the next line
   /// starting at the same indent. Deliberately strict so unrelated text
@@ -484,6 +501,8 @@ class TranslationProvider with ChangeNotifier {
               // causing visible flicker and, for cloud/LLM mode, repeated
               // paid API calls for text that hadn't changed at all.
               final matchedIdForIndex = <int, int>{};
+              // New blocks held back this tick (see the stale-box re-read).
+              final deferredIndices = <int>{};
               if (!_isManualTranslationRequested) {
                 final remainingOldIds =
                     _displayedOverlays.keys.where((id) => !coveredIds.contains(id)).toList();
@@ -510,35 +529,52 @@ class TranslationProvider with ChangeNotifier {
                 // (changes there are caught natively, see BoxWatch), and OCR
                 // often can't read our own translation back (wrong script
                 // model), so "not matched" is no evidence the text is gone —
-                // dropping those made boxes blink out every refresh. Only
-                // replace a box when new text shows up overlapping it.
-                final newTextRects = [
-                  for (var i = 0; i < ocrResults.length; i++)
-                    if (!matchedIdForIndex.containsKey(i)) displayBoxes[i]
-                ];
+                // dropping those made boxes blink out every refresh. They stay.
+                remainingOldIds.clear();
 
-                // New text continuing right after one of our boxes means the
-                // text we translated has grown (dialogue being typed out):
-                // the start of it is hidden under our box, so patching in a
-                // box for just the visible tail left stacks of half-sentence
-                // fragments. Clear everything and re-read a clean frame.
-                final grown = newTextRects.any((r) =>
-                    _displayedOverlays.values.any((o) => continuesText(o.drawnRect, r)));
-                if (grown) {
-                  print('OCR: text grew past our boxes, re-reading without them');
-                  if (Platform.isAndroid) await _overlayService.hideTranslationOverlay();
-                  _displayedOverlays.clear();
-                  droppedStale = true;
-                  return;
+                // New text overlapping one of our boxes, or adjoining it as
+                // part of the same text (dialogue being typed out), means the text under
+                // that box changed — but we can't see the part the box hides.
+                // Translating just the visible piece gave half-sentence
+                // fragments that kept replacing one another. Instead drop the
+                // affected boxes and re-read a frame without them; boxes
+                // elsewhere stay. Rate-limited so text that OCR keeps reading
+                // into one of our boxes can't make it blink on every refresh.
+                final newIndexList = [
+                  for (var i = 0; i < ocrResults.length; i++)
+                    if (!matchedIdForIndex.containsKey(i)) i
+                ];
+                final stale = staleOverlayIds(
+                  {for (final e in _displayedOverlays.entries) e.key: e.value.drawnRect},
+                  [for (final i in newIndexList) displayBoxes[i]],
+                );
+                if (stale.isNotEmpty) {
+                  final now = DateTime.now();
+                  if (now.difference(_lastStaleRereadAt) >= _staleRereadInterval) {
+                    _lastStaleRereadAt = now;
+                    print('OCR: text changed around ${stale.length} of our boxes, re-reading without them');
+                    for (final id in stale) {
+                      if (Platform.isAndroid) await _overlayService.hideTranslationOverlayById(id);
+                      _displayedOverlays.remove(id);
+                    }
+                    droppedStale = true;
+                    return;
+                  }
+                  // Re-read just recently: keep the boxes for now and hold
+                  // back the text touching them rather than stack a box on top.
+                  for (final i in newIndexList) {
+                    final r = displayBoxes[i];
+                    if (stale.any((id) => _touchesText(_displayedOverlays[id]!.drawnRect, r))) {
+                      deferredIndices.add(i);
+                    }
+                  }
                 }
-                remainingOldIds.removeWhere((id) => !newTextRects
-                    .any((r) => r.overlaps(_displayedOverlays[id]!.drawnRect)));
 
                 // Nothing changed at all: same boxes, same text, same place,
                 // nothing added or removed — skip this tick entirely.
                 if (remainingOldIds.isEmpty &&
                     !anyMoved &&
-                    matchedIdForIndex.length == ocrResults.length) {
+                    matchedIdForIndex.length + deferredIndices.length == ocrResults.length) {
                   print('OCR: Screen unchanged (${ocrResults.length} blocks), skipping translation');
                   return;
                 }
@@ -559,7 +595,7 @@ class TranslationProvider with ChangeNotifier {
 
               final newIndices = [
                 for (var i = 0; i < ocrResults.length; i++)
-                  if (!matchedIdForIndex.containsKey(i)) i
+                  if (!matchedIdForIndex.containsKey(i) && !deferredIndices.contains(i)) i
               ];
 
               // A cancelTranslation that arrived during capture/OCR or the

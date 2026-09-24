@@ -4,4 +4,13 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <application>
+        <!-- Debug-only live-translation test harness, see MotionTestActivity. -->
+        <activity
+            android:name="com.lomoware.screen_translate.MotionTestActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:process=":harness"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+    </application>
 </manifest>

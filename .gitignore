@@ -44,3 +44,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 android/key.properties
+
+# Google Play publishing credentials (tools/release.py)
+*service-account*.json
+play-publisher*.json

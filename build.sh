@@ -6,11 +6,14 @@ print_usage() {
     echo "Options:"
     echo "  --bump [type]   Bump version (major, minor, patch, build)"
     echo "  --release       Build release APK and AppBundle"
+    echo "  --publish [track]  Test, build and upload to Google Play (default: internal;"
+    echo "                  see python3 tools/release.py --help)"
     echo "  --help          Show this help message"
 }
 
 BUMP_TYPE=""
 BUILD_RELEASE=0
+PUBLISH_TRACK=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -27,6 +30,15 @@ while [[ "$#" -gt 0 ]]; do
             BUILD_RELEASE=1
             shift 1
             ;;
+        --publish)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                PUBLISH_TRACK=$2
+                shift 2
+            else
+                PUBLISH_TRACK="internal"
+                shift 1
+            fi
+            ;;
         --help)
             print_usage
             exit 0
@@ -38,6 +50,12 @@ while [[ "$#" -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ -n "$PUBLISH_TRACK" ]; then
+    # release.py bumps, tests, builds, uploads and tags on its own, and
+    # reverts the bump if nothing gets published.
+    exec python3 tools/release.py --track "$PUBLISH_TRACK" ${BUMP_TYPE:+--bump "$BUMP_TYPE"}
+fi
 
 if [ -n "$BUMP_TYPE" ]; then
     echo "======================================"

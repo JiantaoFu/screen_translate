@@ -18,9 +18,10 @@ echo  [4] Build APK (Release)
 echo  [5] Build AppBundle (Release)
 echo  [6] Full Release Build (L10n + APK + AAB)
 echo  [7] Bump Version + Full Release (APK + AAB)
+echo  [8] Publish to Google Play (test, build, upload, tag)
 echo.
 echo ===================================================
-set /p opt="Please choose an option [1-7]: "
+set /p opt="Please choose an option [1-8]: "
 
 if "%opt%"=="1" goto convert_l10n
 if "%opt%"=="2" goto gen_l10n
@@ -29,6 +30,7 @@ if "%opt%"=="4" goto build_apk
 if "%opt%"=="5" goto build_bundle
 if "%opt%"=="6" goto full_build
 if "%opt%"=="7" goto bump_and_release
+if "%opt%"=="8" goto publish
 echo.
 color 0C
 echo Invalid option selected, please try again.
@@ -190,6 +192,24 @@ echo Step 5: Building AppBundle (Release)...
 call flutter build appbundle --release --android-skip-build-dependency-validation
 echo.
 echo Version Bump and Release Build Completed Successfully!
+echo.
+pause
+exit /b
+
+:publish
+echo.
+echo ---------------------------------------------------
+echo Publish to Google Play (tools\release.py)
+echo Needs PLAY_SERVICE_ACCOUNT_JSON; see tools\release.py --help
+echo ---------------------------------------------------
+set track=
+set /p track="Track [internal/alpha/beta/production] (default internal): "
+if "%track%"=="" set track=internal
+set bump=
+set /p bump="Bump version first? [build/patch/minor/major] (blank = no): "
+set BUMP_FLAG=
+if not "%bump%"=="" set BUMP_FLAG=--bump %bump%
+python tools\release.py --track %track% %BUMP_FLAG%
 echo.
 pause
 exit /b

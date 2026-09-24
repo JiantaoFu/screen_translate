@@ -117,6 +117,30 @@ storeFile=../screen-trans-key.keystore
 - **升级小版本并发布**：`./build.sh --release --bump minor`
 - **升级大版本并发布**：`./build.sh --release --bump major`
 
+### 3. 一键发布到 Google Play (`tools/release.py`)
+把测试、签名打包、上传和打 tag 串成一条命令，任何一步失败都会停下，不会上传半成品：
+
+1. **预检**：工作区没有未提交的改动；正式签名密钥存在（否则 Gradle 会悄悄改用 debug 签名）；JDK 17–23 可用；Play 凭据可用；versionCode 高于 Play 上已有的最大值
+2. **测试**：`flutter test` 和 Android 单元测试
+3. **构建**：可选升级版本号，生成多语言资源，构建签名 AAB，并确认不是 debug 签名
+4. **上传**：上传 AAB 和 R8 mapping（Play 管理中心的崩溃堆栈才可读），分配到轨道并附上发布说明；Play 校验通过后，确认才提交
+5. **打 tag**：提交版本号改动，打 tag `v<版本>+<构建号>`；加 `--push` 会一并推送
+
+**一次性配置**
+1. 在 Google Cloud Console 启用 *Google Play Android Developer API*，创建服务账号，下载 JSON 密钥
+2. 在 Play 管理中心 → 用户和权限，邀请该服务账号的邮箱，并授予本应用的发布权限
+3. 把密钥放在仓库之外，然后设置环境变量：`setx PLAY_SERVICE_ACCOUNT_JSON C:\path\to\key.json`
+4. 安装依赖：`pip install -r tools/requirements-release.txt`
+
+**常用命令**
+```bash
+python tools/release.py --dry-run             # 完整演练：Play 校验后丢弃，不会发布
+python tools/release.py --track internal      # 发布到内部测试
+python tools/release.py --bump patch --track production --rollout 0.2 --notes-dir release_notes/1.2.2
+python tools/release.py --build-only          # 只构建签名 AAB
+```
+`build.bat` 的 **[8]** 和 `./build.sh --publish [track]` 调用的都是这个脚本。发布说明目录里按 Play 语言代码命名文件（`en-US.txt`、`zh-CN.txt` 等），每种语言最多 500 个字符。
+
 ---
 
 ## 🍏 iOS 支持与配置指南 (iOS Setup Guide - Mac Only)

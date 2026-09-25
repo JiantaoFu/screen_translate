@@ -160,6 +160,21 @@ python tools/test_release.py                  # 发版脚本自身的测试
 - **提示 versionCode must be higher**：Play 上已经有这个构建号了，加 `--bump build`。
 - **构建失败，提示 JDK 版本不对**：Gradle 需要 JDK 17–23（Android Studio 自带的 JBR 25 不行），用 `--java-home` 指定，或设置 `RELEASE_JAVA_HOME`。
 
+
+### 4. 自动化测试
+**每次改动后都要跑**，发版前全部跑一遍：
+
+| 测试 | 命令 | 覆盖内容 | 什么时候跑 |
+|---|---|---|---|
+| Flutter 测试 | `flutter test` | 语言默认值和持久化、识别出自己悬浮窗的文字并过滤、翻译框的去重和重读、翻译框布局 | 每次改动 |
+| Android 单元测试 | `cd android && ./gradlew :app:testDebugUnitTest`（用 JDK 17） | 画面变化分类（MotionClassifier）、图像格式转换 | 每次改动 |
+| 发版脚本测试 | `python tools/test_release.py` | `tools/release.py` 的发布流程和出错处理 | 改了发版脚本时 |
+| 模拟器回归 | `tools/emulator/run_all.sh` | 在真实截屏链路上检查：视频、游戏、打字机等画面上的实时翻译，文字变化后重新翻译，横竖屏切换 | 改了截屏或悬浮窗相关代码时，以及每次发版前 |
+
+- 推到 GitHub 后，CI（`.github/workflows/tests.yml`）会自动跑前三项。模拟器回归需要在本地跑，准备步骤见 `tools/emulator/README.md`。
+- 新增的实时翻译场景加到 debug 专用测试页 `MotionTestActivity`，并在 `tools/emulator/` 里补上对应的检查。
+- `tools/release.py` 发版前会自动跑前两项，没通过就不会发布。
+
 ---
 
 ## 🍏 iOS 支持与配置指南 (iOS Setup Guide - Mac Only)

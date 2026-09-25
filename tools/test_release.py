@@ -445,6 +445,30 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(self.checks, ["keystore", "prepare", "jar signature"])
 
 
+class InstallTest(unittest.TestCase):
+    """install() against canned adb results."""
+
+    def install(self, returncode, output):
+        result = subprocess.CompletedProcess([], returncode, stdout=output, stderr="")
+        with mock.patch.object(build.subprocess, "run", return_value=result):
+            build.install(Path("app.apk"), "PHONE1")
+
+    def test_success(self):
+        self.install(0, "Performing Streamed Install\nSuccess\n")
+
+    def test_downgrade_explains_the_uninstall_tradeoff(self):
+        with self.assertRaisesRegex(build.BuildError, "higher versionCode.*clears its data"):
+            self.install(1, "Failure [INSTALL_FAILED_VERSION_DOWNGRADE: 11 < 2011]\n")
+
+    def test_signature_mismatch_is_explained(self):
+        with self.assertRaisesRegex(build.BuildError, "different key"):
+            self.install(1, "Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: ...]\n")
+
+    def test_other_failures_show_adb_output(self):
+        with self.assertRaisesRegex(build.BuildError, "INSTALL_FAILED_INSUFFICIENT_STORAGE"):
+            self.install(1, "Failure [INSTALL_FAILED_INSUFFICIENT_STORAGE]\n")
+
+
 class CheckApkTest(unittest.TestCase):
     """check_apk against canned aapt2/apksigner output."""
 

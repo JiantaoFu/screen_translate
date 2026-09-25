@@ -254,6 +254,8 @@ def main():
     try:
         step("Preflight")
         check_git_clean(args.allow_dirty)
+        # build() checks this again; checking here fails before ~10 minutes of
+        # tests and building instead of after.
         check_keystore()
         java_home = find_java_home(args.java_home)
         print(f"  JDK: {java_home}")

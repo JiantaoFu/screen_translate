@@ -85,6 +85,7 @@ echo ---------------------------------------------------
 echo Building Release APK...
 echo ---------------------------------------------------
 python tools\build.py apk
+if errorlevel 1 goto build_failed
 echo.
 pause
 exit /b
@@ -95,6 +96,7 @@ echo ---------------------------------------------------
 echo Building Release AppBundle...
 echo ---------------------------------------------------
 python tools\build.py aab
+if errorlevel 1 goto build_failed
 echo.
 pause
 exit /b
@@ -122,8 +124,10 @@ echo Step 2: Generating Flutter Localizations...
 call flutter gen-l10n
 echo Step 3: Building APK (Release)...
 python tools\build.py apk
+if errorlevel 1 goto build_failed
 echo Step 4: Building AppBundle (Release)...
 python tools\build.py aab
+if errorlevel 1 goto build_failed
 echo.
 echo Full Build Completed Successfully!
 echo.
@@ -187,9 +191,11 @@ call flutter gen-l10n
 
 echo Step 4: Building APK (Release)...
 python tools\build.py apk
+if errorlevel 1 goto build_failed
 
 echo Step 5: Building AppBundle (Release)...
 python tools\build.py aab
+if errorlevel 1 goto build_failed
 echo.
 echo Version Bump and Release Build Completed Successfully!
 echo.
@@ -213,6 +219,13 @@ python tools\release.py --track %track% %BUMP_FLAG%
 echo.
 pause
 exit /b
+
+:build_failed
+echo.
+echo [ERROR] Build failed - see the messages above.
+echo.
+pause
+exit /b 1
 
 :exit
 echo.

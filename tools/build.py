@@ -250,11 +250,30 @@ def build(target, java_home, name, code):
     return out
 
 
+INSTALL_HINTS = {
+    "INSTALL_FAILED_VERSION_DOWNGRADE":
+        "the installed app has a higher versionCode (e.g. an old split-per-abi build)",
+    "INSTALL_FAILED_UPDATE_INCOMPATIBLE":
+        "the installed app is signed with a different key (debug vs release, or Play's key)",
+}
+
+
 def install(apk, serial):
-    """Installs over the current app, keeping its data. Refuses (and changes
-    nothing) if the installed app is signed differently or newer."""
+    """Installs over the current app, keeping its data. adb refuses, and
+    changes nothing, if the installed app is newer or signed differently."""
     print(f"  installing on {serial}")
-    run(["adb", "-s", serial, "install", "-r", apk])
+    res = subprocess.run(["adb", "-s", serial, "install", "-r", str(apk)],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace")
+    out = (res.stdout or "") + (res.stderr or "")
+    if res.returncode == 0 and "Success" in out:
+        print("  installed")
+        return
+    for code, why in INSTALL_HINTS.items():
+        if code in out:
+            raise BuildError(f"{serial} refused the install: {why}. Uninstalling the app "
+                             f"first would fix it, but that clears its data "
+                             f"(adb -s {serial} uninstall {PACKAGE})")
+    raise BuildError(f"adb install on {serial} failed:\n{out.strip()}")
 
 
 def main():

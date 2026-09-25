@@ -126,20 +126,39 @@ storeFile=../screen-trans-key.keystore
 4. **上传**：上传 AAB 和 R8 mapping（Play 管理中心的崩溃堆栈才可读），分配到轨道并附上发布说明；Play 校验通过后，确认才提交
 5. **打 tag**：提交版本号改动，打 tag `v<版本>+<构建号>`；加 `--push` 会一并推送
 
-**一次性配置**
-1. 在 Google Cloud Console 启用 *Google Play Android Developer API*，创建服务账号，下载 JSON 密钥
-2. 在 Play 管理中心 → 用户和权限，邀请该服务账号的邮箱，并授予本应用的发布权限
-3. 把密钥放在仓库之外，然后设置环境变量：`setx PLAY_SERVICE_ACCOUNT_JSON C:\path\to\key.json`
+**一次性配置**（每台发版用的电脑做一次）
+1. GCP 项目 `screentranslation-cff83`（即 Firebase 项目）已启用 *Google Play Android Developer API*。
+2. 服务账号 `play-publisher@screentranslation-cff83.iam.gserviceaccount.com` 已在 Play 管理中心 → 用户和权限中获得本应用的发布权限：查看应用信息、发布到测试轨道、发布到正式版。
+3. 在 Cloud Console → IAM → 服务账号 → `play-publisher` → 密钥，为这台电脑新建一个 JSON 密钥。把它放在仓库之外，例如 `C:\Users\<你>\keys\play-publisher.json`，然后设置环境变量：`setx PLAY_SERVICE_ACCOUNT_JSON C:\Users\<你>\keys\play-publisher.json`。密钥不要提交；`.gitignore` 已忽略常见的密钥文件名。
 4. 安装依赖：`pip install -r tools/requirements-release.txt`
+5. `android/key.properties` 和正式签名密钥库要就位（见上文第 1 节）。
 
-**常用命令**
+**发版流程**
+1. **准备**：功能分支合并进 `main`，并在 `main` 上发版。在 `main` 以外的分支发正式版时，脚本会给出警告。然后写好更新说明，目录结构如 `release_notes/1.2.2/en-US.txt`、`zh-CN.txt`，每种语言最多 500 个字符。
+2. **发到内部测试**：
+   ```bash
+   python tools/release.py --bump patch --track internal --notes-dir release_notes/1.2.2 --push
+   ```
+   只改构建号时用 `--bump build`。第一次用、或改过脚本后，可以先加 `--dry-run`：会完整上传并由 Play 校验，然后丢弃，不会发布。
+3. **真机验证**：测试人员名单里的账号可以从 Play 安装内部测试版。重点测视频或游戏画面上的实时翻译，以及横屏。
+4. **推广到正式版**：在 Play 管理中心 → 内部测试 → 对应版本 → "推广版本" → "正式版"。不用重新上传，更新说明会一起带过去。建议先选分阶段发布（比如 20%），Crashlytics 没问题再扩大到 100%。
+5. **审核与监控**：正式版要经过 Google 审核，通常几小时到两天。上线后关注 Crashlytics 崩溃率、ANR 和退款率；出问题就在 Play 管理中心暂停发布。
+
+也可以一步直接发正式版（跳过内部测试）：`python tools/release.py --bump patch --track production --rollout 0.2 --notes-dir release_notes/1.2.2 --push`
+
+**其他命令**
 ```bash
-python tools/release.py --dry-run             # 完整演练：Play 校验后丢弃，不会发布
-python tools/release.py --track internal      # 发布到内部测试
-python tools/release.py --bump patch --track production --rollout 0.2 --notes-dir release_notes/1.2.2
-python tools/release.py --build-only          # 只构建签名 AAB
+python tools/release.py --build-only          # 只构建签名 AAB，不上传
+python tools/release.py --help                # 全部选项
+python tools/test_release.py                  # 发版脚本自身的测试
 ```
-`build.bat` 的 **[8]** 和 `./build.sh --publish [track]` 调用的都是这个脚本。发布说明目录里按 Play 语言代码命名文件（`en-US.txt`、`zh-CN.txt` 等），每种语言最多 500 个字符。
+`build.bat` 的 **[8]** 和 `./build.sh --publish [track]` 调用的都是这个脚本。
+
+**常见问题**
+- **403 / 没有权限**：服务账号在 Play 管理中心的权限没配好，或者刚配好、还没生效，过一会儿再试。
+- **提示 changes cannot be sent for review automatically**：加上 `--changes-not-sent-for-review` 重跑，然后到 Play 管理中心手动提交审核。
+- **提示 versionCode must be higher**：Play 上已经有这个构建号了，加 `--bump build`。
+- **构建失败，提示 JDK 版本不对**：Gradle 需要 JDK 17–23（Android Studio 自带的 JBR 25 不行），用 `--java-home` 指定，或设置 `RELEASE_JAVA_HOME`。
 
 ---
 

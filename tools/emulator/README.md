@@ -17,14 +17,12 @@ Screenshots and logs go to `build/emulator-regression/`.
    "$LOCALAPPDATA/Android/Sdk/emulator/emulator.exe" -avd Medium_Phone_API_36.1 \
        -no-snapshot-load -no-boot-anim -no-audio -gpu swiftshader_indirect
    ```
-2. Build the x86_64 debug APK with Gradle and JDK 17. `flutter build` picks
-   up Android Studio's JBR 25, which this Gradle can't run. The fat APK
-   doesn't fit on the emulator, so build per ABI:
+2. Build the x86_64 debug APK with the project's build script:
    ```
-   cd android && JAVA_HOME="C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot" \
-       ./gradlew assembleDebug -Ptarget-platform=android-x64 -Psplit-per-abi=true
+   python tools/build.py emulator
    ```
-   The output is `build/app/outputs/apk/debug/app-x86_64-debug.apk`.
+   The output is `build/app/outputs/apk/debug/app-debug.apk`, which has only
+   the x86_64 ABI, so it fits on the emulator.
 3. Run `tools/emulator/run_all.sh`. The scripts target `emulator-5554`, or
    `$ANDROID_SERIAL` if set, so a connected phone is never touched.
 

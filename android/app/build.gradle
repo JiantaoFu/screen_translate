@@ -54,6 +54,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // -Pabi=arm64-v8a -Pdisable-abi-filtering=true (tools/build.py) packs one
+        // ABI into a single APK.
+        // Unlike Flutter's split-per-abi it keeps versionCode as-is, so a
+        // sideloaded build doesn't end up above Play's (e.g. 2011 vs 11).
+        if (project.hasProperty('abi')) {
+            ndk { abiFilters project.property('abi') }
+        }
     }
 
     signingConfigs {

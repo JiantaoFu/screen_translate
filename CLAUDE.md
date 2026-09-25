@@ -26,13 +26,31 @@ Run all of these before saying a change is done, and report the results:
 - Only drive the emulator (`emulator-5554`). Never use the user's phone
   (`57241FDCR0074L`) without asking.
 
-## Build gotchas
+## Building: always `tools/build.py`
 
-- `flutter build` fails: Flutter uses Android Studio's JBR 25, which Gradle
-  8.11 can't run. Build with `android/gradlew` and JDK 17 (see the commands above).
-- Gradle reads the app version from `android/local.properties`
-  (`flutter.versionName` / `flutter.versionCode`), not from `pubspec.yaml`.
-  `tools/release.py` syncs it.
+Every build, for any purpose, goes through `tools/build.py`. Don't run
+`flutter build` or `gradlew assemble*/bundle*` by hand.
+
+| Need | Command |
+|---|---|
+| Install on the user's phone (only when asked) | `python tools/build.py apk --install <serial>` (release-signed, arm64) |
+| Emulator / `tools/emulator/` | `python tools/build.py emulator [--install emulator-5554]` (debug, x86_64) |
+| Google Play bundle | `python tools/build.py aab`, or `tools/release.py` to publish |
+
+What the script does:
+- syncs the version from `pubspec.yaml` into `android/local.properties`,
+  which is where Gradle reads it;
+- builds with JDK 17. `flutter build` fails here because it runs on Android
+  Studio's JBR 25;
+- keeps each APK to a single ABI through `-Pabi`, instead of Flutter's
+  split-per-abi. Split-per-abi adds 1000×ABI to versionCode: a sideloaded
+  1.2.1+11 became 2011, which put the phone above Play's versions so Play
+  stopped updating it;
+- checks every output: the version must match pubspec, release builds must
+  not be debug-signed, and Gradle daemons are stopped afterwards.
+
+If a build needs something the script doesn't do, extend `tools/build.py`
+(and `tools/test_release.py`) instead of working around it.
 
 ## Releasing
 

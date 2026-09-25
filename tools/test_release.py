@@ -1,4 +1,4 @@
-"""Tests for tools/release.py with the build, git and Google Play stubbed out.
+"""Tests for tools/release.py and tools/build.py with the build, git and Google Play stubbed out.
 
     pip install -r tools/requirements-release.txt
     python tools/test_release.py
@@ -15,6 +15,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import build  # noqa: E402
 import release  # noqa: E402
 
 
@@ -149,7 +150,7 @@ class KeystoreTest(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
         (self.tmp / "app").mkdir()
-        self.patch = mock.patch.object(release, "ANDROID", self.tmp)
+        self.patch = mock.patch.object(build, "ANDROID", self.tmp)
         self.patch.start()
         self.env = mock.patch.dict(os.environ, {}, clear=False)
         self.env.start()
@@ -163,15 +164,15 @@ class KeystoreTest(unittest.TestCase):
     def test_missing_keystore_is_refused(self):
         (self.tmp / "key.properties").write_text("storePassword=a\nkeyPassword=b\n")
         with self.assertRaisesRegex(release.ReleaseError, "DEBUG"):
-            release.check_keystore()
+            build.check_keystore()
 
     def test_default_keystore_with_env_passwords(self):
         # No key.properties at all, like CI: build.gradle's defaults + env vars.
         (self.tmp / "screen-trans-key.keystore").write_bytes(b"k")
         with self.assertRaisesRegex(release.ReleaseError, "storePassword"):
-            release.check_keystore()
+            build.check_keystore()
         os.environ.update(KEYSTORE_PASSWORD="a", KEY_PASSWORD="b")
-        release.check_keystore()
+        build.check_keystore()
 
     def test_escaped_absolute_path(self):
         store = self.tmp / "keys" / "up.jks"
@@ -180,7 +181,7 @@ class KeystoreTest(unittest.TestCase):
         escaped = str(store).replace("\\", "\\\\").replace(":", "\\:")
         (self.tmp / "key.properties").write_text(
             f"# comment\nstoreFile={escaped}\nstorePassword=a\nkeyPassword=b\n")
-        release.check_keystore()
+        build.check_keystore()
 
 
 def http_error(status, message):
@@ -264,9 +265,8 @@ class MainTest(unittest.TestCase):
         self.aab.write_bytes(b"stale bundle from an earlier build")
         self.creds = Path(tempfile.mkdtemp()) / "play.json"
         self.creds.write_text("{}")
-        self.calls, self.tag_fails, self.gradle_writes_aab = [], False, True
+        self.calls, self.tag_fails, self.build_ok = [], False, True
         self.publish_result = True
-        self.aab_existed_at_build = None
 
         def fake_run(cmd, cwd=None, env=None, capture=False):
             cmd = [str(c) for c in cmd]
@@ -277,10 +277,12 @@ class MainTest(unittest.TestCase):
 
         def fake_gradle(tasks, java_home):
             self.calls.append(["gradle", *tasks])
-            if tasks == ["bundleRelease"]:
-                self.aab_existed_at_build = self.aab.exists()
-                if self.gradle_writes_aab:
-                    self.aab.write_bytes(b"fresh bundle")
+
+        def fake_build(target, java_home, name, code):
+            self.calls.append(["build", target, name, str(code)])
+            if not self.build_ok:
+                raise release.ReleaseError("the build produced nothing")
+            return self.aab
 
         def fake_git(*args):
             self.calls.append(["git", *args])
@@ -301,10 +303,13 @@ class MainTest(unittest.TestCase):
             "run": fake_run, "gradle": fake_gradle, "git": fake_git,
             "check_git_clean": lambda allow: None, "check_keystore": lambda: None,
             "find_java_home": lambda explicit: Path("jdk"),
-            "write_local_versions": lambda n, c: None, "check_signature": lambda jh: None,
+            "build": fake_build,
+            "stop_gradle": lambda jh: self.calls.append(["gradle", "--stop"]),
             "play_service": lambda c: object(), "highest_version_code": lambda svc: 11,
             "publish": fake_publish,
         }.items()]
+        # read_version() lives in build.py and reads build.PUBSPEC.
+        self.patches.append(mock.patch.object(build, "PUBSPEC", self.pubspec))
         for p in self.patches:
             p.start()
 
@@ -358,20 +363,21 @@ class MainTest(unittest.TestCase):
         code, err = self.main(*self.publish_args())
         self.assertEqual(code, 1)
         self.assertIn("versionCode 11 must be higher than 11", err)
-        self.assertNotIn(["gradle", "bundleRelease"], self.calls)
+        self.assertFalse(any(c[0] == "build" for c in self.calls))
 
-    def test_stale_bundle_is_removed_before_building(self):
+    def test_build_only_builds_the_aab_through_build_py(self):
         code, _ = self.main("--build-only", "--skip-tests")
         self.assertEqual(code, 0)
-        self.assertIs(self.aab_existed_at_build, False)
-        self.assertEqual(self.aab.read_bytes(), b"fresh bundle")
+        self.assertIn(["build", "aab", "1.2.1", "11"], self.calls)
         self.assertIn(["gradle", "--stop"], self.calls)
 
-    def test_build_without_bundle_fails(self):
-        self.gradle_writes_aab = False
-        code, err = self.main("--build-only", "--skip-tests")
+    def test_build_failure_stops_the_release(self):
+        self.build_ok = False
+        code, err = self.main(*self.publish_args("--bump", "patch"))
         self.assertEqual(code, 1)
-        self.assertIn("the build produced no bundle", err)
+        self.assertIn("the build produced nothing", err)
+        self.assertEqual(self.pubspec.read_bytes(), self.ORIGINAL)
+        self.assertFalse(any(c[0] == "publish" for c in self.calls))
 
     def test_build_only_keeps_bump(self):
         code, _ = self.main("--build-only", "--skip-tests", "--bump", "patch")
@@ -379,6 +385,91 @@ class MainTest(unittest.TestCase):
         self.assertIn(b"1.2.2+12", self.pubspec.read_bytes())
         self.assertFalse(any(c[0] == "publish" for c in self.calls))
 
+
+class BuildTest(unittest.TestCase):
+    """tools/build.py's build() with Gradle and the output checks stubbed out."""
+
+    def setUp(self):
+        root = Path(tempfile.mkdtemp())
+        self.out = root / "out"
+        self.out.write_bytes(b"stale output from an earlier build")
+        self.gradle_args, self.existed, self.writes, self.checks = None, None, True, []
+
+        def fake_gradle(tasks, java_home):
+            self.gradle_args = tasks
+            self.existed = self.out.exists()
+            if self.writes:
+                self.out.write_bytes(b"fresh")
+
+        targets = {k: (task, plat, abi, self.out, rel)
+                   for k, (task, plat, abi, _, rel) in build.TARGETS.items()}
+        self.patches = [mock.patch.object(build, k, v) for k, v in {
+            "ROOT": root, "TARGETS": targets, "gradle": fake_gradle,
+            "prepare": lambda name, code: self.checks.append("prepare"),
+            "check_keystore": lambda: self.checks.append("keystore"),
+            "check_signature": lambda jh, path: self.checks.append("jar signature"),
+            "check_apk": lambda path, name, code, release: self.checks.append(("apk", release)),
+        }.items()]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+
+    def test_stale_output_is_removed_before_building(self):
+        self.assertEqual(build.build("aab", Path("jdk"), "1.2.1", 11), self.out)
+        self.assertIs(self.existed, False)
+        self.assertEqual(self.out.read_bytes(), b"fresh")
+
+    def test_no_output_fails(self):
+        self.writes = False
+        with self.assertRaisesRegex(build.BuildError, "produced nothing"):
+            build.build("apk", Path("jdk"), "1.2.1", 11)
+
+    def test_release_apk_is_single_abi_without_split_per_abi(self):
+        build.build("apk", Path("jdk"), "1.2.1", 11)
+        self.assertEqual(self.gradle_args, ["assembleRelease", "-Ptarget-platform=android-arm64",
+                                            "-Pabi=arm64-v8a", "-Pdisable-abi-filtering=true"])
+        self.assertEqual(self.checks, ["keystore", "prepare", ("apk", True)])
+
+    def test_emulator_apk_is_debug_x86_64(self):
+        build.build("emulator", Path("jdk"), "1.2.1", 11)
+        self.assertEqual(self.gradle_args, ["assembleDebug", "-Ptarget-platform=android-x64",
+                                            "-Pabi=x86_64", "-Pdisable-abi-filtering=true"])
+        self.assertEqual(self.checks, ["prepare", ("apk", False)])
+
+    def test_aab_has_all_abis_and_a_jar_signature_check(self):
+        build.build("aab", Path("jdk"), "1.2.1", 11)
+        self.assertEqual(self.gradle_args, ["bundleRelease"])
+        self.assertEqual(self.checks, ["keystore", "prepare", "jar signature"])
+
+
+class CheckApkTest(unittest.TestCase):
+    """check_apk against canned aapt2/apksigner output."""
+
+    RELEASE_CERT = "Signer #1 certificate DN: CN=Jeromy Fu, O=Lomoware\n"
+
+    def check(self, badging, certs):
+        outputs = iter([badging, certs])
+        with mock.patch.object(build, "build_tools", lambda: Path("bt")), \
+                mock.patch.object(build, "run", lambda cmd, capture=False: next(outputs)):
+            build.check_apk(Path("app.apk"), "1.2.1", 11, release=True)
+
+    def test_matching_release_apk_passes(self):
+        self.check("package: name='x' versionCode='11' versionName='1.2.1' x\n"
+                   "native-code: 'arm64-v8a'\n", self.RELEASE_CERT)
+
+    def test_abi_offset_version_code_is_refused(self):
+        # What Flutter's split-per-abi did to 1.2.1+11 on arm64.
+        with self.assertRaisesRegex(build.BuildError, "2011"):
+            self.check("package: name='x' versionCode='2011' versionName='1.2.1' x\n",
+                       self.RELEASE_CERT)
+
+    def test_debug_signed_release_apk_is_refused(self):
+        with self.assertRaisesRegex(build.BuildError, "DEBUG"):
+            self.check("package: name='x' versionCode='11' versionName='1.2.1' x\n",
+                       "Signer #1 certificate DN: C=US, O=Android, CN=Android Debug\n")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -84,7 +84,7 @@ echo.
 echo ---------------------------------------------------
 echo Building Release APK...
 echo ---------------------------------------------------
-call flutter build apk --release --android-skip-build-dependency-validation
+python tools\build.py apk
 echo.
 pause
 exit /b
@@ -94,7 +94,7 @@ echo.
 echo ---------------------------------------------------
 echo Building Release AppBundle...
 echo ---------------------------------------------------
-call flutter build appbundle --release --android-skip-build-dependency-validation
+python tools\build.py aab
 echo.
 pause
 exit /b
@@ -121,9 +121,9 @@ if %errorlevel% equ 0 (
 echo Step 2: Generating Flutter Localizations...
 call flutter gen-l10n
 echo Step 3: Building APK (Release)...
-call flutter build apk --release --android-skip-build-dependency-validation
+python tools\build.py apk
 echo Step 4: Building AppBundle (Release)...
-call flutter build appbundle --release --android-skip-build-dependency-validation
+python tools\build.py aab
 echo.
 echo Full Build Completed Successfully!
 echo.
@@ -186,10 +186,10 @@ echo Step 3: Generating Flutter Localizations...
 call flutter gen-l10n
 
 echo Step 4: Building APK (Release)...
-call flutter build apk --release --android-skip-build-dependency-validation
+python tools\build.py apk
 
 echo Step 5: Building AppBundle (Release)...
-call flutter build appbundle --release --android-skip-build-dependency-validation
+python tools\build.py aab
 echo.
 echo Version Bump and Release Build Completed Successfully!
 echo.

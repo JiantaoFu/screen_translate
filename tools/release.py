@@ -33,129 +33,27 @@ Requires: pip install -r tools/requirements-release.txt
 import argparse
 import contextlib
 import os
-import re
-import shutil
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-ANDROID = ROOT / "android"
-PUBSPEC = ROOT / "pubspec.yaml"
-PACKAGE = "com.lomoware.screen_translate"
-AAB = ROOT / "build" / "app" / "outputs" / "bundle" / "release" / "app-release.aab"
-MAPPING = ROOT / "build" / "app" / "outputs" / "mapping" / "release" / "mapping.txt"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build import (  # noqa: E402  (the shared build steps and checks)
+    AAB, MAPPING, PACKAGE, PUBSPEC, ROOT, BuildError as ReleaseError, build,
+    check_keystore, find_java_home, gradle, read_version, run, stop_gradle,
+)
+
 TRACKS = ("internal", "alpha", "beta", "production")
 NOTES_LIMIT = 500  # characters per language, enforced by Play
-IS_WINDOWS = os.name == "nt"
-
-
-class ReleaseError(Exception):
-    pass
 
 
 def step(msg):
     print(f"\n==> {msg}", flush=True)
 
 
-def run(cmd, cwd=ROOT, env=None, capture=False):
-    """Runs cmd, raising ReleaseError on failure. Output streams unless captured."""
-    exe = shutil.which(str(cmd[0])) or str(cmd[0])
-    args = [exe, *map(str, cmd[1:])]
-    # flutter and gradlew are .bat files on Windows and must go through cmd.exe.
-    shell = IS_WINDOWS and exe.lower().endswith((".bat", ".cmd"))
-    res = subprocess.run(
-        subprocess.list2cmdline(args) if shell else args,
-        cwd=cwd, env=env, shell=shell, capture_output=capture,
-        text=True, encoding="utf-8", errors="replace",
-    )
-    if res.returncode != 0:
-        if capture:
-            sys.stderr.write((res.stdout or "") + (res.stderr or ""))
-        raise ReleaseError(f"command failed ({res.returncode}): {' '.join(map(str, cmd))}")
-    return res.stdout if capture else ""
-
-
 def git(*args):
     return run(["git", *args], capture=True).strip()
-
-
-# --------------------------------------------------------------------------
-# Version
-
-
-def read_version():
-    m = re.search(r"^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$",
-                  PUBSPEC.read_text(encoding="utf-8"), re.M)
-    if not m:
-        raise ReleaseError('pubspec.yaml has no "version: x.y.z+n" line')
-    return m.group(1), int(m.group(2))
-
-
-def write_local_versions(name, code):
-    """The Gradle build reads the version from android/local.properties,
-    which only `flutter build` would otherwise refresh from pubspec.yaml."""
-    path = ANDROID / "local.properties"
-    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
-    wanted = {"flutter.versionName": name, "flutter.versionCode": str(code)}
-    out, seen = [], set()
-    for line in lines:
-        key = line.split("=", 1)[0].strip()
-        if key in wanted:
-            out.append(f"{key}={wanted[key]}")
-            seen.add(key)
-        else:
-            out.append(line)
-    out += [f"{k}={v}" for k, v in wanted.items() if k not in seen]
-    path.write_text("\n".join(out) + "\n", encoding="utf-8")
-
-
-# --------------------------------------------------------------------------
-# Preflight
-
-
-def java_major(java):
-    out = subprocess.run([str(java), "-version"], capture_output=True, text=True).stderr
-    m = re.search(r'version "(\d+)(?:\.(\d+))?', out)
-    if not m:
-        return 0
-    major = int(m.group(1))
-    return int(m.group(2) or 0) if major == 1 else major
-
-
-def find_java_home(explicit):
-    for home in filter(None, [explicit, os.environ.get("RELEASE_JAVA_HOME"),
-                              os.environ.get("JAVA_HOME")]):
-        java = Path(home) / "bin" / ("java.exe" if IS_WINDOWS else "java")
-        if not java.exists():
-            continue
-        major = java_major(java)
-        if 17 <= major <= 23:
-            return Path(home)
-        print(f"  skipping {home}: Java {major} (this Gradle version runs on 17-23)")
-    raise ReleaseError("no usable JDK 17-23 found; pass --java-home or set RELEASE_JAVA_HOME")
-
-
-def check_keystore():
-    """Mirrors android/app/build.gradle, which silently signs with the DEBUG
-    key when the keystore file is missing."""
-    props = ANDROID / "key.properties"
-    values = {}
-    if props.exists():
-        for line in props.read_text(encoding="utf-8").splitlines():
-            if "=" in line and not line.lstrip().startswith(("#", "!")):
-                key, value = line.split("=", 1)
-                # Java properties escaping: "C\:\\keys\\x.jks" is C:\keys\x.jks.
-                values[key.strip()] = re.sub(r"\\(.)", r"\1", value.strip())
-    # Same default and relative base as android/app/build.gradle.
-    store = (ANDROID / "app" / values.get("storeFile", "../screen-trans-key.keystore")).resolve()
-    if not store.exists():
-        raise ReleaseError(f"release keystore not found: {store} (the build would fall "
-                           "back to DEBUG signing, which Play rejects)")
-    for key, env in (("storePassword", "KEYSTORE_PASSWORD"), ("keyPassword", "KEY_PASSWORD")):
-        if not values.get(key) and not os.environ.get(env):
-            raise ReleaseError(f"{key} is not set in android/key.properties or ${env}")
 
 
 def check_git_clean(allow_dirty):
@@ -168,27 +66,6 @@ def check_git_clean(allow_dirty):
     if dirty and not allow_dirty:
         raise ReleaseError("uncommitted changes (commit them, or pass --allow-dirty):\n"
                            + "\n".join(dirty))
-
-
-# --------------------------------------------------------------------------
-# Build
-
-
-def gradle(tasks, java_home):
-    wrapper = ANDROID / ("gradlew.bat" if IS_WINDOWS else "gradlew")
-    run([wrapper, *tasks], cwd=ANDROID, env=dict(os.environ, JAVA_HOME=str(java_home)))
-
-
-def check_signature(java_home):
-    keytool = java_home / "bin" / ("keytool.exe" if IS_WINDOWS else "keytool")
-    out = run([keytool, "-J-Duser.language=en", "-printcert", "-jarfile", AAB], capture=True)
-    owner = re.search(r"^Owner:\s*(.+)$", out, re.M)
-    if not owner:
-        raise ReleaseError("could not read the bundle's signing certificate:\n" + out)
-    if "CN=Android Debug" in owner.group(1):
-        raise ReleaseError("the bundle is DEBUG-signed; check android/key.properties")
-    sha = re.search(r"SHA256:\s*(\S+)", out)
-    print(f"  signed by {owner.group(1)}\n  SHA-256 {sha.group(1) if sha else '?'}")
 
 
 # --------------------------------------------------------------------------
@@ -418,19 +295,8 @@ def main():
             gradle([":app:testDebugUnitTest"], java_home)
 
         step("Building the signed release App Bundle")
-        run([sys.executable, ROOT / "scripts" / "convert_arb_to_json.py"])
-        run(["flutter", "pub", "get"])
-        run(["flutter", "gen-l10n"])
-        write_local_versions(name, code)
-        # When nothing changed Gradle skips repackaging and leaves the old
-        # file in place; removing it guarantees the bundle is from this build.
-        AAB.unlink(missing_ok=True)
         used_gradle = True
-        gradle(["bundleRelease"], java_home)
-        if not AAB.exists():
-            raise ReleaseError(f"the build produced no bundle at {AAB}")
-        print(f"  {AAB.relative_to(ROOT)} ({AAB.stat().st_size / 2**20:.1f} MB)")
-        check_signature(java_home)
+        build("aab", java_home, name, code)  # tools/build.py: same build as `build.py aab`
         built = True
 
         if uploading:
@@ -467,11 +333,7 @@ def main():
             PUBSPEC.write_bytes(original_pubspec)
             print("  version bump reverted (nothing was published)")
         if used_gradle:
-            # Gradle daemons hold ~2 GB each long after a one-off build.
-            try:
-                gradle(["--stop"], find_java_home(args.java_home))
-            except ReleaseError:
-                pass
+            stop_gradle(java_home)
 
     minutes = (time.time() - started) / 60
     if published:

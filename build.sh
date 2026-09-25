@@ -74,7 +74,7 @@ if [ $BUILD_RELEASE -eq 1 ]; then
     echo "======================================"
     echo " Building Release APK & AppBundle..."
     echo "======================================"
-    flutter build apk --release
-    flutter build appbundle --release
+    python3 tools/build.py apk
+    python3 tools/build.py aab
     echo "Release build completed successfully!"
 fi

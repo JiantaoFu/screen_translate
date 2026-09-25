@@ -8,7 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && (pwd -W 2>/dev/null || pwd)
 SERIAL="${ANDROID_SERIAL:-emulator-5554}"
 A="adb -s $SERIAL"
 PKG=com.lomoware.screen_translate
-APK="$ROOT/build/app/outputs/apk/debug/app-x86_64-debug.apk"
+APK="$ROOT/build/app/outputs/apk/debug/app-debug.apk"   # python tools/build.py emulator
 OUT="${OUT:-$ROOT/build/emulator-regression}"
 mkdir -p "$OUT"
 PY=$(command -v python3 || command -v python)

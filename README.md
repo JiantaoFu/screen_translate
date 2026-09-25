@@ -103,6 +103,22 @@ storeFile=../screen-trans-key.keystore
 ### 2. 自动化构建与版本升级
 本项目包含两个自动化构建脚本，支持多语言转换、版本号自动升级以及一键打包，极大简化了发布流程。
 
+#### 统一编译脚本 (`tools/build.py`)
+**所有编译都通过这个脚本进行。** `build.bat`、`build.sh`、`tools/release.py` 和模拟器回归都调用它，请不要手动运行 `flutter build` 或 `gradlew`：
+```bash
+python tools/build.py aab                      # 正式签名的 App Bundle（上传 Play 用的就是它）
+python tools/build.py apk                      # 正式签名的 arm64 APK，用于装到手机
+python tools/build.py apk --install <序列号>   # 构建后直接覆盖安装，保留 App 数据（序列号用 adb devices 查）
+python tools/build.py emulator                 # debug 版 x86_64 APK，用于模拟器回归
+```
+脚本会依次：
+- 从 `pubspec.yaml` 同步版本号；
+- 生成多语言资源；
+- 用 JDK 17 调用 Gradle（本机的 `flutter build` 用的是 Android Studio 自带的 JBR 25，跑不通）；
+- 构建完成后检查产物：版本号必须和 `pubspec.yaml` 一致，正式包不能是 debug 签名。
+
+APK 只打包单个 ABI，不使用 Flutter 的 `--split-per-abi`。原因是 split-per-abi 会给 versionCode 加上 ABI 偏移，例如 1.2.1+11 在 arm64 上会变成 2011。这样的包装到手机上以后，Play 就不会再给这台手机推送更新了。
+
 #### Windows 环境 (`build.bat`)
 双击运行 `build.bat`，或在 CMD/PowerShell 中执行：
 - 选择 **[7] Bump Version + Full Release (APK + AAB)**

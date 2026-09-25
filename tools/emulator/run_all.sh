@@ -4,7 +4,7 @@
 # MotionClassifier, OverlayService, OverlayRegions, TranslationProvider's
 # box logic) and before every release. Takes ~10 minutes.
 #
-#   tools/emulator/run_all.sh            # install build/…/app-x86_64-debug.apk, then run
+#   python tools/build.py emulator && tools/emulator/run_all.sh
 #   SKIP_INSTALL=1 tools/emulator/run_all.sh
 #
 # Prerequisites and how to build the APK: tools/emulator/README.md

@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Ανίχνευση κύλισης Screen Translate</string>
+    <string name="accessibility_service_description">Επιτρέπει στο Screen Translate να ανιχνεύει την κύλιση σε άλλες εφαρμογές για συνεχή μετάφραση. Η υπηρεσία εντοπίζει πότε αλλάζει το περιεχόμενο, ώστε οι μεταφράσεις να ενημερώνονται με ακρίβεια.</string>
+    <string name="accessibility_permission_title">Απαιτείται υπηρεσία προσβασιμότητας</string>
+    <string name="accessibility_permission_message">Το Screen Translate χρειάζεται την υπηρεσία προσβασιμότητας για να ανιχνεύει την κύλιση και να μεταφράζει περιεχόμενο σε διάφορες εφαρμογές.</string>
+    <string name="accessibility_permission_benefits">Οφέλη:\n• Συνεχής μετάφραση κατά την κύλιση\n• Λειτουργεί σε πολλές εφαρμογές\n• Πιο ακριβείς μεταφράσεις</string>
+    <string name="accessibility_permission_how_to">Πώς να την ενεργοποιήσετε:\n1. Πατήστε «Ενεργοποίηση»\n2. Βρείτε το «Ανίχνευση κύλισης Screen Translate» στις ρυθμίσεις προσβασιμότητας\n3. Ενεργοποιήστε την υπηρεσία</string>
+    <string name="btn_enable_accessibility">Ενεργοποίηση</string>
+    <string name="btn_cancel">Ακύρωση</string>
+    <string name="tap_outside_to_close">Πατήστε έξω για κλείσιμο</string>
+    <string name="mode_auto_translate">Αυτόματη μετάφραση</string>
+    <string name="mode_original_text">Αρχικό κείμενο</string>
+    <string name="mode_manual_translate">Χειροκίνητη μετάφραση</string>
+</resources>

@@ -27,31 +27,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get source_and_target_cannot_be_the_same => '翻訳元と翻訳先の言語が同じです';
 
   @override
-  String get manage_translation_models => '翻訳モデルを管理';
-
-  @override
-  String model_download_success(Object language) {
-    return '$languageモデルのダウンロードが完了しました';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return '$languageモデルのダウンロードに失敗しました';
-  }
-
-  @override
-  String get model_not_downloaded => 'モデルがダウンロードされていません';
-
-  @override
   String get download_model => 'ダウンロード';
-
-  @override
-  String get remove_translation_model => '翻訳モデルを削除';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return '$languageの翻訳モデルを削除しますか?';
-  }
 
   @override
   String get cancel => 'キャンセル';
@@ -60,45 +36,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get remove => '削除';
 
   @override
-  String get not_installed => 'インストールされていません';
+  String get downloading => 'ダウンロード中...';
 
   @override
-  String get downloading => 'ダウンロード中';
-
-  @override
-  String get installed => 'インストールされています';
-
-  @override
-  String get download_failed => 'ダウンロードに失敗しました';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return '翻訳モデルを削除するのに失敗しました $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return '翻訳モデルをダウンロードするのに失敗しました $language';
-  }
-
-  @override
-  String get auto_translate_mode => '自動翻訳';
-
-  @override
-  String get manual_translate_mode => '手動翻訳';
-
-  @override
-  String get original_text_mode => 'オリジナルテキスト';
-
-  @override
-  String get overlay_permission_required => '翻訳モデル';
+  String get overlay_permission_required => '他のアプリの上に重ねて表示する権限が必要です';
 
   @override
   String get overlay_permission_required_content =>
-      'このプログラムはスクリーンの翻訳を行うために権限が必要です。';
+      '画面に翻訳を表示するには、他のアプリの上に重ねて表示する権限が必要です。';
 
   @override
-  String get grant_permission => '権限を与える';
+  String get grant_permission => '権限を許可';
 
   @override
   String get language_afrikaans => 'アフリカーンス語';
@@ -297,53 +245,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get api_key_required => 'APIキーが必要です';
 
   @override
-  String get api_key_setup_prompt => 'AI翻訳を使用するには、ChatGLM APIキーを設定してください。';
-
-  @override
   String get go_to_settings => '設定に移動';
-
-  @override
-  String get api_key_dialog_title => 'AI翻訳APIの設定';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI翻訳';
-
-  @override
-  String get api_key_get_key_from =>
-      'ChatGLM翻訳を使用するには、ChatGLMの公式サイトから無料のAPIキーを取得する必要があります。';
-
-  @override
-  String get api_key_configuration_steps => 'APIキー設定手順';
-
-  @override
-  String get api_key_step_1 => '1. ChatGLMの公式サイトにアクセスしてアカウントを作成';
-
-  @override
-  String get api_key_step_2 => '2. API管理セクションに移動';
-
-  @override
-  String get api_key_step_3 => '3. アプリケーション用の新しいAPIキーを生成';
-
-  @override
-  String get api_key_input_label => 'ChatGLM APIキー';
-
-  @override
-  String get api_key_input_hint => 'ChatGLM APIキーを入力してください';
 
   @override
   String get api_key_input_error => '有効なAPIキーを入力してください';
 
   @override
-  String get api_key_save_button => 'APIキーを保存';
-
-  @override
-  String get api_key_note => 'APIキーは安全に保存され、翻訳サービスにのみ使用されます。';
-
-  @override
   String get api_key_save_error => '無効なAPIキー。確認して再試行してください。';
-
-  @override
-  String get api_key_save_success => 'APIキーが正常に保存されました';
 
   @override
   String get translation_mode_on_device => 'デバイス内翻訳';
@@ -361,12 +269,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get translation_mode_title => '翻訳モード';
-
-  @override
-  String get translation_mode_on_device_label => 'デバイス内';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => '閉じる';
@@ -534,4 +436,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get language_request_sent => 'ありがとうございます！ご要望を記録しました。';
+
+  @override
+  String get pack_waiting_for_network => 'ネットワークを待機中…';
+
+  @override
+  String get downloading_language_model_toast =>
+      '言語モデルをダウンロードしています（約30MB）。しばらくお待ちください…';
 }

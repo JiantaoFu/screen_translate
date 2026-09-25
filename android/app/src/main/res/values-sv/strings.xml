@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate rullningsavkänning</string>
+    <string name="accessibility_service_description">Låter Screen Translate känna av rullning i andra appar för sömlös översättning. Tjänsten märker när innehållet ändras så att översättningarna uppdateras korrekt.</string>
+    <string name="accessibility_permission_title">Tillgänglighetstjänst krävs</string>
+    <string name="accessibility_permission_message">Screen Translate behöver tillgänglighetstjänsten för att känna av rullning och översätta innehåll i olika appar.</string>
+    <string name="accessibility_permission_benefits">Fördelar:\n• Sömlös översättning när du rullar\n• Fungerar i flera appar\n• Mer exakta översättningar</string>
+    <string name="accessibility_permission_how_to">Så aktiverar du den:\n1. Tryck på ”Aktivera”\n2. Hitta ”Screen Translate rullningsavkänning” i tillgänglighetsinställningarna\n3. Slå på tjänsten</string>
+    <string name="btn_enable_accessibility">Aktivera</string>
+    <string name="btn_cancel">Avbryt</string>
+    <string name="tap_outside_to_close">Tryck utanför för att stänga</string>
+    <string name="mode_auto_translate">Automatisk översättning</string>
+    <string name="mode_original_text">Originaltext</string>
+    <string name="mode_manual_translate">Manuell översättning</string>
+</resources>

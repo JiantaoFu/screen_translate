@@ -28,31 +28,7 @@ class AppLocalizationsFa extends AppLocalizations {
       'زبان مبدا و مقصد نمی‌توانند یکسان باشند';
 
   @override
-  String get manage_translation_models => 'مدیریت مدل‌های ترجمه';
-
-  @override
-  String model_download_success(Object language) {
-    return 'مدل $language با موفقیت دانلود شد';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'خطا در دانلود مدل $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'مدل دانلود نشده است';
-
-  @override
   String get download_model => 'دانلود';
-
-  @override
-  String get remove_translation_model => 'حذف مدل ترجمه';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'آیا مطمئن هستید که می‌خواهید مدل ترجمه برای $language حذف شود؟';
-  }
 
   @override
   String get cancel => 'لغو';
@@ -61,45 +37,18 @@ class AppLocalizationsFa extends AppLocalizations {
   String get remove => 'حذف';
 
   @override
-  String get not_installed => 'نصب نشده است';
+  String get downloading => 'در حال دانلود...';
 
   @override
-  String get downloading => 'دانلود...';
-
-  @override
-  String get installed => 'نصب شده است';
-
-  @override
-  String get download_failed => 'دانلود ناموفق';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'خطا در حذف مدل $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'خطا در دانلود مدل $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'مدل ترجمه';
-
-  @override
-  String get manual_translate_mode => 'ترجمه دستی';
-
-  @override
-  String get original_text_mode => 'مدل متن اصلی';
-
-  @override
-  String get overlay_permission_required => 'مدل ترجمه';
+  String get overlay_permission_required =>
+      'مجوز نمایش روی برنامه‌های دیگر لازم است';
 
   @override
   String get overlay_permission_required_content =>
-      'این برنامه نیاز به دسترسی به صفحه کاربری دارد';
+      'این برنامه برای نمایش ترجمه‌ها روی صفحه به مجوز نمایش روی برنامه‌های دیگر نیاز دارد.';
 
   @override
-  String get grant_permission => 'اعطای دسترسی';
+  String get grant_permission => 'اعطای مجوز';
 
   @override
   String get language_afrikaans => 'آفریکانس';
@@ -299,57 +248,14 @@ class AppLocalizationsFa extends AppLocalizations {
   String get api_key_required => 'کلید API مورد نیاز است';
 
   @override
-  String get api_key_setup_prompt =>
-      'کلید API ChatGLM خود را برای ترجمه هوش مصنوعی تنظیم کنید.';
-
-  @override
   String get go_to_settings => 'رفتن به تنظیمات';
-
-  @override
-  String get api_key_dialog_title => 'پیکربندی API ترجمه هوش مصنوعی';
-
-  @override
-  String get api_key_configuration_title => 'ترجمه ChatGLM با هوش مصنوعی';
-
-  @override
-  String get api_key_get_key_from =>
-      'برای استفاده از ترجمه‌های ChatGLM، باید یک کلید API رایگان از دریافت کنید ';
-
-  @override
-  String get api_key_configuration_steps => 'مراحل پیکربندی کلید API';
-
-  @override
-  String get api_key_step_1 =>
-      '1. از open.bigmodel.cn بازدید کنید و یک حساب ایجاد کنید';
-
-  @override
-  String get api_key_step_2 => '2. به بخش مدیریت API مراجعه کنید';
-
-  @override
-  String get api_key_step_3 => '3. یک کلید API جدید برای برنامه خود ایجاد کنید';
-
-  @override
-  String get api_key_input_label => 'کلید API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'کلید API ChatGLM خود را وارد کنید';
 
   @override
   String get api_key_input_error => 'لطفاً یک کلید API معتبر وارد کنید';
 
   @override
-  String get api_key_save_button => 'ذخیره کلید API';
-
-  @override
-  String get api_key_note =>
-      'کلید API شما به طور امن ذخیره خواهد شد و فقط برای خدمات ترجمه استفاده می‌شود.';
-
-  @override
   String get api_key_save_error =>
       'کلید API نامعتبر است. بررسی کنید و دوباره امتحان کنید.';
-
-  @override
-  String get api_key_save_success => 'کلید API با موفقیت ذخیره شد';
 
   @override
   String get translation_mode_on_device => 'ترجمه در دستگاه';
@@ -367,12 +273,6 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'حالت ترجمه';
-
-  @override
-  String get translation_mode_on_device_label => 'در دستگاه';
-
-  @override
-  String get translation_mode_ai_label => 'هوش مصنوعی';
 
   @override
   String get close => 'بستن';
@@ -545,4 +445,11 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get language_request_sent => 'متشکریم! درخواست شما ثبت شد.';
+
+  @override
+  String get pack_waiting_for_network => 'در انتظار شبکه…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'در حال بارگیری مدل زبان (حدود ۳۰ مگابایت). لطفاً صبر کنید…';
 }

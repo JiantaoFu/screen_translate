@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Detecção de rolagem do Screen Translate</string>
+    <string name="accessibility_service_description">Permite que o Screen Translate detecte a rolagem em outros apps para uma tradução contínua. Este serviço identifica quando o conteúdo muda para atualizar as traduções com precisão.</string>
+    <string name="accessibility_permission_title">Serviço de acessibilidade necessário</string>
+    <string name="accessibility_permission_message">O Screen Translate precisa do serviço de acessibilidade para detectar a rolagem e traduzir conteúdo em diferentes apps.</string>
+    <string name="accessibility_permission_benefits">Vantagens:\n• Tradução contínua durante a rolagem\n• Funciona em vários apps\n• Traduções mais precisas</string>
+    <string name="accessibility_permission_how_to">Como ativar:\n1. Toque em “Ativar”\n2. Encontre “Detecção de rolagem do Screen Translate” nas configurações de acessibilidade\n3. Ative o serviço</string>
+    <string name="btn_enable_accessibility">Ativar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="tap_outside_to_close">Toque fora para fechar</string>
+    <string name="mode_auto_translate">Tradução automática</string>
+    <string name="mode_original_text">Texto original</string>
+    <string name="mode_manual_translate">Tradução manual</string>
+</resources>

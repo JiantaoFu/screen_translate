@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Zaznavanje drsenja Screen Translate</string>
+    <string name="accessibility_service_description">Aplikaciji Screen Translate omogoča zaznavanje drsenja v drugih aplikacijah za tekoč prevod. Storitev zazna, kdaj se vsebina spremeni, da se prevodi natančno posodobijo.</string>
+    <string name="accessibility_permission_title">Potrebna je storitev dostopnosti</string>
+    <string name="accessibility_permission_message">Screen Translate potrebuje storitev dostopnosti za zaznavanje drsenja in prevajanje vsebine v različnih aplikacijah.</string>
+    <string name="accessibility_permission_benefits">Prednosti:\n• Tekoč prevod med drsenjem\n• Deluje v več aplikacijah\n• Natančnejši prevodi</string>
+    <string name="accessibility_permission_how_to">Kako vklopiti:\n1. Dotaknite se »Vklopi«\n2. V nastavitvah dostopnosti poiščite »Zaznavanje drsenja Screen Translate«\n3. Vklopite storitev</string>
+    <string name="btn_enable_accessibility">Vklopi</string>
+    <string name="btn_cancel">Prekliči</string>
+    <string name="tap_outside_to_close">Za zapiranje se dotaknite zunaj okna</string>
+    <string name="mode_auto_translate">Samodejni prevod</string>
+    <string name="mode_original_text">Izvirno besedilo</string>
+    <string name="mode_manual_translate">Ročni prevod</string>
+</resources>

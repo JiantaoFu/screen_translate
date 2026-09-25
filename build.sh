@@ -67,7 +67,6 @@ fi
 echo "======================================"
 echo " Preparing Localizations..."
 echo "======================================"
-python3 scripts/convert_arb_to_json.py
 flutter gen-l10n
 
 if [ $BUILD_RELEASE -eq 1 ]; then

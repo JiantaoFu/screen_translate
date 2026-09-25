@@ -28,31 +28,7 @@ class AppLocalizationsFi extends AppLocalizations {
       'Lähde- ja kohdekieli eivät voi olla samat';
 
   @override
-  String get manage_translation_models => 'Hallitse käännösmalleja';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Malli kielelle $language ladattu onnistuneesti';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Virhe ladattaessa mallia kielelle $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Mallia ei ole ladattu';
-
-  @override
   String get download_model => 'Lataa';
-
-  @override
-  String get remove_translation_model => 'Poista käännösmalli';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Haluatko varmasti poistaa käännösmallin kielellä $language?';
-  }
 
   @override
   String get cancel => 'Peruuta';
@@ -61,45 +37,18 @@ class AppLocalizationsFi extends AppLocalizations {
   String get remove => 'Poista';
 
   @override
-  String get not_installed => 'Ei asennettu';
-
-  @override
   String get downloading => 'Ladataan...';
 
   @override
-  String get installed => 'Asennettu';
-
-  @override
-  String get download_failed => 'Lataus epäonnistui';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Poistaminen käännösmallista epäonnistui kielellä $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Lataaminen käännösmallista epäonnistui kielellä $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automaattinen käännösmalli asentaminen';
-
-  @override
-  String get manual_translate_mode => 'Käännösmalli asentaminen manuaalisesti';
-
-  @override
-  String get original_text_mode => 'Käännösmalli asentaminen';
-
-  @override
-  String get overlay_permission_required => 'Käännösmalli asentaminen';
+  String get overlay_permission_required =>
+      'Tarvitaan lupa näyttää muiden sovellusten päällä';
 
   @override
   String get overlay_permission_required_content =>
-      'This program requires permission to translate on the screen.';
+      'Sovellus tarvitsee luvan näyttää muiden sovellusten päällä, jotta se voi näyttää käännökset näytöllä.';
 
   @override
-  String get grant_permission => 'Give permission';
+  String get grant_permission => 'Myönnä lupa';
 
   @override
   String get language_afrikaans => 'afrikaans';
@@ -295,70 +244,27 @@ class AppLocalizationsFi extends AppLocalizations {
   String get cannot_open_store => 'Google Play Storea ei voitu avata';
 
   @override
-  String get api_key_required => 'API Key Required';
+  String get api_key_required => 'API-avain vaaditaan';
 
   @override
-  String get api_key_setup_prompt =>
-      'Please set up your ChatGLM API key to use AI translation.';
+  String get go_to_settings => 'Siirry asetuksiin';
 
   @override
-  String get go_to_settings => 'Go to Settings';
-
-  @override
-  String get api_key_dialog_title => 'AI Translation API Configuration';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI Translation';
-
-  @override
-  String get api_key_get_key_from =>
-      'To use ChatGLM for translations, you need to obtain an free API key from ';
-
-  @override
-  String get api_key_configuration_steps => 'API Key Configuration Steps';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Visit open.bigmodel.cn and create an account';
-
-  @override
-  String get api_key_step_2 => '2. Navigate to API Management section';
-
-  @override
-  String get api_key_step_3 => '3. Generate a new API key for your application';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API Key';
-
-  @override
-  String get api_key_input_hint => 'Enter your ChatGLM API key';
-
-  @override
-  String get api_key_input_error => 'Please enter a valid API key';
-
-  @override
-  String get api_key_save_button => 'Save API Key';
-
-  @override
-  String get api_key_note =>
-      'Your API key will be securely stored and used only for translation services.';
+  String get api_key_input_error => 'Anna kelvollinen API-avain';
 
   @override
   String get api_key_save_error =>
-      'Invalid API Key. Please check and try again.';
+      'Virheellinen API-avain. Tarkista se ja yritä uudelleen.';
 
   @override
-  String get api_key_save_success => 'API Key Saved Successfully';
-
-  @override
-  String get translation_mode_on_device => 'Käännös Laitteessa';
+  String get translation_mode_on_device => 'Käännös laitteessa';
 
   @override
   String get translation_mode_on_device_description =>
       'Käyttää laitteeseen sisäänrakennettuja käännösmalleja. Nopea ja toimii offline-tilassa, mutta voi olla rajoitettu kielen tuki ja tarkkuus.';
 
   @override
-  String get translation_mode_ai => 'AI-Käännös';
+  String get translation_mode_ai => 'Tekoälykäännös';
 
   @override
   String get translation_mode_ai_description =>
@@ -366,12 +272,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Käännöstila';
-
-  @override
-  String get translation_mode_on_device_label => 'Laitteessa';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Sulje';
@@ -546,4 +446,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Kiitos! Merkitsimme pyyntösi muistiin.';
+
+  @override
+  String get pack_waiting_for_network => 'Odotetaan verkkoa…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Ladataan kielimallia (~30 Mt). Odota hetki…';
 }

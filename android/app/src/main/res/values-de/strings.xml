@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate Scroll-Erkennung</string>
+    <string name="accessibility_service_description">Ermöglicht Screen Translate, das Scrollen in anderen Apps zu erkennen, für eine nahtlose Übersetzung. Der Dienst erkennt, wann sich Inhalte ändern, damit Übersetzungen genau aktualisiert werden.</string>
+    <string name="accessibility_permission_title">Bedienungshilfe erforderlich</string>
+    <string name="accessibility_permission_message">Screen Translate benötigt eine Bedienungshilfe, um Scrollen zu erkennen und Inhalte in verschiedenen Apps zu übersetzen.</string>
+    <string name="accessibility_permission_benefits">Vorteile:\n• Nahtlose Übersetzung beim Scrollen\n• Funktioniert in vielen Apps\n• Genauere Übersetzungen</string>
+    <string name="accessibility_permission_how_to">So aktivieren Sie sie:\n1. Tippen Sie auf „Aktivieren“\n2. Suchen Sie „Screen Translate Scroll-Erkennung“ in den Einstellungen für Bedienungshilfen\n3. Schalten Sie den Dienst ein</string>
+    <string name="btn_enable_accessibility">Aktivieren</string>
+    <string name="btn_cancel">Abbrechen</string>
+    <string name="tap_outside_to_close">Zum Schließen außerhalb tippen</string>
+    <string name="mode_auto_translate">Automatisch übersetzen</string>
+    <string name="mode_original_text">Originaltext</string>
+    <string name="mode_manual_translate">Manuell übersetzen</string>
+</resources>

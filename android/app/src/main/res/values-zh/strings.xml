@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">屏幕翻译滚动检测</string>
+    <string name="accessibility_service_description">让屏幕翻译检测其他应用中的滚动，实现无缝翻译。此服务用于识别内容何时变化，以便准确更新翻译。</string>
+    <string name="accessibility_permission_title">需要无障碍服务</string>
+    <string name="accessibility_permission_message">屏幕翻译需要无障碍服务来检测滚动，并翻译不同应用中的内容。</string>
+    <string name="accessibility_permission_benefits">好处：\n• 滚动时无缝翻译\n• 适用于多个应用\n• 提高翻译准确度</string>
+    <string name="accessibility_permission_how_to">开启方法：\n1. 点按「开启」\n2. 在无障碍设置中找到「屏幕翻译滚动检测」\n3. 开启该服务</string>
+    <string name="btn_enable_accessibility">开启</string>
+    <string name="btn_cancel">取消</string>
+    <string name="tap_outside_to_close">点按外部区域关闭</string>
+    <string name="mode_auto_translate">自动翻译</string>
+    <string name="mode_original_text">原文</string>
+    <string name="mode_manual_translate">手动翻译</string>
+</resources>

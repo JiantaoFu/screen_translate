@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate スクロール検出</string>
+    <string name="accessibility_service_description">他のアプリでのスクロールを検出し、途切れのない翻訳を可能にします。内容の変化を検出して、翻訳を正確に更新します。</string>
+    <string name="accessibility_permission_title">ユーザー補助サービスが必要です</string>
+    <string name="accessibility_permission_message">Screen Translate は、スクロールを検出してさまざまなアプリの内容を翻訳するためにユーザー補助サービスを使用します。</string>
+    <string name="accessibility_permission_benefits">メリット：\n• スクロール中もスムーズに翻訳\n• 複数のアプリで動作\n• 翻訳の精度が向上</string>
+    <string name="accessibility_permission_how_to">有効にする方法：\n1. 「有効にする」をタップ\n2. ユーザー補助の設定で「Screen Translate スクロール検出」を探す\n3. サービスをオンにする</string>
+    <string name="btn_enable_accessibility">有効にする</string>
+    <string name="btn_cancel">キャンセル</string>
+    <string name="tap_outside_to_close">外側をタップして閉じる</string>
+    <string name="mode_auto_translate">自動翻訳</string>
+    <string name="mode_original_text">原文</string>
+    <string name="mode_manual_translate">手動翻訳</string>
+</resources>

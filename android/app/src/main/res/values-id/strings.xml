@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Deteksi Gulir Screen Translate</string>
+    <string name="accessibility_service_description">Memungkinkan Screen Translate mendeteksi guliran di aplikasi lain untuk terjemahan yang mulus. Layanan ini mengenali saat konten berubah agar terjemahan diperbarui dengan akurat.</string>
+    <string name="accessibility_permission_title">Layanan Aksesibilitas Diperlukan</string>
+    <string name="accessibility_permission_message">Screen Translate memerlukan layanan aksesibilitas untuk mendeteksi guliran dan menerjemahkan konten di berbagai aplikasi.</string>
+    <string name="accessibility_permission_benefits">Manfaat:\n• Terjemahan mulus saat menggulir\n• Berfungsi di banyak aplikasi\n• Terjemahan lebih akurat</string>
+    <string name="accessibility_permission_how_to">Cara mengaktifkan:\n1. Ketuk “Aktifkan”\n2. Cari “Deteksi Gulir Screen Translate” di setelan Aksesibilitas\n3. Aktifkan layanan</string>
+    <string name="btn_enable_accessibility">Aktifkan</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="tap_outside_to_close">Ketuk di luar untuk menutup</string>
+    <string name="mode_auto_translate">Terjemahan otomatis</string>
+    <string name="mode_original_text">Teks asli</string>
+    <string name="mode_manual_translate">Terjemahan manual</string>
+</resources>

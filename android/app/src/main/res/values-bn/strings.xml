@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate স্ক্রোল শনাক্তকরণ</string>
+    <string name="accessibility_service_description">Screen Translate-কে অন্য অ্যাপে স্ক্রোল শনাক্ত করতে দেয়, যাতে অনুবাদ নিরবচ্ছিন্ন হয়। কন্টেন্ট কখন বদলায় তা বুঝে এই পরিষেবা অনুবাদ সঠিকভাবে আপডেট করে।</string>
+    <string name="accessibility_permission_title">অ্যাক্সেসিবিলিটি পরিষেবা প্রয়োজন</string>
+    <string name="accessibility_permission_message">স্ক্রোল শনাক্ত করতে এবং বিভিন্ন অ্যাপের কন্টেন্ট অনুবাদ করতে Screen Translate-এর অ্যাক্সেসিবিলিটি পরিষেবা প্রয়োজন।</string>
+    <string name="accessibility_permission_benefits">সুবিধা:\n• স্ক্রোল করার সময় নিরবচ্ছিন্ন অনুবাদ\n• একাধিক অ্যাপে কাজ করে\n• আরও নির্ভুল অনুবাদ</string>
+    <string name="accessibility_permission_how_to">কীভাবে চালু করবেন:\n1. “চালু করুন”-এ ট্যাপ করুন\n2. অ্যাক্সেসিবিলিটি সেটিংসে “Screen Translate স্ক্রোল শনাক্তকরণ” খুঁজুন\n3. পরিষেবাটি চালু করুন</string>
+    <string name="btn_enable_accessibility">চালু করুন</string>
+    <string name="btn_cancel">বাতিল</string>
+    <string name="tap_outside_to_close">বন্ধ করতে বাইরে ট্যাপ করুন</string>
+    <string name="mode_auto_translate">স্বয়ংক্রিয় অনুবাদ</string>
+    <string name="mode_original_text">মূল লেখা</string>
+    <string name="mode_manual_translate">ম্যানুয়াল অনুবাদ</string>
+</resources>

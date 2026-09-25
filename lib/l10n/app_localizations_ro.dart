@@ -28,78 +28,27 @@ class AppLocalizationsRo extends AppLocalizations {
       'Limba sursă și limba țintă nu pot fi identice';
 
   @override
-  String get manage_translation_models => 'Gestionează modelele de traducere';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Model pentru $language descărcat cu succes';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Eroare la descărcarea modelului pentru $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model nedescărcat';
-
-  @override
   String get download_model => 'Descarcă';
-
-  @override
-  String get remove_translation_model => 'Elimina modelul de traducere';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Sigur doriti eliminarea modelului de traducere pentru $language?';
-  }
 
   @override
   String get cancel => 'Anulează';
 
   @override
-  String get remove => 'Elimina';
+  String get remove => 'Elimină';
 
   @override
-  String get not_installed => 'Nedeinstalat';
+  String get downloading => 'Se descarcă...';
 
   @override
-  String get downloading => 'Descarcă...';
-
-  @override
-  String get installed => 'Dinamit';
-
-  @override
-  String get download_failed => 'Descarcărea a esuat';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Eliminarea modelului de traducere a esuat pentru $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Descarcarea modelului de traducere a esuat pentru $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Módul de traducere automat';
-
-  @override
-  String get manual_translate_mode => 'Módul de traducere manual';
-
-  @override
-  String get original_text_mode => 'Módul text original';
-
-  @override
-  String get overlay_permission_required => 'Módul de traducere';
+  String get overlay_permission_required =>
+      'Este necesară permisiunea de afișare peste alte aplicații';
 
   @override
   String get overlay_permission_required_content =>
-      'Acest program necesita permisiuni pentru a traduce pe ecran.';
+      'Aplicația are nevoie de permisiunea de a se afișa peste alte aplicații pentru a arăta traducerile pe ecran.';
 
   @override
-  String get grant_permission => 'Aceepte permisiuni';
+  String get grant_permission => 'Acordă permisiunea';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,61 +247,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get api_key_required => 'Cheie API necesară';
 
   @override
-  String get api_key_setup_prompt =>
-      'Configurați-vă cheia API ChatGLM pentru traducere AI.';
-
-  @override
   String get go_to_settings => 'Mergeți la Setări';
-
-  @override
-  String get api_key_dialog_title => 'Configurare API Traducere AI';
-
-  @override
-  String get api_key_configuration_title => 'Traducere ChatGLM cu AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'Pentru a utiliza traducerile ChatGLM, trebuie să obțineți o cheie API gratuită de la ';
-
-  @override
-  String get api_key_configuration_steps => 'Pași de Configurare a Cheii API';
-
-  @override
-  String get api_key_step_1 => '1. Vizitați open.bigmodel.cn și creați un cont';
-
-  @override
-  String get api_key_step_2 => '2. Navigați la secțiunea de Gestionare API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Generați o nouă cheie API pentru aplicația dvs.';
-
-  @override
-  String get api_key_input_label => 'Cheie API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Introduceți cheia API ChatGLM';
 
   @override
   String get api_key_input_error =>
       'Vă rugăm să introduceți o cheie API validă';
 
   @override
-  String get api_key_save_button => 'Salvați Cheia API';
-
-  @override
-  String get api_key_note =>
-      'Cheia dvs. API va fi stocată în siguranță și utilizată doar pentru servicii de traducere.';
-
-  @override
   String get api_key_save_error =>
       'Cheie API invalidă. Verificați și încercați din nou.';
 
   @override
-  String get api_key_save_success => 'Cheie API Salvată cu Succes';
-
-  @override
-  String get translation_mode_on_device => 'Traducere pe Dispozitiv';
+  String get translation_mode_on_device => 'Traducere pe dispozitiv';
 
   @override
   String get translation_mode_on_device_description =>
@@ -366,13 +272,7 @@ class AppLocalizationsRo extends AppLocalizations {
       'Utilizează modele de IA avansate pentru traduceri mai precise și contextuale. Necesită conexiune la internet și cheie API.';
 
   @override
-  String get translation_mode_title => 'Mod de Traducere';
-
-  @override
-  String get translation_mode_on_device_label => 'Pe Dispozitiv';
-
-  @override
-  String get translation_mode_ai_label => 'IA';
+  String get translation_mode_title => 'Mod de traducere';
 
   @override
   String get close => 'Închide';
@@ -547,4 +447,11 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Mulțumim! Am notat solicitarea ta.';
+
+  @override
+  String get pack_waiting_for_network => 'Se așteaptă rețeaua…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Se descarcă modelul de limbă (~30 MB). Te rugăm să aștepți…';
 }

@@ -28,78 +28,27 @@ class AppLocalizationsEl extends AppLocalizations {
       'Η γλώσσα προέλευσης και προορισμού δεν μπορούν να είναι ίδιες';
 
   @override
-  String get manage_translation_models => 'Διαχείριση μοντέλων μετάφρασης';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Το μοντέλο για τα $language λήφθηκε με επιτυχία';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Σφάλμα κατά τη λήψη του μοντέλου για τα $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Το μοντέλο δεν έχει ληφθεί';
-
-  @override
   String get download_model => 'Λήψη';
 
   @override
-  String get remove_translation_model => 'Αφαιρισμός μοντέλου μετάφρασης';
+  String get cancel => 'Ακύρωση';
 
   @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Θέλετε να αφαιρεθεί το μοντέλο για τα $language;';
-  }
-
-  @override
-  String get cancel => 'Ακυρωση';
-
-  @override
-  String get remove => 'Αφαιριση';
-
-  @override
-  String get not_installed => 'Δεν είναι εγκαταστάθηκε';
+  String get remove => 'Αφαίρεση';
 
   @override
   String get downloading => 'Λήψη...';
 
   @override
-  String get installed => 'Εγκαταστάθηκε';
-
-  @override
-  String get download_failed => 'Λήψη αποτυχίας';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Αποτυχία κατά την αφαιριση του μοντέλου για τα $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Αποτυχία κατά την λήψη του μοντέλου για τα $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Μοντέλο μετάφρασης';
-
-  @override
-  String get manual_translate_mode => 'Μοντέλο μετάφρασης';
-
-  @override
-  String get original_text_mode => 'Μοντέλο κεφαλης κειμενου';
-
-  @override
-  String get overlay_permission_required => 'Μοντέλο μετάφρασης';
+  String get overlay_permission_required =>
+      'Απαιτείται άδεια εμφάνισης πάνω από άλλες εφαρμογές';
 
   @override
   String get overlay_permission_required_content =>
-      'Αυτο το προγραμμα χρειαζεται την δικαιοσυνη την καταγραφη του κεφαλαιου κειμενου';
+      'Η εφαρμογή χρειάζεται άδεια εμφάνισης πάνω από άλλες εφαρμογές για να δείχνει τις μεταφράσεις στην οθόνη.';
 
   @override
-  String get grant_permission => 'Ταλαντα την δικαιοσυνη';
+  String get grant_permission => 'Παραχώρηση άδειας';
 
   @override
   String get language_afrikaans => 'αφρικάανς';
@@ -299,58 +248,14 @@ class AppLocalizationsEl extends AppLocalizations {
   String get api_key_required => 'Απαιτείται Κλειδί API';
 
   @override
-  String get api_key_setup_prompt =>
-      'Ρυθμίστε το κλειδί API του ChatGLM για μετάφραση με AI.';
-
-  @override
   String get go_to_settings => 'Μετάβαση στις Ρυθμίσεις';
-
-  @override
-  String get api_key_dialog_title => 'Διαμόρφωση API Μετάφρασης AI';
-
-  @override
-  String get api_key_configuration_title => 'Μετάφραση ChatGLM με AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'Για να χρησιμοποιήσετε μεταφράσεις ChatGLM, πρέπει να αποκτήσετε ένα δωρεάν κλειδί API από ';
-
-  @override
-  String get api_key_configuration_steps => 'Βήματα Διαμόρφωσης Κλειδιού API';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Επισκεφθείτε το open.bigmodel.cn και δημιουργήστε ένα λογαριασμό';
-
-  @override
-  String get api_key_step_2 => '2. Μεταβείτε στην ενότητα Διαχείρισης API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Δημιουργήστε ένα νέο κλειδί API για την εφαρμογή σας';
-
-  @override
-  String get api_key_input_label => 'Κλειδί API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Εισάγετε το κλειδί API του ChatGLM';
 
   @override
   String get api_key_input_error => 'Παρακαλώ εισάγετε ένα έγκυρο κλειδί API';
 
   @override
-  String get api_key_save_button => 'Αποθήκευση Κλειδιού API';
-
-  @override
-  String get api_key_note =>
-      'Το κλειδί API σας θα αποθηκευτεί με ασφάλεια και θα χρησιμοποιηθεί μόνο για υπηρεσίες μετάφρασης.';
-
-  @override
   String get api_key_save_error =>
       'Μη έγκυρο Κλειδί API. Ελέγξτε και προσπαθήστε ξανά.';
-
-  @override
-  String get api_key_save_success => 'Το Κλειδί API Αποθηκεύτηκε Επιτυχώς';
 
   @override
   String get translation_mode_on_device => 'Μετάφραση στη Συσκευή';
@@ -367,13 +272,7 @@ class AppLocalizationsEl extends AppLocalizations {
       'Χρησιμοποιεί προηγμένα μοντέλα τεχνητής νοημοσύνης για πιο ακριβείς και συναφείς μεταφράσεις. Απαιτεί σύνδεση στο διαδίκτυο και κλειδί API.';
 
   @override
-  String get translation_mode_title => 'Λειτουργία Μετάφρασης';
-
-  @override
-  String get translation_mode_on_device_label => 'Στη Συσκευή';
-
-  @override
-  String get translation_mode_ai_label => 'ΤΝ';
+  String get translation_mode_title => 'Λειτουργία μετάφρασης';
 
   @override
   String get close => 'Κλείσιμο';
@@ -550,4 +449,11 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Ευχαριστούμε! Καταγράψαμε το αίτημά σας.';
+
+  @override
+  String get pack_waiting_for_network => 'Αναμονή για δίκτυο…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Λήψη γλωσσικού μοντέλου (~30 MB). Περιμένετε…';
 }

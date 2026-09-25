@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">تشخیص پیمایش Screen Translate</string>
+    <string name="accessibility_service_description">به Screen Translate امکان می‌دهد پیمایش در برنامه‌های دیگر را تشخیص دهد تا ترجمه بی‌وقفه باشد. این سرویس تغییر محتوا را تشخیص می‌دهد تا ترجمه‌ها دقیق به‌روز شوند.</string>
+    <string name="accessibility_permission_title">سرویس دسترس‌پذیری لازم است</string>
+    <string name="accessibility_permission_message">Screen Translate برای تشخیص پیمایش و ترجمه محتوا در برنامه‌های مختلف به سرویس دسترس‌پذیری نیاز دارد.</string>
+    <string name="accessibility_permission_benefits">مزایا:\n• ترجمه بی‌وقفه هنگام پیمایش\n• در برنامه‌های مختلف کار می‌کند\n• ترجمه دقیق‌تر</string>
+    <string name="accessibility_permission_how_to">نحوه فعال‌سازی:\n1. روی «فعال‌سازی» ضربه بزنید\n2. «تشخیص پیمایش Screen Translate» را در تنظیمات دسترس‌پذیری پیدا کنید\n3. سرویس را روشن کنید</string>
+    <string name="btn_enable_accessibility">فعال‌سازی</string>
+    <string name="btn_cancel">لغو</string>
+    <string name="tap_outside_to_close">برای بستن، بیرون از پنجره ضربه بزنید</string>
+    <string name="mode_auto_translate">ترجمه خودکار</string>
+    <string name="mode_original_text">متن اصلی</string>
+    <string name="mode_manual_translate">ترجمه دستی</string>
+</resources>

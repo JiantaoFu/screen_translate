@@ -27,7 +27,6 @@ import android.os.Build
 import android.app.Activity
 import android.net.Uri
 import android.view.Surface
-import com.lomoware.screen_translate.LocalizationHelper
 import android.util.DisplayMetrics
 import android.graphics.drawable.GradientDrawable
 import android.widget.FrameLayout
@@ -218,14 +217,12 @@ class OverlayService : Service() {
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
 
-    enum class DisplayMode(val icon: Int, val labelKey: String) {
-        AUTO(R.drawable.ic_translate_mode, "auto_translate_mode"),
-        ORIGINAL(R.drawable.ic_original_mode, "original_text_mode"),
-        MANUAL(R.drawable.ic_manual_translate, "manual_translate_mode");
+    enum class DisplayMode(val icon: Int, val labelRes: Int) {
+        AUTO(R.drawable.ic_translate_mode, R.string.mode_auto_translate),
+        ORIGINAL(R.drawable.ic_original_mode, R.string.mode_original_text),
+        MANUAL(R.drawable.ic_manual_translate, R.string.mode_manual_translate);
 
-        fun getLocalizedLabel(context: Context): String {
-            return LocalizationHelper.getLocalizedString(context, labelKey)
-        }
+        fun getLocalizedLabel(context: Context): String = context.getString(labelRes)
     }
 
     private fun updateModeIcon() {
@@ -1029,7 +1026,7 @@ class OverlayService : Service() {
         card.addView(scrollView)
 
         val closeText = TextView(this).apply {
-            this.text = "Tap outside to close"
+            this.text = getString(R.string.tap_outside_to_close)
             textSize = 12f
             setTextColor(Color.GRAY)
             gravity = Gravity.CENTER

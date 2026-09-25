@@ -28,77 +28,27 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zdrojový a cílový jazyk nemohou být stejné';
 
   @override
-  String get manage_translation_models => 'Spravovat překladové modely';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Model pro jazyk $language byl úspěšně stažen';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Chyba při stahování modelu pro jazyk $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model není stažen';
-
-  @override
   String get download_model => 'Stáhnout';
 
   @override
-  String get remove_translation_model => 'Odebrat překladový model';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Opravdu chcete odstranit překladový model pro jazyk $language?';
-  }
-
-  @override
-  String get cancel => 'Zrusit';
+  String get cancel => 'Zrušit';
 
   @override
   String get remove => 'Odebrat';
 
   @override
-  String get not_installed => 'Neni nainstalovan';
+  String get downloading => 'Stahování...';
 
   @override
-  String get downloading => 'Stahovani...';
+  String get overlay_permission_required =>
+      'Je potřeba oprávnění k zobrazení přes jiné aplikace';
 
   @override
-  String get installed => 'Nainstalovan';
+  String get overlay_permission_required_content =>
+      'Aby aplikace mohla zobrazovat překlady na obrazovce, potřebuje oprávnění k zobrazení přes jiné aplikace.';
 
   @override
-  String get download_failed => 'Nelze stahnout';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Nelze odstranit model pro jazyk $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Nelze stahnout model pro jazyk $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Moodel pro automatické prevod';
-
-  @override
-  String get manual_translate_mode => 'Moodel pro rucní prevod';
-
-  @override
-  String get original_text_mode => 'Moodel pro stredni text';
-
-  @override
-  String get overlay_permission_required => 'Moodel pro prevod';
-
-  @override
-  String get overlay_permission_required_content => 'Moodel pro stredni text';
-
-  @override
-  String get grant_permission => 'Moodel pro strany';
+  String get grant_permission => 'Udělit oprávnění';
 
   @override
   String get language_afrikaans => 'afrikánština';
@@ -297,60 +247,17 @@ class AppLocalizationsCs extends AppLocalizations {
   String get api_key_required => 'Vyžadován klíč API';
 
   @override
-  String get api_key_setup_prompt =>
-      'Nastavte si klíč API ChatGLM pro překlad pomocí AI.';
-
-  @override
   String get go_to_settings => 'Přejít do Nastavení';
 
   @override
-  String get api_key_dialog_title => 'Konfigurace API překladu AI';
-
-  @override
-  String get api_key_configuration_title => 'Překlad ChatGLM s AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'Chcete-li používat překlady ChatGLM, musíte získat bezplatný klíč API z ';
-
-  @override
-  String get api_key_configuration_steps => 'Kroky konfigurace klíče API';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Navštivte open.bigmodel.cn a vytvořte si účet';
-
-  @override
-  String get api_key_step_2 => '2. Přejděte do sekce Správy API';
-
-  @override
-  String get api_key_step_3 => '3. Vygenerujte nový klíč API pro vaši aplikaci';
-
-  @override
-  String get api_key_input_label => 'Klíč API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Zadejte svůj klíč API ChatGLM';
-
-  @override
   String get api_key_input_error => 'Zadejte prosím platný klíč API';
-
-  @override
-  String get api_key_save_button => 'Uložit klíč API';
-
-  @override
-  String get api_key_note =>
-      'Váš klíč API bude bezpečně uložen a použit pouze pro překladové služby.';
 
   @override
   String get api_key_save_error =>
       'Neplatný klíč API. Zkontrolujte a zkuste to znovu.';
 
   @override
-  String get api_key_save_success => 'Klíč API byl úspěšně uložen';
-
-  @override
-  String get translation_mode_on_device => 'Překlad na Zařízení';
+  String get translation_mode_on_device => 'Překlad v zařízení';
 
   @override
   String get translation_mode_on_device_description =>
@@ -364,13 +271,7 @@ class AppLocalizationsCs extends AppLocalizations {
       'Používá pokročilé modely AI pro přesnější a kontextové překlady. Vyžaduje připojení k internetu a klíč API.';
 
   @override
-  String get translation_mode_title => 'Překladový Režim';
-
-  @override
-  String get translation_mode_on_device_label => 'Na Zařízení';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Režim překladu';
 
   @override
   String get close => 'Zavřít';
@@ -543,4 +444,11 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Děkujeme! Váš požadavek jsme zaznamenali.';
+
+  @override
+  String get pack_waiting_for_network => 'Čekání na síť…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Stahování jazykového modelu (~30 MB). Čekejte prosím…';
 }

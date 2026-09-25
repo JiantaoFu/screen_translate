@@ -28,78 +28,27 @@ class AppLocalizationsHr extends AppLocalizations {
       'Izvorni i ciljni jezik ne mogu biti isti';
 
   @override
-  String get manage_translation_models => 'Upravljanje modelima prijevoda';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Model za $language uspješno preuzet';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Greška pri preuzimanju modela za $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model nije preuzet';
-
-  @override
   String get download_model => 'Preuzmi';
-
-  @override
-  String get remove_translation_model => 'Obrisi model prijevoda';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Da li ste sigurni da zelite obrisati model prijevoda za $language?';
-  }
 
   @override
   String get cancel => 'Odustani';
 
   @override
-  String get remove => 'Obrisi';
+  String get remove => 'Ukloni';
 
   @override
-  String get not_installed => 'Nije instaliran';
+  String get downloading => 'Preuzimanje...';
 
   @override
-  String get downloading => 'Preuzimanje';
-
-  @override
-  String get installed => 'Instaliran';
-
-  @override
-  String get download_failed => 'Preuzimanje neuspješno';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Greška pri brisanju modela $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Greška pri preuzimanju modela $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatiski prijevod';
-
-  @override
-  String get manual_translate_mode => 'Rucni prijevod';
-
-  @override
-  String get original_text_mode => 'Originalni tekst';
-
-  @override
-  String get overlay_permission_required => 'Način prevodovanja';
+  String get overlay_permission_required =>
+      'Potrebno je dopuštenje za prikaz preko drugih aplikacija';
 
   @override
   String get overlay_permission_required_content =>
-      'Ovaj program zahteva dozvolu za prevod na ekranu.';
+      'Aplikaciji je potrebno dopuštenje za prikaz preko drugih aplikacija kako bi prikazivala prijevode na zaslonu.';
 
   @override
-  String get grant_permission => 'Dozvola';
+  String get grant_permission => 'Dodijeli dopuštenje';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,80 +247,31 @@ class AppLocalizationsHr extends AppLocalizations {
   String get api_key_required => 'Potreban je API ključ';
 
   @override
-  String get api_key_setup_prompt =>
-      'Postavite svoj ChatGLM API ključ za AI prijevod.';
-
-  @override
   String get go_to_settings => 'Idi na Postavke';
 
   @override
-  String get api_key_dialog_title => 'Konfiguracija API-ja za AI prijevod';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI prijevod';
-
-  @override
-  String get api_key_get_key_from =>
-      'Za korištenje ChatGLM prijevoda, morate dobiti besplatni API ključ s ';
-
-  @override
-  String get api_key_configuration_steps => 'Koraci konfiguracije API ključa';
-
-  @override
-  String get api_key_step_1 => '1. Posjetite open.bigmodel.cn i stvorite račun';
-
-  @override
-  String get api_key_step_2 => '2. Idite u odjeljak za upravljanje API-jem';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Generirajte novi API ključ za svoju aplikaciju';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API ključ';
-
-  @override
-  String get api_key_input_hint => 'Unesite svoj ChatGLM API ključ';
-
-  @override
   String get api_key_input_error => 'Molimo unesite valjani API ključ';
-
-  @override
-  String get api_key_save_button => 'Spremi API ključ';
-
-  @override
-  String get api_key_note =>
-      'Vaš API ključ bit će sigurno pohranjen i korišten samo za usluge prijevoda.';
 
   @override
   String get api_key_save_error =>
       'Nevažeći API ključ. Provjerite i pokušajte ponovno.';
 
   @override
-  String get api_key_save_success => 'API ključ je uspješno spremljen';
-
-  @override
-  String get translation_mode_on_device => 'Prijevod na Uređaju';
+  String get translation_mode_on_device => 'Prijevod na uređaju';
 
   @override
   String get translation_mode_on_device_description =>
       'Koristi ugrađene modele prijevoda na vašem uređaju. Brzo i radi izvan mreže, ali može imati ograničenu jezičnu podršku i preciznost.';
 
   @override
-  String get translation_mode_ai => 'AI Prijevod';
+  String get translation_mode_ai => 'AI prijevod';
 
   @override
   String get translation_mode_ai_description =>
       'Koristi napredne AI modele za preciznije i kontekstualne prijevode. Zahtijeva internetsku vezu i API ključ.';
 
   @override
-  String get translation_mode_title => 'Način Prijevoda';
-
-  @override
-  String get translation_mode_on_device_label => 'Na Uređaju';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Način prijevoda';
 
   @override
   String get close => 'Zatvori';
@@ -545,4 +445,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Hvala! Zabilježili smo vaš zahtjev.';
+
+  @override
+  String get pack_waiting_for_network => 'Čekanje mreže…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Preuzimanje jezičnog modela (~30 MB). Pričekajte…';
 }

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
+import '../l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import '../services/model_download_service.dart';
@@ -48,7 +49,6 @@ class _LanguagePack {
   /// pair's key, or a synthesized one for pivots (which have no model files
   /// of their own, just two hops).
   String get key => pair?.key ?? 'pivot:${pivot!.sourceBcp}-${pivot!.targetBcp}';
-  String get displayName => pair?.displayName ?? pivot!.displayName;
   String get sourceBcp => pair?.sourceBcp ?? pivot!.sourceBcp;
   String get targetBcp => pair?.targetBcp ?? pivot!.targetBcp;
   String get sourceFlag => _flagFor(sourceBcp);
@@ -123,14 +123,14 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   final Set<String> _interruptedByBackground = {};
 
   /// Quick-mode (on-device Google ML Kit) per-language download state.
-  /// ML Kit's downloadModel() reports no real progress at all, so
-  /// _quickProgress is a simulated ramp (see _downloadQuickLang) purely for
-  /// perceived feedback — it never claims 100% on its own, only once the
-  /// real download actually completes, so it can't lie about being done.
+  /// _quickProgress holds real progress from ModelDownloadService; it's
+  /// absent while no byte count is known yet (indeterminate spinner).
   final Map<String, bool> _quickDownloaded = {};
   final Set<String> _quickDownloading = {};
   final Set<String> _quickError = {};
   final Map<String, double> _quickProgress = {};
+  /// Quick downloads Android has paused to wait for the network.
+  final Set<String> _quickWaiting = {};
 
   final _apiKeyController = TextEditingController();
   bool _isSavingApiKey = false;
@@ -198,6 +198,13 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     for (final code in TranslationProvider.supportedLanguages.keys) {
       final downloaded = await svc.isModelDownloaded(code);
       if (mounted) setState(() => _quickDownloaded[code] = downloaded);
+      // Started elsewhere (e.g. the home screen's language picker): join
+      // it so this screen shows its progress instead of a Download button.
+      if (!downloaded &&
+          ModelDownloadService.isQuickDownloading(code) &&
+          !_quickDownloading.contains(code)) {
+        _downloadQuickLang(code);
+      }
     }
   }
 
@@ -232,7 +239,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packProgress.remove(lp.key);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(lp.displayName)), backgroundColor: Colors.green),
+          SnackBar(content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(AppLocalizations.of(context)!.languagePairName(lp.sourceBcp, lp.targetBcp))), backgroundColor: Colors.green),
         );
       }
     } catch (e, stack) {
@@ -256,7 +263,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
       context: context,
       builder: (_) => AlertDialog(
         title: Text(localizations.remove_language_pack_title),
-        content: Text(localizations.remove_ai_pack_confirm(lp.displayName)),
+        content: Text(localizations.remove_ai_pack_confirm(localizations.languagePairName(lp.sourceBcp, lp.targetBcp))),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
           TextButton(
@@ -284,42 +291,46 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     setState(() {
       _quickDownloading.add(code);
       _quickError.remove(code);
-      _quickProgress[code] = 0.0;
-    });
-    // ML Kit's downloadModel() exposes no progress callback at all, so a
-    // static "Downloading…" spinner can look identical whether it's 1
-    // second or 60 seconds in. Simulate a ramp toward 90% instead — capped
-    // well short of 100% so it never falsely claims completion — and jump
-    // to the real 100% only once downloadModelWithFallback() actually
-    // returns below.
-    final ticker = Timer.periodic(const Duration(milliseconds: 250), (_) {
-      final current = _quickProgress[code] ?? 0.0;
-      if (current >= 0.9) return;
-      if (mounted) setState(() => _quickProgress[code] = (current + 0.04).clamp(0.0, 0.9));
+      _quickProgress.remove(code);
     });
     try {
-      await ModelDownloadService().downloadModelWithFallback(code);
-      ticker.cancel();
+      await ModelDownloadService().downloadModelWithFallback(
+        code,
+        onProgress: (p) {
+          if (mounted) setState(() => _quickProgress[code] = p);
+        },
+        onWaitingForNetwork: (waiting) {
+          if (!mounted) return;
+          setState(() {
+            if (waiting) {
+              _quickWaiting.add(code);
+            } else {
+              _quickWaiting.remove(code);
+            }
+          });
+        },
+      );
       if (mounted) {
         setState(() {
           _quickDownloaded[code] = true;
           _quickDownloading.remove(code);
           _quickProgress.remove(code);
+          _quickWaiting.remove(code);
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(TranslationProvider.supportedLanguages[code] ?? code)),
+            content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(AppLocalizations.of(context)!.languageName(code))),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      ticker.cancel();
       if (mounted) {
         setState(() {
           _quickDownloading.remove(code);
           _quickError.add(code);
           _quickProgress.remove(code);
+          _quickWaiting.remove(code);
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.download_failed_connection), backgroundColor: Colors.red),
@@ -330,7 +341,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   Future<void> _deleteQuickLang(String code) async {
     final localizations = AppLocalizations.of(context)!;
-    final name = TranslationProvider.supportedLanguages[code] ?? code;
+    final name = localizations.languageName(code);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -619,7 +630,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(lp.displayName,
+                      Text(AppLocalizations.of(context)!.languagePairName(lp.sourceBcp, lp.targetBcp),
                           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
                       if (isDownloading)
                         Text(localizations.pack_downloading_progress(((progress ?? 0) * 100).toStringAsFixed(0)),
@@ -742,7 +753,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     final isDownloading = _quickDownloading.contains(code);
     final isError = _quickError.contains(code);
     final progress = _quickProgress[code];
-    final name = TranslationProvider.supportedLanguages[code] ?? code;
+    final name = localizations.languageName(code);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -762,7 +773,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 children: [
                   Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
                   if (isDownloading)
-                    Text(localizations.pack_downloading_progress(((progress ?? 0) * 100).toStringAsFixed(0)),
+                    Text(_quickWaiting.contains(code)
+                            ? localizations.pack_waiting_for_network
+                            : progress == null
+                                ? localizations.downloading
+                                : localizations.pack_downloading_progress((progress * 100).toStringAsFixed(0)),
                         style: const TextStyle(fontSize: 11, color: orange))
                   else if (isError)
                     Text(localizations.pack_failed_tap_retry, style: TextStyle(fontSize: 11, color: Colors.red[400])),

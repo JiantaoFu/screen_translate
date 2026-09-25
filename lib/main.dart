@@ -11,6 +11,7 @@ import 'services/firebase_remote_config_service.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
+import 'package:screen_translate/l10n/locale_resolution.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
@@ -92,12 +93,7 @@ class ScreenTranslateApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      localeResolutionCallback: (locale, supportedLocales) {
-        // Fallback to English if locale is not supported
-        print('Device Locale: $locale');
-        print('Supported Locales: $supportedLocales');
-        return locale;
-      },
+      localeResolutionCallback: resolveAppLocale,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

@@ -9,7 +9,7 @@ class AppLocalizationsLt extends AppLocalizations {
   AppLocalizationsLt([String locale = 'lt']) : super(locale);
 
   @override
-  String get app_title => 'Ekrano Vertimas';
+  String get app_title => 'Ekrano vertimas';
 
   @override
   String get source_language => 'Iš';
@@ -18,88 +18,37 @@ class AppLocalizationsLt extends AppLocalizations {
   String get target_language => 'Į';
 
   @override
-  String get stop_translation => 'Sustabdyti Vertimą';
+  String get stop_translation => 'Sustabdyti vertimą';
 
   @override
-  String get translate_screen => 'Versti Ekraną';
+  String get translate_screen => 'Versti ekraną';
 
   @override
   String get source_and_target_cannot_be_the_same =>
       'Šaltinio ir tikslo kalbos negali būti vienodos';
 
   @override
-  String get manage_translation_models => 'Tvarkyti Vertimo Modelius';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language modelis sėkmingai atsisiųstas';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Klaida atsisiunčiant $language modelį';
-  }
-
-  @override
-  String get model_not_downloaded => 'Modelis neatsisiųstas';
-
-  @override
   String get download_model => 'Atsisiųsti';
 
   @override
-  String get remove_translation_model => 'Otrinkti Vertimo Modelių';
+  String get cancel => 'Atšaukti';
 
   @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Ar tikrai norite pasalinti vertimo modelių $language?';
-  }
+  String get remove => 'Pašalinti';
 
   @override
-  String get cancel => 'Atsėsti';
+  String get downloading => 'Atsisiunčiama...';
 
   @override
-  String get remove => 'Otrinkti';
-
-  @override
-  String get not_installed => 'Neiškautinamas';
-
-  @override
-  String get downloading => 'Atsisiųstomas';
-
-  @override
-  String get installed => 'Iškautinamas';
-
-  @override
-  String get download_failed => 'Atsisiųsti negaliojo';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Klaida otrinant $language modelių';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Klaida atsisiunčiant $language modelį';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatiskas vertimas';
-
-  @override
-  String get manual_translate_mode => 'Vertimas reėžiu';
-
-  @override
-  String get original_text_mode => 'Originalus tekstas';
-
-  @override
-  String get overlay_permission_required => 'Vertimo Modelis';
+  String get overlay_permission_required =>
+      'Reikia leidimo rodyti virš kitų programų';
 
   @override
   String get overlay_permission_required_content =>
-      'Šis programas turi butini prieigimo prie ekrano vertimui.';
+      'Kad galėtų rodyti vertimus ekrane, programai reikia leidimo rodyti virš kitų programų.';
 
   @override
-  String get grant_permission => 'Griu prieiga';
+  String get grant_permission => 'Suteikti leidimą';
 
   @override
   String get language_afrikaans => 'Afrikanų';
@@ -298,61 +247,17 @@ class AppLocalizationsLt extends AppLocalizations {
   String get api_key_required => 'Reikalingas API raktas';
 
   @override
-  String get api_key_setup_prompt =>
-      'Nustatykite savo ChatGLM API raktą AI vertimui.';
-
-  @override
   String get go_to_settings => 'Eiti į Nustatymus';
 
   @override
-  String get api_key_dialog_title => 'AI Vertimo API Konfigūracija';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI Vertimas';
-
-  @override
-  String get api_key_get_key_from =>
-      'Norėdami naudoti ChatGLM vertimus, turite gauti nemokamą API raktą iš ';
-
-  @override
-  String get api_key_configuration_steps => 'API Rakto Konfigūravimo Žingsniai';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Apsilankykite open.bigmodel.cn ir sukurkite paskyrą';
-
-  @override
-  String get api_key_step_2 => '2. Eikite į API Valdymo skyrių';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Sugeneruokite naują API raktą savo programėlei';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API Raktas';
-
-  @override
-  String get api_key_input_hint => 'Įveskite savo ChatGLM API raktą';
-
-  @override
   String get api_key_input_error => 'Prašome įvesti galiojantį API raktą';
-
-  @override
-  String get api_key_save_button => 'Išsaugoti API Raktą';
-
-  @override
-  String get api_key_note =>
-      'Jūsų API raktas bus saugiai saugomas ir naudojamas tik vertimo paslaugoms.';
 
   @override
   String get api_key_save_error =>
       'Netinkamas API raktas. Patikrinkite ir bandykite dar kartą.';
 
   @override
-  String get api_key_save_success => 'API Raktas Sėkmingai Išsaugotas';
-
-  @override
-  String get translation_mode_on_device => 'Vertimas Įrenginyje';
+  String get translation_mode_on_device => 'Vertimas įrenginyje';
 
   @override
   String get translation_mode_on_device_description =>
@@ -366,13 +271,7 @@ class AppLocalizationsLt extends AppLocalizations {
       'Naudoja pažangius AI modelius tikslesnėms ir kontekstinėms vertimams. Reikalauja interneto ryšio ir API rakto.';
 
   @override
-  String get translation_mode_title => 'Vertimo Režimas';
-
-  @override
-  String get translation_mode_on_device_label => 'Įrenginyje';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Vertimo režimas';
 
   @override
   String get close => 'Uždaryti';
@@ -547,4 +446,11 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Ačiū! Užregistravome jūsų užklausą.';
+
+  @override
+  String get pack_waiting_for_network => 'Laukiama tinklo…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Atsisiunčiamas kalbos modelis (~30 MB). Palaukite…';
 }

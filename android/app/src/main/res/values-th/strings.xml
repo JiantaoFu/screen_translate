@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">การตรวจจับการเลื่อนของ Screen Translate</string>
+    <string name="accessibility_service_description">ช่วยให้ Screen Translate ตรวจจับการเลื่อนในแอปอื่นเพื่อแปลได้อย่างต่อเนื่อง บริการนี้ตรวจจับเมื่อเนื้อหาเปลี่ยนเพื่ออัปเดตคำแปลได้อย่างแม่นยำ</string>
+    <string name="accessibility_permission_title">ต้องใช้บริการการช่วยเหลือพิเศษ</string>
+    <string name="accessibility_permission_message">Screen Translate ต้องใช้บริการการช่วยเหลือพิเศษเพื่อตรวจจับการเลื่อนและแปลเนื้อหาในแอปต่างๆ</string>
+    <string name="accessibility_permission_benefits">ประโยชน์:\n• แปลต่อเนื่องขณะเลื่อน\n• ใช้ได้กับหลายแอป\n• คำแปลแม่นยำขึ้น</string>
+    <string name="accessibility_permission_how_to">วิธีเปิดใช้:\n1. แตะ “เปิดใช้”\n2. ค้นหา “การตรวจจับการเลื่อนของ Screen Translate” ในการตั้งค่าการช่วยเหลือพิเศษ\n3. เปิดบริการ</string>
+    <string name="btn_enable_accessibility">เปิดใช้</string>
+    <string name="btn_cancel">ยกเลิก</string>
+    <string name="tap_outside_to_close">แตะด้านนอกเพื่อปิด</string>
+    <string name="mode_auto_translate">แปลอัตโนมัติ</string>
+    <string name="mode_original_text">ข้อความต้นฉบับ</string>
+    <string name="mode_manual_translate">แปลด้วยตนเอง</string>
+</resources>

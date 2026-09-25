@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,6 +18,15 @@ enum OnnxModelStatus { notDownloaded, downloading, ready, error }
 // ─── Download progress callback ───────────────────────────────────────────────
 
 typedef DownloadProgressCallback = void Function(double progress);
+
+/// Called with true when a download is stalled waiting for the network,
+/// and with false when it moves again.
+typedef WaitingForNetworkCallback = void Function(bool waiting);
+
+/// One reading of a Quick-mode download: [progress] is null while no byte
+/// count is known; [waiting] is true while Android's DownloadManager has
+/// paused it to wait for the network.
+typedef QuickDownloadReading = ({double? progress, bool waiting});
 
 // ─── ModelDownloadService ─────────────────────────────────────────────────────
 
@@ -63,8 +73,141 @@ class ModelDownloadService {
 
   // ── Google ML Kit helpers ─────────────────────────────────────────────────
 
+  /// Quick-mode (ML Kit) downloads in flight, shared across screens for the
+  /// same reasons as [_activeOnnxDownloads]: the home screen's language
+  /// picker and Settings must agree on what's downloading, and both must
+  /// get the live progress feed whichever one started it.
+  static final Map<String, Future<void>> _activeQuickDownloads = {};
+
+  /// Latest real progress (0.0-1.0) per in-flight Quick download. Absent
+  /// until a real byte count is known — ML Kit spends the first moments
+  /// fetching model metadata before any bytes move, and the UI shows an
+  /// indeterminate spinner then rather than a made-up percentage.
+  static final Map<String, double> _quickProgress = {};
+  static final Map<String, List<DownloadProgressCallback>> _quickProgressListeners = {};
+  static final Map<String, bool> _quickWaiting = {};
+  static final Map<String, List<WaitingForNetworkCallback>> _quickWaitingListeners = {};
+
+  static const _nativeChannel = MethodChannel('com.lomoware.screen_translate/model_download');
+
+  /// Reads the state of the ML Kit download for a language. ML Kit's own
+  /// API reports nothing until the download finishes, but it downloads
+  /// through Android's DownloadManager, which the native side reads.
+  /// Returns null when no such download is running. Replaceable in tests.
+  @visibleForTesting
+  static Future<QuickDownloadReading?> Function(String langCode) quickProgressProbe = (langCode) async {
+    try {
+      final result = await _nativeChannel
+          .invokeMapMethod<String, Object?>('getMlKitDownloadProgress', {'lang': langCode});
+      if (result == null) return null;
+      final downloaded = result['downloaded'] as int? ?? 0;
+      final total = result['total'] as int? ?? -1;
+      return (
+        progress: total > 0 ? downloaded / total : null,
+        waiting: result['waiting'] as bool? ?? false,
+      );
+    } catch (_) {
+      return null;
+    }
+  };
+
+  @visibleForTesting
+  static Duration quickProgressPollInterval = const Duration(milliseconds: 400);
+
+  static void _emitQuickProgress(String langCode, double progress) {
+    _quickProgress[langCode] = progress;
+    for (final cb in List<DownloadProgressCallback>.of(_quickProgressListeners[langCode] ?? const [])) {
+      cb(progress);
+    }
+  }
+
+  static void _emitQuickWaiting(String langCode, bool waiting) {
+    if ((_quickWaiting[langCode] ?? false) == waiting) return;
+    _quickWaiting[langCode] = waiting;
+    for (final cb in List<WaitingForNetworkCallback>.of(_quickWaitingListeners[langCode] ?? const [])) {
+      cb(waiting);
+    }
+  }
+
+  /// Whether a Quick-mode model download for [langCode] is in flight,
+  /// started from any screen.
+  static bool isQuickDownloading(String langCode) =>
+      _activeQuickDownloads.containsKey(langCode);
+
   /// Downloads a Google ML Kit model with a custom-server fallback.
-  Future<void> downloadModelWithFallback(String langCode) async {
+  ///
+  /// If a download for [langCode] is already in flight, joins it. Every
+  /// caller's [onProgress] gets the live progress (0.0-1.0), whether it
+  /// started the download or joined it, and [onWaitingForNetwork] hears
+  /// when it stalls waiting for the network and when it resumes.
+  Future<void> downloadModelWithFallback(
+    String langCode, {
+    DownloadProgressCallback? onProgress,
+    WaitingForNetworkCallback? onWaitingForNetwork,
+  }) {
+    if (onProgress != null) {
+      _quickProgressListeners.putIfAbsent(langCode, () => []).add(onProgress);
+      final current = _quickProgress[langCode];
+      if (current != null) onProgress(current);
+    }
+    if (onWaitingForNetwork != null) {
+      _quickWaitingListeners.putIfAbsent(langCode, () => []).add(onWaitingForNetwork);
+      if (_quickWaiting[langCode] ?? false) onWaitingForNetwork(true);
+    }
+
+    final existing = _activeQuickDownloads[langCode];
+    if (existing != null) return existing;
+
+    // Poll the real byte count while the download runs. Capped at 99%:
+    // ML Kit still unpacks and verifies the model after the bytes arrive,
+    // so 100% is only reported once the download call actually returns.
+    var lastProgress = 0.0;
+    final poller = Timer.periodic(quickProgressPollInterval, (_) async {
+      final reading = await quickProgressProbe(langCode);
+      if (reading == null || !_activeQuickDownloads.containsKey(langCode)) return;
+      _emitQuickWaiting(langCode, reading.waiting);
+      final p = reading.progress;
+      if (p == null) return;
+      final capped = p.clamp(0.0, 0.99);
+      // DownloadManager can briefly report a smaller total before the
+      // real one arrives; never let the bar run backwards.
+      if (capped < lastProgress) return;
+      lastProgress = capped;
+      _emitQuickProgress(langCode, capped);
+    });
+
+    // If Google's download fails partway, the custom-server fallback starts
+    // from zero. Map it onto what's left of the bar instead of jumping back.
+    double? fallbackBase;
+    final future = _downloadModelWithFallbackImpl(
+      langCode,
+      onFallbackProgress: (p) {
+        final base = fallbackBase ??= lastProgress;
+        lastProgress = (base + p.clamp(0.0, 1.0) * (0.99 - base)).clamp(0.0, 0.99);
+        _emitQuickProgress(langCode, lastProgress);
+      },
+    ).then((_) {
+      poller.cancel();
+      _emitQuickProgress(langCode, 1.0);
+    }).whenComplete(() {
+      poller.cancel();
+      _activeQuickDownloads.remove(langCode);
+      _quickProgress.remove(langCode);
+      _quickProgressListeners.remove(langCode);
+      _quickWaiting.remove(langCode);
+      _quickWaitingListeners.remove(langCode);
+    });
+    _activeQuickDownloads[langCode] = future;
+    // Same as downloadOnnxModel: keep an unawaited failure from being
+    // reported as unhandled, while callers still get the error.
+    future.catchError((_) {});
+    return future;
+  }
+
+  Future<void> _downloadModelWithFallbackImpl(
+    String langCode, {
+    required DownloadProgressCallback onFallbackProgress,
+  }) async {
     try {
       debugPrint('Attempting to download ML Kit model for "$langCode" from Google...');
       await _googleModelManager.downloadModel(langCode, isWifiRequired: false);
@@ -73,7 +216,7 @@ class ModelDownloadService {
       debugPrint('Failed to download from Google. Reason: $e');
       debugPrint('Initiating fallback to custom server...');
       try {
-        await _customModelManager.downloadAndInstallModel(langCode);
+        await _customModelManager.downloadAndInstallModel(langCode, onProgress: onFallbackProgress);
         debugPrint('ML Kit model for "$langCode" downloaded successfully from custom server.');
       } catch (fallbackError) {
         debugPrint('Fallback download also failed. Reason: $fallbackError');

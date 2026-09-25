@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate स्क्रॉल पहचान</string>
+    <string name="accessibility_service_description">Screen Translate को दूसरे ऐप्स में स्क्रॉल पहचानने देता है, ताकि अनुवाद बिना रुकावट हो। यह सेवा पहचानती है कि सामग्री कब बदली, ताकि अनुवाद सही तरह से अपडेट हो सके।</string>
+    <string name="accessibility_permission_title">सुलभता सेवा ज़रूरी है</string>
+    <string name="accessibility_permission_message">स्क्रॉल पहचानने और अलग-अलग ऐप्स की सामग्री का अनुवाद करने के लिए Screen Translate को सुलभता सेवा की ज़रूरत है।</string>
+    <string name="accessibility_permission_benefits">फ़ायदे:\n• स्क्रॉल करते समय बिना रुकावट अनुवाद\n• कई ऐप्स में काम करता है\n• अनुवाद ज़्यादा सटीक</string>
+    <string name="accessibility_permission_how_to">चालू करने का तरीका:\n1. “चालू करें” पर टैप करें\n2. सुलभता सेटिंग में “Screen Translate स्क्रॉल पहचान” ढूंढें\n3. सेवा चालू करें</string>
+    <string name="btn_enable_accessibility">चालू करें</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="tap_outside_to_close">बंद करने के लिए बाहर टैप करें</string>
+    <string name="mode_auto_translate">अपने-आप अनुवाद</string>
+    <string name="mode_original_text">मूल टेक्स्ट</string>
+    <string name="mode_manual_translate">मैन्युअल अनुवाद</string>
+</resources>

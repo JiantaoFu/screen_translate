@@ -28,78 +28,27 @@ class AppLocalizationsPl extends AppLocalizations {
       'Język źródłowy i docelowy nie mogą być takie same';
 
   @override
-  String get manage_translation_models => 'Zarządzaj modelami tłumaczenia';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Pomyślnie pobrano model dla języka $language';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Błąd podczas pobierania modelu dla języka $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model nie został pobrany';
-
-  @override
   String get download_model => 'Pobierz';
-
-  @override
-  String get remove_translation_model => 'Odejmij model tłumaczenia';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Czy na pewno chcesz usunąć model tłumaczenia dla języka $language?';
-  }
 
   @override
   String get cancel => 'Anuluj';
 
   @override
-  String get remove => 'Odejmij';
-
-  @override
-  String get not_installed => 'Nie zainstalowano';
+  String get remove => 'Usuń';
 
   @override
   String get downloading => 'Pobieranie...';
 
   @override
-  String get installed => 'Zainstalowano';
-
-  @override
-  String get download_failed => 'Pobieranie nie powiodło się';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Usuwanie modelu nie powiodło się dla języka $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Pobieranie modelu nie powiodło się dla języka $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatyczne tłumaczenie';
-
-  @override
-  String get manual_translate_mode => 'Tłumaczenie rejestrowane';
-
-  @override
-  String get original_text_mode => 'Tryb tekstu oryginalnego';
-
-  @override
-  String get overlay_permission_required => 'Tryb tłumaczenia';
+  String get overlay_permission_required =>
+      'Wymagane uprawnienie do wyświetlania nad innymi aplikacjami';
 
   @override
   String get overlay_permission_required_content =>
-      'Program wymaga uprawnienia do tłumaczenia na ekranie.';
+      'Aby wyświetlać tłumaczenia na ekranie, aplikacja potrzebuje uprawnienia do wyświetlania nad innymi aplikacjami.';
 
   @override
-  String get grant_permission => 'Pozwolenie';
+  String get grant_permission => 'Przyznaj uprawnienie';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,60 +247,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String get api_key_required => 'Wymagany klucz API';
 
   @override
-  String get api_key_setup_prompt =>
-      'Proszę skonfigurować klucz API ChatGLM do korzystania z tłumaczenia AI.';
-
-  @override
   String get go_to_settings => 'Przejdź do Ustawień';
 
   @override
-  String get api_key_dialog_title => 'Konfiguracja API Tłumaczenia AI';
-
-  @override
-  String get api_key_configuration_title => 'Tłumaczenie ChatGLM z AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'Aby korzystać z tłumaczeń ChatGLM, musisz uzyskać darmowy klucz API z ';
-
-  @override
-  String get api_key_configuration_steps => 'Kroki konfiguracji klucza API';
-
-  @override
-  String get api_key_step_1 => '1. Odwiedź open.bigmodel.cn i utwórz konto';
-
-  @override
-  String get api_key_step_2 => '2. Przejdź do sekcji Zarządzania API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Wygeneruj nowy klucz API dla swojej aplikacji';
-
-  @override
-  String get api_key_input_label => 'Klucz API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Wprowadź swój klucz API ChatGLM';
-
-  @override
   String get api_key_input_error => 'Proszę wprowadzić prawidłowy klucz API';
-
-  @override
-  String get api_key_save_button => 'Zapisz klucz API';
-
-  @override
-  String get api_key_note =>
-      'Twój klucz API zostanie bezpiecznie przechowany i użyty tylko dla usług tłumaczeniowych.';
 
   @override
   String get api_key_save_error =>
       'Nieprawidłowy klucz API. Sprawdź i spróbuj ponownie.';
 
   @override
-  String get api_key_save_success => 'Klucz API został pomyślnie zapisany';
-
-  @override
-  String get translation_mode_on_device => 'Tłumaczenie na Urządzeniu';
+  String get translation_mode_on_device => 'Tłumaczenie na urządzeniu';
 
   @override
   String get translation_mode_on_device_description =>
@@ -365,13 +271,7 @@ class AppLocalizationsPl extends AppLocalizations {
       'Używa zaawansowanych modeli AI do bardziej precyzyjnych i kontekstowych tłumaczeń. Wymaga połączenia internetowego i klucza API.';
 
   @override
-  String get translation_mode_title => 'Tryb Tłumaczenia';
-
-  @override
-  String get translation_mode_on_device_label => 'Na Urządzeniu';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Tryb tłumaczenia';
 
   @override
   String get close => 'Zamknij';
@@ -546,4 +446,11 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Dziękujemy! Zarejestrowaliśmy Twoją prośbę.';
+
+  @override
+  String get pack_waiting_for_network => 'Oczekiwanie na sieć…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Pobieranie modelu językowego (~30 MB). Proszę czekać…';
 }

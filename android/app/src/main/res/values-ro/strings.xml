@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Detectarea derulării Screen Translate</string>
+    <string name="accessibility_service_description">Permite aplicației Screen Translate să detecteze derularea în alte aplicații pentru o traducere fără întreruperi. Serviciul recunoaște când se schimbă conținutul, pentru ca traducerile să fie actualizate corect.</string>
+    <string name="accessibility_permission_title">Este necesar serviciul de accesibilitate</string>
+    <string name="accessibility_permission_message">Screen Translate are nevoie de serviciul de accesibilitate pentru a detecta derularea și a traduce conținutul din diferite aplicații.</string>
+    <string name="accessibility_permission_benefits">Avantaje:\n• Traducere fără întreruperi la derulare\n• Funcționează în mai multe aplicații\n• Traduceri mai exacte</string>
+    <string name="accessibility_permission_how_to">Cum îl activezi:\n1. Atinge „Activează”\n2. Găsește „Detectarea derulării Screen Translate” în setările de accesibilitate\n3. Activează serviciul</string>
+    <string name="btn_enable_accessibility">Activează</string>
+    <string name="btn_cancel">Anulează</string>
+    <string name="tap_outside_to_close">Atinge în afară pentru a închide</string>
+    <string name="mode_auto_translate">Traducere automată</string>
+    <string name="mode_original_text">Text original</string>
+    <string name="mode_manual_translate">Traducere manuală</string>
+</resources>

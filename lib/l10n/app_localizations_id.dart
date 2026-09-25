@@ -28,31 +28,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Bahasa sumber dan target tidak boleh sama';
 
   @override
-  String get manage_translation_models => 'Kelola model terjemahan';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Model untuk $language berhasil diunduh';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Terjadi kesalahan saat mengunduh model untuk $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model belum diunduh';
-
-  @override
   String get download_model => 'Unduh';
-
-  @override
-  String get remove_translation_model => 'Hapus model terjemahan';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Apakah Anda yakin ingin menghapus model terjemahan untuk $language?';
-  }
 
   @override
   String get cancel => 'Batal';
@@ -61,42 +37,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get remove => 'Hapus';
 
   @override
-  String get not_installed => 'Tidak terinstall';
+  String get downloading => 'Mengunduh...';
 
   @override
-  String get downloading => 'Mengunduh';
-
-  @override
-  String get installed => 'Terinstall';
-
-  @override
-  String get download_failed => 'Gagal mengunduh';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Gagal menghapus model terjemahan untuk $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Gagal mengunduh model terjemahan untuk $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatisasi Terjemahan';
-
-  @override
-  String get manual_translate_mode => 'Terjemahan Manual';
-
-  @override
-  String get original_text_mode => 'Mode Text Asli';
-
-  @override
-  String get overlay_permission_required => 'Mode Terjemahan';
+  String get overlay_permission_required =>
+      'Izin tampil di atas aplikasi lain diperlukan';
 
   @override
   String get overlay_permission_required_content =>
-      'Program ini meminta izin untuk terjemahan di layar.';
+      'Aplikasi ini memerlukan izin tampil di atas aplikasi lain untuk menampilkan terjemahan di layar.';
 
   @override
   String get grant_permission => 'Berikan izin';
@@ -298,56 +247,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get api_key_required => 'Kunci API Diperlukan';
 
   @override
-  String get api_key_setup_prompt =>
-      'Atur kunci API ChatGLM Anda untuk terjemahan AI.';
-
-  @override
   String get go_to_settings => 'Pergi ke Pengaturan';
-
-  @override
-  String get api_key_dialog_title => 'Konfigurasi API Terjemahan AI';
-
-  @override
-  String get api_key_configuration_title => 'Terjemahan ChatGLM dengan AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'Untuk menggunakan terjemahan ChatGLM, Anda perlu mendapatkan kunci API gratis dari ';
-
-  @override
-  String get api_key_configuration_steps => 'Langkah Konfigurasi Kunci API';
-
-  @override
-  String get api_key_step_1 => '1. Kunjungi open.bigmodel.cn dan buat akun';
-
-  @override
-  String get api_key_step_2 => '2. Navigasi ke bagian Manajemen API';
-
-  @override
-  String get api_key_step_3 => '3. Hasilkan kunci API baru untuk aplikasi Anda';
-
-  @override
-  String get api_key_input_label => 'Kunci API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Masukkan kunci API ChatGLM Anda';
 
   @override
   String get api_key_input_error => 'Silakan masukkan kunci API yang valid';
 
   @override
-  String get api_key_save_button => 'Simpan Kunci API';
-
-  @override
-  String get api_key_note =>
-      'Kunci API Anda akan disimpan dengan aman dan hanya digunakan untuk layanan terjemahan.';
-
-  @override
   String get api_key_save_error =>
       'Kunci API tidak valid. Periksa dan coba lagi.';
-
-  @override
-  String get api_key_save_success => 'Kunci API Berhasil Disimpan';
 
   @override
   String get translation_mode_on_device => 'Terjemahan di Perangkat';
@@ -365,12 +272,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Mode Terjemahan';
-
-  @override
-  String get translation_mode_on_device_label => 'Di Perangkat';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Tutup';
@@ -544,4 +445,11 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Terima kasih! Permintaan Anda telah kami catat.';
+
+  @override
+  String get pack_waiting_for_network => 'Menunggu jaringan…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Mengunduh model bahasa (~30 MB). Harap tunggu…';
 }

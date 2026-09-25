@@ -28,31 +28,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изходният и целевият език не могат да бъдат еднакви';
 
   @override
-  String get manage_translation_models => 'Управление на моделите за превод';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Моделът за $language е изтеглен успешно';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Грешка при изтегляне на модела за $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Моделът не е изтеглен';
-
-  @override
   String get download_model => 'Изтегли';
-
-  @override
-  String get remove_translation_model => 'Премахване на модел за превод';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Да съществува модел за $language?';
-  }
 
   @override
   String get cancel => 'Отказ';
@@ -61,46 +37,18 @@ class AppLocalizationsBg extends AppLocalizations {
   String get remove => 'Премахване';
 
   @override
-  String get not_installed => 'Не е изтеглен';
-
-  @override
   String get downloading => 'Изтегляне...';
 
   @override
-  String get installed => 'Изтеглен';
-
-  @override
-  String get download_failed => 'Неуспешно изтегляне';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Неуспешно премахване на модел за $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Неуспешно изтегляне на модел за $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Модел за автоматично превод';
-
-  @override
-  String get manual_translate_mode => 'Модел за ръчно превод';
-
-  @override
-  String get original_text_mode => 'Модел за оригинални текст';
-
-  @override
   String get overlay_permission_required =>
-      'Може да се рисуваме над други приложения';
+      'Нужно е разрешение за показване върху други приложения';
 
   @override
   String get overlay_permission_required_content =>
-      'Това приложение изисква разрешение за рисуване над други приложения.';
+      'Приложението се нуждае от разрешение да се показва върху други приложения, за да изобразява преводите на екрана.';
 
   @override
-  String get grant_permission => 'Разрешение';
+  String get grant_permission => 'Даване на разрешение';
 
   @override
   String get language_afrikaans => 'африкаанс';
@@ -299,61 +247,17 @@ class AppLocalizationsBg extends AppLocalizations {
   String get api_key_required => 'Изисква се API ключ';
 
   @override
-  String get api_key_setup_prompt =>
-      'Конфигурирайте вашия ChatGLM API ключ за AI превод.';
-
-  @override
   String get go_to_settings => 'Отиване в Настройки';
 
   @override
-  String get api_key_dialog_title => 'Конфигуриране на API за AI превод';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI превод';
-
-  @override
-  String get api_key_get_key_from =>
-      'За да използвате ChatGLM преводи, трябва да получите безплатен API ключ от ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'Стъпки за конфигуриране на API ключ';
-
-  @override
-  String get api_key_step_1 => '1. Посетете open.bigmodel.cn и създайте акаунт';
-
-  @override
-  String get api_key_step_2 => '2. Отидете в секцията за управление на API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Генерирайте нов API ключ за вашето приложение';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API ключ';
-
-  @override
-  String get api_key_input_hint => 'Въведете вашия ChatGLM API ключ';
-
-  @override
   String get api_key_input_error => 'Моля, въведете валиден API ключ';
-
-  @override
-  String get api_key_save_button => 'Запазване на API ключ';
-
-  @override
-  String get api_key_note =>
-      'Вашият API ключ ще бъде съхранен сигурно и използван само за услуги за превод.';
 
   @override
   String get api_key_save_error =>
       'Невалиден API ключ. Проверете и опитайте отново.';
 
   @override
-  String get api_key_save_success => 'API ключът е запазен успешно';
-
-  @override
-  String get translation_mode_on_device => 'Превод на Устройство';
+  String get translation_mode_on_device => 'Превод на устройството';
 
   @override
   String get translation_mode_on_device_description =>
@@ -367,13 +271,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Използва напреднали модели на ИИ за по-точни и контекстуални преводи. Изисква интернет връзка и API ключ.';
 
   @override
-  String get translation_mode_title => 'Режим на Превод';
-
-  @override
-  String get translation_mode_on_device_label => 'На Устройство';
-
-  @override
-  String get translation_mode_ai_label => 'ИИ';
+  String get translation_mode_title => 'Режим на превод';
 
   @override
   String get close => 'Затвори';
@@ -548,4 +446,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Благодарим! Регистрирахме заявката ви.';
+
+  @override
+  String get pack_waiting_for_network => 'Изчакване на мрежа…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Изтегляне на езиков модел (~30 MB). Моля, изчакайте…';
 }

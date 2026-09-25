@@ -28,31 +28,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Исходный и целевой языки не могут быть одинаковыми';
 
   @override
-  String get manage_translation_models => 'Управление моделями перевода';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Модель $language успешно загружена';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Ошибка при загрузке модели $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Модель не загружена';
-
-  @override
   String get download_model => 'Загрузить';
-
-  @override
-  String get remove_translation_model => 'Удалить модель перевода';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Вы уверены, что хотите удалить модель перевода для $language?';
-  }
 
   @override
   String get cancel => 'Отмена';
@@ -61,45 +37,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get remove => 'Удалить';
 
   @override
-  String get not_installed => 'Не установлено';
-
-  @override
   String get downloading => 'Загрузка...';
 
   @override
-  String get installed => 'Установлено';
-
-  @override
-  String get download_failed => 'Загрузка не удалась';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Не удалось удалить модель для $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Не удалось загрузить модель для $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Автоматический перевод';
-
-  @override
-  String get manual_translate_mode => 'Ручной перевод';
-
-  @override
-  String get original_text_mode => 'Модель оригинального текста';
-
-  @override
-  String get overlay_permission_required => 'Модель перевода';
+  String get overlay_permission_required =>
+      'Нужно разрешение на показ поверх других приложений';
 
   @override
   String get overlay_permission_required_content =>
-      'Этот приложение требует разрешения на перевод на экране.';
+      'Чтобы показывать перевод на экране, приложению нужно разрешение на показ поверх других приложений.';
 
   @override
-  String get grant_permission => 'Позволить разрешения';
+  String get grant_permission => 'Предоставить разрешение';
 
   @override
   String get language_afrikaans => 'Африкаанс';
@@ -298,62 +247,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get api_key_required => 'Требуется API-ключ';
 
   @override
-  String get api_key_setup_prompt =>
-      'Пожалуйста, настройте ваш API-ключ ChatGLM для использования ИИ-перевода.';
-
-  @override
   String get go_to_settings => 'Перейти к настройкам';
-
-  @override
-  String get api_key_dialog_title => 'Настройка API для ИИ-перевода';
-
-  @override
-  String get api_key_configuration_title => 'ИИ-перевод ChatGLM';
-
-  @override
-  String get api_key_get_key_from =>
-      'Чтобы использовать переводы ChatGLM, вам нужно получить бесплатный API-ключ от ';
-
-  @override
-  String get api_key_configuration_steps => 'Шаги настройки API-ключа';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Посетите open.bigmodel.cn и создайте учетную запись';
-
-  @override
-  String get api_key_step_2 => '2. Перейдите в раздел управления API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Создайте новый API-ключ для вашего приложения';
-
-  @override
-  String get api_key_input_label => 'API-ключ ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Введите ваш API-ключ ChatGLM';
 
   @override
   String get api_key_input_error =>
       'Пожалуйста, введите действительный API-ключ';
 
   @override
-  String get api_key_save_button => 'Сохранить API-ключ';
-
-  @override
-  String get api_key_note =>
-      'Ваш API-ключ будет надежно сохранен и использован только для служб перевода.';
-
-  @override
   String get api_key_save_error =>
       'Неверный API-ключ. Проверьте и попробуйте снова.';
 
   @override
-  String get api_key_save_success => 'API-ключ успешно сохранен';
-
-  @override
-  String get translation_mode_on_device => 'Перевод на Устройстве';
+  String get translation_mode_on_device => 'Перевод на устройстве';
 
   @override
   String get translation_mode_on_device_description =>
@@ -367,13 +272,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Использует передовые модели ИИ для более точных и контекстных переводов. Требует подключения к интернету и ключа API.';
 
   @override
-  String get translation_mode_title => 'Режим Перевода';
-
-  @override
-  String get translation_mode_on_device_label => 'Устройство';
-
-  @override
-  String get translation_mode_ai_label => 'ИИ';
+  String get translation_mode_title => 'Режим перевода';
 
   @override
   String get close => 'Закрыть';
@@ -548,4 +447,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Спасибо! Мы зафиксировали ваш запрос.';
+
+  @override
+  String get pack_waiting_for_network => 'Ожидание сети…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Загрузка языковой модели (~30 МБ). Подождите…';
 }

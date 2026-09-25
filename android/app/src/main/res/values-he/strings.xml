@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">זיהוי גלילה של Screen Translate</string>
+    <string name="accessibility_service_description">מאפשר ל-Screen Translate לזהות גלילה באפליקציות אחרות לתרגום רציף. השירות מזהה מתי התוכן משתנה כדי לעדכן את התרגום בדיוק.</string>
+    <string name="accessibility_permission_title">נדרש שירות נגישות</string>
+    <string name="accessibility_permission_message">Screen Translate צריך את שירות הנגישות כדי לזהות גלילה ולתרגם תוכן באפליקציות שונות.</string>
+    <string name="accessibility_permission_benefits">יתרונות:\n• תרגום רציף בזמן גלילה\n• עובד באפליקציות רבות\n• תרגום מדויק יותר</string>
+    <string name="accessibility_permission_how_to">איך מפעילים:\n1. הקישו על \"הפעלה\"\n2. מצאו את \"זיהוי גלילה של Screen Translate\" בהגדרות הנגישות\n3. הפעילו את השירות</string>
+    <string name="btn_enable_accessibility">הפעלה</string>
+    <string name="btn_cancel">ביטול</string>
+    <string name="tap_outside_to_close">הקישו מחוץ לחלון כדי לסגור</string>
+    <string name="mode_auto_translate">תרגום אוטומטי</string>
+    <string name="mode_original_text">טקסט מקורי</string>
+    <string name="mode_manual_translate">תרגום ידני</string>
+</resources>

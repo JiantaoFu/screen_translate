@@ -11,50 +11,28 @@ echo ===================================================
 echo             SCREEN TRANSLATE BUILDER
 echo ===================================================
 echo.
-echo  [1] Convert Localization ARB to JSON (Android assets)
-echo  [2] Generate Flutter Localization (gen-l10n)
-echo  [3] Run Flutter Clean and Pub Get
-echo  [4] Build APK (Release)
-echo  [5] Build AppBundle (Release)
-echo  [6] Full Release Build (L10n + APK + AAB)
-echo  [7] Bump Version + Full Release (APK + AAB)
-echo  [8] Publish to Google Play (test, build, upload, tag)
+echo  [1] Generate Flutter Localization (gen-l10n)
+echo  [2] Run Flutter Clean and Pub Get
+echo  [3] Build APK (Release)
+echo  [4] Build AppBundle (Release)
+echo  [5] Full Release Build (L10n + APK + AAB)
+echo  [6] Bump Version + Full Release (APK + AAB)
+echo  [7] Publish to Google Play (test, build, upload, tag)
 echo.
 echo ===================================================
-set /p opt="Please choose an option [1-8]: "
+set /p opt="Please choose an option [1-7]: "
 
-if "%opt%"=="1" goto convert_l10n
-if "%opt%"=="2" goto gen_l10n
-if "%opt%"=="3" goto flutter_clean
-if "%opt%"=="4" goto build_apk
-if "%opt%"=="5" goto build_bundle
-if "%opt%"=="6" goto full_build
-if "%opt%"=="7" goto bump_and_release
-if "%opt%"=="8" goto publish
+if "%opt%"=="1" goto gen_l10n
+if "%opt%"=="2" goto flutter_clean
+if "%opt%"=="3" goto build_apk
+if "%opt%"=="4" goto build_bundle
+if "%opt%"=="5" goto full_build
+if "%opt%"=="6" goto bump_and_release
+if "%opt%"=="7" goto publish
 echo.
 color 0C
 echo Invalid option selected, please try again.
 color 0B
-pause
-exit /b
-
-:convert_l10n
-echo.
-echo ---------------------------------------------------
-echo Converting ARB files to JSON...
-echo ---------------------------------------------------
-python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    python scripts\convert_arb_to_json.py
-) else (
-    python3 --version >nul 2>&1
-    if %errorlevel% equ 0 (
-        python3 scripts\convert_arb_to_json.py
-    ) else (
-        echo [ERROR] Python is not installed or not in PATH!
-    )
-)
-echo.
 pause
 exit /b
 
@@ -106,26 +84,12 @@ echo.
 echo ---------------------------------------------------
 echo Running Full Release Build...
 echo ---------------------------------------------------
-echo Step 1: Converting ARB files to JSON...
-python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    python scripts\convert_arb_to_json.py
-) else (
-    python3 --version >nul 2>&1
-    if %errorlevel% equ 0 (
-        python3 scripts\convert_arb_to_json.py
-    ) else (
-        echo [ERROR] Python is not installed or not in PATH!
-        pause
-        goto menu
-    )
-)
-echo Step 2: Generating Flutter Localizations...
+echo Step 1: Generating Flutter Localizations...
 call flutter gen-l10n
-echo Step 3: Building APK (Release)...
+echo Step 2: Building APK (Release)...
 python tools\build.py apk
 if errorlevel 1 goto build_failed
-echo Step 4: Building AppBundle (Release)...
+echo Step 3: Building AppBundle (Release)...
 python tools\build.py aab
 if errorlevel 1 goto build_failed
 echo.
@@ -178,22 +142,14 @@ if %errorlevel% equ 0 (
     )
 )
 
-echo Step 2: Converting ARB files to JSON...
-python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    python scripts\convert_arb_to_json.py
-) else (
-    python3 scripts\convert_arb_to_json.py
-)
-
-echo Step 3: Generating Flutter Localizations...
+echo Step 2: Generating Flutter Localizations...
 call flutter gen-l10n
 
-echo Step 4: Building APK (Release)...
+echo Step 3: Building APK (Release)...
 python tools\build.py apk
 if errorlevel 1 goto build_failed
 
-echo Step 5: Building AppBundle (Release)...
+echo Step 4: Building AppBundle (Release)...
 python tools\build.py aab
 if errorlevel 1 goto build_failed
 echo.

@@ -28,31 +28,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bron- en doeltaal kunnen niet hetzelfde zijn';
 
   @override
-  String get manage_translation_models => 'Vertaalmodellen beheren';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Model $language succesvol gedownload';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Fout bij downloaden van model $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model niet gedownload';
-
-  @override
   String get download_model => 'Downloaden';
-
-  @override
-  String get remove_translation_model => 'Vertaalmodel verwijderen';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Weet je zeker dat je het vertaalmodel voor $language wilt verwijderen?';
-  }
 
   @override
   String get cancel => 'Annuleren';
@@ -61,45 +37,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get remove => 'Verwijderen';
 
   @override
-  String get not_installed => 'Niet geinstalleerd';
-
-  @override
   String get downloading => 'Downloaden...';
 
   @override
-  String get installed => 'Geinstalleerd';
-
-  @override
-  String get download_failed => 'Downloaden mislukt';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Fout bij verwijderen van vertaalmodel voor $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Fout bij downloaden van vertaalmodel voor $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatische vertaling';
-
-  @override
-  String get manual_translate_mode => 'Handmatige vertaling';
-
-  @override
-  String get original_text_mode => 'Oriënterende tekst';
-
-  @override
-  String get overlay_permission_required => 'Vertalingsmode';
+  String get overlay_permission_required =>
+      'Toestemming voor weergave over andere apps vereist';
 
   @override
   String get overlay_permission_required_content =>
-      'Dit programma heeft vereist om te vertalen op het scherm.';
+      'De app heeft toestemming nodig om over andere apps te worden weergegeven, zodat vertalingen op het scherm kunnen verschijnen.';
 
   @override
-  String get grant_permission => 'Geef toestemming';
+  String get grant_permission => 'Toestemming geven';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,69 +247,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get api_key_required => 'API-sleutel vereist';
 
   @override
-  String get api_key_setup_prompt =>
-      'Stel uw ChatGLM API-sleutel in voor AI-vertaling.';
-
-  @override
   String get go_to_settings => 'Ga naar Instellingen';
 
   @override
-  String get api_key_dialog_title => 'Configuratie van AI-vertaling API';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI-vertaling';
-
-  @override
-  String get api_key_get_key_from =>
-      'Om ChatGLM-vertalingen te gebruiken, moet u een gratis API-sleutel verkrijgen van ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'Configuratiestappen voor API-sleutel';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Bezoek open.bigmodel.cn en maak een account aan';
-
-  @override
-  String get api_key_step_2 => '2. Navigeer naar de API-beheer sectie';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Genereer een nieuwe API-sleutel voor uw applicatie';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API-sleutel';
-
-  @override
-  String get api_key_input_hint => 'Voer uw ChatGLM API-sleutel in';
-
-  @override
   String get api_key_input_error => 'Voer een geldige API-sleutel in';
-
-  @override
-  String get api_key_save_button => 'API-sleutel opslaan';
-
-  @override
-  String get api_key_note =>
-      'Uw API-sleutel wordt veilig opgeslagen en alleen gebruikt voor vertaaldiensten.';
 
   @override
   String get api_key_save_error =>
       'Ongeldige API-sleutel. Controleer en probeer opnieuw.';
 
   @override
-  String get api_key_save_success => 'API-sleutel succesvol opgeslagen';
-
-  @override
-  String get translation_mode_on_device => 'Vertaling op Apparaat';
+  String get translation_mode_on_device => 'Vertaling op het apparaat';
 
   @override
   String get translation_mode_on_device_description =>
       'Gebruikt ingebouwde vertalingsmodellen op uw apparaat. Snel en werkt offline, maar kan beperkte taalondersteuning en nauwkeurigheid hebben.';
 
   @override
-  String get translation_mode_ai => 'AI-Vertaling';
+  String get translation_mode_ai => 'AI-vertaling';
 
   @override
   String get translation_mode_ai_description =>
@@ -368,12 +272,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Vertaalmodus';
-
-  @override
-  String get translation_mode_on_device_label => 'Op Apparaat';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Sluiten';
@@ -546,4 +444,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Bedankt! We hebben je verzoek genoteerd.';
+
+  @override
+  String get pack_waiting_for_network => 'Wachten op netwerk…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Taalmodel downloaden (~30 MB). Even geduld…';
 }

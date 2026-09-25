@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate -vierityksen tunnistus</string>
+    <string name="accessibility_service_description">Antaa Screen Translaten tunnistaa vierityksen muissa sovelluksissa, jotta kääntäminen sujuu katkeamatta. Palvelu huomaa, kun sisältö muuttuu, jotta käännökset päivittyvät tarkasti.</string>
+    <string name="accessibility_permission_title">Esteettömyyspalvelu tarvitaan</string>
+    <string name="accessibility_permission_message">Screen Translate tarvitsee esteettömyyspalvelun vierityksen tunnistamiseen ja eri sovellusten sisällön kääntämiseen.</string>
+    <string name="accessibility_permission_benefits">Hyödyt:\n• Katkeamaton käännös vierittäessä\n• Toimii useissa sovelluksissa\n• Tarkemmat käännökset</string>
+    <string name="accessibility_permission_how_to">Näin otat sen käyttöön:\n1. Napauta ”Ota käyttöön”\n2. Etsi ”Screen Translate -vierityksen tunnistus” esteettömyysasetuksista\n3. Ota palvelu käyttöön</string>
+    <string name="btn_enable_accessibility">Ota käyttöön</string>
+    <string name="btn_cancel">Peruuta</string>
+    <string name="tap_outside_to_close">Sulje napauttamalla ikkunan ulkopuolelle</string>
+    <string name="mode_auto_translate">Automaattinen käännös</string>
+    <string name="mode_original_text">Alkuperäinen teksti</string>
+    <string name="mode_manual_translate">Manuaalinen käännös</string>
+</resources>

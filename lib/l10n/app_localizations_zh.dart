@@ -27,31 +27,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get source_and_target_cannot_be_the_same => '源语言和目标语言不能相同';
 
   @override
-  String get manage_translation_models => '管理翻译模型';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language模型下载成功';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return '下载$language模型失败';
-  }
-
-  @override
-  String get model_not_downloaded => '模型未下载';
-
-  @override
   String get download_model => '下载';
-
-  @override
-  String get remove_translation_model => '移除翻译模型';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return '确定要移除$language翻译模型吗?';
-  }
 
   @override
   String get cancel => '取消';
@@ -60,41 +36,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get remove => '移除';
 
   @override
-  String get not_installed => '未安装';
-
-  @override
   String get downloading => '下载中...';
 
   @override
-  String get installed => '已安装';
+  String get overlay_permission_required => '需要悬浮窗权限';
 
   @override
-  String get download_failed => '下载失败';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return '移除$language翻译模型失败';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return '下载$language翻译模型失败';
-  }
-
-  @override
-  String get auto_translate_mode => '自动翻译模式';
-
-  @override
-  String get manual_translate_mode => '手动翻译模式';
-
-  @override
-  String get original_text_mode => '原文模式';
-
-  @override
-  String get overlay_permission_required => '翻译模型';
-
-  @override
-  String get overlay_permission_required_content => '此程序需要屏幕覆盖权限';
+  String get overlay_permission_required_content => '应用需要悬浮窗权限，才能在屏幕上显示翻译。';
 
   @override
   String get grant_permission => '授予权限';
@@ -295,52 +243,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get api_key_required => '需要 API 密钥';
 
   @override
-  String get api_key_setup_prompt => '请设置您的 ChatGLM API 密钥以使用 AI 翻译。';
-
-  @override
   String get go_to_settings => '转到设置';
-
-  @override
-  String get api_key_dialog_title => 'AI翻译API配置';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI翻译';
-
-  @override
-  String get api_key_get_key_from => '要使用ChatGLM翻译，您需要从获取免费的API密钥 ';
-
-  @override
-  String get api_key_configuration_steps => 'API密钥配置步骤';
-
-  @override
-  String get api_key_step_1 => '1. 访问open.bigmodel.cn并创建账户';
-
-  @override
-  String get api_key_step_2 => '2. 导航到API管理部分';
-
-  @override
-  String get api_key_step_3 => '3. 为您的应用程序生成新的API密钥';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API密钥';
-
-  @override
-  String get api_key_input_hint => '输入您的ChatGLM API密钥';
 
   @override
   String get api_key_input_error => '请输入有效的API密钥';
 
   @override
-  String get api_key_save_button => '保存API密钥';
-
-  @override
-  String get api_key_note => '您的API密钥将安全存储，仅用于翻译服务。';
-
-  @override
   String get api_key_save_error => '无效的API密钥。请检查并重试。';
-
-  @override
-  String get api_key_save_success => 'API密钥保存成功';
 
   @override
   String get translation_mode_on_device => '设备内翻译';
@@ -358,12 +267,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get translation_mode_title => '翻译模式';
-
-  @override
-  String get translation_mode_on_device_label => '设备内';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => '关闭';
@@ -529,4 +432,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get language_request_sent => '谢谢！我们已记录你的请求。';
+
+  @override
+  String get pack_waiting_for_network => '等待网络…';
+
+  @override
+  String get downloading_language_model_toast => '正在下载语言模型（约30MB），请稍候…';
 }

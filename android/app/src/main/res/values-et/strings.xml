@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate kerimise tuvastus</string>
+    <string name="accessibility_service_description">Võimaldab Screen Translate\'il tuvastada kerimist teistes rakendustes, et tõlge oleks katkematu. Teenus märkab, kui sisu muutub, et tõlkeid täpselt värskendada.</string>
+    <string name="accessibility_permission_title">Vaja on juurdepääsetavuse teenust</string>
+    <string name="accessibility_permission_message">Screen Translate vajab juurdepääsetavuse teenust, et tuvastada kerimist ja tõlkida sisu eri rakendustes.</string>
+    <string name="accessibility_permission_benefits">Eelised:\n• Katkematu tõlge kerimise ajal\n• Töötab mitmes rakenduses\n• Täpsemad tõlked</string>
+    <string name="accessibility_permission_how_to">Kuidas sisse lülitada:\n1. Puudutage „Lülita sisse“\n2. Leidke juurdepääsetavuse seadetest „Screen Translate kerimise tuvastus“\n3. Lülitage teenus sisse</string>
+    <string name="btn_enable_accessibility">Lülita sisse</string>
+    <string name="btn_cancel">Tühista</string>
+    <string name="tap_outside_to_close">Sulgemiseks puudutage väljaspool akent</string>
+    <string name="mode_auto_translate">Automaatne tõlge</string>
+    <string name="mode_original_text">Algtekst</string>
+    <string name="mode_manual_translate">Käsitsi tõlge</string>
+</resources>

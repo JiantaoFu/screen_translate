@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate: засичане на превъртане</string>
+    <string name="accessibility_service_description">Позволява на Screen Translate да засича превъртането в други приложения за непрекъснат превод. Услугата разпознава кога съдържанието се променя, за да обновява превода точно.</string>
+    <string name="accessibility_permission_title">Необходима е услуга за достъпност</string>
+    <string name="accessibility_permission_message">Screen Translate се нуждае от услугата за достъпност, за да засича превъртането и да превежда съдържание в различни приложения.</string>
+    <string name="accessibility_permission_benefits">Предимства:\n• Непрекъснат превод при превъртане\n• Работи в много приложения\n• По-точен превод</string>
+    <string name="accessibility_permission_how_to">Как да включите:\n1. Докоснете „Включване“\n2. Намерете „Screen Translate: засичане на превъртане“ в настройките за достъпност\n3. Включете услугата</string>
+    <string name="btn_enable_accessibility">Включване</string>
+    <string name="btn_cancel">Отказ</string>
+    <string name="tap_outside_to_close">Докоснете извън прозореца, за да затворите</string>
+    <string name="mode_auto_translate">Автоматичен превод</string>
+    <string name="mode_original_text">Оригинален текст</string>
+    <string name="mode_manual_translate">Ръчен превод</string>
+</resources>

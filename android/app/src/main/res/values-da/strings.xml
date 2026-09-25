@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate rulleregistrering</string>
+    <string name="accessibility_service_description">Lader Screen Translate registrere rulning i andre apps for problemfri oversættelse. Tjenesten registrerer, når indholdet ændres, så oversættelserne opdateres præcist.</string>
+    <string name="accessibility_permission_title">Hjælpefunktion påkrævet</string>
+    <string name="accessibility_permission_message">Screen Translate har brug for hjælpefunktionen til at registrere rulning og oversætte indhold i forskellige apps.</string>
+    <string name="accessibility_permission_benefits">Fordele:\n• Problemfri oversættelse, mens du ruller\n• Virker i flere apps\n• Mere præcise oversættelser</string>
+    <string name="accessibility_permission_how_to">Sådan aktiverer du den:\n1. Tryk på \"Aktivér\"\n2. Find \"Screen Translate rulleregistrering\" under indstillingerne for hjælpefunktioner\n3. Slå tjenesten til</string>
+    <string name="btn_enable_accessibility">Aktivér</string>
+    <string name="btn_cancel">Annuller</string>
+    <string name="tap_outside_to_close">Tryk udenfor for at lukke</string>
+    <string name="mode_auto_translate">Automatisk oversættelse</string>
+    <string name="mode_original_text">Originaltekst</string>
+    <string name="mode_manual_translate">Manuel oversættelse</string>
+</resources>

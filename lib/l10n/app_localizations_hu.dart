@@ -28,78 +28,27 @@ class AppLocalizationsHu extends AppLocalizations {
       'A forrás- és célnyelv nem lehet ugyanaz';
 
   @override
-  String get manage_translation_models => 'Fordítási modellek kezelése';
-
-  @override
-  String model_download_success(Object language) {
-    return 'A(z) $language modell sikeresen letöltve';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Hiba történt a(z) $language modell letöltése közben';
-  }
-
-  @override
-  String get model_not_downloaded => 'A modell nincs letöltve';
-
-  @override
   String get download_model => 'Letöltés';
-
-  @override
-  String get remove_translation_model => 'Modell torlása';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Biztos benne, hogy törli a $language fordítást?';
-  }
 
   @override
   String get cancel => 'Mégse';
 
   @override
-  String get remove => 'Torol';
-
-  @override
-  String get not_installed => 'Nincs telepítve';
+  String get remove => 'Eltávolítás';
 
   @override
   String get downloading => 'Letöltés...';
 
   @override
-  String get installed => 'Telepítve';
-
-  @override
-  String get download_failed => 'Letöltés hiba';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Hiba történt a(z) $language modell torlásakor';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Hiba történt a(z) $language modell letöltése közben';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatikus forrásközépfordítás';
-
-  @override
-  String get manual_translate_mode => 'Manuális forrásközépfordítás';
-
-  @override
-  String get original_text_mode => 'Erre a szöveg';
-
-  @override
-  String get overlay_permission_required => 'Fordítás náluk';
+  String get overlay_permission_required =>
+      'Engedély szükséges a más alkalmazások feletti megjelenítéshez';
 
   @override
   String get overlay_permission_required_content =>
-      'Fordítás náluk, hogy a kepernyő főnépének megfeleljen';
+      'Az alkalmazásnak engedély kell a más alkalmazások feletti megjelenítéshez, hogy a fordításokat a képernyőn mutathassa.';
 
   @override
-  String get grant_permission => 'Engedély';
+  String get grant_permission => 'Engedély megadása';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -299,81 +248,31 @@ class AppLocalizationsHu extends AppLocalizations {
   String get api_key_required => 'API kulcs szükséges';
 
   @override
-  String get api_key_setup_prompt =>
-      'Állítsa be a ChatGLM API kulcsát AI fordításhoz.';
-
-  @override
   String get go_to_settings => 'Ugrás a Beállításokhoz';
 
   @override
-  String get api_key_dialog_title => 'AI fordítási API konfigurálása';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI fordítás';
-
-  @override
-  String get api_key_get_key_from =>
-      'A ChatGLM fordítások használatához szerezzen egy ingyenes API kulcsot ';
-
-  @override
-  String get api_key_configuration_steps => 'API kulcs konfigurációs lépések';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Látogasson el a open.bigmodel.cn oldalra és hozzon létre egy fiókot';
-
-  @override
-  String get api_key_step_2 => '2. Navigáljon az API kezelési részhez';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Generáljon egy új API kulcsot az alkalmazásához';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API kulcs';
-
-  @override
-  String get api_key_input_hint => 'Adja meg a ChatGLM API kulcsát';
-
-  @override
   String get api_key_input_error => 'Kérem, adjon meg egy érvényes API kulcsot';
-
-  @override
-  String get api_key_save_button => 'API kulcs mentése';
-
-  @override
-  String get api_key_note =>
-      'Az API kulcsa biztonságosan tárolásra kerül és csak fordítási szolgáltatásokhoz lesz felhasználva.';
 
   @override
   String get api_key_save_error =>
       'Érvénytelen API kulcs. Ellenőrizze és próbálja újra.';
 
   @override
-  String get api_key_save_success => 'API kulcs sikeresen mentve';
-
-  @override
-  String get translation_mode_on_device => 'Fordítás Eszközön';
+  String get translation_mode_on_device => 'Fordítás az eszközön';
 
   @override
   String get translation_mode_on_device_description =>
       'Beépített fordítási modelleket használ az eszközén. Gyors és offline is működik, de lehet, hogy korlátozott nyelvi támogatással és pontossággal rendelkezik.';
 
   @override
-  String get translation_mode_ai => 'AI-Fordítás';
+  String get translation_mode_ai => 'AI-fordítás';
 
   @override
   String get translation_mode_ai_description =>
       'Fejlett AI-modelleket használ pontosabb és kontextuális fordításokhoz. Internetkapcsolatot és API-kulcsot igényel.';
 
   @override
-  String get translation_mode_title => 'Fordítási Mód';
-
-  @override
-  String get translation_mode_on_device_label => 'Eszközön';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Fordítási mód';
 
   @override
   String get close => 'Bezárás';
@@ -549,4 +448,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Köszönjük! Rögzítettük a kérésedet.';
+
+  @override
+  String get pack_waiting_for_network => 'Várakozás a hálózatra…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Nyelvi modell letöltése (~30 MB). Kérjük, várjon…';
 }

@@ -10,6 +10,9 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.BinaryMessenger
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.lomoware.screen_translate/screen_capture"
@@ -19,6 +22,7 @@ class MainActivity: FlutterActivity() {
     private val TAG = "MainActivity"
     private var permissionData: Intent? = null
     private val OVERLAY_CHANNEL = "com.lomoware.screen_translate/overlay"
+    private val MODEL_DOWNLOAD_CHANNEL = "com.lomoware.screen_translate/model_download"
 
     companion object {
         // Null until the Flutter engine is attached. Services can be started
@@ -27,6 +31,11 @@ class MainActivity: FlutterActivity() {
         // the background), so callers must handle null instead of crashing.
         @Volatile
         var binaryMessenger: BinaryMessenger? = null
+
+        // Shared by every MainActivity instance, so recreating the Activity
+        // (e.g. on rotation) doesn't leak a thread each time.
+        private val modelDownloadExecutor = Executors.newSingleThreadExecutor()
+        private val mainHandler = Handler(Looper.getMainLooper())
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -96,6 +105,30 @@ class MainActivity: FlutterActivity() {
                 "getTranslationMode" -> {
                     val translationMode = OverlayService.getInstance()?.getCurrentTranslationMode() ?: "auto"
                     result.success(translationMode)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        MethodChannel(binaryMessenger, MODEL_DOWNLOAD_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getMlKitDownloadProgress" -> {
+                    val lang = call.argument<String>("lang")
+                    // Polled every 400 ms during a download; the query is an
+                    // IPC to the downloads provider, so keep it off the main
+                    // thread (which also drives live capture and overlays).
+                    modelDownloadExecutor.execute {
+                        val progress = try {
+                            lang?.let { MlKitDownloadProgress.query(applicationContext, it) }
+                        } catch (e: Exception) {
+                            Log.w(TAG, "getMlKitDownloadProgress failed", e)
+                            null
+                        }
+                        val reply = progress?.let {
+                            mapOf("downloaded" to it.downloaded, "total" to it.total, "waiting" to it.waiting)
+                        }
+                        mainHandler.post { result.success(reply) }
+                    }
                 }
                 else -> result.notImplemented()
             }

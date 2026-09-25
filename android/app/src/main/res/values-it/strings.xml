@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Rilevamento scorrimento di Screen Translate</string>
+    <string name="accessibility_service_description">Consente a Screen Translate di rilevare lo scorrimento nelle altre app per una traduzione continua. Il servizio rileva quando il contenuto cambia, così le traduzioni vengono aggiornate con precisione.</string>
+    <string name="accessibility_permission_title">Servizio di accessibilità necessario</string>
+    <string name="accessibility_permission_message">Screen Translate ha bisogno del servizio di accessibilità per rilevare lo scorrimento e tradurre i contenuti delle varie app.</string>
+    <string name="accessibility_permission_benefits">Vantaggi:\n• Traduzione continua durante lo scorrimento\n• Funziona in più app\n• Traduzioni più precise</string>
+    <string name="accessibility_permission_how_to">Come attivarlo:\n1. Tocca «Attiva»\n2. Trova «Rilevamento scorrimento di Screen Translate» nelle impostazioni di accessibilità\n3. Attiva il servizio</string>
+    <string name="btn_enable_accessibility">Attiva</string>
+    <string name="btn_cancel">Annulla</string>
+    <string name="tap_outside_to_close">Tocca fuori per chiudere</string>
+    <string name="mode_auto_translate">Traduzione automatica</string>
+    <string name="mode_original_text">Testo originale</string>
+    <string name="mode_manual_translate">Traduzione manuale</string>
+</resources>

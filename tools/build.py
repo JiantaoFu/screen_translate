@@ -218,7 +218,6 @@ def check_apk(path, name, code, release):
 
 def prepare(name, code):
     """Everything `flutter build` would do before invoking Gradle."""
-    run([sys.executable, ROOT / "scripts" / "convert_arb_to_json.py"])
     run(["flutter", "pub", "get"])
     run(["flutter", "gen-l10n"])
     write_local_versions(name, code)

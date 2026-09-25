@@ -28,31 +28,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Quell- und Zielsprache können nicht identisch sein';
 
   @override
-  String get manage_translation_models => 'Übersetzungsmodelle verwalten';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Modell für $language wurde erfolgreich heruntergeladen';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Fehler beim Herunterladen des Modells für $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Modell nicht heruntergeladen';
-
-  @override
   String get download_model => 'Herunterladen';
-
-  @override
-  String get remove_translation_model => 'Übersetzungsmodell entfernen';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Wollen Sie das Übersetzungsmodell für $language wirklich entfernen?';
-  }
 
   @override
   String get cancel => 'Abbrechen';
@@ -61,222 +37,195 @@ class AppLocalizationsDe extends AppLocalizations {
   String get remove => 'Entfernen';
 
   @override
-  String get not_installed => 'Nicht installiert';
-
-  @override
   String get downloading => 'Herunterladen...';
 
   @override
-  String get installed => 'Installiert';
-
-  @override
-  String get download_failed => 'Herunterladen fehlgeschlagen';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Fehler beim Entfernen des Übersetzungsmodells für $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Fehler beim Herunterladen des Übersetzungsmodells für $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatische Übersetzung';
-
-  @override
-  String get manual_translate_mode => 'Manuelle Übersetzung';
-
-  @override
-  String get original_text_mode => 'Originaltextmodell';
-
-  @override
-  String get overlay_permission_required => 'Møde kan oversættes på skærmen';
+  String get overlay_permission_required =>
+      'Berechtigung zum Einblenden über anderen Apps erforderlich';
 
   @override
   String get overlay_permission_required_content =>
-      'Dette program bruger tildelinger til at oversætte på skærmen.';
+      'Die App braucht die Berechtigung, über anderen Apps eingeblendet zu werden, um Übersetzungen auf dem Bildschirm anzuzeigen.';
 
   @override
-  String get grant_permission => 'Tildel tildelinger';
+  String get grant_permission => 'Berechtigung erteilen';
 
   @override
-  String get language_afrikaans => 'afrikaans';
+  String get language_afrikaans => 'Afrikaans';
 
   @override
-  String get language_albanian => 'albanisch';
+  String get language_albanian => 'Albanisch';
 
   @override
-  String get language_arabic => 'arabisch';
+  String get language_arabic => 'Arabisch';
 
   @override
-  String get language_belarusian => 'weißrussisch';
+  String get language_belarusian => 'Weißrussisch';
 
   @override
-  String get language_bengali => 'bengali';
+  String get language_bengali => 'Bengali';
 
   @override
-  String get language_bulgarian => 'bulgarisch';
+  String get language_bulgarian => 'Bulgarisch';
 
   @override
-  String get language_catalan => 'katalanisch';
+  String get language_catalan => 'Katalanisch';
 
   @override
-  String get language_chinese => 'chinesisch';
+  String get language_chinese => 'Chinesisch';
 
   @override
-  String get language_croatian => 'kroatisch';
+  String get language_croatian => 'Kroatisch';
 
   @override
-  String get language_czech => 'tschechisch';
+  String get language_czech => 'Tschechisch';
 
   @override
-  String get language_danish => 'dänisch';
+  String get language_danish => 'Dänisch';
 
   @override
-  String get language_dutch => 'niederländisch';
+  String get language_dutch => 'Niederländisch';
 
   @override
-  String get language_english => 'englisch';
+  String get language_english => 'Englisch';
 
   @override
-  String get language_esperanto => 'esperanto';
+  String get language_esperanto => 'Esperanto';
 
   @override
-  String get language_estonian => 'estnisch';
+  String get language_estonian => 'Estnisch';
 
   @override
-  String get language_finnish => 'finnisch';
+  String get language_finnish => 'Finnisch';
 
   @override
-  String get language_french => 'französisch';
+  String get language_french => 'Französisch';
 
   @override
-  String get language_galician => 'galizisch';
+  String get language_galician => 'Galizisch';
 
   @override
-  String get language_georgian => 'georgisch';
+  String get language_georgian => 'Georgisch';
 
   @override
-  String get language_german => 'deutsch';
+  String get language_german => 'Deutsch';
 
   @override
-  String get language_greek => 'griechisch';
+  String get language_greek => 'Griechisch';
 
   @override
-  String get language_gujarati => 'gujarati';
+  String get language_gujarati => 'Gujarati';
 
   @override
-  String get language_haitian => 'haitianisch';
+  String get language_haitian => 'Haitianisch';
 
   @override
-  String get language_hebrew => 'hebräisch';
+  String get language_hebrew => 'Hebräisch';
 
   @override
-  String get language_hindi => 'hindi';
+  String get language_hindi => 'Hindi';
 
   @override
-  String get language_hungarian => 'ungarisch';
+  String get language_hungarian => 'Ungarisch';
 
   @override
-  String get language_icelandic => 'isländisch';
+  String get language_icelandic => 'Isländisch';
 
   @override
-  String get language_indonesian => 'indonesisch';
+  String get language_indonesian => 'Indonesisch';
 
   @override
-  String get language_irish => 'irisch';
+  String get language_irish => 'Irisch';
 
   @override
-  String get language_italian => 'italienisch';
+  String get language_italian => 'Italienisch';
 
   @override
-  String get language_japanese => 'japanisch';
+  String get language_japanese => 'Japanisch';
 
   @override
-  String get language_kannada => 'kannada';
+  String get language_kannada => 'Kannada';
 
   @override
-  String get language_korean => 'koreanisch';
+  String get language_korean => 'Koreanisch';
 
   @override
-  String get language_latvian => 'lettisch';
+  String get language_latvian => 'Lettisch';
 
   @override
-  String get language_lithuanian => 'litauisch';
+  String get language_lithuanian => 'Litauisch';
 
   @override
-  String get language_macedonian => 'mazedonisch';
+  String get language_macedonian => 'Mazedonisch';
 
   @override
-  String get language_malay => 'malaiisch';
+  String get language_malay => 'Malaiisch';
 
   @override
-  String get language_maltese => 'maltesisch';
+  String get language_maltese => 'Maltesisch';
 
   @override
-  String get language_marathi => 'marathi';
+  String get language_marathi => 'Marathi';
 
   @override
-  String get language_norwegian => 'norwegisch';
+  String get language_norwegian => 'Norwegisch';
 
   @override
-  String get language_persian => 'persisch';
+  String get language_persian => 'Persisch';
 
   @override
-  String get language_polish => 'polnisch';
+  String get language_polish => 'Polnisch';
 
   @override
-  String get language_portuguese => 'portugiesisch';
+  String get language_portuguese => 'Portugiesisch';
 
   @override
-  String get language_romanian => 'rumänisch';
+  String get language_romanian => 'Rumänisch';
 
   @override
-  String get language_russian => 'russisch';
+  String get language_russian => 'Russisch';
 
   @override
-  String get language_slovak => 'slowakisch';
+  String get language_slovak => 'Slowakisch';
 
   @override
-  String get language_slovenian => 'slowenisch';
+  String get language_slovenian => 'Slowenisch';
 
   @override
-  String get language_spanish => 'spanisch';
+  String get language_spanish => 'Spanisch';
 
   @override
-  String get language_swahili => 'swahili';
+  String get language_swahili => 'Swahili';
 
   @override
-  String get language_swedish => 'schwedisch';
+  String get language_swedish => 'Schwedisch';
 
   @override
-  String get language_tagalog => 'tagalog';
+  String get language_tagalog => 'Tagalog';
 
   @override
-  String get language_tamil => 'tamil';
+  String get language_tamil => 'Tamil';
 
   @override
-  String get language_telugu => 'telugu';
+  String get language_telugu => 'Telugu';
 
   @override
-  String get language_thai => 'thailändisch';
+  String get language_thai => 'Thailändisch';
 
   @override
-  String get language_turkish => 'türkisch';
+  String get language_turkish => 'Türkisch';
 
   @override
-  String get language_ukrainian => 'ukrainisch';
+  String get language_ukrainian => 'Ukrainisch';
 
   @override
-  String get language_urdu => 'urdu';
+  String get language_urdu => 'Urdu';
 
   @override
-  String get language_vietnamese => 'vietnamesisch';
+  String get language_vietnamese => 'Vietnamesisch';
 
   @override
-  String get language_welsh => 'walisisch';
+  String get language_welsh => 'Walisisch';
 
   @override
   String get enjoying_app => 'Gefällt Ihnen Screen Translate?';
@@ -299,60 +248,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_key_required => 'API-Schlüssel erforderlich';
 
   @override
-  String get api_key_setup_prompt =>
-      'Bitte richten Sie Ihren ChatGLM-API-Schlüssel ein, um KI-Übersetzung zu verwenden.';
-
-  @override
   String get go_to_settings => 'Zu den Einstellungen';
-
-  @override
-  String get api_key_dialog_title => 'KI-Übersetzungs-API-Konfiguration';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM KI-Übersetzung';
-
-  @override
-  String get api_key_get_key_from =>
-      'Um ChatGLM-Übersetzungen zu nutzen, müssen Sie einen kostenlosen API-Schlüssel von erhalten ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'API-Schlüssel Konfigurationsschritte';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Besuchen Sie open.bigmodel.cn und erstellen Sie ein Konto';
-
-  @override
-  String get api_key_step_2 => '2. Navigieren Sie zum API-Verwaltungsbereich';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Generieren Sie einen neuen API-Schlüssel für Ihre Anwendung';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API-Schlüssel';
-
-  @override
-  String get api_key_input_hint => 'Geben Sie Ihren ChatGLM API-Schlüssel ein';
 
   @override
   String get api_key_input_error =>
       'Bitte geben Sie einen gültigen API-Schlüssel ein';
 
   @override
-  String get api_key_save_button => 'API-Schlüssel speichern';
-
-  @override
-  String get api_key_note =>
-      'Ihr API-Schlüssel wird sicher gespeichert und nur für Übersetzungsdienste verwendet.';
-
-  @override
   String get api_key_save_error =>
       'Ungültiger API-Schlüssel. Bitte überprüfen Sie und versuchen Sie es erneut.';
-
-  @override
-  String get api_key_save_success => 'API-Schlüssel erfolgreich gespeichert';
 
   @override
   String get translation_mode_on_device => 'Geräteübersetzung';
@@ -370,12 +274,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Übersetzungsmodus';
-
-  @override
-  String get translation_mode_on_device_label => 'Gerät';
-
-  @override
-  String get translation_mode_ai_label => 'KI';
 
   @override
   String get close => 'Schließen';
@@ -553,4 +451,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Danke! Wir haben deine Anfrage vermerkt.';
+
+  @override
+  String get pack_waiting_for_network => 'Warte auf Netzwerk…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Sprachmodell wird heruntergeladen (~30 MB). Bitte warten…';
 }

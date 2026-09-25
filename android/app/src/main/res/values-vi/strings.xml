@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Phát hiện cuộn của Screen Translate</string>
+    <string name="accessibility_service_description">Cho phép Screen Translate phát hiện thao tác cuộn trong các ứng dụng khác để dịch liền mạch. Dịch vụ này nhận biết khi nội dung thay đổi để cập nhật bản dịch chính xác.</string>
+    <string name="accessibility_permission_title">Cần dịch vụ hỗ trợ tiếp cận</string>
+    <string name="accessibility_permission_message">Screen Translate cần dịch vụ hỗ trợ tiếp cận để phát hiện thao tác cuộn và dịch nội dung trong các ứng dụng khác nhau.</string>
+    <string name="accessibility_permission_benefits">Lợi ích:\n• Dịch liền mạch khi cuộn\n• Hoạt động trên nhiều ứng dụng\n• Bản dịch chính xác hơn</string>
+    <string name="accessibility_permission_how_to">Cách bật:\n1. Nhấn “Bật”\n2. Tìm “Phát hiện cuộn của Screen Translate” trong cài đặt Hỗ trợ tiếp cận\n3. Bật dịch vụ</string>
+    <string name="btn_enable_accessibility">Bật</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="tap_outside_to_close">Nhấn bên ngoài để đóng</string>
+    <string name="mode_auto_translate">Dịch tự động</string>
+    <string name="mode_original_text">Văn bản gốc</string>
+    <string name="mode_manual_translate">Dịch thủ công</string>
+</resources>

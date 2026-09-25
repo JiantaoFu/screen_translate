@@ -28,78 +28,27 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kaynak ve hedef dil aynı olamaz';
 
   @override
-  String get manage_translation_models => 'Çeviri modellerini yönet';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language modeli başarıyla indirildi';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return '$language modeli indirilirken hata oluştu';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model indirilmedi';
-
-  @override
   String get download_model => 'İndir';
 
   @override
-  String get remove_translation_model => 'Çeviri modelini kaldır';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Kaynak dildeki çeviri modelini silmek istediğinizden emin misiniz? $language';
-  }
-
-  @override
-  String get cancel => 'Iptal';
+  String get cancel => 'İptal';
 
   @override
   String get remove => 'Kaldır';
 
   @override
-  String get not_installed => 'Yok';
+  String get downloading => 'İndiriliyor...';
 
   @override
-  String get downloading => 'Indiriliyor...';
-
-  @override
-  String get installed => 'Yüklendi';
-
-  @override
-  String get download_failed => 'Indirme hatalı';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Çeviri modelini kaldırırken hata oluştu: $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Çeviri modelini indirirken hata oluştu: $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Otomatik çeviri modülü';
-
-  @override
-  String get manual_translate_mode => 'Manuel çeviri modülü';
-
-  @override
-  String get original_text_mode => 'Orjinal metin modülü';
-
-  @override
-  String get overlay_permission_required => 'Översättningsmodell';
+  String get overlay_permission_required =>
+      'Diğer uygulamaların üzerinde gösterme izni gerekli';
 
   @override
   String get overlay_permission_required_content =>
-      'Denna programkrav dobbelklickar på skärm förstärkning';
+      'Çevirileri ekranda gösterebilmek için uygulamanın diğer uygulamaların üzerinde gösterme iznine ihtiyacı var.';
 
   @override
-  String get grant_permission => 'Giv tillräckliga tillräckliga';
+  String get grant_permission => 'İzin ver';
 
   @override
   String get language_afrikaans => 'Afrikaanca';
@@ -298,59 +247,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get api_key_required => 'API Anahtarı Gerekli';
 
   @override
-  String get api_key_setup_prompt =>
-      'AI çevirisi için ChatGLM API anahtarınızı ayarlayın.';
-
-  @override
   String get go_to_settings => 'Ayarlara Git';
-
-  @override
-  String get api_key_dialog_title => 'AI Çeviri API Yapılandırması';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI Çevirisi';
-
-  @override
-  String get api_key_get_key_from =>
-      'ChatGLM çevirilerini kullanmak için ücretsiz bir API anahtarı almanız gerekiyor ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'API Anahtarı Yapılandırma Adımları';
-
-  @override
-  String get api_key_step_1 =>
-      '1. open.bigmodel.cn\'yi ziyaret edin ve bir hesap oluşturun';
-
-  @override
-  String get api_key_step_2 => '2. API Yönetimi bölümüne gidin';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Uygulamanız için yeni bir API anahtarı oluşturun';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API Anahtarı';
-
-  @override
-  String get api_key_input_hint => 'ChatGLM API anahtarınızı girin';
 
   @override
   String get api_key_input_error => 'Lütfen geçerli bir API anahtarı girin';
 
   @override
-  String get api_key_save_button => 'API Anahtarını Kaydet';
-
-  @override
-  String get api_key_note =>
-      'API anahtarınız güvenli bir şekilde depolanacak ve yalnızca çeviri hizmetleri için kullanılacaktır.';
-
-  @override
   String get api_key_save_error =>
       'Geçersiz API Anahtarı. Kontrol edip tekrar deneyin.';
-
-  @override
-  String get api_key_save_success => 'API Anahtarı Başarıyla Kaydedildi';
 
   @override
   String get translation_mode_on_device => 'Cihaz İçi Çeviri';
@@ -368,12 +272,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Çeviri Modu';
-
-  @override
-  String get translation_mode_on_device_label => 'Cihaz İçi';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Kapat';
@@ -549,4 +447,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Teşekkürler! Talebinizi kaydettik.';
+
+  @override
+  String get pack_waiting_for_network => 'Ağ bekleniyor…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Dil modeli indiriliyor (~30 MB). Lütfen bekleyin…';
 }

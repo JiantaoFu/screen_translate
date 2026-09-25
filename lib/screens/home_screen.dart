@@ -46,6 +46,10 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
   /// instead of silently sitting on the stale download-available icon.
   final Set<String> _downloadingCodes = {};
 
+  /// Real progress (0.0-1.0) of those downloads; absent until a byte count
+  /// is known, when the spinner stays indeterminate.
+  final Map<String, double> _downloadProgress = {};
+
   @override
   void initState() {
     super.initState();
@@ -83,10 +87,21 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
             return Icon(Icons.check_circle, color: Colors.green, size: 16);
 
           case TranslationMode.onDevice:
-            if (_downloadingCodes.contains(languageCode)) {
-              return const SizedBox(
-                width: 14, height: 14,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            if (_downloadingCodes.contains(languageCode) ||
+                ModelDownloadService.isQuickDownloading(languageCode)) {
+              final progress = _downloadProgress[languageCode];
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (progress != null)
+                    Text('${(progress * 100).toStringAsFixed(0)}%',
+                        style: const TextStyle(fontSize: 11, color: Colors.orange)),
+                  const SizedBox(width: 4),
+                  SizedBox(
+                    width: 14, height: 14,
+                    child: CircularProgressIndicator(value: progress, strokeWidth: 2),
+                  ),
+                ],
               );
             }
             return FutureBuilder<bool>(
@@ -198,12 +213,19 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 if (isDownloaded || _downloadingCodes.contains(code)) return;
                 if (mounted) setState(() => _downloadingCodes.add(code));
                 try {
-                  await modelService.downloadModelWithFallback(code);
+                  await modelService.downloadModelWithFallback(code, onProgress: (p) {
+                    if (mounted) setState(() => _downloadProgress[code] = p);
+                  });
                 } catch (_) {
                   // Swallowed — translateText() retries on demand and will
                   // surface a real error there if it's still unavailable.
                 } finally {
-                  if (mounted) setState(() => _downloadingCodes.remove(code));
+                  if (mounted) {
+                    setState(() {
+                      _downloadingCodes.remove(code);
+                      _downloadProgress.remove(code);
+                    });
+                  }
                 }
               });
             },
@@ -679,7 +701,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(p.$3, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
+                  child: Text(AppLocalizations.of(context)!.languagePairName(p.$1, p.$2), style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
                 ),
                 SizedBox(width: 4),
                 _onnxDownloadProgress.containsKey(key)
@@ -769,7 +791,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             }
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(localizations.pack_is_ready_snackbar(pairs.firstWhere((x) => '${x.$1}|${x.$2}' == selectedKey).$3)), backgroundColor: Colors.green),
+                SnackBar(content: Text(localizations.pack_is_ready_snackbar(localizations.languagePairName(selectedKey.split('|')[0], selectedKey.split('|')[1]))), backgroundColor: Colors.green),
               );
             }
           } catch (e) {

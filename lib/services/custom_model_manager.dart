@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive.dart';
@@ -18,15 +19,25 @@ class CustomModelManager {
     return Directory(path.join(appDir.parent.path, 'no_backup'));
   }
 
-  Future<void> downloadAndInstallModel(String langCode) async {
+  Future<void> downloadAndInstallModel(
+    String langCode, {
+    void Function(double progress)? onProgress,
+  }) async {
     final url = '$baseUrl/$langCode.zip';
     print('Fallback: Downloading model for $langCode from $url...');
 
+    final client = http.Client();
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await client.send(http.Request('GET', Uri.parse(url)));
 
       if (response.statusCode == 200) {
-        final bytes = response.bodyBytes;
+        final total = response.contentLength;
+        final builder = BytesBuilder(copy: false);
+        await for (final chunk in response.stream) {
+          builder.add(chunk);
+          if (total != null && total > 0) onProgress?.call(builder.length / total);
+        }
+        final bytes = builder.takeBytes();
         final archive = ZipDecoder().decodeBytes(bytes);
         final extractionDir = await _getExtractionDir();
 
@@ -46,11 +57,14 @@ class CustomModelManager {
         }
         print('Fallback model for $langCode installed successfully.');
       } else {
+        await response.stream.drain<void>();
         throw Exception('Fallback failed: HTTP ${response.statusCode}');
       }
     } catch (e) {
       print('Error during fallback download for $langCode: $e');
       rethrow;
+    } finally {
+      client.close();
     }
   }
 }

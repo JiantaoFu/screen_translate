@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate slinkimo aptikimas</string>
+    <string name="accessibility_service_description">Leidžia Screen Translate aptikti slinkimą kitose programose, kad vertimas būtų sklandus. Paslauga atpažįsta, kada pasikeičia turinys, kad vertimai būtų tiksliai atnaujinti.</string>
+    <string name="accessibility_permission_title">Reikalinga pritaikymo neįgaliesiems paslauga</string>
+    <string name="accessibility_permission_message">Screen Translate reikia pritaikymo neįgaliesiems paslaugos, kad galėtų aptikti slinkimą ir versti turinį įvairiose programose.</string>
+    <string name="accessibility_permission_benefits">Privalumai:\n• Sklandus vertimas slenkant\n• Veikia daugelyje programų\n• Tikslesni vertimai</string>
+    <string name="accessibility_permission_how_to">Kaip įjungti:\n1. Palieskite „Įjungti“\n2. Pritaikymo neįgaliesiems nustatymuose raskite „Screen Translate slinkimo aptikimas“\n3. Įjunkite paslaugą</string>
+    <string name="btn_enable_accessibility">Įjungti</string>
+    <string name="btn_cancel">Atšaukti</string>
+    <string name="tap_outside_to_close">Palieskite už lango ribų, kad uždarytumėte</string>
+    <string name="mode_auto_translate">Automatinis vertimas</string>
+    <string name="mode_original_text">Originalus tekstas</string>
+    <string name="mode_manual_translate">Rankinis vertimas</string>
+</resources>

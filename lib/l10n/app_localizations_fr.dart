@@ -28,31 +28,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les langues source et cible ne peuvent pas être identiques';
 
   @override
-  String get manage_translation_models => 'Gérer les modèles de traduction';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Modèle $language téléchargé avec succès';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Échec du téléchargement du modèle $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Modèle non téléchargé';
-
-  @override
   String get download_model => 'Télécharger';
-
-  @override
-  String get remove_translation_model => 'Supprimer le modèle de traduction';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Voulez-vous vraiment supprimer le modèle de traduction pour $language?';
-  }
 
   @override
   String get cancel => 'Annuler';
@@ -61,45 +37,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get remove => 'Supprimer';
 
   @override
-  String get not_installed => 'Non-instalé';
-
-  @override
   String get downloading => 'Téléchargement...';
 
   @override
-  String get installed => 'Instalé';
-
-  @override
-  String get download_failed => 'Echec du téléchargement';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Échec lors de la suppression du modèle pour $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Échec du téléchargement du modèle pour $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatisme de traduction';
-
-  @override
-  String get manual_translate_mode => 'Traduction manuelle';
-
-  @override
-  String get original_text_mode => 'Mode du texte original';
-
-  @override
-  String get overlay_permission_required => 'Permission requise';
+  String get overlay_permission_required =>
+      'Autorisation de superposition requise';
 
   @override
   String get overlay_permission_required_content =>
-      'Ce programme requiert des permissions pour traduire à l\'écran.';
+      'L\'appli a besoin de l\'autorisation de s\'afficher par-dessus les autres applis pour montrer les traductions à l\'écran.';
 
   @override
-  String get grant_permission => 'Accorder les permissions';
+  String get grant_permission => 'Autoriser';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,61 +247,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get api_key_required => 'Clé API requise';
 
   @override
-  String get api_key_setup_prompt =>
-      'Veuillez configurer votre clé API ChatGLM pour utiliser la traduction par IA.';
-
-  @override
   String get go_to_settings => 'Aller aux paramètres';
-
-  @override
-  String get api_key_dialog_title =>
-      'Configuration de l\'API de Traduction par IA';
-
-  @override
-  String get api_key_configuration_title => 'Traduction ChatGLM par IA';
-
-  @override
-  String get api_key_get_key_from =>
-      'Pour utiliser les traductions ChatGLM, vous devez obtenir une clé API gratuite depuis ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'Étapes de Configuration de la Clé API';
-
-  @override
-  String get api_key_step_1 => '1. Visitez open.bigmodel.cn et créez un compte';
-
-  @override
-  String get api_key_step_2 => '2. Accédez à la section de Gestion des API';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Générez une nouvelle clé API pour votre application';
-
-  @override
-  String get api_key_input_label => 'Clé API ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'Entrez votre clé API ChatGLM';
 
   @override
   String get api_key_input_error => 'Veuillez entrer une clé API valide';
 
   @override
-  String get api_key_save_button => 'Enregistrer la Clé API';
-
-  @override
-  String get api_key_note =>
-      'Votre clé API sera stockée en toute sécurité et utilisée uniquement pour les services de traduction.';
-
-  @override
   String get api_key_save_error => 'Clé API invalide. Vérifiez et réessayez.';
 
   @override
-  String get api_key_save_success => 'Clé API enregistrée avec succès';
-
-  @override
-  String get translation_mode_on_device => 'Traduction sur Appareil';
+  String get translation_mode_on_device => 'Traduction sur l\'appareil';
 
   @override
   String get translation_mode_on_device_description =>
@@ -366,13 +270,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Utilise des modèles d\'IA avancés pour des traductions plus précises et contextuelles. Nécessite une connexion Internet et une clé API.';
 
   @override
-  String get translation_mode_title => 'Mode de Traduction';
-
-  @override
-  String get translation_mode_on_device_label => 'Sur Appareil';
-
-  @override
-  String get translation_mode_ai_label => 'IA';
+  String get translation_mode_title => 'Mode de traduction';
 
   @override
   String get close => 'Fermer';
@@ -548,4 +446,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Merci ! Votre demande a été enregistrée.';
+
+  @override
+  String get pack_waiting_for_network => 'En attente du réseau…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Téléchargement du modèle de langue (~30 Mo). Veuillez patienter…';
 }

@@ -28,78 +28,26 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن أن تكون لغة المصدر والهدف متطابقة';
 
   @override
-  String get manage_translation_models => 'إدارة نماذج الترجمة';
-
-  @override
-  String model_download_success(Object language) {
-    return 'تم تنزيل نموذج $language بنجاح';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'حدث خطأ أثناء تنزيل نموذج $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'لم يتم تنزيل النموذج';
-
-  @override
   String get download_model => 'تنزيل';
 
   @override
-  String get remove_translation_model => 'حذف نموذج الترجمة';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'هل تريد حذف نموذج الترجمة للغة $language؟';
-  }
-
-  @override
-  String get cancel => 'الغاء';
+  String get cancel => 'إلغاء';
 
   @override
   String get remove => 'حذف';
 
   @override
-  String get not_installed => 'لم يتم تنزيل';
+  String get downloading => 'جارٍ التنزيل...';
 
   @override
-  String get downloading => 'تنزيل...';
-
-  @override
-  String get installed => 'تم تنزيل';
-
-  @override
-  String get download_failed => 'فشل تنزيل';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'فشل حذف نموذج $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'فشل تنزيل نموذج $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'مودة الترجمة الاوتوماتيكية';
-
-  @override
-  String get manual_translate_mode => 'مودة الترجمة اليدوي';
-
-  @override
-  String get original_text_mode => 'مودة النص الأصلي';
-
-  @override
-  String get overlay_permission_required => 'المسموح لرسم على الشاشة';
+  String get overlay_permission_required => 'مطلوب إذن العرض فوق التطبيقات';
 
   @override
   String get overlay_permission_required_content =>
-      'هذا البرنامج يحتاج اذن لرسم على الشاشة';
+      'يحتاج هذا التطبيق إلى إذن العرض فوق التطبيقات الأخرى لإظهار الترجمات على الشاشة.';
 
   @override
-  String get grant_permission => 'المسموح';
+  String get grant_permission => 'منح الإذن';
 
   @override
   String get language_afrikaans => 'الأفريكانية';
@@ -298,57 +246,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get api_key_required => 'مطلوب مفتاح API';
 
   @override
-  String get api_key_setup_prompt =>
-      'يرجى إعداد مفتاح ChatGLM API للترجمة باستخدام الذكاء الاصطناعي.';
-
-  @override
   String get go_to_settings => 'الذهاب إلى الإعدادات';
-
-  @override
-  String get api_key_dialog_title =>
-      'إعداد واجهة برمجة التطبيقات للترجمة بالذكاء الاصطناعي';
-
-  @override
-  String get api_key_configuration_title => 'ترجمة ChatGLM بالذكاء الاصطناعي';
-
-  @override
-  String get api_key_get_key_from =>
-      'لاستخدام ترجمات ChatGLM، تحتاج إلى الحصول على مفتاح API مجاني من ';
-
-  @override
-  String get api_key_configuration_steps => 'خطوات إعداد مفتاح API';
-
-  @override
-  String get api_key_step_1 => '1. قم بزيارة open.bigmodel.cn وإنشاء حساب';
-
-  @override
-  String get api_key_step_2 => '2. انتقل إلى قسم إدارة API';
-
-  @override
-  String get api_key_step_3 => '3. قم بإنشاء مفتاح API جديد لتطبيقك';
-
-  @override
-  String get api_key_input_label => 'مفتاح API الخاص بـ ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'أدخل مفتاح API الخاص بـ ChatGLM';
 
   @override
   String get api_key_input_error => 'يرجى إدخال مفتاح API صالح';
 
   @override
-  String get api_key_save_button => 'حفظ مفتاح API';
-
-  @override
-  String get api_key_note =>
-      'سيتم تخزين مفتاح API الخاص بك بشكل آمن واستخدامه فقط لخدمات الترجمة.';
-
-  @override
   String get api_key_save_error =>
       'مفتاح API غير صالح. يرجى التحقق والمحاولة مرة أخرى.';
-
-  @override
-  String get api_key_save_success => 'تم حفظ مفتاح API بنجاح';
 
   @override
   String get translation_mode_on_device => 'الترجمة على الجهاز';
@@ -366,12 +271,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'وضع الترجمة';
-
-  @override
-  String get translation_mode_on_device_label => 'على الجهاز';
-
-  @override
-  String get translation_mode_ai_label => 'الذكاء الاصطناعي';
 
   @override
   String get close => 'إغلاق';
@@ -542,4 +441,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get language_request_sent => 'شكرًا! لقد سجّلنا طلبك.';
+
+  @override
+  String get pack_waiting_for_network => 'في انتظار الشبكة…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'جارٍ تنزيل نموذج اللغة (~30 ميغابايت). يُرجى الانتظار…';
 }

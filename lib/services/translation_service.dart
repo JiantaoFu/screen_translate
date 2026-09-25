@@ -1,4 +1,5 @@
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:screen_translate/l10n/locale_resolution.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
@@ -52,14 +53,14 @@ class TranslationService {
       // Check and download source language model
       if (!await modelService.isModelDownloaded(sourceCode)) {
         print('Translation: Downloading language model for $sourceCode');
-        overlayService.showToast('Downloading language model... (~30MB). Please wait.');
+        overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
         await modelService.downloadModelWithFallback(sourceCode);
       }
       
       // Check and download target language model
       if (!await modelService.isModelDownloaded(targetCode)) {
         print('Translation: Downloading language model for $targetCode');
-        overlayService.showToast('Downloading language model... (~30MB). Please wait.');
+        overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
         await modelService.downloadModelWithFallback(targetCode);
       }
       print('Translation: Both language models are available.');

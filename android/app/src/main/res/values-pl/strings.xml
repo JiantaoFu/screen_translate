@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Wykrywanie przewijania Screen Translate</string>
+    <string name="accessibility_service_description">Pozwala Screen Translate wykrywać przewijanie w innych aplikacjach, aby tłumaczenie działało płynnie. Usługa rozpoznaje zmiany treści, dzięki czemu tłumaczenia są dokładnie aktualizowane.</string>
+    <string name="accessibility_permission_title">Wymagana usługa ułatwień dostępu</string>
+    <string name="accessibility_permission_message">Screen Translate potrzebuje usługi ułatwień dostępu, aby wykrywać przewijanie i tłumaczyć treści w różnych aplikacjach.</string>
+    <string name="accessibility_permission_benefits">Korzyści:\n• Płynne tłumaczenie podczas przewijania\n• Działa w wielu aplikacjach\n• Dokładniejsze tłumaczenia</string>
+    <string name="accessibility_permission_how_to">Jak włączyć:\n1. Kliknij „Włącz”\n2. Znajdź „Wykrywanie przewijania Screen Translate” w ustawieniach ułatwień dostępu\n3. Włącz usługę</string>
+    <string name="btn_enable_accessibility">Włącz</string>
+    <string name="btn_cancel">Anuluj</string>
+    <string name="tap_outside_to_close">Kliknij poza oknem, aby zamknąć</string>
+    <string name="mode_auto_translate">Tłumaczenie automatyczne</string>
+    <string name="mode_original_text">Tekst oryginalny</string>
+    <string name="mode_manual_translate">Tłumaczenie ręczne</string>
+</resources>

@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate 스크롤 감지</string>
+    <string name="accessibility_service_description">다른 앱의 스크롤을 감지하여 끊김 없이 번역할 수 있게 합니다. 내용이 바뀌는 시점을 파악해 번역을 정확하게 업데이트합니다.</string>
+    <string name="accessibility_permission_title">접근성 서비스 필요</string>
+    <string name="accessibility_permission_message">Screen Translate는 스크롤을 감지하고 여러 앱의 내용을 번역하기 위해 접근성 서비스가 필요합니다.</string>
+    <string name="accessibility_permission_benefits">장점:\n• 스크롤하는 동안에도 끊김 없는 번역\n• 여러 앱에서 작동\n• 번역 정확도 향상</string>
+    <string name="accessibility_permission_how_to">사용 설정 방법:\n1. \'사용\'을(를) 탭하세요\n2. 접근성 설정에서 \'Screen Translate 스크롤 감지\'을(를) 찾으세요\n3. 서비스를 켜세요</string>
+    <string name="btn_enable_accessibility">사용</string>
+    <string name="btn_cancel">취소</string>
+    <string name="tap_outside_to_close">바깥쪽을 탭하여 닫기</string>
+    <string name="mode_auto_translate">자동 번역</string>
+    <string name="mode_original_text">원문</string>
+    <string name="mode_manual_translate">수동 번역</string>
+</resources>

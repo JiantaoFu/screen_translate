@@ -27,78 +27,26 @@ class AppLocalizationsKo extends AppLocalizations {
   String get source_and_target_cannot_be_the_same => '원본 언어와 대상 언어가 같을 수 없습니다';
 
   @override
-  String get manage_translation_models => '번역 모델 관리';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language 모델 다운로드 완료';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return '$language 모델 다운로드 실패';
-  }
-
-  @override
-  String get model_not_downloaded => '모델이 다운로드되지 않음';
-
-  @override
   String get download_model => '다운로드';
 
   @override
-  String get remove_translation_model => '번역 모델 삭제';
+  String get cancel => '취소';
 
   @override
-  String remove_translation_model_confirmation(Object language) {
-    return '$language번역 모델을 삭제합니다か?';
-  }
-
-  @override
-  String get cancel => '죽기';
-
-  @override
-  String get remove => ' 삭제';
-
-  @override
-  String get not_installed => '설치되지 않음';
+  String get remove => '삭제';
 
   @override
   String get downloading => '다운로드 중...';
 
   @override
-  String get installed => '설치된 모델';
-
-  @override
-  String get download_failed => '다운로드 실패';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return '$language 모델 삭제 실패';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return '$language 모델 다운로드 실패';
-  }
-
-  @override
-  String get auto_translate_mode => '자동 트랜스';
-
-  @override
-  String get manual_translate_mode => '마달 트랜스';
-
-  @override
-  String get original_text_mode => '예전 텍스트 모델';
-
-  @override
-  String get overlay_permission_required => '번역 모델';
+  String get overlay_permission_required => '다른 앱 위에 표시 권한 필요';
 
   @override
   String get overlay_permission_required_content =>
-      '이 프로그램은 스크림에 대한 번역을 위한 기능을 필요하면들다.';
+      '화면에 번역을 표시하려면 다른 앱 위에 표시 권한이 필요합니다.';
 
   @override
-  String get grant_permission => '기능을 통해 주기';
+  String get grant_permission => '권한 허용';
 
   @override
   String get language_afrikaans => '아프리칸스어';
@@ -297,52 +245,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get api_key_required => 'API 키 필요';
 
   @override
-  String get api_key_setup_prompt => 'AI 번역을 사용하려면 ChatGLM API 키를 설정하세요.';
-
-  @override
   String get go_to_settings => '설정으로 이동';
-
-  @override
-  String get api_key_dialog_title => 'AI 번역 API 구성';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI 번역';
-
-  @override
-  String get api_key_get_key_from => 'ChatGLM 번역을 사용하려면 에서 무료 API 키를 받아야 합니다 ';
-
-  @override
-  String get api_key_configuration_steps => 'API 키 구성 단계';
-
-  @override
-  String get api_key_step_1 => '1. open.bigmodel.cn을 방문하여 계정 생성';
-
-  @override
-  String get api_key_step_2 => '2. API 관리 섹션으로 이동';
-
-  @override
-  String get api_key_step_3 => '3. 애플리케이션용 새 API 키 생성';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API 키';
-
-  @override
-  String get api_key_input_hint => 'ChatGLM API 키를 입력하세요';
 
   @override
   String get api_key_input_error => '유효한 API 키를 입력하세요';
 
   @override
-  String get api_key_save_button => 'API 키 저장';
-
-  @override
-  String get api_key_note => 'API 키는 안전하게 저장되며 번역 서비스에만 사용됩니다.';
-
-  @override
   String get api_key_save_error => '잘못된 API 키입니다. 확인하고 다시 시도하세요.';
-
-  @override
-  String get api_key_save_success => 'API 키가 성공적으로 저장되었습니다';
 
   @override
   String get translation_mode_on_device => '기기 내 번역';
@@ -360,12 +269,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get translation_mode_title => '번역 모드';
-
-  @override
-  String get translation_mode_on_device_label => '기기 내';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => '닫기';
@@ -533,4 +436,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get language_request_sent => '감사합니다! 요청이 접수되었습니다.';
+
+  @override
+  String get pack_waiting_for_network => '네트워크 대기 중…';
+
+  @override
+  String get downloading_language_model_toast =>
+      '언어 모델을 다운로드하는 중입니다(약 30MB). 잠시 기다려 주세요…';
 }

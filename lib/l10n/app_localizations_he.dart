@@ -28,31 +28,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'שפת המקור והיעד לא יכולות להיות זהות';
 
   @override
-  String get manage_translation_models => 'ניהול מודלי תרגום';
-
-  @override
-  String model_download_success(Object language) {
-    return 'מודל $language הורד בהצלחה';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'שגיאה בהורדת מודל $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'המודל לא הורד';
-
-  @override
   String get download_model => 'הורד';
-
-  @override
-  String get remove_translation_model => 'הסרת מודל תרגום';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'האם אתה רוצה להסיר את המודל לתרגום לשפה $language?';
-  }
 
   @override
   String get cancel => 'ביטול';
@@ -61,45 +37,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get remove => 'הסרה';
 
   @override
-  String get not_installed => 'לא מותקן';
-
-  @override
   String get downloading => 'מוריד...';
 
   @override
-  String get installed => 'מותקן';
-
-  @override
-  String get download_failed => 'הורדה נכשלה';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'שגיאה בהסרת מודל $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'שגיאה בהורדת מודל $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatizm';
-
-  @override
-  String get manual_translate_mode => 'הפוך ידנית';
-
-  @override
-  String get original_text_mode => 'מודל טקסט הפוך';
-
-  @override
-  String get overlay_permission_required => 'מודל תרגום';
+  String get overlay_permission_required =>
+      'נדרשת הרשאה להצגה מעל אפליקציות אחרות';
 
   @override
   String get overlay_permission_required_content =>
-      'פרוטם צריך להפוך את המסך לפנימי.';
+      'האפליקציה צריכה הרשאה להצגה מעל אפליקציות אחרות כדי להציג תרגומים על המסך.';
 
   @override
-  String get grant_permission => 'הפוך את המסך לפנימי';
+  String get grant_permission => 'מתן הרשאה';
 
   @override
   String get language_afrikaans => 'אפריקאנס';
@@ -298,55 +247,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get api_key_required => 'נדרש מפתח API';
 
   @override
-  String get api_key_setup_prompt =>
-      'הגדר את מפתח ה-API של ChatGLM לתרגום מבוסס AI.';
-
-  @override
   String get go_to_settings => 'עבור להגדרות';
-
-  @override
-  String get api_key_dialog_title => 'הגדרת API לתרגום AI';
-
-  @override
-  String get api_key_configuration_title => 'תרגום ChatGLM עם AI';
-
-  @override
-  String get api_key_get_key_from =>
-      'כדי להשתמש בתרגומי ChatGLM, עליך לקבל מפתח API חינם מ-';
-
-  @override
-  String get api_key_configuration_steps => 'שלבי הגדרת מפתח API';
-
-  @override
-  String get api_key_step_1 => '1. בקר ב-open.bigmodel.cn וצור חשבון';
-
-  @override
-  String get api_key_step_2 => '2. עבור לסעיף ניהול API';
-
-  @override
-  String get api_key_step_3 => '3. צור מפתח API חדש עבור האפליקציה שלך';
-
-  @override
-  String get api_key_input_label => 'מפתח API של ChatGLM';
-
-  @override
-  String get api_key_input_hint => 'הזן את מפתח ה-API של ChatGLM';
 
   @override
   String get api_key_input_error => 'אנא הזן מפתח API תקף';
 
   @override
-  String get api_key_save_button => 'שמור מפתח API';
-
-  @override
-  String get api_key_note =>
-      'מפתח ה-API שלך יישמר בבטחה וישמש רק לשירותי תרגום.';
-
-  @override
   String get api_key_save_error => 'מפתח API לא תקף. בדוק ונסה שוב.';
-
-  @override
-  String get api_key_save_success => 'מפתח API נשמר בהצלחה';
 
   @override
   String get translation_mode_on_device => 'תרגום במכשיר';
@@ -364,12 +271,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'מצב תרגום';
-
-  @override
-  String get translation_mode_on_device_label => 'במכשיר';
-
-  @override
-  String get translation_mode_ai_label => 'בינה מלאכותית';
 
   @override
   String get close => 'סגור';
@@ -539,4 +440,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get language_request_sent => 'תודה! רשמנו את הבקשה שלך.';
+
+  @override
+  String get pack_waiting_for_network => 'ממתין לרשת…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'מוריד מודל שפה (כ-30MB). נא להמתין…';
 }

@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Detekce posouvání Screen Translate</string>
+    <string name="accessibility_service_description">Umožňuje aplikaci Screen Translate rozpoznat posouvání v jiných aplikacích pro plynulý překlad. Služba pozná, kdy se obsah změní, aby se překlady přesně aktualizovaly.</string>
+    <string name="accessibility_permission_title">Je vyžadována služba usnadnění přístupu</string>
+    <string name="accessibility_permission_message">Screen Translate potřebuje službu usnadnění přístupu, aby rozpoznala posouvání a překládala obsah v různých aplikacích.</string>
+    <string name="accessibility_permission_benefits">Výhody:\n• Plynulý překlad při posouvání\n• Funguje v mnoha aplikacích\n• Přesnější překlady</string>
+    <string name="accessibility_permission_how_to">Jak zapnout:\n1. Klepněte na „Zapnout“\n2. V nastavení usnadnění přístupu najděte „Detekce posouvání Screen Translate“\n3. Zapněte službu</string>
+    <string name="btn_enable_accessibility">Zapnout</string>
+    <string name="btn_cancel">Zrušit</string>
+    <string name="tap_outside_to_close">Klepnutím mimo okno zavřete</string>
+    <string name="mode_auto_translate">Automatický překlad</string>
+    <string name="mode_original_text">Původní text</string>
+    <string name="mode_manual_translate">Ruční překlad</string>
+</resources>

@@ -1,0 +1,4 @@
+• Language pack downloads now show real progress, and tell you when they are waiting for the network
+• Fixed the app failing to open on phones set to a language it doesn't translate its menus into (e.g. Ukrainian, Malay), or to Norwegian
+• The accessibility prompt and overlay labels now appear in your language
+• Corrected many menu translations across languages

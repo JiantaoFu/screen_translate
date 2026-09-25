@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate Kaydırma Algılama</string>
+    <string name="accessibility_service_description">Screen Translate\'in diğer uygulamalardaki kaydırmayı algılayarak kesintisiz çeviri yapmasını sağlar. Bu hizmet, içeriğin ne zaman değiştiğini algılayarak çevirilerin doğru şekilde güncellenmesine yardımcı olur.</string>
+    <string name="accessibility_permission_title">Erişilebilirlik Hizmeti Gerekli</string>
+    <string name="accessibility_permission_message">Screen Translate, kaydırmayı algılamak ve farklı uygulamalardaki içeriği çevirmek için erişilebilirlik hizmetine ihtiyaç duyar.</string>
+    <string name="accessibility_permission_benefits">Avantajlar:\n• Kaydırırken kesintisiz çeviri\n• Birçok uygulamada çalışır\n• Daha doğru çeviriler</string>
+    <string name="accessibility_permission_how_to">Nasıl etkinleştirilir:\n1. “Etkinleştir” düğmesine dokunun\n2. Erişilebilirlik ayarlarında “Screen Translate Kaydırma Algılama” öğesini bulun\n3. Hizmeti açın</string>
+    <string name="btn_enable_accessibility">Etkinleştir</string>
+    <string name="btn_cancel">İptal</string>
+    <string name="tap_outside_to_close">Kapatmak için dışarıya dokunun</string>
+    <string name="mode_auto_translate">Otomatik çeviri</string>
+    <string name="mode_original_text">Orijinal metin</string>
+    <string name="mode_manual_translate">Manuel çeviri</string>
+</resources>

@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Screen Translate: отслеживание прокрутки</string>
+    <string name="accessibility_service_description">Позволяет Screen Translate отслеживать прокрутку в других приложениях для непрерывного перевода. Сервис определяет, когда меняется содержимое, чтобы точно обновлять перевод.</string>
+    <string name="accessibility_permission_title">Нужна служба специальных возможностей</string>
+    <string name="accessibility_permission_message">Screen Translate использует службу специальных возможностей, чтобы отслеживать прокрутку и переводить содержимое разных приложений.</string>
+    <string name="accessibility_permission_benefits">Преимущества:\n• Непрерывный перевод при прокрутке\n• Работает во многих приложениях\n• Более точный перевод</string>
+    <string name="accessibility_permission_how_to">Как включить:\n1. Нажмите «Включить»\n2. Найдите «Screen Translate: отслеживание прокрутки» в настройках специальных возможностей\n3. Включите службу</string>
+    <string name="btn_enable_accessibility">Включить</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="tap_outside_to_close">Нажмите за пределами окна, чтобы закрыть</string>
+    <string name="mode_auto_translate">Автоперевод</string>
+    <string name="mode_original_text">Исходный текст</string>
+    <string name="mode_manual_translate">Ручной перевод</string>
+</resources>

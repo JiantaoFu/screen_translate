@@ -65,4 +65,15 @@ extension AppLocalizationsExtension on AppLocalizations {
     };
     return map[key] ?? key; // Fallback to the key if not found
   }
+
+  /// The language's name in the UI language, e.g. "中文" for "zh" in Chinese.
+  String languageName(String code) {
+    final key = 'language_$code';
+    final name = getLocalizedValue(key);
+    return name == key ? code : name;
+  }
+
+  /// A translation direction, e.g. "日语 → 英语".
+  String languagePairName(String source, String target) =>
+      '${languageName(source)} → ${languageName(target)}';
 }

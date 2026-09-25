@@ -1,2 +1,15 @@
-<?xml version="1.0" ?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Detección de desplazamiento de Screen Translate</string>
+    <string name="accessibility_service_description">Permite que Screen Translate detecte el desplazamiento en otras apps para traducir sin interrupciones. Este servicio detecta cuándo cambia el contenido para actualizar las traducciones con precisión.</string>
+    <string name="accessibility_permission_title">Se requiere el servicio de accesibilidad</string>
+    <string name="accessibility_permission_message">Screen Translate necesita el servicio de accesibilidad para detectar el desplazamiento y traducir contenido en distintas apps.</string>
+    <string name="accessibility_permission_benefits">Ventajas:\n• Traducción fluida al desplazarte\n• Funciona en varias apps\n• Traducciones más precisas</string>
+    <string name="accessibility_permission_how_to">Cómo activarlo:\n1. Toca «Activar»\n2. Busca «Detección de desplazamiento de Screen Translate» en los ajustes de accesibilidad\n3. Activa el servicio</string>
+    <string name="btn_enable_accessibility">Activar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="tap_outside_to_close">Toca fuera para cerrar</string>
+    <string name="mode_auto_translate">Traducción automática</string>
+    <string name="mode_original_text">Texto original</string>
+    <string name="mode_manual_translate">Traducción manual</string>
+</resources>

@@ -28,31 +28,7 @@ class AppLocalizationsNo extends AppLocalizations {
       'Kilde- og målspråk kan ikke være like';
 
   @override
-  String get manage_translation_models => 'Administrer oversettelsesmodeller';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Modell for $language er lastet ned';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Kunne ikke laste ned modell for $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Modell ikke lastet ned';
-
-  @override
   String get download_model => 'Last ned';
-
-  @override
-  String get remove_translation_model => 'Fjern oversettelsesmodel';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Er du sikker på at du vil fjerne oversettelsesmodel for $language?';
-  }
 
   @override
   String get cancel => 'Avbryt';
@@ -61,45 +37,18 @@ class AppLocalizationsNo extends AppLocalizations {
   String get remove => 'Fjern';
 
   @override
-  String get not_installed => 'Ikke installert';
+  String get downloading => 'Laster ned...';
 
   @override
-  String get downloading => 'Henter...';
-
-  @override
-  String get installed => 'Installert';
-
-  @override
-  String get download_failed => 'Download feilet';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Feilet at slette model for $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Feilet at hente model for $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatisk oversettelse';
-
-  @override
-  String get manual_translate_mode => 'Manuell oversettelse';
-
-  @override
-  String get original_text_mode => 'Originaltekstmodel';
-
-  @override
-  String get overlay_permission_required => 'Oversættelsesmodel';
+  String get overlay_permission_required =>
+      'Tillatelse til å vises over andre apper kreves';
 
   @override
   String get overlay_permission_required_content =>
-      'Dette program bruger tildelinger til at oversætte på skærmen.';
+      'Appen trenger tillatelse til å vises over andre apper for å kunne vise oversettelser på skjermen.';
 
   @override
-  String get grant_permission => 'Tildel tildelinger';
+  String get grant_permission => 'Gi tillatelse';
 
   @override
   String get language_afrikaans => 'Afrikaans';
@@ -298,67 +247,23 @@ class AppLocalizationsNo extends AppLocalizations {
   String get api_key_required => 'API-nøkkel kreves';
 
   @override
-  String get api_key_setup_prompt =>
-      'Sett opp din ChatGLM API-nøkkel for AI-oversettelse.';
-
-  @override
   String get go_to_settings => 'Gå til Innstillinger';
-
-  @override
-  String get api_key_dialog_title => 'Konfigurasjon av AI-oversettings-API';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI-oversettelse';
-
-  @override
-  String get api_key_get_key_from =>
-      'For å bruke ChatGLM-oversettelser, må du skaffe en gratis API-nøkkel fra ';
-
-  @override
-  String get api_key_configuration_steps =>
-      'Konfigurasjonstrinn for API-nøkkel';
-
-  @override
-  String get api_key_step_1 => '1. Besøk open.bigmodel.cn og opprett en konto';
-
-  @override
-  String get api_key_step_2 => '2. Naviger til API-administrasjonsseksjonen';
-
-  @override
-  String get api_key_step_3 =>
-      '3. Generer en ny API-nøkkel for din applikasjon';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API-nøkkel';
-
-  @override
-  String get api_key_input_hint => 'Skriv inn din ChatGLM API-nøkkel';
 
   @override
   String get api_key_input_error => 'Vennligst skriv inn en gyldig API-nøkkel';
 
   @override
-  String get api_key_save_button => 'Lagre API-nøkkel';
-
-  @override
-  String get api_key_note =>
-      'Din API-nøkkel vil bli lagret sikkert og kun brukt for oversettelsestjenester.';
-
-  @override
   String get api_key_save_error => 'Ugyldig API-nøkkel. Sjekk og prøv igjen.';
 
   @override
-  String get api_key_save_success => 'API-nøkkel lagret vellykket';
-
-  @override
-  String get translation_mode_on_device => 'Oversettelse på Enhet';
+  String get translation_mode_on_device => 'Oversettelse på enheten';
 
   @override
   String get translation_mode_on_device_description =>
       'Bruker innebygde oversettelsesmodeller på enheten din. Rask og fungerer frakoblet, men kan ha begrenset språkstøtte og nøyaktighet.';
 
   @override
-  String get translation_mode_ai => 'AI-Oversettelse';
+  String get translation_mode_ai => 'AI-oversettelse';
 
   @override
   String get translation_mode_ai_description =>
@@ -366,12 +271,6 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Oversettelsesmodus';
-
-  @override
-  String get translation_mode_on_device_label => 'På Enhet';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Lukk';
@@ -545,4 +444,11 @@ class AppLocalizationsNo extends AppLocalizations {
   @override
   String get language_request_sent =>
       'Takk! Vi har registrert forespørselen din.';
+
+  @override
+  String get pack_waiting_for_network => 'Venter på nettverk…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Laster ned språkmodell (~30 MB). Vent litt…';
 }

@@ -28,78 +28,27 @@ class AppLocalizationsHi extends AppLocalizations {
       'स्रोत और लक्ष्य भाषा समान नहीं हो सकती';
 
   @override
-  String get manage_translation_models => 'अनुवाद मॉडल प्रबंधित करें';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language मॉडल सफलतापूर्वक डाउनलोड किया गया';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return '$language मॉडल डाउनलोड करने में त्रुटि';
-  }
-
-  @override
-  String get model_not_downloaded => 'मॉडल डाउनलोड नहीं किया गया';
-
-  @override
   String get download_model => 'डाउनलोड करें';
 
   @override
-  String get remove_translation_model => 'मॉडल तरक्की हटाएं';
+  String get cancel => 'रद्द करें';
 
   @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'आप किस भाषा के लिए यह अनुवाद मॉडल हटाना चाहते हैं?';
-  }
+  String get remove => 'हटाएँ';
 
   @override
-  String get cancel => 'रद्द करना';
+  String get downloading => 'डाउनलोड हो रहा है...';
 
   @override
-  String get remove => 'हटाना';
-
-  @override
-  String get not_installed => 'निर्माण नहीं किया गया';
-
-  @override
-  String get downloading => 'डाउनलोड हो रहा है';
-
-  @override
-  String get installed => 'निर्माण किया गया';
-
-  @override
-  String get download_failed => 'डाउनलोड नहीं किया गया';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'अनुवाद मॉडल $language हटाने में त्रुटि';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'अनुवाद मॉडल $language डाउनलोड करने में त्रुटि';
-  }
-
-  @override
-  String get auto_translate_mode => 'ऑटो अनुवाद मोड';
-
-  @override
-  String get manual_translate_mode => 'व्यक्तिगत अनुवाद मोड';
-
-  @override
-  String get original_text_mode => 'उर्व्यवस्थित टेक्स्ट मोड';
-
-  @override
-  String get overlay_permission_required => 'अनुवाद मोड';
+  String get overlay_permission_required =>
+      'दूसरे ऐप्स के ऊपर दिखाने की अनुमति ज़रूरी है';
 
   @override
   String get overlay_permission_required_content =>
-      'अनुवाद मोड के लिए आपकी अनुमति आवश्यक है';
+      'स्क्रीन पर अनुवाद दिखाने के लिए इस ऐप को दूसरे ऐप्स के ऊपर दिखाने की अनुमति चाहिए।';
 
   @override
-  String get grant_permission => 'अनुमति आवश्यक';
+  String get grant_permission => 'अनुमति दें';
 
   @override
   String get language_afrikaans => 'अफ्रीकी';
@@ -298,57 +247,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get api_key_required => 'API कुंजी आवश्यक है';
 
   @override
-  String get api_key_setup_prompt =>
-      'कृपया AI अनुवाद का उपयोग करने के लिए अपनी ChatGLM API कुंजी सेट करें।';
-
-  @override
   String get go_to_settings => 'सेटिंग्स पर जाएं';
-
-  @override
-  String get api_key_dialog_title => 'AI अनुवाद API कॉन्फ़िगरेशन';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI अनुवाद';
-
-  @override
-  String get api_key_get_key_from =>
-      'ChatGLM अनुवाद का उपयोग करने के लिए, आपको से एक मुफ्त API कुंजी प्राप्त करनी होगी ';
-
-  @override
-  String get api_key_configuration_steps => 'API कुंजी कॉन्फ़िगरेशन चरण';
-
-  @override
-  String get api_key_step_1 => '1. open.bigmodel.cn पर जाएं और एक खाता बनाएं';
-
-  @override
-  String get api_key_step_2 => '2. API प्रबंधन अनुभाग पर नेविगेट करें';
-
-  @override
-  String get api_key_step_3 =>
-      '3. अपने एप्लिकेशन के लिए एक नई API कुंजी जनरेट करें';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API कुंजी';
-
-  @override
-  String get api_key_input_hint => 'अपनी ChatGLM API कुंजी दर्ज करें';
 
   @override
   String get api_key_input_error => 'कृपया एक वैध API कुंजी दर्ज करें';
 
   @override
-  String get api_key_save_button => 'API कुंजी सहेजें';
-
-  @override
-  String get api_key_note =>
-      'आपकी API कुंजी सुरक्षित रूप से संग्रहीत की जाएगी और केवल अनुवाद सेवाओं के लिए उपयोग की जाएगी।';
-
-  @override
   String get api_key_save_error =>
       'अवैध API कुंजी। कृपया जांचें और फिर से प्रयास करें।';
-
-  @override
-  String get api_key_save_success => 'API कुंजी सफलतापूर्वक सहेजी गई';
 
   @override
   String get translation_mode_on_device => 'डिवाइस पर अनुवाद';
@@ -366,12 +272,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'अनुवाद मोड';
-
-  @override
-  String get translation_mode_on_device_label => 'डिवाइस पर';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'बंद करें';
@@ -546,4 +446,11 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get language_request_sent =>
       'धन्यवाद! हमने आपका अनुरोध दर्ज कर लिया है।';
+
+  @override
+  String get pack_waiting_for_network => 'नेटवर्क का इंतज़ार…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'भाषा मॉडल डाउनलोड हो रहा है (~30 MB)। कृपया इंतज़ार करें…';
 }

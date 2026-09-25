@@ -200,47 +200,11 @@ abstract class AppLocalizations {
   /// **'Source and target languages cannot be the same'**
   String get source_and_target_cannot_be_the_same;
 
-  /// No description provided for @manage_translation_models.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage Translation Models'**
-  String get manage_translation_models;
-
-  /// No description provided for @model_download_success.
-  ///
-  /// In en, this message translates to:
-  /// **'{language} model downloaded successfully'**
-  String model_download_success(Object language);
-
-  /// No description provided for @model_download_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to download {language} model'**
-  String model_download_error(Object language);
-
-  /// No description provided for @model_not_downloaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Model not downloaded'**
-  String get model_not_downloaded;
-
   /// No description provided for @download_model.
   ///
   /// In en, this message translates to:
   /// **'Download'**
   String get download_model;
-
-  /// No description provided for @remove_translation_model.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove Translation Model'**
-  String get remove_translation_model;
-
-  /// No description provided for @remove_translation_model_confirmation.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to remove the {language} translation model?'**
-  String remove_translation_model_confirmation(Object language);
 
   /// No description provided for @cancel.
   ///
@@ -254,59 +218,11 @@ abstract class AppLocalizations {
   /// **'Remove'**
   String get remove;
 
-  /// No description provided for @not_installed.
-  ///
-  /// In en, this message translates to:
-  /// **'Not Installed'**
-  String get not_installed;
-
   /// No description provided for @downloading.
   ///
   /// In en, this message translates to:
   /// **'Downloading...'**
   String get downloading;
-
-  /// No description provided for @installed.
-  ///
-  /// In en, this message translates to:
-  /// **'Installed'**
-  String get installed;
-
-  /// No description provided for @download_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'Download Failed'**
-  String get download_failed;
-
-  /// No description provided for @failed_to_remove_model.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to remove {language} model'**
-  String failed_to_remove_model(Object language);
-
-  /// No description provided for @failed_to_download_model.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to download {language} model'**
-  String failed_to_download_model(Object language);
-
-  /// No description provided for @auto_translate_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Auto Translate Mode'**
-  String get auto_translate_mode;
-
-  /// No description provided for @manual_translate_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Manual Translate Mode'**
-  String get manual_translate_mode;
-
-  /// No description provided for @original_text_mode.
-  ///
-  /// In en, this message translates to:
-  /// **'Original Text Mode'**
-  String get original_text_mode;
 
   /// No description provided for @overlay_permission_required.
   ///
@@ -716,71 +632,11 @@ abstract class AppLocalizations {
   /// **'API Key Required'**
   String get api_key_required;
 
-  /// No description provided for @api_key_setup_prompt.
-  ///
-  /// In en, this message translates to:
-  /// **'Please set up your ChatGLM API key to use AI translation.'**
-  String get api_key_setup_prompt;
-
   /// No description provided for @go_to_settings.
   ///
   /// In en, this message translates to:
   /// **'Go to Settings'**
   String get go_to_settings;
-
-  /// No description provided for @api_key_dialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'AI Translation API Configuration'**
-  String get api_key_dialog_title;
-
-  /// No description provided for @api_key_configuration_title.
-  ///
-  /// In en, this message translates to:
-  /// **'ChatGLM AI Translation'**
-  String get api_key_configuration_title;
-
-  /// No description provided for @api_key_get_key_from.
-  ///
-  /// In en, this message translates to:
-  /// **'To use ChatGLM for translations, you need to obtain an free API key from '**
-  String get api_key_get_key_from;
-
-  /// No description provided for @api_key_configuration_steps.
-  ///
-  /// In en, this message translates to:
-  /// **'API Key Configuration Steps'**
-  String get api_key_configuration_steps;
-
-  /// No description provided for @api_key_step_1.
-  ///
-  /// In en, this message translates to:
-  /// **'1. Visit open.bigmodel.cn and create an account'**
-  String get api_key_step_1;
-
-  /// No description provided for @api_key_step_2.
-  ///
-  /// In en, this message translates to:
-  /// **'2. Navigate to API Management section'**
-  String get api_key_step_2;
-
-  /// No description provided for @api_key_step_3.
-  ///
-  /// In en, this message translates to:
-  /// **'3. Generate a new API key for your application'**
-  String get api_key_step_3;
-
-  /// No description provided for @api_key_input_label.
-  ///
-  /// In en, this message translates to:
-  /// **'ChatGLM API Key'**
-  String get api_key_input_label;
-
-  /// No description provided for @api_key_input_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your ChatGLM API key'**
-  String get api_key_input_hint;
 
   /// No description provided for @api_key_input_error.
   ///
@@ -788,29 +644,11 @@ abstract class AppLocalizations {
   /// **'Please enter a valid API key'**
   String get api_key_input_error;
 
-  /// No description provided for @api_key_save_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Save API Key'**
-  String get api_key_save_button;
-
-  /// No description provided for @api_key_note.
-  ///
-  /// In en, this message translates to:
-  /// **'Your API key will be securely stored and used only for translation services.'**
-  String get api_key_note;
-
   /// No description provided for @api_key_save_error.
   ///
   /// In en, this message translates to:
   /// **'Invalid API Key. Please check and try again.'**
   String get api_key_save_error;
-
-  /// No description provided for @api_key_save_success.
-  ///
-  /// In en, this message translates to:
-  /// **'API Key Saved Successfully'**
-  String get api_key_save_success;
 
   /// No description provided for @translation_mode_on_device.
   ///
@@ -841,18 +679,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Translation Mode'**
   String get translation_mode_title;
-
-  /// No description provided for @translation_mode_on_device_label.
-  ///
-  /// In en, this message translates to:
-  /// **'On-Device'**
-  String get translation_mode_on_device_label;
-
-  /// No description provided for @translation_mode_ai_label.
-  ///
-  /// In en, this message translates to:
-  /// **'AI'**
-  String get translation_mode_ai_label;
 
   /// No description provided for @close.
   ///
@@ -1153,6 +979,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thanks! We\'ve noted your request.'**
   String get language_request_sent;
+
+  /// Shown instead of a percentage while a model download is paused waiting for the network
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for network…'**
+  String get pack_waiting_for_network;
+
+  /// Toast when translating needs a language model that isn't downloaded yet
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading language model (~30 MB). Please wait…'**
+  String get downloading_language_model_toast;
 }
 
 class _AppLocalizationsDelegate

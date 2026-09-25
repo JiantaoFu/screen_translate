@@ -28,31 +28,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Source and target languages cannot be the same';
 
   @override
-  String get manage_translation_models => 'Manage Translation Models';
-
-  @override
-  String model_download_success(Object language) {
-    return '$language model downloaded successfully';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Failed to download $language model';
-  }
-
-  @override
-  String get model_not_downloaded => 'Model not downloaded';
-
-  @override
   String get download_model => 'Download';
-
-  @override
-  String get remove_translation_model => 'Remove Translation Model';
-
-  @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Are you sure you want to remove the $language translation model?';
-  }
 
   @override
   String get cancel => 'Cancel';
@@ -61,35 +37,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remove => 'Remove';
 
   @override
-  String get not_installed => 'Not Installed';
-
-  @override
   String get downloading => 'Downloading...';
-
-  @override
-  String get installed => 'Installed';
-
-  @override
-  String get download_failed => 'Download Failed';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Failed to remove $language model';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Failed to download $language model';
-  }
-
-  @override
-  String get auto_translate_mode => 'Auto Translate Mode';
-
-  @override
-  String get manual_translate_mode => 'Manual Translate Mode';
-
-  @override
-  String get original_text_mode => 'Original Text Mode';
 
   @override
   String get overlay_permission_required => 'Overlay Permission Required';
@@ -298,57 +246,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get api_key_required => 'API Key Required';
 
   @override
-  String get api_key_setup_prompt =>
-      'Please set up your ChatGLM API key to use AI translation.';
-
-  @override
   String get go_to_settings => 'Go to Settings';
-
-  @override
-  String get api_key_dialog_title => 'AI Translation API Configuration';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI Translation';
-
-  @override
-  String get api_key_get_key_from =>
-      'To use ChatGLM for translations, you need to obtain an free API key from ';
-
-  @override
-  String get api_key_configuration_steps => 'API Key Configuration Steps';
-
-  @override
-  String get api_key_step_1 =>
-      '1. Visit open.bigmodel.cn and create an account';
-
-  @override
-  String get api_key_step_2 => '2. Navigate to API Management section';
-
-  @override
-  String get api_key_step_3 => '3. Generate a new API key for your application';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API Key';
-
-  @override
-  String get api_key_input_hint => 'Enter your ChatGLM API key';
 
   @override
   String get api_key_input_error => 'Please enter a valid API key';
 
   @override
-  String get api_key_save_button => 'Save API Key';
-
-  @override
-  String get api_key_note =>
-      'Your API key will be securely stored and used only for translation services.';
-
-  @override
   String get api_key_save_error =>
       'Invalid API Key. Please check and try again.';
-
-  @override
-  String get api_key_save_success => 'API Key Saved Successfully';
 
   @override
   String get translation_mode_on_device => 'On-Device Translation';
@@ -366,12 +271,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get translation_mode_title => 'Translation Mode';
-
-  @override
-  String get translation_mode_on_device_label => 'On-Device';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
 
   @override
   String get close => 'Close';
@@ -543,4 +442,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language_request_sent => 'Thanks! We\'ve noted your request.';
+
+  @override
+  String get pack_waiting_for_network => 'Waiting for network…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Downloading language model (~30 MB). Please wait…';
 }

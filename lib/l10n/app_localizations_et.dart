@@ -28,78 +28,27 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lähte- ja sihtkeel ei saa olla samad';
 
   @override
-  String get manage_translation_models => 'Halda tõlkemudeleid';
-
-  @override
-  String model_download_success(Object language) {
-    return 'Mudel keelele $language on edukalt alla laaditud';
-  }
-
-  @override
-  String model_download_error(Object language) {
-    return 'Viga mudeli allalaadimisel keelele $language';
-  }
-
-  @override
-  String get model_not_downloaded => 'Mudel pole alla laaditud';
-
-  @override
   String get download_model => 'Laadi alla';
 
   @override
-  String get remove_translation_model => 'Otsi tõlkemudel';
+  String get cancel => 'Tühista';
 
   @override
-  String remove_translation_model_confirmation(Object language) {
-    return 'Opravdu chcete odstranit překladový model pro jazyk $language?';
-  }
+  String get remove => 'Eemalda';
 
   @override
-  String get cancel => 'Zrusit';
+  String get downloading => 'Allalaadimine...';
 
   @override
-  String get remove => 'Odebrat';
-
-  @override
-  String get not_installed => 'Neni nainstalovan';
-
-  @override
-  String get downloading => 'Stahovani...';
-
-  @override
-  String get installed => 'Nainstalovan';
-
-  @override
-  String get download_failed => 'Nelze stahnout';
-
-  @override
-  String failed_to_remove_model(Object language) {
-    return 'Nelze odstranit model pro jazyk $language';
-  }
-
-  @override
-  String failed_to_download_model(Object language) {
-    return 'Nelze stahnout model pro jazyk $language';
-  }
-
-  @override
-  String get auto_translate_mode => 'Automatizm';
-
-  @override
-  String get manual_translate_mode => 'Traduce manual';
-
-  @override
-  String get original_text_mode => 'Text original';
-
-  @override
-  String get overlay_permission_required => 'Permission requise';
+  String get overlay_permission_required =>
+      'Vaja on luba kuvada teiste rakenduste peal';
 
   @override
   String get overlay_permission_required_content =>
-      'Ce programme requiert des permissions pour traduire à l\'écran.';
+      'Tõlgete kuvamiseks ekraanil vajab rakendus luba kuvada teiste rakenduste peal.';
 
   @override
-  String get grant_permission => 'Accorder les permissions';
+  String get grant_permission => 'Anna luba';
 
   @override
   String get language_afrikaans => 'afrikaans';
@@ -298,79 +247,31 @@ class AppLocalizationsEt extends AppLocalizations {
   String get api_key_required => 'API võti on vajalik';
 
   @override
-  String get api_key_setup_prompt =>
-      'Seadistage oma ChatGLM API võti AI tõlkeks.';
-
-  @override
   String get go_to_settings => 'Mine Seadetesse';
 
   @override
-  String get api_key_dialog_title => 'AI Tõlke API Konfigureerimine';
-
-  @override
-  String get api_key_configuration_title => 'ChatGLM AI Tõlge';
-
-  @override
-  String get api_key_get_key_from =>
-      'ChatGLM tõlgete kasutamiseks peate saama tasuta API võtme ';
-
-  @override
-  String get api_key_configuration_steps => 'API võtme konfigureerimise sammud';
-
-  @override
-  String get api_key_step_1 => '1. Külastage open.bigmodel.cn-i ja looge konto';
-
-  @override
-  String get api_key_step_2 => '2. Liikuge API haldamise jaotisse';
-
-  @override
-  String get api_key_step_3 => '3. Looge oma rakendusele uus API võti';
-
-  @override
-  String get api_key_input_label => 'ChatGLM API võti';
-
-  @override
-  String get api_key_input_hint => 'Sisestage oma ChatGLM API võti';
-
-  @override
   String get api_key_input_error => 'Palun sisestage kehtiv API võti';
-
-  @override
-  String get api_key_save_button => 'Salvesta API võti';
-
-  @override
-  String get api_key_note =>
-      'Teie API võti salvestatakse turvaliselt ja kasutatakse ainult tõlketeenuste jaoks.';
 
   @override
   String get api_key_save_error =>
       'Vigane API võti. Kontrollige ja proovige uuesti.';
 
   @override
-  String get api_key_save_success => 'API võti on edukalt salvestatud';
-
-  @override
-  String get translation_mode_on_device => 'Tõlge Seadmes';
+  String get translation_mode_on_device => 'Tõlge seadmes';
 
   @override
   String get translation_mode_on_device_description =>
       'Kasutab seadmesse sisseehitatud tõlkemudeleid. Kiire ja töötab võrguühenduseta, kuid võib olla piiratud keeletoega ja täpsusega.';
 
   @override
-  String get translation_mode_ai => 'AI-Tõlge';
+  String get translation_mode_ai => 'AI-tõlge';
 
   @override
   String get translation_mode_ai_description =>
       'Kasutab täiustatud AI-mudeleid täpsemateks ja kontekstuaalseteks tõlgeteks. Nõuab internetiühendust ja API-võtit.';
 
   @override
-  String get translation_mode_title => 'Tõlke Režiim';
-
-  @override
-  String get translation_mode_on_device_label => 'Seadmes';
-
-  @override
-  String get translation_mode_ai_label => 'AI';
+  String get translation_mode_title => 'Tõlkerežiim';
 
   @override
   String get close => 'Sulge';
@@ -536,11 +437,18 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get ai_pair_unsupported_content =>
-      'AI-reżiimil pole selle keelepaari jaoks veel mudelit. Anna meile teada, et soovid seda — see aitab meil otsustada, mida järgmisena arendada.';
+      'AI-režiimil pole selle keelepaari jaoks veel mudelit. Anna meile teada, et soovid seda — see aitab meil otsustada, mida järgmisena arendada.';
 
   @override
   String get request_language_pair => 'Taotle seda keelt';
 
   @override
   String get language_request_sent => 'Aitäh! Oleme su taotluse kirja pannud.';
+
+  @override
+  String get pack_waiting_for_network => 'Võrgu ootamine…';
+
+  @override
+  String get downloading_language_model_toast =>
+      'Keelemudeli allalaadimine (~30 MB). Palun oodake…';
 }

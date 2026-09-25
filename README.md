@@ -50,7 +50,7 @@ storeFile=../screen-trans-key.keystore
 
 #### Windows 环境 (`build.bat`)
 双击运行 `build.bat`，或在 CMD/PowerShell 中执行：
-- 选择 **[7] Bump Version + Full Release (APK + AAB)**
+- 选择 **[6] Bump Version + Full Release (APK + AAB)**
 - 在二级菜单中，您可以选择升级大版本号(Major)、小版本号(Minor)、补丁号(Patch) 或 仅升级构建号(Build Number)。
 - 脚本会自动修改 `pubspec.yaml`，然后进行全局多语言生成的编译打包。
 你的点子很有创意！类似于共享屏幕的权限结合实时翻译功能，确实可以解决许多人在多语言环境中遇到的沟通障碍。这个想法在多个场景下都会非常有用，尤其是在跨语言的工作或学习环境中。
@@ -121,7 +121,7 @@ APK 只打包单个 ABI，不使用 Flutter 的 `--split-per-abi`。原因是 sp
 
 #### Windows 环境 (`build.bat`)
 双击运行 `build.bat`，或在 CMD/PowerShell 中执行：
-- 选择 **[7] Bump Version + Full Release (APK + AAB)**
+- 选择 **[6] Bump Version + Full Release (APK + AAB)**
 - 在二级菜单中，您可以选择升级大版本号(Major)、小版本号(Minor)、补丁号(Patch) 或 仅升级构建号(Build Number)。
 - 脚本会自动修改 `pubspec.yaml`，然后进行全局多语言生成的编译打包。
 
@@ -168,7 +168,7 @@ python tools/release.py --build-only          # 只构建签名 AAB，不上传
 python tools/release.py --help                # 全部选项
 python tools/test_release.py                  # 发版脚本自身的测试
 ```
-`build.bat` 的 **[8]** 和 `./build.sh --publish [track]` 调用的都是这个脚本。
+`build.bat` 的 **[7]** 和 `./build.sh --publish [track]` 调用的都是这个脚本。
 
 **常见问题**
 - **403 / 没有权限**：服务账号在 Play 管理中心的权限没配好，或者刚配好、还没生效，过一会儿再试。

@@ -13,7 +13,20 @@ Run all of these before saying a change is done, and report the results:
 | Flutter tests | `flutter test` | every change |
 | Android unit tests | `cd android && JAVA_HOME="C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot" ./gradlew :app:testDebugUnitTest` | every change |
 | Release tool tests | `python tools/test_release.py` | when `tools/release.py` changes |
-| Emulator regression | `tools/emulator/run_all.sh` (setup: `tools/emulator/README.md`) | any change to the capture/overlay pipeline (ScreenCaptureService, FrameStabilizer, MotionClassifier, OverlayService, OverlayRegions, TranslationProvider's box logic), and before every release |
+| Emulator regression | `tools/emulator/run_all.sh` (setup: `tools/emulator/README.md`) | changes that can alter capture/overlay behaviour (see below), and before every release |
+
+The emulator regression takes about 10 minutes, so decide from what the
+change can affect rather than which file it touches:
+- **Run it all** when a change can alter frame capture, change detection,
+  or how boxes are placed, updated or removed: logic in ScreenCaptureService,
+  FrameStabilizer, MotionClassifier, OverlayService, OverlayRegions, or
+  TranslationProvider's box logic. Always run it all before a release.
+- **Run only the matching script** when the change is narrow, e.g.
+  `rotcheck.sh` for rotation handling or `typecheck.sh` for typewriter
+  text. The table in `tools/emulator/README.md` says what each script checks.
+- **Skip it** when the change can't reach that behaviour, even inside those
+  files: text/resources, logging, comments, renames, or code outside the
+  pipeline. Say that you skipped it, and why, when reporting.
 
 - Add or update tests with each behaviour change. Unit tests go in `test/`
   (Dart) or `android/app/src/test/kotlin/` (Kotlin).

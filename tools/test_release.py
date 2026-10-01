@@ -27,18 +27,20 @@ class FakeRequest:
         self.log.append(self.name)
         return self.result
 
-    def next_chunk(self):  # resumable upload: one chunk then done
+    def next_chunk(self, num_retries=0):  # resumable upload: one chunk then done
         self.log.append(self.name)
+        self.retries = num_retries
         return None, self.result
 
 
 class FakeEdits:
     def __init__(self, log, version_code):
-        self.log, self.version_code, self.calls = log, version_code, {}
+        self.log, self.version_code, self.calls, self.requests = log, version_code, {}, {}
 
     def _req(self, name, result=None, **kw):
         self.calls[name] = kw
-        return FakeRequest(self.log, name, result or {})
+        self.requests[name] = FakeRequest(self.log, name, result or {})
+        return self.requests[name]
 
     def insert(self, **kw): return self._req("insert", {"id": "E1"}, **kw)
     def delete(self, **kw): return self._req("delete", **kw)
@@ -98,6 +100,8 @@ class PublishTest(unittest.TestCase):
         self.assertEqual(svc.log, ["insert", "bundles.upload", "mapping.upload",
                                    "tracks.update", "validate", "commit"])
         self.assertTrue(svc.e.calls["bundles.upload"]["ackBundleInstallationWarning"])
+        # A dropped connection mid-upload is retried, not a failed release.
+        self.assertEqual(svc.e.requests["bundles.upload"].retries, release.CHUNK_RETRIES)
         self.assertEqual(svc.e.calls["mapping.upload"]["apkVersionCode"], 11)
         body = svc.e.calls["tracks.update"]["body"]
         self.assertEqual(body["track"], "internal")

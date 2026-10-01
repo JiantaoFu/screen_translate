@@ -101,7 +101,18 @@ def play_service(credentials):
             credentials, scopes=["https://www.googleapis.com/auth/androidpublisher"])
     except (OSError, ValueError) as e:
         raise ReleaseError(f"can't use Play credentials {credentials}: {e}") from e
-    return build("androidpublisher", "v3", credentials=creds, cache_discovery=False)
+    # googleapiclient waits 60 s per request by default. After the last chunk
+    # of a ~140 MB bundle Play processes the whole bundle before it answers,
+    # which took longer than that: 1.2.3's publish failed at 97% with "The
+    # read operation timed out".
+    import google_auth_httplib2
+    import httplib2
+    http = google_auth_httplib2.AuthorizedHttp(creds, http=httplib2.Http(timeout=UPLOAD_TIMEOUT_S))
+    return build("androidpublisher", "v3", http=http, cache_discovery=False)
+
+
+UPLOAD_TIMEOUT_S = 600
+CHUNK_RETRIES = 3
 
 
 @contextlib.contextmanager
@@ -130,7 +141,9 @@ def highest_version_code(svc):
 def upload(request, what):
     response = None
     while response is None:
-        status, response = request.next_chunk()
+        # Resumable uploads ask Play where to continue, so a retried chunk
+        # doesn't re-send or duplicate the bundle.
+        status, response = request.next_chunk(num_retries=CHUNK_RETRIES)
         if status:
             print(f"  {what}: {int(status.progress() * 100)}%", end="\r", flush=True)
     print(f"  {what}: done      ")

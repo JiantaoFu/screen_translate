@@ -850,7 +850,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             // Our buttons, and the status bar while it's shown (its clock and
             // the screen-sharing timer aren't content and tick constantly).
             val hidden = OverlayRegions.controlRects().toMutableList()
-            if (OverlayRegions.statusBarVisible) hidden += Rect(0, 0, width, statusBarHeight())
+            if (OverlayRegions.statusBarMayBeInFrame()) hidden += Rect(0, 0, width, statusBarHeight())
             blankRects(stableFrame, width, height, hidden)
             // Remove old frames if queue is too large
             while (imageQueue.size >= MAX_QUEUE_SIZE) {

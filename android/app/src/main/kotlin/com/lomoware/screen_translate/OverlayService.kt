@@ -820,8 +820,16 @@ class OverlayService : Service() {
                 // space constraint.
                 maxLines = 15
 
+                val spPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 1f, resources.displayMetrics)
+                val refPaint = android.text.TextPaint(paint).apply { textSize = 100 * spPx }
+                val wordCapSp = OverlayTextFit.maxSizeKeepingWordsWhole(
+                    text.toString(),
+                    transformedWidth - paddingLeft - paddingRight,
+                    100f,
+                ) { refPaint.measureText(it) }
+                val maxSp = (wordCapSp?.toInt() ?: 100).coerceIn(7, 100)
                 setAutoSizeTextTypeUniformWithConfiguration(
-                    6, 100, 1, TypedValue.COMPLEX_UNIT_SP
+                    6, maxSp, 1, TypedValue.COMPLEX_UNIT_SP
                 )
                 gravity = Gravity.CENTER
             }

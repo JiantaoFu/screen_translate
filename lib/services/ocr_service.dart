@@ -87,6 +87,33 @@ class OCRService {
   /// image translation) — previously duplicated in both, which is exactly
   /// how a threshold tweak meant for both paths could end up applied to
   /// only one.
+  /// A block's text with vertical CJK columns in reading order.
+  ///
+  /// ML Kit sometimes returns a whole vertical speech bubble as one block
+  /// whose lines (columns) are ordered left to right, but vertical Japanese
+  /// and Chinese read right to left, so the sentence reached the translator
+  /// backwards ("壊している / ロボットが街を / たすけて" → "It is destroyed.
+  /// Take the robot or town!"). Lines are reordered only when every line is a
+  /// tall column; horizontal text keeps ML Kit's order.
+  @visibleForTesting
+  static String readingOrderText(List<(String, Rect)> lines, TextRecognitionScript script) {
+    final cjk = script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese;
+    final vertical = lines.length > 1 && lines.every((l) => l.$2.height > l.$2.width * 1.5);
+    if (!cjk || !vertical) return lines.map((l) => l.$1).join('\n');
+    final sorted = [...lines]..sort((a, b) => b.$2.center.dx.compareTo(a.$2.center.dx));
+    return sorted.map((l) => l.$1).join('\n');
+  }
+
+  static String _blockText(TextBlock block, TextRecognitionScript script) =>
+      readingOrderText([for (final l in block.lines) (l.text, l.boundingBox)], script);
+
+  @visibleForTesting
+  List<OCRResult> mergeNearbyBlocksForTest(
+    List<OCRResult> blocks,
+    TextRecognitionScript script, {
+    double mergeAggressiveness = 1.5,
+  }) => _mergeNearbyBlocks(blocks, script, mergeAggressiveness);
+
   List<OCRResult> _mergeNearbyBlocks(
     List<OCRResult> initialResults,
     TextRecognitionScript script,
@@ -323,14 +350,14 @@ class OCRService {
           // different backgrounds — e.g. a chat screen's alternating
           // message-bubble colors — even when the boxes are close enough
           // spatially that they'd otherwise look like one paragraph.
-          final pad = boundingBox.height * 0.3;
-          final localColor = ColorUtils.extractRegionColorFromNV21(
-            imageBytes, width, height,
-            boundingBox.left - pad, boundingBox.top - pad,
-            boundingBox.width + pad * 2, boundingBox.height + pad * 2,
+          // Pad by glyph size, not box height: a vertical (manga) column
+          // is tall, and height-based padding reached past its bubble.
+          final pad = min(boundingBox.width, boundingBox.height) * 0.3;
+          final localColor = ColorUtils.extractSurroundColorFromNV21(
+            imageBytes, width, height, boundingBox, pad,
           );
           initialResults.add(OCRResult(
-            text: block.text,
+            text: _blockText(block, script),
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,
@@ -422,15 +449,13 @@ class OCRService {
             boundingBox.height > 0) {
           Color localColor = Colors.white;
           if (decodedForColor != null) {
-            final pad = boundingBox.height * 0.3;
-            localColor = ColorUtils.extractRegionColorFromImage(
-              decodedForColor,
-              boundingBox.left - pad, boundingBox.top - pad,
-              boundingBox.width + pad * 2, boundingBox.height + pad * 2,
+            final pad = min(boundingBox.width, boundingBox.height) * 0.3;
+            localColor = ColorUtils.extractSurroundColorFromImage(
+              decodedForColor, boundingBox, pad,
             );
           }
           initialResults.add(OCRResult(
-            text: block.text,
+            text: _blockText(block, script),
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,

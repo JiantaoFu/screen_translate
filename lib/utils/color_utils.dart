@@ -197,6 +197,63 @@ class ColorUtils {
     }
   }
 
+  /// The background colour *around* a piece of text: the per-channel median
+  /// of points on a ring [pad] pixels outside the text box. Used to decide
+  /// whether two OCR blocks sit on the same bubble/container.
+  ///
+  /// Averaging a grid inside a padded box (what [extractRegionColorFromNV21]
+  /// does) mixes in glyph ink, and when the padding scales with box height
+  /// a tall vertical manga column reaches far outside its speech bubble. The
+  /// columns of one bubble then got different greys and were never merged,
+  /// so each column was translated on its own. Pass a glyph-sized [pad].
+  static Color extractSurroundColorFromNV21(
+    Uint8List bytes,
+    int imgWidth,
+    int imgHeight,
+    Rect box,
+    double pad,
+  ) {
+    if (bytes.length < imgWidth * imgHeight * 1.5) return Colors.white;
+    return _ringMedian(box, pad, imgWidth, imgHeight,
+        (x, y) => _getColorFromBytesNV21(bytes, imgWidth, imgHeight, x, y));
+  }
+
+  /// [extractSurroundColorFromNV21] for a decoded image (static
+  /// "Translate Image" path).
+  static Color extractSurroundColorFromImage(img.Image image, Rect box, double pad) {
+    return _ringMedian(box, pad, image.width, image.height, (x, y) {
+      final p = image.getPixel(x, y);
+      return Color.fromRGBO(p.r.toInt(), p.g.toInt(), p.b.toInt(), 1.0);
+    });
+  }
+
+  static Color _ringMedian(Rect box, double pad, int imgWidth, int imgHeight,
+      Color Function(int x, int y) pixelAt) {
+    const perSide = 8;
+    final ring = box.inflate(pad);
+    final rs = <int>[], gs = <int>[], bs = <int>[];
+    void sample(double x, double y) {
+      if (x < 0 || y < 0 || x >= imgWidth || y >= imgHeight) return;
+      final c = pixelAt(x.toInt(), y.toInt());
+      rs.add(c.red);
+      gs.add(c.green);
+      bs.add(c.blue);
+    }
+
+    for (int i = 0; i < perSide; i++) {
+      final t = (i + 0.5) / perSide;
+      final x = ring.left + ring.width * t;
+      final y = ring.top + ring.height * t;
+      sample(x, ring.top);
+      sample(x, ring.bottom);
+      sample(ring.left, y);
+      sample(ring.right, y);
+    }
+    if (rs.isEmpty) return Colors.white;
+    int median(List<int> v) => (v..sort())[v.length ~/ 2];
+    return Color.fromRGBO(median(rs), median(gs), median(bs), 1.0);
+  }
+
   /// Assign weights to sample points similar to Kotlin implementation
   static double _getWeightForIndex(int index) {
     switch (index) {

@@ -303,7 +303,30 @@ class TranslationProvider with ChangeNotifier {
       _sourceLanguage = savedSource;
       _targetLanguage = savedTarget;
     }
+    _translationMode = await restoredTranslationMode(
+      prefs.getString(_prefTranslationMode),
+      hasApiKey: LLMTranslationService.isApiKeyConfigured,
+    );
     notifyListeners();
+  }
+
+  static const _prefTranslationMode = 'translationMode';
+
+  /// The saved mode, or Quick when there is none or it can't run. The mode
+  /// used to reset to Quick on every launch, so someone who downloaded an AI
+  /// language pack silently lost it the next time they opened the app. A
+  /// missing AI pack already falls back to ML Kit per text, but Cloud without
+  /// an API key would fail every translation (the settings dialog selects
+  /// Cloud before a key exists), so Cloud is restored only with a key.
+  @visibleForTesting
+  static Future<TranslationMode> restoredTranslationMode(
+    String? saved, {
+    required Future<bool> Function() hasApiKey,
+  }) async {
+    final mode = TranslationMode.values.where((m) => m.name == saved).firstOrNull;
+    if (mode == null) return TranslationMode.onDevice;
+    if (mode == TranslationMode.llm && !await hasApiKey()) return TranslationMode.onDevice;
+    return mode;
   }
 
   static const _prefSourceLanguage = 'sourceLanguage';
@@ -358,6 +381,7 @@ class TranslationProvider with ChangeNotifier {
 
   void setTranslationMode(TranslationMode mode) {
     _translationMode = mode;
+    SharedPreferences.getInstance().then((p) => p.setString(_prefTranslationMode, mode.name));
     notifyListeners();
   }
 
@@ -905,7 +929,31 @@ class TranslationProvider with ChangeNotifier {
     _translationService.cancelAllTranslations();
   }
 
+  /// OCR text as the translator should see it. Line breaks in Japanese and
+  /// Chinese are layout (a vertical bubble's columns, a wrapped dialogue
+  /// line), not sentence breaks, and these languages don't put spaces
+  /// between words: the three columns of "たすけて!あの / ロボットが街を /
+  /// 壊している!" reached the model as fragments and came back as "That
+  /// robot or that city is destroying it." Lines are joined directly, with a
+  /// space only between two Latin-script ends. Other languages are unchanged.
+  @visibleForTesting
+  static String sourceTextForTranslation(String text, String sourceLanguage) {
+    if (sourceLanguage != 'ja' && sourceLanguage != 'zh') return text;
+    final lines = text.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty);
+    final out = StringBuffer();
+    for (final line in lines) {
+      if (out.isNotEmpty) {
+        final prev = out.toString();
+        bool ascii(int c) => c < 0x80;
+        if (ascii(prev.codeUnitAt(prev.length - 1)) && ascii(line.codeUnitAt(0))) out.write(' ');
+      }
+      out.write(line);
+    }
+    return out.toString();
+  }
+
   Future<String> translateText(String text) async {
+    text = sourceTextForTranslation(text, _sourceLanguage);
     switch (_translationMode) {
       case TranslationMode.onDevice:
         return await _translationService.translateText(
@@ -951,7 +999,7 @@ class TranslationProvider with ChangeNotifier {
     if (texts.isEmpty) return [];
     if (_translationMode == TranslationMode.llm) {
       return await _llmTranslationService.translateBatch(
-        texts: texts,
+        texts: [for (final t in texts) sourceTextForTranslation(t, _sourceLanguage)],
         sourceLanguage: _sourceLanguage,
         targetLanguage: _targetLanguage,
       );

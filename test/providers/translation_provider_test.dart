@@ -69,6 +69,48 @@ void main() {
       expect(restored.targetLanguage, 'vi');
     });
 
+    test('AI mode is persisted and restored', () async {
+      provider.setTranslationMode(TranslationMode.onnx);
+      await pumpEventQueue();
+
+      final restored = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+      );
+      await pumpEventQueue();
+      expect(restored.translationMode, TranslationMode.onnx);
+    });
+
+    test('restored mode falls back to Quick when it cannot run', () async {
+      Future<bool> withKey() async => true;
+      Future<bool> noKey() async => false;
+      expect(await TranslationProvider.restoredTranslationMode(null, hasApiKey: withKey),
+          TranslationMode.onDevice);
+      expect(await TranslationProvider.restoredTranslationMode('bogus', hasApiKey: withKey),
+          TranslationMode.onDevice);
+      expect(await TranslationProvider.restoredTranslationMode('onnx', hasApiKey: noKey),
+          TranslationMode.onnx);
+      expect(await TranslationProvider.restoredTranslationMode('llm', hasApiKey: withKey),
+          TranslationMode.llm);
+      // Cloud is selected by the settings dialog before a key exists.
+      expect(await TranslationProvider.restoredTranslationMode('llm', hasApiKey: noKey),
+          TranslationMode.onDevice);
+    });
+
+    test('Japanese/Chinese line breaks are joined before translation', () {
+      expect(TranslationProvider.sourceTextForTranslation('たすけて!あの\nロボットが街を\n壊している!', 'ja'),
+          'たすけて!あのロボットが街を壊している!');
+      expect(TranslationProvider.sourceTextForTranslation('勇者よ。 \n 気をつけて', 'ja'), '勇者よ。気をつけて');
+      // A space only where two Latin-script ends meet.
+      expect(TranslationProvider.sourceTextForTranslation('HP\nMP 回復', 'zh'), 'HP MP 回復');
+      // Other source languages are untouched.
+      expect(TranslationProvider.sourceTextForTranslation('Hello\nworld', 'en'), 'Hello\nworld');
+    });
+
     test('setters update languages and mode, and notify listeners', () {
       var notifications = 0;
       provider.addListener(() => notifications++);

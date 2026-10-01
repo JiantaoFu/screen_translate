@@ -111,6 +111,12 @@ class PublishTest(unittest.TestCase):
         self.assertEqual({n["language"] for n in rel["releaseNotes"]}, {"en-US", "zh-CN"})
         self.assertNotIn("changesNotSentForReview", svc.e.calls["commit"])
 
+    def test_play_http_keeps_resumable_uploads_working(self):
+        http = release.play_http()
+        # 308 = "resume incomplete" during a resumable upload, not a redirect.
+        self.assertNotIn(308, http.redirect_codes)
+        self.assertEqual(http.timeout, release.UPLOAD_TIMEOUT_S)
+
     def test_staged_rollout(self):
         svc = FakeService()
         release.publish(svc, "1.2.1", 11, args(track="production", rollout=0.2), {})

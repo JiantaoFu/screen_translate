@@ -106,9 +106,19 @@ def play_service(credentials):
     # which took longer than that: 1.2.3's publish failed at 97% with "The
     # read operation timed out".
     import google_auth_httplib2
-    import httplib2
-    http = google_auth_httplib2.AuthorizedHttp(creds, http=httplib2.Http(timeout=UPLOAD_TIMEOUT_S))
+    http = google_auth_httplib2.AuthorizedHttp(creds, http=play_http())
     return build("androidpublisher", "v3", http=http, cache_discovery=False)
+
+
+def play_http():
+    """googleapiclient's own transport (it stops httplib2 treating the 308s of
+    a resumable upload as redirects; a plain httplib2.Http failed with
+    "Redirected but the response is missing a Location: header"), with a
+    longer timeout."""
+    from googleapiclient.http import build_http
+    http = build_http()
+    http.timeout = UPLOAD_TIMEOUT_S
+    return http
 
 
 UPLOAD_TIMEOUT_S = 600
@@ -121,9 +131,10 @@ def play_api(action):
     Play's own message (e.g. missing permissions) instead of a traceback."""
     from google.auth.exceptions import GoogleAuthError
     from googleapiclient.errors import HttpError
+    from httplib2 import HttpLib2Error
     try:
         yield
-    except (HttpError, GoogleAuthError, OSError) as e:
+    except (HttpError, GoogleAuthError, HttpLib2Error, OSError) as e:
         raise ReleaseError(f"{action} failed: {e}") from e
 
 

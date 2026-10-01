@@ -17,6 +17,9 @@ Screenshots and logs go to `build/emulator-regression/`.
    "$LOCALAPPDATA/Android/Sdk/emulator/emulator.exe" -avd Medium_Phone_API_36.1 \
        -no-snapshot-load -no-boot-anim -no-audio -gpu swiftshader_indirect
    ```
+   Its files are in `~/.android/avd/Medium_Phone.avd/`. For AI mode, as in
+   the store demo video (`tools/demo_video/`), set `hw.ramSize=4096` in its
+   `config.ini`: at 2 GB the low-memory killer kills the app.
 2. Build the x86_64 debug APK with the project's build script:
    ```
    python tools/build.py emulator

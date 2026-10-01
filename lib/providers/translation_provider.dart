@@ -146,8 +146,33 @@ class TranslationProvider with ChangeNotifier {
   /// nothing to translate — and since they tick, they churned a box on every
   /// refresh.
   @visibleForTesting
-  static bool hasTranslatableText(OCRResult r) => _letter.hasMatch(r.text);
+  /// Whether [r] has text worth translating: a letter in the source
+  /// language's script. Without the script check, everything with a letter
+  /// went to the translator, including text already in English: our own UI
+  /// ("Trash" came back from ja→en as "Tash"), app toolbars ("Oct 1") and
+  /// status-bar labels, each covered by a useless or garbled box.
+  static bool hasTranslatableText(OCRResult r, [String? sourceLanguage]) {
+    final script = sourceLanguage == null ? null : _scriptOf[sourceLanguage];
+    return (script ?? (sourceLanguage == null ? _letter : _latin)).hasMatch(r.text);
+  }
+
   static final _letter = RegExp(r'\p{L}', unicode: true);
+  static final _latin = RegExp(r'\p{Script=Latin}', unicode: true);
+  static RegExp _script(String names) =>
+      RegExp('[${names.split(',').map((n) => '\\p{Script=$n}').join()}]', unicode: true);
+  // Languages not listed here are written in Latin script.
+  static final Map<String, RegExp> _scriptOf = () {
+    final arabic = _script('Arabic'), cyrillic = _script('Cyrillic'), devanagari = _script('Devanagari');
+    return {
+      'ar': arabic, 'fa': arabic, 'ur': arabic,
+      'be': cyrillic, 'bg': cyrillic, 'mk': cyrillic, 'ru': cyrillic, 'uk': cyrillic,
+      'hi': devanagari, 'mr': devanagari,
+      'bn': _script('Bengali'), 'el': _script('Greek'), 'gu': _script('Gujarati'),
+      'he': _script('Hebrew'), 'ka': _script('Georgian'), 'kn': _script('Kannada'),
+      'ta': _script('Tamil'), 'te': _script('Telugu'), 'th': _script('Thai'),
+      'ja': _script('Hiragana,Katakana,Han'), 'ko': _script('Hangul,Han'), 'zh': _script('Han'),
+    };
+  }();
 
   // Same box, allowing a small tolerance of 12 physical pixels for screen
   // coordinate noise between ticks.
@@ -432,12 +457,29 @@ class TranslationProvider with ChangeNotifier {
     );
   }
 
+  /// Whether our own activity is the screen in front (so there is nothing to
+  /// translate). Paused/inactive/hidden means another app is on top.
+  @visibleForTesting
+  static bool isOwnAppInFront(AppLifecycleState? state) => state == AppLifecycleState.resumed;
+
   void _startPeriodicCapture() async {
     if (_captureTimer != null) return;
 
     _captureTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
       if (!_isTranslating) return;
       if (_isProcessingCapture) return; // Guard to prevent overlapping ticks
+      if (isOwnAppInFront(WidgetsBinding.instance.lifecycleState)) {
+        // Our own screen isn't something to translate: its English UI came
+        // back as garbled boxes ("命Al" for the AI chip), and a frame of it
+        // could still be translated after the user rotated into a game,
+        // drawing the result at scaled, wrong coordinates.
+        if (_displayedOverlays.isNotEmpty) {
+          _overlayService.hideTranslationOverlay();
+          _displayedOverlays.clear();
+          _translationToken++;
+        }
+        return;
+      }
 
       _isProcessingCapture = true;
 
@@ -493,7 +535,7 @@ class TranslationProvider with ChangeNotifier {
               // drop it and keep that box as is.
               final coveredIds = <int>{};
               final ocrResults = withoutOwnOverlayText(
-                rawOcrResults.where(hasTranslatableText).toList(),
+                rawOcrResults.where((r) => hasTranslatableText(r, _sourceLanguage)).toList(),
                 _isManualTranslationRequested
                     ? const <int, Rect>{}
                     : {for (final e in _displayedOverlays.entries) e.key: e.value.drawnRect},

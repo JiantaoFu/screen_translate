@@ -337,19 +337,11 @@ class ModelDownloadService {
   }) async {
     final targetDir = await onnxModelDir(langPairKey);
     await targetDir.create(recursive: true);
-    // Clean up only stray leftovers from a previous interrupted attempt
-    // (half-written .tmp files) — fully-renamed final files are left in
-    // place so a retry resumes rather than re-downloading a multi-hundred-
-    // MB pack from scratch just because one file failed. This matters in
-    // practice: Android closes the app's network sockets a few seconds
-    // after it's backgrounded (confirmed via logcat — no foreground
-    // service here to keep them alive), so a background-interrupted
-    // download is common, not exceptional.
-    await for (final entity in targetDir.list()) {
-      if (entity is File && entity.path.endsWith('.tmp')) {
-        await entity.delete();
-      }
-    }
+    // Finished files and half-written .tmp files from an interrupted attempt
+    // are both kept: finished ones are skipped below, and a .tmp is resumed
+    // where it stopped. This matters in practice: Android closes the app's
+    // sockets a few seconds after it's backgrounded, and a slow connection
+    // needs several minutes for one ~180 MB decoder file.
 
     // Look up the pair to decide which ONNX variant to download
     final pair = kSupportedOnnxPairs.firstWhere(
@@ -403,59 +395,20 @@ class ModelDownloadService {
         }
 
         final url = '$baseUrl/$remotePath';
-
-        // Bound the ENTIRE per-file operation (network + disk I/O) so that a
-        // stall anywhere — including sink.close()/rename(), which have no
-        // timeout of their own — surfaces as a retryable error instead of
-        // hanging the UI forever at "100%, downloading...".
         debugPrint('OnnxDownload: [$localName] requesting $url');
-        await Future(() async {
-          final request = http.Request('GET', Uri.parse(url));
-          final response = await client.send(request).timeout(const Duration(seconds: 15));
-          debugPrint('OnnxDownload: [$localName] connected, status=${response.statusCode}, '
-              'contentLength=${response.contentLength}');
-
-          if (response.statusCode != 200) {
-            // Drain the stream to free the connection
-            response.stream.drain();
-            throw Exception('OnnxDownload: HTTP ${response.statusCode} for $url');
-          }
-
-          final tmpFile = File(p.join(targetDir.path, '$localName.tmp'));
-          final sink = tmpFile.openWrite();
-
-          int totalBytes = response.contentLength ?? (100 * 1024 * 1024); // fallback 100MB
-          int receivedBytes = 0;
-
-          await for (final chunk in response.stream.timeout(const Duration(seconds: 15))) {
-            sink.add(chunk);
-            receivedBytes += chunk.length;
-
-            // Cap in-flight progress below 100% — the file isn't actually done
-            // until it's flushed and renamed below. Showing 100% here would
-            // be a lie: there's still real work left, and the user has no way
-            // to tell "100% and truly done" apart from "100% and still stuck".
-            double fileProgress = (receivedBytes / totalBytes).clamp(0.0, 0.99);
-
-            double overallProgress = (completedFiles + fileProgress) / totalFiles;
-            onProgress?.call(overallProgress);
-
-            // Workaround for some connections hanging at the very end
-            if (response.contentLength != null && receivedBytes >= response.contentLength!) {
-              break;
-            }
-          }
-          debugPrint('OnnxDownload: [$localName] stream done, received=$receivedBytes bytes, '
-              'closing sink...');
-          await sink.close();
-          debugPrint('OnnxDownload: [$localName] sink closed, renaming...');
-          await tmpFile.rename(finalFile.path);
-          debugPrint('OnnxDownload: [$localName] renamed to final path.');
-        }).timeout(
-          const Duration(seconds: 180),
-          onTimeout: () => throw TimeoutException(
-              'OnnxDownload: Timed out downloading/finalizing $remotePath'),
+        await downloadFileResumable(
+          client: client,
+          url: url,
+          target: finalFile,
+          onBytes: (received, total) {
+            // Cap in-flight progress below 100% — the file isn't done until
+            // it's flushed and renamed, and "100% but still working" can't
+            // be told apart from "100% and stuck".
+            final fileProgress = total == null ? 0.0 : (received / total).clamp(0.0, 0.99);
+            onProgress?.call((completedFiles + fileProgress) / totalFiles);
+          },
         );
+        debugPrint('OnnxDownload: [$localName] renamed to final path.');
 
         completedFiles++;
         onProgress?.call(completedFiles / totalFiles);
@@ -479,6 +432,87 @@ class ModelDownloadService {
     }
   }
 
+  /// Downloads [url] to [target] through `<target>.tmp`, resuming a partial
+  /// .tmp with an HTTP Range request and retrying up to [maxAttempts] times.
+  ///
+  /// Only a stall fails an attempt: no response or no data for
+  /// [stallTimeout]. There used to be a fixed 3-minute cap per file, and on a
+  /// slow connection the 182 MB ja→en decoder could never finish in time;
+  /// each retry also deleted the partial file and started from zero.
+  @visibleForTesting
+  static Future<void> downloadFileResumable({
+    required http.Client client,
+    required String url,
+    required File target,
+    void Function(int received, int? total)? onBytes,
+    Duration stallTimeout = const Duration(seconds: 30),
+    int maxAttempts = 6,
+    Duration retryDelay = const Duration(seconds: 2),
+  }) async {
+    final tmp = File('${target.path}.tmp');
+    Object? lastError;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        var offset = await tmp.exists() ? await tmp.length() : 0;
+        final request = http.Request('GET', Uri.parse(url));
+        if (offset > 0) request.headers['Range'] = 'bytes=$offset-';
+        final response = await client.send(request).timeout(stallTimeout);
+        final int? total;
+        final IOSink sink;
+        if (response.statusCode == 206 && offset > 0) {
+          total = _totalFromContentRange(response.headers['content-range']) ??
+              (response.contentLength == null ? null : offset + response.contentLength!);
+          sink = tmp.openWrite(mode: FileMode.append);
+        } else if (response.statusCode == 200) {
+          offset = 0; // server ignored the Range: start over
+          total = response.contentLength;
+          sink = tmp.openWrite();
+        } else {
+          unawaited(response.stream.drain<void>().catchError((_) {}));
+          if (response.statusCode == 416) {
+            // The partial file is no longer valid for this URL.
+            await tmp.delete();
+            throw Exception('OnnxDownload: range not satisfiable, restarting $url');
+          }
+          final retryable = response.statusCode >= 500 || response.statusCode == 408 || response.statusCode == 429;
+          final error = HttpException('OnnxDownload: HTTP ${response.statusCode} for $url');
+          if (!retryable) throw _NonRetryable(error);
+          throw error;
+        }
+        var received = offset;
+        try {
+          await for (final chunk in response.stream.timeout(stallTimeout)) {
+            sink.add(chunk);
+            received += chunk.length;
+            onBytes?.call(received, total);
+            // Some connections hang at the very end instead of closing.
+            if (total != null && received >= total) break;
+          }
+        } finally {
+          await sink.close().timeout(stallTimeout);
+        }
+        if (total != null && received < total) {
+          throw Exception('OnnxDownload: connection closed at $received of $total bytes');
+        }
+        await tmp.rename(target.path).timeout(stallTimeout);
+        return;
+      } on _NonRetryable catch (e) {
+        throw e.error;
+      } catch (e) {
+        lastError = e;
+        debugPrint('OnnxDownload: attempt $attempt/$maxAttempts for $url failed: $e');
+        if (attempt < maxAttempts) await Future<void>.delayed(retryDelay);
+      }
+    }
+    throw lastError!;
+  }
+
+  static int? _totalFromContentRange(String? header) {
+    // "bytes 100-199/200"
+    final total = header?.split('/').last;
+    return total == null ? null : int.tryParse(total);
+  }
+
   /// Deletes a downloaded ONNX model from device storage.
   Future<void> deleteOnnxModel(String langPairKey) async {
     final dir = await onnxModelDir(langPairKey);
@@ -500,4 +534,10 @@ class ModelDownloadService {
     }
     return totalBytes / (1024 * 1024);
   }
+}
+
+/// An HTTP error that retrying won't fix (e.g. 404).
+class _NonRetryable implements Exception {
+  final Object error;
+  _NonRetryable(this.error);
 }

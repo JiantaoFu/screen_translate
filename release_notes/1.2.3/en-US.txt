@@ -1,0 +1,6 @@
+• Vertical manga speech bubbles are now translated as one sentence, in the right reading order
+• Translated text no longer breaks words across lines
+• Text that is already in your language (and the app's own screen) is no longer "translated"
+• Fixed stray boxes over the status bar
+• Your translation mode (Quick / AI / Cloud) is remembered after restarting the app
+• AI language packs now resume after a slow or interrupted connection, and Settings shows each pack's real size

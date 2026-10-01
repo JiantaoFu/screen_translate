@@ -389,8 +389,9 @@ class OverlayService : Service() {
         controlButton = ImageView(this).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 setOnApplyWindowInsetsListener { _, insets ->
-                    OverlayRegions.statusBarVisible =
-                        insets.isVisible(android.view.WindowInsets.Type.statusBars())
+                    val visible = insets.isVisible(android.view.WindowInsets.Type.statusBars())
+                    if (visible != OverlayRegions.statusBarVisible) Log.d(TAG, "Status bar visible=$visible")
+                    OverlayRegions.statusBarVisible = visible
                     insets
                 }
             }

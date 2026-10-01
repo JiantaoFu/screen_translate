@@ -14,6 +14,10 @@ $A shell settings put secure accessibility_enabled 1
 $A shell settings put system accelerometer_rotation 0
 $A shell settings put system user_rotation 0
 $A shell am force-stop $PKG
+# The harness text is English. Only text in the source language's script is
+# translated, so pin the pair (and Quick mode) instead of using whatever the
+# app last saved.
+$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLanguage=zh translationMode=onDevice >/dev/null
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c

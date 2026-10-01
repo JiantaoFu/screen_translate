@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,17 @@ class _LanguagePack {
   String get targetBcp => pair?.targetBcp ?? pivot!.targetBcp;
   String get sourceFlag => _flagFor(sourceBcp);
   String get targetFlag => _flagFor(targetBcp);
+  /// Download size in MB; a pivot downloads both of its hops.
+  int? get downloadMb => pair != null
+      ? kOnnxPackDownloadMb[pair!.key]
+      : (kOnnxPackDownloadMb[pivot!.firstHopKey] ?? 0) + (kOnnxPackDownloadMb[pivot!.secondHopKey] ?? 0);
+}
+
+/// "230–550 MB": the range of single-pack sizes, rounded to 10 MB.
+String _packSizeRange() {
+  final sizes = [for (final lp in _kLanguagePacks) if (lp.pair != null) lp.downloadMb].whereType<int>();
+  int round10(int v) => (v / 10).round() * 10;
+  return '${round10(sizes.reduce(min))}–${round10(sizes.reduce(max))} MB';
 }
 
 const _kLanguagePacks = [
@@ -585,7 +597,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 const Icon(Icons.download_for_offline_outlined, color: indigo, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  AppLocalizations.of(context)!.language_packs_header('50 MB'),
+                  AppLocalizations.of(context)!.language_packs_header(_packSizeRange()),
                   style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: indigo),
                 ),
               ],
@@ -640,7 +652,10 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                             style: TextStyle(fontSize: 11, color: Colors.green[600]))
                       else if (isError)
                         Text(localizations.pack_failed_tap_retry,
-                            style: TextStyle(fontSize: 11, color: Colors.red[400])),
+                            style: TextStyle(fontSize: 11, color: Colors.red[400]))
+                      else if (lp.downloadMb != null)
+                        Text('${lp.downloadMb} MB',
+                            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                     ],
                   ),
                 ),

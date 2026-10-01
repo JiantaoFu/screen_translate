@@ -22,22 +22,27 @@ if [ "${ram_kb:-0}" -lt 3500000 ]; then
   echo "Emulator has $((ram_kb / 1024)) MB RAM; set hw.ramSize=4096 in the AVD's config.ini and cold-boot it."; exit 1
 fi
 
-# The default display's rotation (the first match; later ones are other windows' configs).
-rotation() { $A shell dumpsys window | grep -m1 -oE "mDisplayRotation=ROTATION_[0-9]+" | cut -d_ -f2; }
+# Current orientation of the default display, from its size ("cur=1080x2400").
+# (The first mDisplayRotation in `dumpsys window` can be another window's stale config.)
+orientation() {
+  $A shell dumpsys window displays | grep -m1 -oE "cur=[0-9]+x[0-9]+" |
+    awk -Fx '{ sub("cur=", "", $1); print ($1 < $2) ? "portrait" : "landscape" }'
+}
 
 # Rotate the virtual sensor until the display matches. Locking with
-# user_rotation didn't hold on this AVD, so auto-rotate stays on.
-rotate_to() { # rotate_to <regex of allowed rotations> <name>
+# user_rotation didn't hold on this AVD, so auto-rotate stays on. Rotate
+# while our app is in front: the launcher is portrait-only.
+rotate_to() { # rotate_to portrait|landscape
   $A shell settings put system accelerometer_rotation 1
   sleep 2
   for _ in 1 2 3 4 5; do
-    rotation | grep -qE "^($1)$" && return 0
+    [ "$(orientation)" = "$1" ] && return 0
     $A emu rotate >/dev/null; sleep 3
   done
-  echo "could not rotate to $2"; exit 1
+  echo "could not rotate to $1"; exit 1
 }
-portrait() { rotate_to 0 portrait; }
-landscape() { rotate_to "90|270" landscape; }
+portrait() { rotate_to portrait; }
+landscape() { rotate_to landscape; }
 
 # 1. AI language pack. The in-app download times out on the emulator's slow
 #    network (see the open issue in README), so fetch it on the host and push
@@ -92,18 +97,15 @@ for c in "clock -e hhmm 1000" "battery -e level 100 -e plugged false" \
   $A shell am broadcast -a com.android.systemui.demo -e command $c >/dev/null
 done
 
-# 4. Permissions, Japanese → English, AI mode (the mode is remembered).
+# 4. Permissions; Japanese → English in AI mode.
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell settings put secure enabled_accessibility_services $PKG/.ScrollDetectionAccessibilityService
 $A shell settings put secure accessibility_enabled 1
 portrait
-prev_mode=$($A shell run-as $PKG cat shared_prefs/FlutterSharedPreferences.xml 2>/dev/null |
-  grep -oE 'flutter.translationMode">[a-zA-Z]+' | cut -d'>' -f2)
 $A shell am force-stop $PKG
-$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 12
-$A shell input tap 538 1318; sleep 2   # "AI" chip
+$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=ja targetLanguage=en translationMode=onnx
 $A shell am force-stop $PHOTOS
-$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 3
+$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 12
 
 record() { # record <name> <limit-seconds>
   $A shell rm -f /sdcard/$1.mp4
@@ -136,11 +138,9 @@ show "$GAME" 1200 250; sleep 20
 stop_record landscape_game
 [ "$(app_pid)" = "$pid" ] || echo "WARNING: the app restarted during recording (low memory?); check the clips"
 
-# 7. Restore: portrait, real status bar, the previous translation mode
-#    (the regression scripts expect Quick).
+# 7. Restore portrait and the real status bar. (start.sh sets its own
+#    language pair and mode, so the regression doesn't depend on this run.)
 portrait
 $A shell am broadcast -a com.android.systemui.demo -e command exit >/dev/null
 $A shell am force-stop $PKG
-prev_mode=${prev_mode:-onDevice}   # unset = the app's default, Quick
-$A shell "run-as $PKG sed -i 's/flutter.translationMode\">[a-zA-Z]*</flutter.translationMode\">$prev_mode</' shared_prefs/FlutterSharedPreferences.xml"
 echo "Done. Next: python tools/demo_video/contact_sheet.py $REC_OUT/portrait_manga.mp4"

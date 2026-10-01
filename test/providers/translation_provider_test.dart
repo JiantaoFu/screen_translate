@@ -272,6 +272,37 @@ void main() {
       expect(t('안녕 3'), isTrue);
       expect(t('Привет'), isTrue);
     });
+
+    test('nothing is translated while our own app is in front', () {
+      expect(TranslationProvider.isOwnAppInFront(AppLifecycleState.resumed), isTrue);
+      for (final s in [AppLifecycleState.inactive, AppLifecycleState.paused,
+                       AppLifecycleState.hidden, AppLifecycleState.detached, null]) {
+        expect(TranslationProvider.isOwnAppInFront(s), isFalse);
+      }
+    });
+
+    test('needs a letter in the source language script', () {
+      bool t(String s, String source) =>
+          TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10), source);
+      // ja→en: English UI, dates and status-bar labels are already readable.
+      expect(t('Trash', 'ja'), isFalse);
+      expect(t('Oct 1', 'ja'), isFalse);
+      expect(t('7:37 AM', 'ja'), isFalse);
+      expect(t('たすけて!', 'ja'), isTrue);
+      expect(t('HP回復', 'ja'), isTrue);
+      expect(t('村長', 'ja'), isTrue);
+      // Korean, Chinese, Cyrillic sources.
+      expect(t('안녕하세요', 'ko'), isTrue);
+      expect(t('Settings', 'ko'), isFalse);
+      expect(t('设置', 'zh'), isTrue);
+      expect(t('こんにちは', 'zh'), isFalse);
+      expect(t('Привет', 'ru'), isTrue);
+      expect(t('Hello', 'ru'), isFalse);
+      // Latin sources: text already in a non-Latin target is skipped.
+      expect(t('Hello', 'en'), isTrue);
+      expect(t('你好', 'en'), isFalse);
+      expect(t('¿Dónde?', 'es'), isTrue);
+    });
   });
 
   group('computeDisplayBoxes', () {

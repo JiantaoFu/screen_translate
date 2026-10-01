@@ -171,6 +171,27 @@ OnnxLangPair? findOnnxPair(String source, String target) {
 /// shared pivot language — used when no direct model exists for the
 /// requested language pair (e.g. no usable zh→es model exists, but
 /// zh→en and en→es do).
+/// Download size of each pack (all five files) in MB, measured on Hugging
+/// Face on 2026-10-01. Settings used to say "~50 MB each"; the real packs are
+/// 230–553 MB (ja→en is 414 MB), which matters on mobile data.
+const Map<String, int> kOnnxPackDownloadMb = {
+  'opus-mt-en-zh': 438,
+  'opus-mt-zh-en': 438,
+  'opus-mt-ja-en': 414,
+  'opus-mt-ko-en': 337,
+  'opus-mt-th-en': 330,
+  'opus-mt-vi-en': 374,
+  'opus-mt-id-en': 305,
+  'opus-mt-de-en': 399,
+  'opus-mt-es-en': 438,
+  'opus-mt-fr-en': 407,
+  'opus-mt-ru-en': 425,
+  'opus-mt-ja-es': 230,
+  'opus-mt-en-es': 238,
+  'opus-mt-ja-pt': 237,
+  'opus-mt-tc-big-en-pt': 553,
+};
+
 class OnnxPivotPair {
   final String sourceBcp;
   final String targetBcp;

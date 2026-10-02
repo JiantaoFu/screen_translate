@@ -33,6 +33,15 @@ ICON = os.path.join(REPO, 'android', 'app', 'src', 'main', 'res', 'playstore-ico
 
 BRAND = 'Screen Translate'   # the app's name (android:label); two words
 
+# Background music (CC BY 4.0: the credit must be shown; it goes on the
+# outro card, and belongs in video descriptions too). The track's last hit
+# at 189.1 s has died away by MUSIC_END, so the music starts MUSIC_END -
+# <video length> into the track: its real ending lands on the outro instead
+# of a fade in mid-phrase.
+MUSIC = os.path.join(HERE, 'music', 'upbeat-forever.mp3')
+MUSIC_END = 190.4
+MUSIC_CREDIT = 'Music: "Upbeat Forever" by Kevin MacLeod (incompetech.com), CC BY 4.0'
+
 # (start, end, speed) pieces of a recording, joined back to back; then the
 # last frame is held for `hold` seconds. screenrecord writes frames only when
 # the screen changes, so a clip ends on its last change (the translation).
@@ -176,7 +185,7 @@ def card(lay, name, path):
     im.save(path)
 
 
-def title_card(lay, sub, button, path):
+def title_card(lay, sub, button, path, credit=None):
     im = background(lay).convert('RGBA')
     d = ImageDraw.Draw(im)
     top = (lay.h - 640) // 2
@@ -198,6 +207,11 @@ def title_card(lay, sub, button, path):
         by = y + 70
         d.rounded_rectangle([x0, by, x0 + tw + 80, by + 80], radius=40, fill=ACCENT)
         d.text((x0 + 40, by + 14), button, font=f, fill=WHITE)
+    if credit:
+        f = font(REG, 22)
+        lines = wrap(d, credit, f, lay.w - 80)
+        for i, line in enumerate(lines):
+            centered(d, lay, lay.h - 40 - 28 * (len(lines) - i), line, f, (148, 163, 184))
     im.convert('RGB').save(path)
 
 
@@ -230,6 +244,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--full', action='store_true', help='longer cut at real speed instead of the 30s cut')
     ap.add_argument('--vertical', action='store_true', help='9:16 (1080x1920) for Shorts / Reels / TikTok')
+    ap.add_argument('--no-music', action='store_true', help='leave out the background music')
     args = ap.parse_args()
     lay = TALL if args.vertical else WIDE
     tag = ('full' if args.full else '30s') + ('_vertical' if args.vertical else '')
@@ -241,7 +256,8 @@ def main():
     cuts = CUTS_FULL if args.full else CUTS_30
     intro, outro = (3.0, 3.5) if args.full else (1.5, 3.0)
     title_card(lay, 'Translate anything on your screen, instantly', None, t('intro.png'))
-    title_card(lay, 'Manga · Webtoons · Games · Any app', 'Get it on Google Play', t('outro.png'))
+    title_card(lay, 'Manga · Webtoons · Games · Any app', 'Get it on Google Play', t('outro.png'),
+               credit=None if args.no_music else MUSIC_CREDIT)
 
     segs = [t('seg0.mp4')]
     still(t('intro.png'), intro, segs[0])
@@ -257,8 +273,30 @@ def main():
     out = os.path.join(OUT_DIR, name + ('_vertical' if args.vertical else '') + '.mp4')
     with open(t('concat.txt'), 'w') as fh:
         fh.writelines(f"file '{s}'\n" for s in segs)
-    ffmpeg(['-f', 'concat', '-safe', '0', '-i', t('concat.txt'), '-c', 'copy', '-movflags', '+faststart', out])
+    if args.no_music:
+        ffmpeg(['-f', 'concat', '-safe', '0', '-i', t('concat.txt'), '-c', 'copy', '-movflags', '+faststart', out])
+    else:
+        silent = t('silent.mp4')
+        ffmpeg(['-f', 'concat', '-safe', '0', '-i', t('concat.txt'), '-c', 'copy', silent])
+        add_music(silent, out)
     print(out)
+
+
+def duration(path):
+    r = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path],
+                       capture_output=True, text=True, check=True)
+    return float(r.stdout.strip())
+
+
+def add_music(video, out):
+    """Mux the music under the video, ending where the track itself ends."""
+    length = duration(video)
+    start = max(0.0, MUSIC_END - length)
+    ffmpeg(['-i', video, '-ss', f'{start:.3f}', '-i', MUSIC,
+            '-filter_complex', f'[1:a]atrim=0:{length:.3f},asetpts=PTS-STARTPTS,'
+            f'loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:st=0:d=0.4[a]',
+            '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
+            '-ar', '48000', '-shortest', '-movflags', '+faststart', out])
 
 
 if __name__ == '__main__':

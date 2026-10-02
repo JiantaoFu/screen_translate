@@ -6,7 +6,8 @@ emulator (AI mode, Japanese → English), about 24 s each:
 - `demo_video_30s_vertical.mp4`: 9:16 (1080x1920) for Shorts, Reels and
   TikTok (a 16:9 video is shown there as a thin strip).
 
-The editing adds only captions, an intro and an outro, and cuts dead time.
+The editing adds only captions, an intro and an outro, background music,
+and cuts dead time.
 Every page still shows the original text and the "…" placeholder before
 its translation. The system screen-sharing dialog is played at 3x (about
 2 s). The brand is written "Screen Translate" (the app's label).
@@ -20,6 +21,7 @@ its translation. The system screen-sharing dialog is played at 3x (about
 | `recordings/landscape_game.mp4` | Raw screenrecord (2400x1080): the game dialogue in landscape |
 | `record.sh` | Makes new recordings on the emulator |
 | `contact_sheet.py` | Timestamped frame grid of a recording, used to pick cut points |
+| `music/` | The background track and its credit (CC BY 4.0) |
 | `edit.py` | Turns the recordings into the videos: default 16:9 30 s cut, `--vertical` 9:16, `--full` the longer real-speed cut |
 
 ## Re-render from the committed recordings
@@ -35,6 +37,19 @@ python tools/demo_video/edit.py --full       # → build/play_store_assets/demo_
 
 This needs ffmpeg and Pillow, plus the Segoe UI fonts from Windows. When the
 new videos are approved, copy them over the ones in this folder.
+
+## Music
+
+"Upbeat Forever" by Kevin MacLeod (incompetech.com), CC BY 4.0. The license
+needs the credit shown: `edit.py` puts it on the outro card, and it should
+also go in every video description:
+
+    Music: "Upbeat Forever" by Kevin MacLeod (incompetech.com), licensed under CC BY 4.0
+
+The music is cut so the track's own ending (its last hit at 189.1 s, silent
+by 190.4 s) lands on the outro, rather than fading out mid-phrase. It is
+loudness-normalized to about -16 LUFS. `--no-music` leaves it out (e.g. to
+pick a trending sound inside TikTok instead).
 
 ## Choosing the text in the images
 

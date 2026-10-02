@@ -1,0 +1,6 @@
+upbeat-forever.mp3
+Music: "Upbeat Forever" by Kevin MacLeod (incompetech.com), licensed under CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+
+CC BY needs this credit in the video description or in the video itself.
+edit.py puts it on the outro card; also paste it into YouTube descriptions.

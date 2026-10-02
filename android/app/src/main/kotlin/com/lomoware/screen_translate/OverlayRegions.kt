@@ -106,8 +106,10 @@ object OverlayRegions {
     // stable frame is delivered after STABILIZATION_DELAY_MS, so a frame
     // can still show the bar for a while after the flag dropped. Its clock
     // and screen-sharing timer were then OCR'd into boxes ("10:00, 00:06)")
-    // that stayed over the hidden bar.
-    private const val STATUS_BAR_GRACE_MS = 1000L
+    // that stayed over the hidden bar. 1 s wasn't enough: on the emulator a
+    // frame queued 1.1 s after the bar was reported hidden still showed it
+    // ("10:00回 00:27)" was translated).
+    private const val STATUS_BAR_GRACE_MS = 2500L
 
     /** Whether the status bar may be in a frame captured around [now]. */
     fun statusBarMayBeInFrame(now: Long = SystemClock.uptimeMillis()): Boolean =

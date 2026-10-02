@@ -825,7 +825,10 @@ class OverlayService : Service() {
                 val refPaint = android.text.TextPaint(paint).apply { textSize = 100 * spPx }
                 val wordCapSp = OverlayTextFit.maxSizeKeepingWordsWhole(
                     text.toString(),
-                    transformedWidth - paddingLeft - paddingRight,
+                    // 10% margin: Paint.measureText and the real line layout
+                    // differ a little, and a word measured to fit exactly
+                    // still broke ("destro / ying" in a manga bubble).
+                    (transformedWidth - paddingLeft - paddingRight) * 0.9f,
                     100f,
                 ) { refPaint.measureText(it) }
                 val maxSp = (wordCapSp?.toInt() ?: 100).coerceIn(7, 100)

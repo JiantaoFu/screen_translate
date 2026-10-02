@@ -1,8 +1,8 @@
-manga-1-jp.png: たすけて！あのロボットが街を壊している！
-  EN: Help! That robot is destroying the city!
+manga-1-jp.png: ロボットは街を壊してる！
+  EN: Robots are destroying cities!
 
-manga-2-jp.png: この剣があれば、闇に勝てるはずだ。
-  EN: With this sword, I can defeat the darkness.
+manga-2-jp.png: この剣でおまえを倒す！
+  EN: I will take you down with my sword!
 
-game-dialogue-jp.png: 村長: 勇者よ、城の北の塔に魔王が待っている。気をつけて進むのじゃ。
-  EN: Village Chief: Hero, the Demon Lord awaits in the tower north of the castle. Proceed with caution.
+game-dialogue-jp.png: 村長: 北の塔へ行きなさい。気をつけてな！
+  EN: Chief: Go to the north tower. Be careful!

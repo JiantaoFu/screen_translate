@@ -72,11 +72,10 @@ image_id() {
   $A shell content query --uri content://media/external/images/media --projection _id \
     --where "_display_name=\'$1\'" | grep -oE "_id=[0-9]+" | tail -1 | cut -d= -f2
 }
+# Always pushed: the files keep their names when make_assets.py changes them.
 for f in manga-1-jp manga-2-jp game-dialogue-jp; do
-  if [ -z "$(image_id $f.png)" ]; then
-    $A push "$HERE/assets/$f.png" /sdcard/Pictures/$f.png >/dev/null
-    $A shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Pictures/$f.png >/dev/null
-  fi
+  $A push "$HERE/assets/$f.png" /sdcard/Pictures/$f.png >/dev/null
+  $A shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Pictures/$f.png >/dev/null
 done
 sleep 2
 M1=$(image_id manga-1-jp.png); M2=$(image_id manga-2-jp.png); GAME=$(image_id game-dialogue-jp.png)

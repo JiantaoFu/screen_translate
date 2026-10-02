@@ -26,17 +26,17 @@ class OverlayRegionsStatusBarTest {
         // just after can still show the bar.
         OverlayRegions.statusBarVisible = false
         assertTrue(OverlayRegions.statusBarMayBeInFrame())
-        ShadowSystemClock.advanceBy(Duration.ofMillis(500))
+        ShadowSystemClock.advanceBy(Duration.ofMillis(1500))
         assertTrue(OverlayRegions.statusBarMayBeInFrame())
 
-        ShadowSystemClock.advanceBy(Duration.ofMillis(600))
+        ShadowSystemClock.advanceBy(Duration.ofMillis(1100))
         assertFalse(OverlayRegions.statusBarMayBeInFrame())
     }
 
     @Test
     fun staysHiddenWhileImmersive() {
         OverlayRegions.statusBarVisible = false
-        ShadowSystemClock.advanceBy(Duration.ofMillis(2000))
+        ShadowSystemClock.advanceBy(Duration.ofMillis(3000))
         // A repeated "hidden" report doesn't restart the grace period.
         OverlayRegions.statusBarVisible = false
         assertFalse(OverlayRegions.statusBarMayBeInFrame(SystemClock.uptimeMillis()))

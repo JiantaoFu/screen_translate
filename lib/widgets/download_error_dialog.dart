@@ -19,11 +19,11 @@ String feedbackEngineLabel(TranslationMode mode) => switch (mode) {
 /// (app version, device, Android version/SDK, engine, language pair).
 /// Shows the support address if no email app is installed.
 Future<void> sendFeedbackEmail(BuildContext context) async {
-  final localizations = AppLocalizations.of(context)!;
+  final localeTag = Localizations.localeOf(context).toLanguageTag();
   final provider = Provider.of<TranslationProvider>(context, listen: false);
   final messenger = ScaffoldMessenger.maybeOf(context);
   final opened = await FeedbackEmailService().send(
-    subject: localizations.send_feedback,
+    subject: feedbackSubject(localeTag),
     engine: feedbackEngineLabel(provider.translationMode),
     languagePair: '${provider.sourceLanguage} → ${provider.targetLanguage}',
   );
@@ -32,38 +32,70 @@ Future<void> sendFeedbackEmail(BuildContext context) async {
   }
 }
 
+/// True while a download-failed dialog is on screen. Global, so two
+/// failures at once (e.g. the source and the target pack) never stack two
+/// dialogs: a call made while one is showing returns
+/// [DownloadFailedAction.dismiss] immediately without showing anything.
+bool _downloadFailedDialogShowing = false;
+
+@visibleForTesting
+bool get isDownloadFailedDialogShowing => _downloadFailedDialogShowing;
+
 /// Clear error dialog after language-pack download retries are exhausted.
-/// Offers Retry, one-tap switch to Cloud AI (LLM), and Send feedback.
+/// Offers Close, Send feedback, one-tap switch to Cloud AI (LLM) and Retry.
+///
+/// Dismissible: tapping outside, Back, and Close all return
+/// [DownloadFailedAction.dismiss]. Send feedback also closes it before
+/// opening the mail app. The user is leaving the app at that point anyway,
+/// and a dialog left open underneath would be stale when they come back.
+/// Retry is still available afterwards from the pack's row or the next
+/// Translate tap.
+///
+/// Call this only for something the user did (tapping Translate or a
+/// download button). Background pre-downloads stay silent.
 Future<DownloadFailedAction> showDownloadFailedDialog(
   BuildContext context, {
   required String packLabel,
 }) async {
-  final localizations = AppLocalizations.of(context)!;
-  final result = await showDialog<DownloadFailedAction>(
-    context: context,
-    barrierDismissible: false,
-    builder: (dialogContext) => AlertDialog(
-      title: Text(localizations.download_failed_title),
-      content: Text(localizations.download_failed_body(packLabel)),
-      actions: [
-        TextButton(
-          onPressed: () => sendFeedbackEmail(context),
-          child: Text(localizations.send_feedback_by_email),
-        ),
-        TextButton(
-          onPressed: () =>
-              Navigator.pop(dialogContext, DownloadFailedAction.switchToCloudAi),
-          child: Text(localizations.switch_to_cloud_ai),
-        ),
-        TextButton(
-          onPressed: () =>
-              Navigator.pop(dialogContext, DownloadFailedAction.retry),
-          child: Text(localizations.retry),
-        ),
-      ],
-    ),
-  );
-  return result ?? DownloadFailedAction.dismiss;
+  if (_downloadFailedDialogShowing) return DownloadFailedAction.dismiss;
+  _downloadFailedDialogShowing = true;
+  try {
+    final localizations = AppLocalizations.of(context)!;
+    final result = await showDialog<DownloadFailedAction>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(localizations.download_failed_title),
+        content: Text(localizations.download_failed_body(packLabel)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, DownloadFailedAction.dismiss),
+            child: Text(localizations.close),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext, DownloadFailedAction.dismiss);
+              if (context.mounted) sendFeedbackEmail(context);
+            },
+            child: Text(localizations.send_feedback_by_email),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, DownloadFailedAction.switchToCloudAi),
+            child: Text(localizations.switch_to_cloud_ai),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, DownloadFailedAction.retry),
+            child: Text(localizations.retry),
+          ),
+        ],
+      ),
+    );
+    return result ?? DownloadFailedAction.dismiss;
+  } finally {
+    _downloadFailedDialogShowing = false;
+  }
 }
 
 /// Switches to Cloud AI in one tap when an API key is already saved.

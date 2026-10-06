@@ -218,33 +218,14 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                   await modelService.downloadModelWithFallback(code, onProgress: (p) {
                     if (mounted) setState(() => _downloadProgress[code] = p);
                   });
-                } catch (_) {
-                  if (!mounted) return;
-                  final localizations = AppLocalizations.of(this.context)!;
-                  final action = await showDownloadFailedDialog(
-                    this.context,
-                    packLabel: localizations.languageName(code),
-                  );
-                  if (!mounted) return;
-                  if (action == DownloadFailedAction.retry) {
-                    // Re-enter the same pre-warm path.
-                    setState(() => _downloadingCodes.add(code));
-                    try {
-                      await modelService.downloadModelWithFallback(code, onProgress: (p) {
-                        if (mounted) setState(() => _downloadProgress[code] = p);
-                      });
-                    } catch (_) {}
-                  } else if (action == DownloadFailedAction.switchToCloudAi) {
-                    final provider = Provider.of<TranslationProvider>(this.context, listen: false);
-                    await switchToCloudAi(this.context, openSettings: () {
-                      Navigator.of(this.context).push(MaterialPageRoute(
-                        builder: (_) => ChangeNotifierProvider.value(
-                          value: provider,
-                          child: const TranslationSettingsScreen(),
-                        ),
-                      ));
-                    });
-                  }
+                } catch (e) {
+                  // Background pre-download: stay silent. The service has
+                  // recorded the failure; the single download-failed dialog
+                  // appears when the user taps Translate (or a download
+                  // button in Settings), not now. Two of these can fail at
+                  // once (source and target), and a modal for something the
+                  // user didn't ask for is worse than the old silence.
+                  debugPrint('Background pre-download of "$code" failed: $e');
                 } finally {
                   if (mounted) {
                     setState(() {
@@ -353,21 +334,37 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     final review = ReviewPromptService(prefs);
     await review.recordSuccessfulTranslation();
-    if (!review.shouldPrompt()) return;
     if (!context.mounted) return;
-    await review.markPromptShown();
-    await _launchInAppReview(context);
+    // Unavailable review API: logged only. No snackbar, no store fallback.
+    final inAppReview = InAppReview.instance;
+    await review.maybeRequestReview(
+      isAvailable: inAppReview.isAvailable,
+      requestReview: inAppReview.requestReview,
+    );
   }
 
-  Future<void> _launchInAppReview(BuildContext context) async {
-    final InAppReview inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      await inAppReview.requestReview();
-    } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.cannot_open_store)),
-      );
-    }
+  /// Quick mode: if a background pre-download of the source or target pack
+  /// failed, show the (single) download-failed dialog now that the user
+  /// actually wants to translate. Returns whether to go ahead and start.
+  /// Retry clears the failures and starts; translating downloads missing
+  /// packs on demand.
+  Future<bool> _confirmQuickPacksBeforeTranslate(
+    BuildContext context,
+    TranslationProvider provider,
+  ) async {
+    if (provider.translationMode != TranslationMode.onDevice) return true;
+    final failed = {provider.sourceLanguage, provider.targetLanguage}
+        .where(ModelDownloadService.quickDownloadFailed)
+        .toList();
+    if (failed.isEmpty) return true;
+    final localizations = AppLocalizations.of(context)!;
+    final action = await _handleDownloadFailed(
+      context,
+      failed.map(localizations.languageName).join(', '),
+    );
+    if (action != DownloadFailedAction.retry) return false;
+    failed.forEach(ModelDownloadService.clearQuickDownloadFailure);
+    return true;
   }
 
   /// Shows the download-failed dialog. Returns the chosen action so callers
@@ -442,6 +439,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         await _trackTranslationAndPromptReview(context);
                                       }
                                     } else {
+                                      if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {
+                                        return;
+                                      }
+                                      if (!context.mounted) return;
                                       if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
                                         return;
                                       }

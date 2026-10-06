@@ -40,6 +40,11 @@ String feedbackBody({
           ..writeln('Languages: $languagePair'))
         .toString();
 
+/// Feedback email subject: fixed English plus the app's locale code, e.g.
+/// "Screen Translate feedback (es)". Not localized, so support can filter
+/// and read every subject whatever the user's language.
+String feedbackSubject(String localeTag) => 'Screen Translate feedback ($localeTag)';
+
 /// mailto: URI with subject and body. Encoded by hand: Uri's
 /// queryParameters would turn spaces into "+", which mail apps show as is.
 Uri feedbackMailto({required String subject, required String body, String to = kSupportEmail}) =>

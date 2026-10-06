@@ -28,4 +28,9 @@ void main() {
     expect(uri.queryParameters['subject'], 'Send Feedback');
     expect(uri.queryParameters['body'], body);
   });
+
+  test('subject is fixed English plus the locale code', () {
+    expect(feedbackSubject('es'), 'Screen Translate feedback (es)');
+    expect(feedbackSubject('pt'), 'Screen Translate feedback (pt)');
+  });
 }

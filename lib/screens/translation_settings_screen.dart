@@ -210,7 +210,18 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     final svc = ModelDownloadService();
     for (final code in TranslationProvider.supportedLanguages.keys) {
       final downloaded = await svc.isModelDownloaded(code);
-      if (mounted) setState(() => _quickDownloaded[code] = downloaded);
+      if (mounted) {
+        setState(() {
+          _quickDownloaded[code] = downloaded;
+          // A silent background failure (e.g. the home screen's pre-download)
+          // shows here as the row's failed/Retry state.
+          if (!downloaded &&
+              ModelDownloadService.quickDownloadFailed(code) &&
+              !_quickDownloading.contains(code)) {
+            _quickError.add(code);
+          }
+        });
+      }
       // Started elsewhere (e.g. the home screen's language picker): join
       // it so this screen shows its progress instead of a Download button.
       if (!downloaded &&
@@ -228,7 +239,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
 
   // ── Download / delete ────────────────────────────────────────────────────────
 
-  Future<void> _downloadPack(_LanguagePack lp) async {
+  /// [userInitiated]: the user tapped Download/Retry. Only then does a
+  /// failure show the download-failed dialog; joining a download started
+  /// elsewhere, or resuming one after the app returns to the foreground,
+  /// fails quietly into the row's error state.
+  Future<void> _downloadPack(_LanguagePack lp, {bool userInitiated = false}) async {
     _joinedDownloads.add(lp.key);
     setState(() {
       _packStatus[lp.key] = OnnxModelStatus.downloading;
@@ -263,6 +278,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packStatus[lp.key] = OnnxModelStatus.error;
           _packProgress.remove(lp.key);
         });
+        if (!userInitiated) return;
         final localizations = AppLocalizations.of(context)!;
         final action = await showDownloadFailedDialog(
           context,
@@ -270,7 +286,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         );
         if (!mounted) return;
         if (action == DownloadFailedAction.retry) {
-          _downloadPack(lp);
+          _downloadPack(lp, userInitiated: true);
         } else if (action == DownloadFailedAction.switchToCloudAi) {
           await _switchToCloudAi();
         }
@@ -323,7 +339,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     }
   }
 
-  Future<void> _downloadQuickLang(String code) async {
+  /// See [_downloadPack] for [userInitiated].
+  Future<void> _downloadQuickLang(String code, {bool userInitiated = false}) async {
     setState(() {
       _quickDownloading.add(code);
       _quickError.remove(code);
@@ -368,6 +385,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _quickProgress.remove(code);
           _quickWaiting.remove(code);
         });
+        if (!userInitiated) return;
         final localizations = AppLocalizations.of(context)!;
         final action = await showDownloadFailedDialog(
           context,
@@ -375,7 +393,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         );
         if (!mounted) return;
         if (action == DownloadFailedAction.retry) {
-          _downloadQuickLang(code);
+          _downloadQuickLang(code, userInitiated: true);
         } else if (action == DownloadFailedAction.switchToCloudAi) {
           await _switchToCloudAi();
         }
@@ -720,7 +738,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   )
                 else
                   GestureDetector(
-                    onTap: () => _downloadPack(lp),
+                    onTap: () => _downloadPack(lp, userInitiated: true),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
@@ -857,7 +875,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               )
             else
               GestureDetector(
-                onTap: () => _downloadQuickLang(code),
+                onTap: () => _downloadQuickLang(code, userInitiated: true),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(

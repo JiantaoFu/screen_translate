@@ -1,0 +1,4 @@
+• Language pack downloads are more reliable: they retry automatically, resume on slow connections, and if one still fails you can retry or switch to Cloud AI in one tap
+• Long-press the floating button to hide all translations at once
+• Send feedback by email with your device and app details filled in, to help us fix problems faster
+• The rating request is less intrusive: it only appears after a few successful translations, and never after a download error or crash

@@ -13,5 +13,5 @@
     <string name="mode_original_text">Texto original</string>
     <string name="mode_manual_translate">Tradução manual</string>
     <string name="hide_all_overlays">Ocultar tudo</string>
-    <string name="overlays_hidden_toast">Traduções ocultadas</string>
+    <string name="overlays_hidden_toast">Traduções ocultas</string>
 </resources>

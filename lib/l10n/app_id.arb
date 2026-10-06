@@ -78,7 +78,7 @@
   "not_now": "Tidak Sekarang",
   "cannot_open_store": "Tidak dapat membuka Google Play Store",
   "api_key_required": "Kunci API Diperlukan",
-  "go_to_settings": "Pergi ke Pengaturan",
+  "go_to_settings": "Buka Pengaturan",
   "api_key_input_error": "Silakan masukkan kunci API yang valid",
   "api_key_save_error": "Kunci API tidak valid. Periksa dan coba lagi.",
   "translation_mode_on_device": "Terjemahan di Perangkat",
@@ -138,8 +138,8 @@
   "language_request_sent": "Terima kasih! Permintaan Anda telah kami catat.",
   "pack_waiting_for_network": "Menunggu jaringan…",
   "downloading_language_model_toast": "Mengunduh model bahasa (~30 MB). Harap tunggu…",
-  "download_failed_title": "Unduhan paket bahasa gagal",
-  "download_failed_body": "\"{pack}\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi lalu coba lagi, atau beralih ke AI Cloud (tanpa paket offline).",
+  "download_failed_title": "Gagal mengunduh paket bahasa",
+  "download_failed_body": "Paket \"{pack}\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi Anda lalu coba lagi, atau beralih ke AI Cloud (tidak perlu paket offline).",
   "switch_to_cloud_ai": "Beralih ke AI Cloud",
   "send_feedback_by_email": "Kirim masukan lewat email"
 }

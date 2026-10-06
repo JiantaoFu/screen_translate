@@ -247,7 +247,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get api_key_required => 'Se requiere clave API';
 
   @override
-  String get go_to_settings => 'Ir a Configuración';
+  String get go_to_settings => 'Ir a Ajustes';
 
   @override
   String get api_key_input_error => 'Ingrese una clave API válida';
@@ -459,7 +459,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String download_failed_body(String pack) {
-    return 'No se pudo descargar \"$pack\" tras varios intentos. Comprueba la conexión y reintenta, o cambia a IA en la nube (sin paquete sin conexión).';
+    return 'No se pudo descargar el paquete \"$pack\" tras varios intentos. Comprueba tu conexión y vuelve a intentarlo, o cambia a IA en la nube (no necesita paquete de idioma).';
   }
 
   @override

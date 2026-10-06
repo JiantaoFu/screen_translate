@@ -137,5 +137,9 @@
   "request_language_pair": "Taotle seda keelt",
   "language_request_sent": "Aitäh! Oleme su taotluse kirja pannud.",
   "pack_waiting_for_network": "Võrgu ootamine…",
-  "downloading_language_model_toast": "Keelemudeli allalaadimine (~30 MB). Palun oodake…"
+  "downloading_language_model_toast": "Keelemudeli allalaadimine (~30 MB). Palun oodake…",
+  "download_failed_title": "Keelepaketi allalaadimine ebaõnnestus",
+  "download_failed_body": "Paketti „{pack}“ ei õnnestunud mitme katse järel alla laadida. Kontrolli ühendust ja proovi uuesti või lülitu pilve AI-le (võrguühenduseta paketti pole vaja).",
+  "switch_to_cloud_ai": "Lülitu pilve AI-le",
+  "send_feedback_by_email": "Saada tagasisidet e-postiga"
 }

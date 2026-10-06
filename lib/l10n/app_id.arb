@@ -137,5 +137,9 @@
   "request_language_pair": "Minta Bahasa Ini",
   "language_request_sent": "Terima kasih! Permintaan Anda telah kami catat.",
   "pack_waiting_for_network": "Menunggu jaringan…",
-  "downloading_language_model_toast": "Mengunduh model bahasa (~30 MB). Harap tunggu…"
+  "downloading_language_model_toast": "Mengunduh model bahasa (~30 MB). Harap tunggu…",
+  "download_failed_title": "Unduhan paket bahasa gagal",
+  "download_failed_body": "\"{pack}\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi lalu coba lagi, atau beralih ke AI Cloud (tanpa paket offline).",
+  "switch_to_cloud_ai": "Beralih ke AI Cloud",
+  "send_feedback_by_email": "Kirim masukan lewat email"
 }

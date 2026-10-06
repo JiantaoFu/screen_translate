@@ -455,4 +455,18 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Nyelvi modell letöltése (~30 MB). Kérjük, várjon…';
+
+  @override
+  String get download_failed_title => 'A nyelvi csomag letöltése sikertelen';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'A(z) „$pack” csomagot több próbálkozás után sem sikerült letölteni. Ellenőrizze a kapcsolatot és próbálja újra, vagy váltson a felhő AI-ra (nincs szükség offline csomagra).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Váltás felhő AI-ra';
+
+  @override
+  String get send_feedback_by_email => 'Visszajelzés küldése e-mailben';
 }

@@ -6,6 +6,8 @@ import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/translation_settings_screen.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
+import 'package:screen_translate/widgets/download_error_dialog.dart';
+import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
@@ -217,8 +219,32 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                     if (mounted) setState(() => _downloadProgress[code] = p);
                   });
                 } catch (_) {
-                  // Swallowed — translateText() retries on demand and will
-                  // surface a real error there if it's still unavailable.
+                  if (!mounted) return;
+                  final localizations = AppLocalizations.of(this.context)!;
+                  final action = await showDownloadFailedDialog(
+                    this.context,
+                    packLabel: localizations.languageName(code),
+                  );
+                  if (!mounted) return;
+                  if (action == DownloadFailedAction.retry) {
+                    // Re-enter the same pre-warm path.
+                    setState(() => _downloadingCodes.add(code));
+                    try {
+                      await modelService.downloadModelWithFallback(code, onProgress: (p) {
+                        if (mounted) setState(() => _downloadProgress[code] = p);
+                      });
+                    } catch (_) {}
+                  } else if (action == DownloadFailedAction.switchToCloudAi) {
+                    final provider = Provider.of<TranslationProvider>(this.context, listen: false);
+                    await switchToCloudAi(this.context, openSettings: () {
+                      Navigator.of(this.context).push(MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider.value(
+                          value: provider,
+                          child: const TranslationSettingsScreen(),
+                        ),
+                      ));
+                    });
+                  }
                 } finally {
                   if (mounted) {
                     setState(() {
@@ -325,61 +351,45 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> _trackTranslationAndPromptReview(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    int translationCount = prefs.getInt('translationCount') ?? 0;
-    int promptCount = prefs.getInt('reviewPromptCount') ?? 0;
-
-    translationCount++;
-    await prefs.setInt('translationCount', translationCount);
-
-    // Prompt at increasing translation milestones
-    final promptThresholds = [10, 50, 100, 250, 500];
-
-    if (promptCount < promptThresholds.length &&
-        translationCount >= promptThresholds[promptCount]) {
-      _showReviewPromptDialog(context);
-      await prefs.setInt('reviewPromptCount', promptCount + 1);
-    }
+    final review = ReviewPromptService(prefs);
+    await review.recordSuccessfulTranslation();
+    if (!review.shouldPrompt()) return;
+    if (!context.mounted) return;
+    await review.markPromptShown();
+    await _launchInAppReview(context);
   }
 
-  void _showReviewPromptDialog(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.enjoying_app),
-          content: Text(AppLocalizations.of(context)!.review_prompt_message),
-          actions: [
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.not_now),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.rate_now),
-              onPressed: () {
-                _launchInAppReview(context);
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _launchInAppReview(BuildContext context) async {
+  Future<void> _launchInAppReview(BuildContext context) async {
     final InAppReview inAppReview = InAppReview.instance;
-
     if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
-    } else {
+      await inAppReview.requestReview();
+    } else if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.cannot_open_store)),
       );
     }
+  }
+
+  /// Shows the download-failed dialog. Returns the chosen action so callers
+  /// can retry their own download; Cloud AI switching is handled here.
+  Future<DownloadFailedAction> _handleDownloadFailed(
+    BuildContext context,
+    String packLabel,
+  ) async {
+    final action = await showDownloadFailedDialog(context, packLabel: packLabel);
+    if (!context.mounted) return DownloadFailedAction.dismiss;
+    if (action == DownloadFailedAction.switchToCloudAi) {
+      final provider = Provider.of<TranslationProvider>(context, listen: false);
+      await switchToCloudAi(context, openSettings: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(
+            value: provider,
+            child: const TranslationSettingsScreen(),
+          ),
+        ));
+      });
+    }
+    return action;
   }
 
   @override
@@ -796,9 +806,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             }
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(localizations.download_failed_connection), backgroundColor: Colors.red),
+              final action = await _handleDownloadFailed(
+                this.context,
+                localizations.languagePairName(
+                    selectedKey.split('|')[0], selectedKey.split('|')[1]),
               );
+              if (!mounted) return;
+              if (action == DownloadFailedAction.retry) {
+                setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
+                try {
+                  final pair = findOnnxPair(source, target);
+                  if (pair != null) {
+                    await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
+                      if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+                    });
+                  } else {
+                    final pivot = findOnnxPivotPair(source, target);
+                    if (pivot != null) {
+                      await modelService.downloadOnnxPivot(pivot, onProgress: (p) {
+                        if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+                      });
+                    }
+                  }
+                } catch (_) {}
+              }
             }
           } finally {
             if (mounted) setState(() => _onnxDownloadProgress.remove(selectedKey));

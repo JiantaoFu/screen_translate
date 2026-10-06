@@ -137,5 +137,9 @@
   "request_language_pair": "Begär detta språk",
   "language_request_sent": "Tack! Vi har noterat din begäran.",
   "pack_waiting_for_network": "Väntar på nätverk…",
-  "downloading_language_model_toast": "Laddar ned språkmodell (~30 MB). Vänta…"
+  "downloading_language_model_toast": "Laddar ned språkmodell (~30 MB). Vänta…",
+  "download_failed_title": "Nedladdningen av språkpaketet misslyckades",
+  "download_failed_body": "Det gick inte att ladda ned ”{pack}” efter flera försök. Kontrollera anslutningen och försök igen, eller byt till Moln-AI (inget offlinepaket behövs).",
+  "switch_to_cloud_ai": "Byt till Moln-AI",
+  "send_feedback_by_email": "Skicka feedback via e-post"
 }

@@ -405,27 +405,52 @@ class OverlayService : Service() {
             val padding = (size * 0.25f).toInt()
             setPadding(padding, padding, padding, padding)
 
+            // Announce the long-press action to TalkBack as "Hide all".
+            androidx.core.view.ViewCompat.replaceAccessibilityAction(
+                this,
+                androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+                getString(R.string.hide_all_overlays),
+                null
+            )
+            var longPressFired = false
+            val longPressRunnable = Runnable {
+                longPressFired = true
+                hideAllFromButton()
+            }
             setOnTouchListener { view, event ->
                 trackControlButtonTouch(event)
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        longPressFired = false
                         view.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).start()
                         lastTouchX = event.rawX
                         lastTouchY = event.rawY
                         originalX = (view.layoutParams as WindowManager.LayoutParams).x
                         originalY = (view.layoutParams as WindowManager.LayoutParams).y
+                        // Long-press "Hide all" — Play reviews said stale
+                        // overlays blocked the screen after page changes.
+                        this@OverlayService.handler.postDelayed(longPressRunnable, 500)
                         true
                     }
                     MotionEvent.ACTION_UP -> {
+                        this@OverlayService.handler.removeCallbacks(longPressRunnable)
                         view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
                         val moved = Math.abs(event.rawX - lastTouchX) > 5 ||
                                   Math.abs(event.rawY - lastTouchY) > 5
-                        if (!moved) {
+                        if (!moved && !longPressFired) {
                             switchMode()
                         }
                         true
                     }
+                    MotionEvent.ACTION_CANCEL -> {
+                        this@OverlayService.handler.removeCallbacks(longPressRunnable)
+                        view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                        true
+                    }
                     MotionEvent.ACTION_MOVE -> {
+                        val moved = Math.abs(event.rawX - lastTouchX) > 5 ||
+                                  Math.abs(event.rawY - lastTouchY) > 5
+                        if (moved) this@OverlayService.handler.removeCallbacks(longPressRunnable)
                         val params = view.layoutParams as WindowManager.LayoutParams
                         params.x = (originalX + (event.rawX - lastTouchX)).toInt()
                         params.y = (originalY + (event.rawY - lastTouchY)).toInt()
@@ -583,6 +608,25 @@ class OverlayService : Service() {
         translateButton?.visibility = when (displayMode) {
             DisplayMode.MANUAL -> View.VISIBLE
             else -> View.GONE
+        }
+    }
+
+    /**
+     * "Hide all" (long-press on the mode button): removes every translation
+     * box at once and tells Dart to forget them through the same
+     * cancelTranslation path a scroll/page change uses, so its bookkeeping
+     * matches the screen. Boxes come back on the next content change, or
+     * via Translate in manual mode.
+     */
+    private fun hideAllFromButton() {
+        Log.d(TAG, "Hide all requested from the floating button")
+        hideAllOverlays()
+        showTooltip(getString(R.string.overlays_hidden_toast))
+        if (!::methodChannel.isInitialized) return
+        try {
+            methodChannel.invokeMethod("cancelTranslation", null)
+        } catch (e: Exception) {
+            Log.e(TAG, "Hide all: cancelTranslation failed", e)
         }
     }
 

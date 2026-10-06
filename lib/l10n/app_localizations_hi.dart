@@ -453,4 +453,18 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'भाषा मॉडल डाउनलोड हो रहा है (~30 MB)। कृपया इंतज़ार करें…';
+
+  @override
+  String get download_failed_title => 'भाषा पैक डाउनलोड विफल रहा';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'कई प्रयासों के बाद भी \"$pack\" डाउनलोड नहीं हो सका। कनेक्शन जांचें और फिर से प्रयास करें, या क्लाउड AI पर जाएं (ऑफ़लाइन पैक की ज़रूरत नहीं)।';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'क्लाउड AI पर जाएं';
+
+  @override
+  String get send_feedback_by_email => 'ईमेल से फ़ीडबैक भेजें';
 }

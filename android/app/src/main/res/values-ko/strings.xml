@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">자동 번역</string>
     <string name="mode_original_text">원문</string>
     <string name="mode_manual_translate">수동 번역</string>
+    <string name="hide_all_overlays">모두 숨기기</string>
+    <string name="overlays_hidden_toast">번역이 숨겨졌습니다</string>
 </resources>

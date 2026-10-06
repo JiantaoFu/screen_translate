@@ -137,5 +137,9 @@
   "request_language_pair": "درخواست این زبان",
   "language_request_sent": "متشکریم! درخواست شما ثبت شد.",
   "pack_waiting_for_network": "در انتظار شبکه…",
-  "downloading_language_model_toast": "در حال بارگیری مدل زبان (حدود ۳۰ مگابایت). لطفاً صبر کنید…"
+  "downloading_language_model_toast": "در حال بارگیری مدل زبان (حدود ۳۰ مگابایت). لطفاً صبر کنید…",
+  "download_failed_title": "دانلود بسته زبان ناموفق بود",
+  "download_failed_body": "پس از چند تلاش، دانلود «{pack}» ممکن نشد. اتصال را بررسی و دوباره تلاش کنید یا به هوش مصنوعی ابری بروید (بدون بسته آفلاین).",
+  "switch_to_cloud_ai": "رفتن به هوش مصنوعی ابری",
+  "send_feedback_by_email": "ارسال بازخورد با ایمیل"
 }

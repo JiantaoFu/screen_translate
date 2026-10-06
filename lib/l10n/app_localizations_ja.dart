@@ -443,4 +443,18 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       '言語モデルをダウンロードしています（約30MB）。しばらくお待ちください…';
+
+  @override
+  String get download_failed_title => '言語パックのダウンロードに失敗しました';
+
+  @override
+  String download_failed_body(String pack) {
+    return '「$pack」を何度試してもダウンロードできませんでした。接続を確認して再試行するか、クラウド AI に切り替えてください（オフラインパック不要）。';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'クラウド AI に切り替え';
+
+  @override
+  String get send_feedback_by_email => 'メールでフィードバックを送る';
 }

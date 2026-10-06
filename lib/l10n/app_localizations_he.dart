@@ -447,4 +447,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'מוריד מודל שפה (כ-30MB). נא להמתין…';
+
+  @override
+  String get download_failed_title => 'הורדת חבילת השפה נכשלה';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'לא ניתן היה להוריד את \"$pack\" לאחר מספר ניסיונות. בדקו את החיבור ונסו שוב, או עברו ל-AI בענן (ללא חבילה לא מקוונת).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'מעבר ל-AI בענן';
+
+  @override
+  String get send_feedback_by_email => 'שליחת משוב באימייל';
 }

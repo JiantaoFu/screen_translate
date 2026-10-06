@@ -137,5 +137,9 @@
   "request_language_pair": "Заявка за този език",
   "language_request_sent": "Благодарим! Регистрирахме заявката ви.",
   "pack_waiting_for_network": "Изчакване на мрежа…",
-  "downloading_language_model_toast": "Изтегляне на езиков модел (~30 MB). Моля, изчакайте…"
+  "downloading_language_model_toast": "Изтегляне на езиков модел (~30 MB). Моля, изчакайте…",
+  "download_failed_title": "Неуспешно изтегляне на езиковия пакет",
+  "download_failed_body": "Неуспешно изтегляне на „{pack}“ след няколко опита. Проверете връзката и опитайте отново или превключете на облачен ИИ (не е нужен офлайн пакет).",
+  "switch_to_cloud_ai": "Превключи на облачен ИИ",
+  "send_feedback_by_email": "Обратна връзка по имейл"
 }

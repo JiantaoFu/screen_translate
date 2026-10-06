@@ -137,5 +137,9 @@
   "request_language_pair": "Poproś o ten język",
   "language_request_sent": "Dziękujemy! Zarejestrowaliśmy Twoją prośbę.",
   "pack_waiting_for_network": "Oczekiwanie na sieć…",
-  "downloading_language_model_toast": "Pobieranie modelu językowego (~30 MB). Proszę czekać…"
+  "downloading_language_model_toast": "Pobieranie modelu językowego (~30 MB). Proszę czekać…",
+  "download_failed_title": "Nie udało się pobrać pakietu językowego",
+  "download_failed_body": "Nie udało się pobrać „{pack}” mimo kilku prób. Sprawdź połączenie i spróbuj ponownie lub przełącz na AI w chmurze (pakiet offline nie jest potrzebny).",
+  "switch_to_cloud_ai": "Przełącz na AI w chmurze",
+  "send_feedback_by_email": "Wyślij opinię e-mailem"
 }

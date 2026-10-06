@@ -137,5 +137,9 @@
   "request_language_pair": "Vyžiadať tento jazyk",
   "language_request_sent": "Ďakujeme! Vašu žiadosť sme zaznamenali.",
   "pack_waiting_for_network": "Čaká sa na sieť…",
-  "downloading_language_model_toast": "Sťahuje sa jazykový model (~30 MB). Čakajte, prosím…"
+  "downloading_language_model_toast": "Sťahuje sa jazykový model (~30 MB). Čakajte, prosím…",
+  "download_failed_title": "Stiahnutie jazykového balíka zlyhalo",
+  "download_failed_body": "Balík „{pack}“ sa nepodarilo stiahnuť ani po niekoľkých pokusoch. Skontrolujte pripojenie a skúste to znova, alebo prepnite na cloudové AI (offline balík nie je potrebný).",
+  "switch_to_cloud_ai": "Prepnúť na cloudové AI",
+  "send_feedback_by_email": "Poslať spätnú väzbu e-mailom"
 }

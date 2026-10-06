@@ -7,8 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:screen_translate/services/custom_model_manager.dart';
+import 'package:screen_translate/services/download_retry.dart';
+import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/services/onnx_translation_service.dart';
 
 // ─── ONNX model download status ──────────────────────────────────────────────
@@ -204,13 +207,56 @@ class ModelDownloadService {
     return future;
   }
 
+  /// How long ML Kit's own (Google) download may run before we treat it as
+  /// stalled and fall through to the custom-server mirror. Before this a
+  /// stalled DownloadManager entry kept the spinner running forever
+  /// (Play reviews, mostly from the Middle East).
+  @visibleForTesting
+  static Duration quickGoogleTimeout = const Duration(minutes: 2);
+
+  /// Cap for one whole attempt (Google + mirror fallback). A timeout counts
+  /// as a failed attempt for [withRetries].
+  @visibleForTesting
+  static Duration quickAttemptTimeout = const Duration(minutes: 4);
+
+  @visibleForTesting
+  static int quickMaxRetries = 2;
+
+  @visibleForTesting
+  static Duration quickRetryBackoff = const Duration(seconds: 2);
+
   Future<void> _downloadModelWithFallbackImpl(
     String langCode, {
     required DownloadProgressCallback onFallbackProgress,
   }) async {
     try {
+      await withRetries(
+        () => _downloadQuickOnce(langCode, onFallbackProgress: onFallbackProgress),
+        maxRetries: quickMaxRetries,
+        attemptTimeout: quickAttemptTimeout,
+        initialBackoff: quickRetryBackoff,
+        onAttemptFailed: (attempt, error) {
+          debugPrint(
+            'Quick download for "$langCode" attempt $attempt failed: $error',
+          );
+        },
+      );
+    } catch (e) {
+      // Mark the device so in-app review never asks after a download failure.
+      await _recordDownloadError();
+      rethrow;
+    }
+  }
+
+  Future<void> _downloadQuickOnce(
+    String langCode, {
+    required DownloadProgressCallback onFallbackProgress,
+  }) async {
+    try {
       debugPrint('Attempting to download ML Kit model for "$langCode" from Google...');
-      await _googleModelManager.downloadModel(langCode, isWifiRequired: false);
+      await _googleModelManager
+          .downloadModel(langCode, isWifiRequired: false)
+          .timeout(quickGoogleTimeout);
       debugPrint('ML Kit model for "$langCode" downloaded successfully from Google.');
     } catch (e) {
       debugPrint('Failed to download from Google. Reason: $e');
@@ -332,6 +378,28 @@ class ModelDownloadService {
   }
 
   Future<void> _downloadOnnxModelImpl(
+    String langPairKey, {
+    DownloadProgressCallback? onProgress,
+  }) async {
+    // Retry/timeout already live per file in downloadFileResumable (stall
+    // timeout + Range resume, since 1.2.3). Here we only record the final
+    // failure so the in-app review prompt never targets this device.
+    try {
+      await _downloadOnnxModelOnce(langPairKey, onProgress: onProgress);
+    } catch (e) {
+      await _recordDownloadError();
+      rethrow;
+    }
+  }
+
+  static Future<void> _recordDownloadError() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await ReviewPromptService(prefs).recordError();
+    } catch (_) {}
+  }
+
+  Future<void> _downloadOnnxModelOnce(
     String langPairKey, {
     DownloadProgressCallback? onProgress,
   }) async {

@@ -448,4 +448,18 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'กำลังดาวน์โหลดโมเดลภาษา (~30 MB) โปรดรอสักครู่…';
+
+  @override
+  String get download_failed_title => 'ดาวน์โหลดแพ็กภาษาไม่สำเร็จ';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'ดาวน์โหลด \"$pack\" ไม่สำเร็จหลังจากลองหลายครั้ง ตรวจสอบการเชื่อมต่อแล้วลองใหม่ หรือเปลี่ยนไปใช้ AI บนคลาวด์ (ไม่ต้องใช้แพ็กออฟไลน์)';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'เปลี่ยนไปใช้ AI บนคลาวด์';
+
+  @override
+  String get send_feedback_by_email => 'ส่งความคิดเห็นทางอีเมล';
 }

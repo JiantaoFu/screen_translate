@@ -452,4 +452,19 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Preuzimanje jezičnog modela (~30 MB). Pričekajte…';
+
+  @override
+  String get download_failed_title =>
+      'Preuzimanje jezičnog paketa nije uspjelo';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Paket „$pack” nije moguće preuzeti ni nakon nekoliko pokušaja. Provjerite vezu i pokušajte ponovno ili prijeđite na Cloud AI (izvanmrežni paket nije potreban).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Prijeđi na Cloud AI';
+
+  @override
+  String get send_feedback_by_email => 'Pošalji povratne informacije e-poštom';
 }

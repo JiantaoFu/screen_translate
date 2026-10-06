@@ -451,4 +451,18 @@ class AppLocalizationsNo extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Laster ned språkmodell (~30 MB). Vent litt…';
+
+  @override
+  String get download_failed_title => 'Nedlasting av språkpakke mislyktes';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Kunne ikke laste ned «$pack» etter flere forsøk. Sjekk tilkoblingen og prøv igjen, eller bytt til Sky-AI (ingen frakoblet pakke nødvendig).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Bytt til Sky-AI';
+
+  @override
+  String get send_feedback_by_email => 'Send tilbakemelding på e-post';
 }

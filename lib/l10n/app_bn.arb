@@ -137,5 +137,9 @@
   "request_language_pair": "এই ভাষার অনুরোধ করুন",
   "language_request_sent": "ধন্যবাদ! আমরা আপনার অনুরোধ নথিভুক্ত করেছি।",
   "pack_waiting_for_network": "নেটওয়ার্কের অপেক্ষায়…",
-  "downloading_language_model_toast": "ভাষা মডেল ডাউনলোড হচ্ছে (~30 MB)। অনুগ্রহ করে অপেক্ষা করুন…"
+  "downloading_language_model_toast": "ভাষা মডেল ডাউনলোড হচ্ছে (~30 MB)। অনুগ্রহ করে অপেক্ষা করুন…",
+  "download_failed_title": "ভাষা প্যাক ডাউনলোড ব্যর্থ হয়েছে",
+  "download_failed_body": "কয়েকবার চেষ্টার পরেও \"{pack}\" ডাউনলোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন, অথবা ক্লাউড এআই-তে যান (অফলাইন প্যাক লাগবে না)।",
+  "switch_to_cloud_ai": "ক্লাউড এআই-তে যান",
+  "send_feedback_by_email": "ইমেলে মতামত পাঠান"
 }

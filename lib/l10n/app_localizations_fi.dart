@@ -453,4 +453,18 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Ladataan kielimallia (~30 Mt). Odota hetki…';
+
+  @override
+  String get download_failed_title => 'Kielipaketin lataus epäonnistui';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Pakettia ”$pack” ei voitu ladata useasta yrityksestä huolimatta. Tarkista yhteys ja yritä uudelleen tai vaihda pilvi-tekoälyyn (offline-pakettia ei tarvita).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Vaihda pilvi-tekoälyyn';
+
+  @override
+  String get send_feedback_by_email => 'Lähetä palautetta sähköpostilla';
 }

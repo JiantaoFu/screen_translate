@@ -453,4 +453,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Téléchargement du modèle de langue (~30 Mo). Veuillez patienter…';
+
+  @override
+  String get download_failed_title =>
+      'Échec du téléchargement du pack de langue';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Impossible de télécharger « $pack » après plusieurs essais. Vérifiez la connexion et réessayez, ou passez à l\'IA cloud (aucun pack hors ligne requis).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Passer à l\'IA cloud';
+
+  @override
+  String get send_feedback_by_email => 'Envoyer un commentaire par e-mail';
 }

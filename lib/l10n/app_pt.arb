@@ -137,5 +137,9 @@
   "request_language_pair": "Solicitar este idioma",
   "language_request_sent": "Obrigado! Registramos sua solicitação.",
   "pack_waiting_for_network": "Aguardando a rede…",
-  "downloading_language_model_toast": "Baixando o modelo de idioma (~30 MB). Aguarde…"
+  "downloading_language_model_toast": "Baixando o modelo de idioma (~30 MB). Aguarde…",
+  "download_failed_title": "Falha ao baixar o pacote de idioma",
+  "download_failed_body": "Não foi possível baixar \"{pack}\" após várias tentativas. Verifique a conexão e tente de novo, ou mude para IA na nuvem (sem pacote offline).",
+  "switch_to_cloud_ai": "Mudar para IA na nuvem",
+  "send_feedback_by_email": "Enviar feedback por e-mail"
 }

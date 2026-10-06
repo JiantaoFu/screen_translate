@@ -11,6 +11,7 @@ import '../l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
 import '../services/model_download_service.dart';
+import '../widgets/download_error_dialog.dart';
 import '../services/onnx_translation_service.dart';
 
 // ─── Language pack display data ───────────────────────────────────────────────
@@ -262,11 +263,34 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packStatus[lp.key] = OnnxModelStatus.error;
           _packProgress.remove(lp.key);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.download_failed_connection), backgroundColor: Colors.red),
+        final localizations = AppLocalizations.of(context)!;
+        final action = await showDownloadFailedDialog(
+          context,
+          packLabel: localizations.languagePairName(lp.sourceBcp, lp.targetBcp),
         );
+        if (!mounted) return;
+        if (action == DownloadFailedAction.retry) {
+          _downloadPack(lp);
+        } else if (action == DownloadFailedAction.switchToCloudAi) {
+          await _switchToCloudAi();
+        }
       }
     }
+  }
+
+  Future<void> _switchToCloudAi() async {
+    if (await LLMTranslationService.isApiKeyConfigured()) {
+      if (mounted) await switchToCloudAi(context);
+      return;
+    }
+    if (!mounted) return;
+    // No key yet: select Cloud AI like tapping its mode card, which reveals
+    // the key field on this screen, and say what's needed.
+    Provider.of<TranslationProvider>(context, listen: false)
+        .setTranslationMode(TranslationMode.llm);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.cloud_ai_api_key_required_content),
+    ));
   }
 
   Future<void> _deletePack(_LanguagePack lp) async {
@@ -344,9 +368,17 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _quickProgress.remove(code);
           _quickWaiting.remove(code);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.download_failed_connection), backgroundColor: Colors.red),
+        final localizations = AppLocalizations.of(context)!;
+        final action = await showDownloadFailedDialog(
+          context,
+          packLabel: localizations.languageName(code),
         );
+        if (!mounted) return;
+        if (action == DownloadFailedAction.retry) {
+          _downloadQuickLang(code);
+        } else if (action == DownloadFailedAction.switchToCloudAi) {
+          await _switchToCloudAi();
+        }
       }
     }
   }
@@ -946,13 +978,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   Widget _feedbackSection() {
     final localizations = AppLocalizations.of(context)!;
     return GestureDetector(
-      onTap: () => launchUrl(
-        Uri(
-          scheme: 'mailto',
-          path: 'support@wtao.top',
-          query: 'subject=${Uri.encodeComponent(localizations.send_feedback)}',
-        ),
-      ),
+      onTap: () => sendFeedbackEmail(context),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(

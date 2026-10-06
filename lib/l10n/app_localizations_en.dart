@@ -449,4 +449,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Downloading language model (~30 MB). Please wait…';
+
+  @override
+  String get download_failed_title => 'Language pack download failed';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Couldn\'t download \"$pack\" after several tries. Check your connection, retry, or switch to Cloud AI (no offline pack needed).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Switch to Cloud AI';
+
+  @override
+  String get send_feedback_by_email => 'Send feedback by email';
 }

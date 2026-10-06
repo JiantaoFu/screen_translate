@@ -137,5 +137,9 @@
   "api_key_required": "API-avain vaaditaan",
   "go_to_settings": "Siirry asetuksiin",
   "api_key_input_error": "Anna kelvollinen API-avain",
-  "api_key_save_error": "Virheellinen API-avain. Tarkista se ja yritä uudelleen."
+  "api_key_save_error": "Virheellinen API-avain. Tarkista se ja yritä uudelleen.",
+  "download_failed_title": "Kielipaketin lataus epäonnistui",
+  "download_failed_body": "Pakettia ”{pack}” ei voitu ladata useasta yrityksestä huolimatta. Tarkista yhteys ja yritä uudelleen tai vaihda pilvi-tekoälyyn (offline-pakettia ei tarvita).",
+  "switch_to_cloud_ai": "Vaihda pilvi-tekoälyyn",
+  "send_feedback_by_email": "Lähetä palautetta sähköpostilla"
 }

@@ -451,4 +451,18 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Stahování jazykového modelu (~30 MB). Čekejte prosím…';
+
+  @override
+  String get download_failed_title => 'Stažení jazykového balíčku se nezdařilo';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Balíček „$pack“ se nepodařilo stáhnout ani po několika pokusech. Zkontrolujte připojení a zkuste to znovu, nebo přepněte na Cloud AI (offline balíček není potřeba).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Přepnout na Cloud AI';
+
+  @override
+  String get send_feedback_by_email => 'Poslat zpětnou vazbu e-mailem';
 }

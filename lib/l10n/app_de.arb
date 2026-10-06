@@ -137,5 +137,9 @@
   "request_language_pair": "Diese Sprache anfordern",
   "language_request_sent": "Danke! Wir haben deine Anfrage vermerkt.",
   "pack_waiting_for_network": "Warte auf Netzwerk…",
-  "downloading_language_model_toast": "Sprachmodell wird heruntergeladen (~30 MB). Bitte warten…"
+  "downloading_language_model_toast": "Sprachmodell wird heruntergeladen (~30 MB). Bitte warten…",
+  "download_failed_title": "Sprachpaket-Download fehlgeschlagen",
+  "download_failed_body": "„{pack}“ konnte nach mehreren Versuchen nicht heruntergeladen werden. Verbindung prüfen und erneut versuchen, oder zu Cloud-KI wechseln (kein Offline-Paket nötig).",
+  "switch_to_cloud_ai": "Zu Cloud-KI wechseln",
+  "send_feedback_by_email": "Feedback per E-Mail senden"
 }

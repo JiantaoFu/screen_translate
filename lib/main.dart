@@ -15,6 +15,8 @@ import 'package:screen_translate/l10n/locale_resolution.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'services/review_prompt_service.dart';
 import 'services/ocr_sampling_service.dart';
 
 Future<void> main() async {
@@ -59,6 +61,12 @@ Future<void> main() async {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
       };
+      // A crash on the previous run marks this device as having had an
+      // error, so the in-app review prompt never asks it.
+      if (await FirebaseCrashlytics.instance.didCrashOnPreviousExecution()) {
+        final prefs = await SharedPreferences.getInstance();
+        await ReviewPromptService(prefs).recordError();
+      }
 
       // Initialize Firebase Remote Config
       final remoteConfig = FirebaseRemoteConfigService();

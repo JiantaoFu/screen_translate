@@ -185,5 +185,16 @@
   "downloading_language_model_toast": "Downloading language model (~30 MB). Please wait…",
   "@downloading_language_model_toast": {
     "description": "Toast when translating needs a language model that isn't downloaded yet"
-  }
+  },
+  "download_failed_title": "Language pack download failed",
+  "download_failed_body": "Couldn't download \"{pack}\" after several tries. Check your connection, retry, or switch to Cloud AI (no offline pack needed).",
+  "@download_failed_body": {
+    "placeholders": {
+      "pack": {
+        "type": "String"
+      }
+    }
+  },
+  "switch_to_cloud_ai": "Switch to Cloud AI",
+  "send_feedback_by_email": "Send feedback by email"
 }

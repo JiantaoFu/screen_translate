@@ -454,4 +454,18 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Se descarcă modelul de limbă (~30 MB). Te rugăm să aștepți…';
+
+  @override
+  String get download_failed_title => 'Descărcarea pachetului de limbă a eșuat';
+
+  @override
+  String download_failed_body(String pack) {
+    return '„$pack” nu a putut fi descărcat după mai multe încercări. Verifică conexiunea și reîncearcă sau treci la AI din cloud (nu e nevoie de pachet offline).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Treci la AI din cloud';
+
+  @override
+  String get send_feedback_by_email => 'Trimite feedback prin e-mail';
 }

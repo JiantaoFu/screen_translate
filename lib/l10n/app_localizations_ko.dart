@@ -443,4 +443,18 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       '언어 모델을 다운로드하는 중입니다(약 30MB). 잠시 기다려 주세요…';
+
+  @override
+  String get download_failed_title => '언어 팩 다운로드 실패';
+
+  @override
+  String download_failed_body(String pack) {
+    return '여러 번 시도했지만 \"$pack\"을(를) 다운로드하지 못했습니다. 연결을 확인한 뒤 다시 시도하거나 클라우드 AI로 전환하세요(오프라인 팩 불필요).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => '클라우드 AI로 전환';
+
+  @override
+  String get send_feedback_by_email => '이메일로 피드백 보내기';
 }

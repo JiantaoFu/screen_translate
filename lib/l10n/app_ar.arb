@@ -137,5 +137,9 @@
   "request_language_pair": "طلب هذه اللغة",
   "language_request_sent": "شكرًا! لقد سجّلنا طلبك.",
   "pack_waiting_for_network": "في انتظار الشبكة…",
-  "downloading_language_model_toast": "جارٍ تنزيل نموذج اللغة (~30 ميغابايت). يُرجى الانتظار…"
+  "downloading_language_model_toast": "جارٍ تنزيل نموذج اللغة (~30 ميغابايت). يُرجى الانتظار…",
+  "download_failed_title": "فشل تنزيل حزمة اللغة",
+  "download_failed_body": "تعذّر تنزيل \"{pack}\" بعد عدة محاولات. تحقق من الاتصال وأعد المحاولة، أو بدّل إلى الذكاء الاصطناعي السحابي (بدون حزمة دون اتصال).",
+  "switch_to_cloud_ai": "التبديل إلى الذكاء الاصطناعي السحابي",
+  "send_feedback_by_email": "إرسال ملاحظات عبر البريد"
 }

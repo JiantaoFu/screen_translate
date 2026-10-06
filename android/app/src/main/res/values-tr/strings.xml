@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Otomatik çeviri</string>
     <string name="mode_original_text">Orijinal metin</string>
     <string name="mode_manual_translate">Manuel çeviri</string>
+    <string name="hide_all_overlays">Tümünü gizle</string>
+    <string name="overlays_hidden_toast">Çeviriler gizlendi</string>
 </resources>

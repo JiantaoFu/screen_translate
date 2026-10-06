@@ -452,4 +452,18 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'در حال بارگیری مدل زبان (حدود ۳۰ مگابایت). لطفاً صبر کنید…';
+
+  @override
+  String get download_failed_title => 'دانلود بسته زبان ناموفق بود';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'پس از چند تلاش، دانلود «$pack» ممکن نشد. اتصال را بررسی و دوباره تلاش کنید یا به هوش مصنوعی ابری بروید (بدون بسته آفلاین).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'رفتن به هوش مصنوعی ابری';
+
+  @override
+  String get send_feedback_by_email => 'ارسال بازخورد با ایمیل';
 }

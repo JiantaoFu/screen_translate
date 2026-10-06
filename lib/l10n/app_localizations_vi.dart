@@ -451,4 +451,18 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Đang tải mô hình ngôn ngữ (~30 MB). Vui lòng chờ…';
+
+  @override
+  String get download_failed_title => 'Tải gói ngôn ngữ thất bại';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Không thể tải \"$pack\" sau nhiều lần thử. Hãy kiểm tra kết nối rồi thử lại, hoặc chuyển sang AI đám mây (không cần gói ngoại tuyến).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Chuyển sang AI đám mây';
+
+  @override
+  String get send_feedback_by_email => 'Gửi phản hồi qua email';
 }

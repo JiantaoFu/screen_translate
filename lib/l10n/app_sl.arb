@@ -137,5 +137,9 @@
   "request_language_pair": "Zahtevaj ta jezik",
   "language_request_sent": "Hvala! Vašo zahtevo smo zabeležili.",
   "pack_waiting_for_network": "Čakanje na omrežje…",
-  "downloading_language_model_toast": "Prenos jezikovnega modela (~30 MB). Počakajte…"
+  "downloading_language_model_toast": "Prenos jezikovnega modela (~30 MB). Počakajte…",
+  "download_failed_title": "Prenos jezikovnega paketa ni uspel",
+  "download_failed_body": "Paketa »{pack}« ni bilo mogoče prenesti niti po več poskusih. Preverite povezavo in poskusite znova ali preklopite na oblačno UI (paket brez povezave ni potreben).",
+  "switch_to_cloud_ai": "Preklopi na oblačno UI",
+  "send_feedback_by_email": "Pošlji povratne informacije po e-pošti"
 }

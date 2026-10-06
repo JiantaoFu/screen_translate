@@ -137,5 +137,9 @@
   "request_language_pair": "Anmod om dette sprog",
   "language_request_sent": "Tak! Vi har noteret din anmodning.",
   "pack_waiting_for_network": "Venter på netværk…",
-  "downloading_language_model_toast": "Downloader sprogmodel (~30 MB). Vent venligst…"
+  "downloading_language_model_toast": "Downloader sprogmodel (~30 MB). Vent venligst…",
+  "download_failed_title": "Download af sprogpakke mislykkedes",
+  "download_failed_body": "\"{pack}\" kunne ikke downloades efter flere forsøg. Tjek forbindelsen og prøv igen, eller skift til Cloud AI (ingen offlinepakke nødvendig).",
+  "switch_to_cloud_ai": "Skift til Cloud AI",
+  "send_feedback_by_email": "Send feedback via e-mail"
 }

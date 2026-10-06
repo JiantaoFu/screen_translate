@@ -137,5 +137,9 @@
   "request_language_pair": "Yêu cầu ngôn ngữ này",
   "language_request_sent": "Cảm ơn! Chúng tôi đã ghi nhận yêu cầu của bạn.",
   "pack_waiting_for_network": "Đang chờ mạng…",
-  "downloading_language_model_toast": "Đang tải mô hình ngôn ngữ (~30 MB). Vui lòng chờ…"
+  "downloading_language_model_toast": "Đang tải mô hình ngôn ngữ (~30 MB). Vui lòng chờ…",
+  "download_failed_title": "Tải gói ngôn ngữ thất bại",
+  "download_failed_body": "Không thể tải \"{pack}\" sau nhiều lần thử. Hãy kiểm tra kết nối rồi thử lại, hoặc chuyển sang AI đám mây (không cần gói ngoại tuyến).",
+  "switch_to_cloud_ai": "Chuyển sang AI đám mây",
+  "send_feedback_by_email": "Gửi phản hồi qua email"
 }

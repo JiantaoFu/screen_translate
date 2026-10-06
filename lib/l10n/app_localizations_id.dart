@@ -452,4 +452,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Mengunduh model bahasa (~30 MB). Harap tunggu…';
+
+  @override
+  String get download_failed_title => 'Unduhan paket bahasa gagal';
+
+  @override
+  String download_failed_body(String pack) {
+    return '\"$pack\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi lalu coba lagi, atau beralih ke AI Cloud (tanpa paket offline).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Beralih ke AI Cloud';
+
+  @override
+  String get send_feedback_by_email => 'Kirim masukan lewat email';
 }

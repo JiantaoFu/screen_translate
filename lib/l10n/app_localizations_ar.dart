@@ -448,4 +448,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'جارٍ تنزيل نموذج اللغة (~30 ميغابايت). يُرجى الانتظار…';
+
+  @override
+  String get download_failed_title => 'فشل تنزيل حزمة اللغة';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'تعذّر تنزيل \"$pack\" بعد عدة محاولات. تحقق من الاتصال وأعد المحاولة، أو بدّل إلى الذكاء الاصطناعي السحابي (بدون حزمة دون اتصال).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'التبديل إلى الذكاء الاصطناعي السحابي';
+
+  @override
+  String get send_feedback_by_email => 'إرسال ملاحظات عبر البريد';
 }

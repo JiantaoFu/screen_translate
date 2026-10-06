@@ -367,30 +367,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return true;
   }
 
-  /// Quick mode: if a background pre-download of the source or target pack
-  /// failed, show the (single) download-failed dialog now that the user
-  /// actually wants to translate. Returns whether to go ahead and start.
-  /// Retry clears the failures and starts; translating downloads missing
-  /// packs on demand.
-  Future<bool> _confirmQuickPacksBeforeTranslate(
-    BuildContext context,
-    TranslationProvider provider,
-  ) async {
-    if (provider.translationMode != TranslationMode.onDevice) return true;
-    final failed = {provider.sourceLanguage, provider.targetLanguage}
-        .where(ModelDownloadService.quickDownloadFailed)
-        .toList();
-    if (failed.isEmpty) return true;
-    final localizations = AppLocalizations.of(context)!;
-    final action = await _handleDownloadFailed(
-      context,
-      failed.map(localizations.languageName).join(', '),
-    );
-    if (action != DownloadFailedAction.retry) return false;
-    failed.forEach(ModelDownloadService.clearQuickDownloadFailure);
-    return true;
-  }
-
   /// Shows the download-failed dialog. Returns the chosen action so callers
   /// can retry their own download; Cloud AI switching is handled here.
   Future<DownloadFailedAction> _handleDownloadFailed(

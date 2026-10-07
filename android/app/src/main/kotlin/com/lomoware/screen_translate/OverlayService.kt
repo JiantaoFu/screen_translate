@@ -405,13 +405,17 @@ class OverlayService : Service() {
             val padding = (size * 0.25f).toInt()
             setPadding(padding, padding, padding, padding)
 
-            // Announce the long-press action to TalkBack as "Hide all".
+            // Offer the long-press action to TalkBack as "Hide all". It needs
+            // its own handler: the long-press is detected in the touch
+            // listener, so Android's default long-click would do nothing.
             androidx.core.view.ViewCompat.replaceAccessibilityAction(
                 this,
                 androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
-                getString(R.string.hide_all_overlays),
-                null
-            )
+                getString(R.string.hide_all_overlays)
+            ) { _, _ ->
+                hideAllFromButton()
+                true
+            }
             var longPressFired = false
             val longPressRunnable = Runnable {
                 longPressFired = true
@@ -613,10 +617,11 @@ class OverlayService : Service() {
 
     /**
      * "Hide all" (long-press on the mode button): removes every translation
-     * box at once and tells Dart to forget them through the same
-     * cancelTranslation path a scroll/page change uses, so its bookkeeping
-     * matches the screen. Boxes come back on the next content change, or
-     * via Translate in manual mode.
+     * box at once and tells Dart to forget them. Dart's hideAll works like
+     * cancelTranslation (scroll/page change), except that a pass it cuts
+     * short doesn't ask for a fresh frame, which on a static page would
+     * draw the same boxes straight back. Boxes come back on the next
+     * content change, or via Translate in manual mode.
      */
     private fun hideAllFromButton() {
         Log.d(TAG, "Hide all requested from the floating button")
@@ -624,9 +629,9 @@ class OverlayService : Service() {
         showTooltip(getString(R.string.overlays_hidden_toast))
         if (!::methodChannel.isInitialized) return
         try {
-            methodChannel.invokeMethod("cancelTranslation", null)
+            methodChannel.invokeMethod("hideAll", null)
         } catch (e: Exception) {
-            Log.e(TAG, "Hide all: cancelTranslation failed", e)
+            Log.e(TAG, "Hide all: hideAll failed", e)
         }
     }
 

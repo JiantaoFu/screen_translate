@@ -26,6 +26,7 @@ for mode in static feed video game typewriter; do run "scenario $mode" scenario.
 for mode in static game video; do run "switch $mode" switch.sh $mode; done
 run typewriter typecheck.sh 2
 run rotation rotcheck.sh 4
+run "hide all" hidecheck.sh
 run fdprobe fdprobe.sh video
 
 if [ "$(app_pid)" != "$pid" ]; then failed+=("app restarted (pid $pid -> $(app_pid)): crash?"); fi

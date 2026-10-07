@@ -32,13 +32,16 @@ class _FakeGoogle extends OnDeviceTranslatorModelManager {
 class _FakeBackup extends CustomModelManager {
   int failures;
   int calls = 0;
+  bool? sawAlreadyInstalled;
   _FakeBackup({this.failures = 0});
 
   @override
   Future<void> downloadAndInstallModel(String langCode,
-      {void Function(double progress)? onProgress}) async {
+      {void Function(double progress)? onProgress,
+      Future<bool> Function()? isAlreadyInstalled}) async {
     calls++;
     if (calls <= failures) throw Exception('backup failed');
+    sawAlreadyInstalled = await isAlreadyInstalled?.call();
     onProgress?.call(1.0);
   }
 }
@@ -122,6 +125,30 @@ void main() {
     expect(ModelDownloadService.quickDownloadFailed('ur'), isFalse);
   });
 
+  test('a recorded failure is dropped once the pack is on disk after all', () async {
+    // Google's DownloadManager keeps going after our 2-minute timeout and
+    // can finish after the backup failed too.
+    final google = _FakeGoogle(hang: false);
+    final service = ModelDownloadService.withManagers(google, _FakeBackup(failures: 99));
+    await expectLater(service.downloadModelWithFallback('ar'), throwsA(anything));
+    expect(await service.quickDownloadStillFailed('ar'), isTrue);
+
+    google.downloaded = true;
+    expect(await service.quickDownloadStillFailed('ar'), isFalse);
+    expect(ModelDownloadService.quickDownloadFailed('ar'), isFalse,
+        reason: 'the stale record is cleared, not just hidden');
+    expect(await service.quickDownloadStillFailed('en'), isFalse);
+  });
+
+  test('the backup is told whether Google installed the pack meanwhile', () async {
+    final google = _FakeGoogle(hang: true);
+    final backup = _FakeBackup();
+    final service = ModelDownloadService.withManagers(google, backup);
+    google.downloaded = true;
+    await service.downloadModelWithFallback('ko');
+    expect(backup.sawAlreadyInstalled, isTrue);
+  });
+
   group('backup server download', () {
     final body = List<int>.generate(1000, (i) => i % 256);
     late Directory dir;
@@ -179,6 +206,12 @@ void main() {
       final zip = await manager(client, maxAttempts: 1).downloadZip('fa');
       expect(zip.readAsBytesSync(), body);
       expect(ranges, [null, 'bytes=500-']);
+    });
+
+    test('no unpacking over a pack ML Kit installed meanwhile', () async {
+      // The served bytes aren't a zip, so unpacking would throw.
+      await manager(server([])).downloadAndInstallModel('ja', isAlreadyInstalled: () async => true);
+      expect(File('${dir.path}/ja.zip').existsSync(), isFalse, reason: 'downloaded zip is cleaned up');
     });
 
     test('slow but steady is never cut off: only a stall fails', () async {

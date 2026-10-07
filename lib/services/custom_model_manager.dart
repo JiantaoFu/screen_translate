@@ -78,12 +78,23 @@ class CustomModelManager {
     return zip;
   }
 
+  /// Downloads and unpacks the backup pack into ML Kit's model folder.
+  ///
+  /// [isAlreadyInstalled] is checked between download and unpacking: ML
+  /// Kit's own download can't be cancelled, and if it finished meanwhile,
+  /// unpacking over its files could leave a mix of two copies.
   Future<void> downloadAndInstallModel(
     String langCode, {
     void Function(double progress)? onProgress,
+    Future<bool> Function()? isAlreadyInstalled,
   }) async {
     debugPrint('Fallback: Downloading model for $langCode from $baseUrl...');
     final zip = await downloadZip(langCode, onProgress: onProgress);
+    if (isAlreadyInstalled != null && await isAlreadyInstalled()) {
+      debugPrint('Fallback: $langCode was installed by ML Kit meanwhile; skipping unpack.');
+      await zip.delete();
+      return;
+    }
     try {
       final archive = ZipDecoder().decodeBytes(await zip.readAsBytes());
       final extractionDir = await _getExtractionDir();

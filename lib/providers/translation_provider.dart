@@ -49,6 +49,7 @@ enum TranslationMode {
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
   int _translationToken = 0; // Bumped each capture cycle to detect stale results
+  int? _hiddenByUserAtToken; // _translationToken right after the user's "Hide all"
   String _lastTranslatedText = '';
   // Whether the current/last live session rendered at least one translated
   // box — used to only ask for a store review after the app actually worked.
@@ -861,7 +862,7 @@ class TranslationProvider with ChangeNotifier {
             print('Error hiding leftover placeholders: $e');
           }
         }
-        if (droppedStale && _isTranslating) {
+        if (droppedStale && _isTranslating && _translationToken != _hiddenByUserAtToken) {
           await _androidScreenCaptureService?.requestFreshFrame();
         }
         _isProcessingCapture = false; // Always release guard
@@ -929,8 +930,9 @@ class TranslationProvider with ChangeNotifier {
               print("Manual translation requested"); // Add this debug print
               requestManualTranslation();
               break;
+            case 'hideAll':
             case 'cancelTranslation':
-              print("Translation cancelled due to scroll");
+              print("Translation cancelled: ${call.method}");
               cancelTranslation(_lastTranslatedText, _sourceLanguage, _targetLanguage);
               _translationService.cancelAllTranslations();
               _overlayService.hideTranslationOverlay();
@@ -941,6 +943,12 @@ class TranslationProvider with ChangeNotifier {
               // _displayedOverlays, where the next tick matches them by
               // text/position and never re-translates them.
               _translationToken++;
+              // Hide all: a pass cut short here must not ask for a fresh
+              // frame (see `finally` in the capture tick), or a static page
+              // is translated and drawn straight back. A later cancel bumps
+              // the token again and restores the normal behaviour.
+              _hiddenByUserAtToken =
+                  call.method == 'hideAll' ? _translationToken : null;
               break;
             default:
               throw MissingPluginException();

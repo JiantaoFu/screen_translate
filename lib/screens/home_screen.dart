@@ -353,10 +353,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     TranslationProvider provider,
   ) async {
     if (provider.translationMode != TranslationMode.onDevice) return true;
-    final failed = {provider.sourceLanguage, provider.targetLanguage}
-        .where(ModelDownloadService.quickDownloadFailed)
-        .toList();
+    final service = ModelDownloadService();
+    final failed = <String>[
+      for (final code in {provider.sourceLanguage, provider.targetLanguage})
+        if (await service.quickDownloadStillFailed(code)) code,
+    ];
     if (failed.isEmpty) return true;
+    if (!context.mounted) return false;
     final localizations = AppLocalizations.of(context)!;
     final action = await _handleDownloadFailed(
       context,
@@ -784,53 +787,40 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           );
           if (confirmed != true) return;
 
-          setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
           final modelService = ModelDownloadService();
-          try {
+          final pairName = localizations.languagePairName(source, target);
+          Future<void> download() async {
+            void progress(double p) {
+              if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+            }
             final pair = findOnnxPair(source, target);
             if (pair != null) {
-              await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
-                if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-              });
+              await modelService.downloadOnnxModel(pair.key, onProgress: progress);
             } else {
               final pivot = findOnnxPivotPair(source, target);
-              if (pivot != null) {
-                await modelService.downloadOnnxPivot(pivot, onProgress: (p) {
-                  if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-                });
-              }
+              if (pivot != null) await modelService.downloadOnnxPivot(pivot, onProgress: progress);
             }
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(localizations.pack_is_ready_snackbar(localizations.languagePairName(selectedKey.split('|')[0], selectedKey.split('|')[1]))), backgroundColor: Colors.green),
-              );
-            }
-          } catch (e) {
-            if (mounted) {
-              final action = await _handleDownloadFailed(
-                this.context,
-                localizations.languagePairName(
-                    selectedKey.split('|')[0], selectedKey.split('|')[1]),
-              );
-              if (!mounted) return;
-              if (action == DownloadFailedAction.retry) {
-                setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
-                try {
-                  final pair = findOnnxPair(source, target);
-                  if (pair != null) {
-                    await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
-                      if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-                    });
-                  } else {
-                    final pivot = findOnnxPivotPair(source, target);
-                    if (pivot != null) {
-                      await modelService.downloadOnnxPivot(pivot, onProgress: (p) {
-                        if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-                      });
-                    }
-                  }
-                } catch (_) {}
+          }
+
+          try {
+            // Retry goes round again, so a retry gets the same "ready"
+            // snackbar or failure dialog as the first attempt.
+            while (mounted) {
+              setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
+              try {
+                await download();
+              } catch (e) {
+                if (!mounted) return;
+                final action = await _handleDownloadFailed(this.context, pairName);
+                if (action == DownloadFailedAction.retry) continue;
+                return;
               }
+              if (mounted) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(content: Text(localizations.pack_is_ready_snackbar(pairName)), backgroundColor: Colors.green),
+                );
+              }
+              return;
             }
           } finally {
             if (mounted) setState(() => _onnxDownloadProgress.remove(selectedKey));

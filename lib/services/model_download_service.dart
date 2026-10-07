@@ -152,6 +152,19 @@ class ModelDownloadService {
 
   static void clearQuickDownloadFailure(String langCode) => _quickFailed.remove(langCode);
 
+  /// [quickDownloadFailed], checked against the disk: a pack that arrived
+  /// after we gave up (Google's DownloadManager keeps going past
+  /// [quickGoogleTimeout]) clears its record instead of blocking Translate
+  /// with a stale "download failed" dialog.
+  Future<bool> quickDownloadStillFailed(String langCode) async {
+    if (!_quickFailed.contains(langCode)) return false;
+    if (await _isDownloadedSafe(langCode)) {
+      _quickFailed.remove(langCode);
+      return false;
+    }
+    return true;
+  }
+
   @visibleForTesting
   static void resetQuickStateForTesting() {
     _quickFailed.clear();
@@ -323,7 +336,14 @@ class ModelDownloadService {
       debugPrint('Failed to download from Google. Reason: $e');
       debugPrint('Initiating fallback to custom server...');
       try {
-        await _customModelManager.downloadAndInstallModel(langCode, onProgress: onFallbackProgress);
+        // Google's download can't be cancelled and keeps running past its
+        // timeout. If it finished while the backup was downloading, don't
+        // unpack a second copy over the model ML Kit just installed.
+        await _customModelManager.downloadAndInstallModel(
+          langCode,
+          onProgress: onFallbackProgress,
+          isAlreadyInstalled: () => _isDownloadedSafe(langCode),
+        );
         debugPrint('ML Kit model for "$langCode" downloaded successfully from custom server.');
       } catch (fallbackError) {
         debugPrint('Fallback download also failed. Reason: $fallbackError');

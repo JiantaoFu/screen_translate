@@ -454,4 +454,18 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Prenos jezikovnega modela (~30 MB). Počakajte…';
+
+  @override
+  String get download_failed_title => 'Prenos jezikovnega paketa ni uspel';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Paketa »$pack« ni bilo mogoče prenesti niti po več poskusih. Preverite povezavo in poskusite znova ali preklopite na oblačno UI (paket brez povezave ni potreben).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Preklopi na oblačno UI';
+
+  @override
+  String get send_feedback_by_email => 'Pošlji povratne informacije po e-pošti';
 }

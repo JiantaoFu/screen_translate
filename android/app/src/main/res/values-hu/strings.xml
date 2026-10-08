@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automatikus fordítás</string>
     <string name="mode_original_text">Eredeti szöveg</string>
     <string name="mode_manual_translate">Kézi fordítás</string>
+    <string name="hide_all_overlays">Összes elrejtése</string>
+    <string name="overlays_hidden_toast">Fordítások elrejtve</string>
 </resources>

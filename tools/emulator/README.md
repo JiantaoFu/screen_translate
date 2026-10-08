@@ -37,6 +37,7 @@ Screenshots and logs go to `build/emulator-regression/`.
 | `scenario.sh <mode>` | translated boxes stay on screen over video, feed, game, typewriter and static screens, with no crash |
 | `switch.sh <mode>` | when the text under our boxes changes, the change is detected and the new text is translated |
 | `typecheck.sh` | typed-out game dialogue ends up fully translated, not as stacked fragments |
+| `hidecheck.sh` | Hide all (long-press on the floating button) clears every box and keeps them off an unchanged page, also when pressed during a page change; the next page change brings boxes back |
 | `rotcheck.sh` | another app rotating to landscape and back: the rotation is detected, no stale boxes are drawn, and the boxes stay on the text |
 | `set_prefs.py` | sets the app's saved preferences (language pair, mode); `start.sh` pins en→zh in Quick mode with it, because only text in the source language's script is translated |
 | `fdprobe.sh` | report only: file descriptor growth, to track the emulator `getPlanes()` sync_file leak |

@@ -991,6 +991,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Downloading language model (~30 MB). Please wait…'**
   String get downloading_language_model_toast;
+
+  /// No description provided for @download_failed_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Language pack download failed'**
+  String get download_failed_title;
+
+  /// No description provided for @download_failed_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t download \"{pack}\" after several tries. Check your connection, retry, or switch to Cloud AI (no offline pack needed).'**
+  String download_failed_body(String pack);
+
+  /// No description provided for @switch_to_cloud_ai.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Cloud AI'**
+  String get switch_to_cloud_ai;
+
+  /// No description provided for @send_feedback_by_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback by email'**
+  String get send_feedback_by_email;
 }
 
 class _AppLocalizationsDelegate

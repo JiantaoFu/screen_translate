@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automatický preklad</string>
     <string name="mode_original_text">Pôvodný text</string>
     <string name="mode_manual_translate">Ručný preklad</string>
+    <string name="hide_all_overlays">Skryť všetko</string>
+    <string name="overlays_hidden_toast">Preklady skryté</string>
 </resources>

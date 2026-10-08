@@ -7,8 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:screen_translate/services/custom_model_manager.dart';
+import 'package:screen_translate/services/download_retry.dart';
+import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/services/onnx_translation_service.dart';
 
 // ─── ONNX model download status ──────────────────────────────────────────────
@@ -70,6 +73,9 @@ class ModelDownloadService {
   ModelDownloadService()
       : _googleModelManager = OnDeviceTranslatorModelManager(),
         _customModelManager = CustomModelManager();
+
+  @visibleForTesting
+  ModelDownloadService.withManagers(this._googleModelManager, this._customModelManager);
 
   // ── Google ML Kit helpers ─────────────────────────────────────────────────
 
@@ -134,6 +140,41 @@ class ModelDownloadService {
   static bool isQuickDownloading(String langCode) =>
       _activeQuickDownloads.containsKey(langCode);
 
+  /// Languages whose last Quick-mode download failed (after all retries)
+  /// and hasn't been retried since. In memory only.
+  ///
+  /// Background pre-downloads (home screen, Settings refresh) fail silently
+  /// and just record it here; the failure dialog is shown later, once,
+  /// when the user actually starts translating or taps download.
+  static final Set<String> _quickFailed = {};
+
+  static bool quickDownloadFailed(String langCode) => _quickFailed.contains(langCode);
+
+  static void clearQuickDownloadFailure(String langCode) => _quickFailed.remove(langCode);
+
+  /// [quickDownloadFailed], checked against the disk: a pack that arrived
+  /// after we gave up (Google's DownloadManager keeps going past
+  /// [quickGoogleTimeout]) clears its record instead of blocking Translate
+  /// with a stale "download failed" dialog.
+  Future<bool> quickDownloadStillFailed(String langCode) async {
+    if (!_quickFailed.contains(langCode)) return false;
+    if (await _isDownloadedSafe(langCode)) {
+      _quickFailed.remove(langCode);
+      return false;
+    }
+    return true;
+  }
+
+  @visibleForTesting
+  static void resetQuickStateForTesting() {
+    _quickFailed.clear();
+    _activeQuickDownloads.clear();
+    _quickProgress.clear();
+    _quickProgressListeners.clear();
+    _quickWaiting.clear();
+    _quickWaitingListeners.clear();
+  }
+
   /// Downloads a Google ML Kit model with a custom-server fallback.
   ///
   /// If a download for [langCode] is already in flight, joins it. Every
@@ -179,6 +220,7 @@ class ModelDownloadService {
     // If Google's download fails partway, the custom-server fallback starts
     // from zero. Map it onto what's left of the bar instead of jumping back.
     double? fallbackBase;
+    _quickFailed.remove(langCode);
     final future = _downloadModelWithFallbackImpl(
       langCode,
       onFallbackProgress: (p) {
@@ -188,7 +230,11 @@ class ModelDownloadService {
       },
     ).then((_) {
       poller.cancel();
+      _quickFailed.remove(langCode);
       _emitQuickProgress(langCode, 1.0);
+    }, onError: (Object e, StackTrace st) {
+      _quickFailed.add(langCode);
+      Error.throwWithStackTrace(e, st);
     }).whenComplete(() {
       poller.cancel();
       _activeQuickDownloads.remove(langCode);
@@ -204,19 +250,100 @@ class ModelDownloadService {
     return future;
   }
 
+  /// How long ML Kit's own (Google) download may run before we treat it as
+  /// stalled and fall through to the custom-server mirror. Before this a
+  /// stalled DownloadManager entry kept the spinner running forever
+  /// (Play reviews, mostly from the Middle East).
+  @visibleForTesting
+  static Duration quickGoogleTimeout = const Duration(minutes: 2);
+
+  /// Cap for one whole attempt (Google + backup server). Null since 1.2.4:
+  /// the old 4-minute total left the backup server ~2 minutes after Google
+  /// used its share, too little for a ~30 MB pack on a slow network. The
+  /// backup now fails only on a stall (no bytes for
+  /// [CustomModelManager.stallTimeout]) and resumes its partial file, the
+  /// same as ONNX downloads; Google keeps its own [quickGoogleTimeout].
+  @visibleForTesting
+  static Duration? quickAttemptTimeout;
+
+  @visibleForTesting
+  static int quickMaxRetries = 2;
+
+  @visibleForTesting
+  static Duration quickRetryBackoff = const Duration(seconds: 2);
+
   Future<void> _downloadModelWithFallbackImpl(
     String langCode, {
     required DownloadProgressCallback onFallbackProgress,
   }) async {
+    // Once Google has failed or timed out, later attempts go straight to the
+    // backup server: retrying Google would spend another 2 minutes, and the
+    // backup resumes where it stopped.
+    var skipGoogle = false;
     try {
+      await withRetries(
+        () async {
+          if (skipGoogle && await _isDownloadedSafe(langCode)) {
+            // Google's DownloadManager entry may have finished meanwhile.
+            return;
+          }
+          await _downloadQuickOnce(
+            langCode,
+            skipGoogle: skipGoogle,
+            onGoogleFailed: () => skipGoogle = true,
+            onFallbackProgress: onFallbackProgress,
+          );
+        },
+        maxRetries: quickMaxRetries,
+        attemptTimeout: quickAttemptTimeout,
+        initialBackoff: quickRetryBackoff,
+        onAttemptFailed: (attempt, error) {
+          debugPrint(
+            'Quick download for "$langCode" attempt $attempt failed: $error',
+          );
+        },
+      );
+    } catch (e) {
+      // Mark the device so in-app review never asks after a download failure.
+      await _recordDownloadError();
+      rethrow;
+    }
+  }
+
+  Future<bool> _isDownloadedSafe(String langCode) async {
+    try {
+      return await _googleModelManager.isModelDownloaded(langCode);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _downloadQuickOnce(
+    String langCode, {
+    required bool skipGoogle,
+    required void Function() onGoogleFailed,
+    required DownloadProgressCallback onFallbackProgress,
+  }) async {
+    try {
+      if (skipGoogle) throw StateError('Google already failed in this download');
       debugPrint('Attempting to download ML Kit model for "$langCode" from Google...');
-      await _googleModelManager.downloadModel(langCode, isWifiRequired: false);
+      await _googleModelManager
+          .downloadModel(langCode, isWifiRequired: false)
+          .timeout(quickGoogleTimeout);
       debugPrint('ML Kit model for "$langCode" downloaded successfully from Google.');
     } catch (e) {
+      onGoogleFailed();
       debugPrint('Failed to download from Google. Reason: $e');
       debugPrint('Initiating fallback to custom server...');
       try {
-        await _customModelManager.downloadAndInstallModel(langCode, onProgress: onFallbackProgress);
+        // Google's download can't be cancelled and keeps running past its
+        // timeout. If it finished while the backup was downloading, don't
+        // unpack a second copy over the model ML Kit just installed.
+        await _customModelManager.downloadAndInstallModel(
+          langCode,
+          onProgress: onFallbackProgress,
+          isAlreadyInstalled: () => _isDownloadedSafe(langCode),
+        );
         debugPrint('ML Kit model for "$langCode" downloaded successfully from custom server.');
       } catch (fallbackError) {
         debugPrint('Fallback download also failed. Reason: $fallbackError');
@@ -335,6 +462,28 @@ class ModelDownloadService {
     String langPairKey, {
     DownloadProgressCallback? onProgress,
   }) async {
+    // Retry/timeout already live per file in downloadFileResumable (stall
+    // timeout + Range resume, since 1.2.3). Here we only record the final
+    // failure so the in-app review prompt never targets this device.
+    try {
+      await _downloadOnnxModelOnce(langPairKey, onProgress: onProgress);
+    } catch (e) {
+      await _recordDownloadError();
+      rethrow;
+    }
+  }
+
+  static Future<void> _recordDownloadError() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await ReviewPromptService(prefs).recordError();
+    } catch (_) {}
+  }
+
+  Future<void> _downloadOnnxModelOnce(
+    String langPairKey, {
+    DownloadProgressCallback? onProgress,
+  }) async {
     final targetDir = await onnxModelDir(langPairKey);
     await targetDir.create(recursive: true);
     // Finished files and half-written .tmp files from an interrupted attempt
@@ -432,13 +581,9 @@ class ModelDownloadService {
     }
   }
 
-  /// Downloads [url] to [target] through `<target>.tmp`, resuming a partial
-  /// .tmp with an HTTP Range request and retrying up to [maxAttempts] times.
-  ///
-  /// Only a stall fails an attempt: no response or no data for
-  /// [stallTimeout]. There used to be a fixed 3-minute cap per file, and on a
-  /// slow connection the 182 MB ja→en decoder could never finish in time;
-  /// each retry also deleted the partial file and started from zero.
+  /// Downloads [url] to [target] with Range resume and a stall timeout; see
+  /// [downloadFileResumable] in download_retry.dart (shared with the
+  /// Quick-mode backup server since 1.2.4).
   @visibleForTesting
   static Future<void> downloadFileResumable({
     required http.Client client,
@@ -448,70 +593,16 @@ class ModelDownloadService {
     Duration stallTimeout = const Duration(seconds: 30),
     int maxAttempts = 6,
     Duration retryDelay = const Duration(seconds: 2),
-  }) async {
-    final tmp = File('${target.path}.tmp');
-    Object? lastError;
-    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        var offset = await tmp.exists() ? await tmp.length() : 0;
-        final request = http.Request('GET', Uri.parse(url));
-        if (offset > 0) request.headers['Range'] = 'bytes=$offset-';
-        final response = await client.send(request).timeout(stallTimeout);
-        final int? total;
-        final IOSink sink;
-        if (response.statusCode == 206 && offset > 0) {
-          total = _totalFromContentRange(response.headers['content-range']) ??
-              (response.contentLength == null ? null : offset + response.contentLength!);
-          sink = tmp.openWrite(mode: FileMode.append);
-        } else if (response.statusCode == 200) {
-          offset = 0; // server ignored the Range: start over
-          total = response.contentLength;
-          sink = tmp.openWrite();
-        } else {
-          unawaited(response.stream.drain<void>().catchError((_) {}));
-          if (response.statusCode == 416) {
-            // The partial file is no longer valid for this URL.
-            await tmp.delete();
-            throw Exception('OnnxDownload: range not satisfiable, restarting $url');
-          }
-          final retryable = response.statusCode >= 500 || response.statusCode == 408 || response.statusCode == 429;
-          final error = HttpException('OnnxDownload: HTTP ${response.statusCode} for $url');
-          if (!retryable) throw _NonRetryable(error);
-          throw error;
-        }
-        var received = offset;
-        try {
-          await for (final chunk in response.stream.timeout(stallTimeout)) {
-            sink.add(chunk);
-            received += chunk.length;
-            onBytes?.call(received, total);
-            // Some connections hang at the very end instead of closing.
-            if (total != null && received >= total) break;
-          }
-        } finally {
-          await sink.close().timeout(stallTimeout);
-        }
-        if (total != null && received < total) {
-          throw Exception('OnnxDownload: connection closed at $received of $total bytes');
-        }
-        await tmp.rename(target.path).timeout(stallTimeout);
-        return;
-      } on _NonRetryable catch (e) {
-        throw e.error;
-      } catch (e) {
-        lastError = e;
-        debugPrint('OnnxDownload: attempt $attempt/$maxAttempts for $url failed: $e');
-        if (attempt < maxAttempts) await Future<void>.delayed(retryDelay);
-      }
-    }
-    throw lastError!;
-  }
-
-  static int? _totalFromContentRange(String? header) {
-    // "bytes 100-199/200"
-    final total = header?.split('/').last;
-    return total == null ? null : int.tryParse(total);
-  }
+  }) =>
+      resumableDownload(
+        client: client,
+        url: url,
+        target: target,
+        onBytes: onBytes,
+        stallTimeout: stallTimeout,
+        maxAttempts: maxAttempts,
+        retryDelay: retryDelay,
+      );
 
   /// Deletes a downloaded ONNX model from device storage.
   Future<void> deleteOnnxModel(String langPairKey) async {
@@ -534,10 +625,4 @@ class ModelDownloadService {
     }
     return totalBytes / (1024 * 1024);
   }
-}
-
-/// An HTTP error that retrying won't fix (e.g. 404).
-class _NonRetryable implements Exception {
-  final Object error;
-  _NonRetryable(this.error);
 }

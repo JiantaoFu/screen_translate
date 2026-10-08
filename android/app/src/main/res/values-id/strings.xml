@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Terjemahan otomatis</string>
     <string name="mode_original_text">Teks asli</string>
     <string name="mode_manual_translate">Terjemahan manual</string>
+    <string name="hide_all_overlays">Sembunyikan semua</string>
+    <string name="overlays_hidden_toast">Terjemahan disembunyikan</string>
 </resources>

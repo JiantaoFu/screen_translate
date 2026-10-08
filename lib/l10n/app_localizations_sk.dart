@@ -450,4 +450,18 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Sťahuje sa jazykový model (~30 MB). Čakajte, prosím…';
+
+  @override
+  String get download_failed_title => 'Stiahnutie jazykového balíka zlyhalo';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Balík „$pack“ sa nepodarilo stiahnuť ani po niekoľkých pokusoch. Skontrolujte pripojenie a skúste to znova, alebo prepnite na cloudové AI (offline balík nie je potrebný).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Prepnúť na cloudové AI';
+
+  @override
+  String get send_feedback_by_email => 'Poslať spätnú väzbu e-mailom';
 }

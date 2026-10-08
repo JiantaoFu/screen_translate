@@ -453,4 +453,18 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Atsisiunčiamas kalbos modelis (~30 MB). Palaukite…';
+
+  @override
+  String get download_failed_title => 'Nepavyko atsisiųsti kalbos paketo';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Po kelių bandymų nepavyko atsisiųsti „$pack“. Patikrinkite ryšį ir bandykite dar kartą arba perjunkite į debesijos DI (neprisijungus naudojamas paketas nereikalingas).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Perjungti į debesijos DI';
+
+  @override
+  String get send_feedback_by_email => 'Siųsti atsiliepimą el. paštu';
 }

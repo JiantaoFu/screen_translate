@@ -247,7 +247,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get api_key_required => 'Se requiere clave API';
 
   @override
-  String get go_to_settings => 'Ir a Configuración';
+  String get go_to_settings => 'Ir a Ajustes';
 
   @override
   String get api_key_input_error => 'Ingrese una clave API válida';
@@ -453,4 +453,18 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Descargando el modelo de idioma (~30 MB). Espera un momento…';
+
+  @override
+  String get download_failed_title => 'Error al descargar el paquete de idioma';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'No se pudo descargar el paquete \"$pack\" tras varios intentos. Comprueba tu conexión y vuelve a intentarlo, o cambia a IA en la nube (no necesita paquete de idioma).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Cambiar a IA en la nube';
+
+  @override
+  String get send_feedback_by_email => 'Enviar comentarios por correo';
 }

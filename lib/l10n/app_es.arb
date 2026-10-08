@@ -78,7 +78,7 @@
   "not_now": "Ahora no",
   "cannot_open_store": "No se pudo abrir Google Play Store",
   "api_key_required": "Se requiere clave API",
-  "go_to_settings": "Ir a Configuración",
+  "go_to_settings": "Ir a Ajustes",
   "api_key_input_error": "Ingrese una clave API válida",
   "api_key_save_error": "Clave API no válida. Verifique e inténtelo de nuevo.",
   "translation_mode_on_device": "Traducción en el dispositivo",
@@ -137,5 +137,9 @@
   "request_language_pair": "Solicitar este idioma",
   "language_request_sent": "¡Gracias! Hemos registrado tu solicitud.",
   "pack_waiting_for_network": "Esperando la red…",
-  "downloading_language_model_toast": "Descargando el modelo de idioma (~30 MB). Espera un momento…"
+  "downloading_language_model_toast": "Descargando el modelo de idioma (~30 MB). Espera un momento…",
+  "download_failed_title": "Error al descargar el paquete de idioma",
+  "download_failed_body": "No se pudo descargar el paquete \"{pack}\" tras varios intentos. Comprueba tu conexión y vuelve a intentarlo, o cambia a IA en la nube (no necesita paquete de idioma).",
+  "switch_to_cloud_ai": "Cambiar a IA en la nube",
+  "send_feedback_by_email": "Enviar comentarios por correo"
 }

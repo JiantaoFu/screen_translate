@@ -438,4 +438,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get downloading_language_model_toast => '正在下载语言模型（约30MB），请稍候…';
+
+  @override
+  String get download_failed_title => '语言包下载失败';
+
+  @override
+  String download_failed_body(String pack) {
+    return '多次尝试后仍无法下载“$pack”。请检查网络后重试，或改用云端 AI（无需离线语言包）。';
+  }
+
+  @override
+  String get switch_to_cloud_ai => '改用云端 AI';
+
+  @override
+  String get send_feedback_by_email => '通过邮件发送反馈';
 }

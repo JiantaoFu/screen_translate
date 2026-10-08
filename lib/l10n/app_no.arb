@@ -137,5 +137,9 @@
   "request_language_pair": "Be om dette språket",
   "language_request_sent": "Takk! Vi har registrert forespørselen din.",
   "pack_waiting_for_network": "Venter på nettverk…",
-  "downloading_language_model_toast": "Laster ned språkmodell (~30 MB). Vent litt…"
+  "downloading_language_model_toast": "Laster ned språkmodell (~30 MB). Vent litt…",
+  "download_failed_title": "Nedlasting av språkpakke mislyktes",
+  "download_failed_body": "Kunne ikke laste ned «{pack}» etter flere forsøk. Sjekk tilkoblingen og prøv igjen, eller bytt til Sky-AI (ingen frakoblet pakke nødvendig).",
+  "switch_to_cloud_ai": "Bytt til Sky-AI",
+  "send_feedback_by_email": "Send tilbakemelding på e-post"
 }

@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">自動翻訳</string>
     <string name="mode_original_text">原文</string>
     <string name="mode_manual_translate">手動翻訳</string>
+    <string name="hide_all_overlays">すべて非表示</string>
+    <string name="overlays_hidden_toast">翻訳を非表示にしました</string>
 </resources>

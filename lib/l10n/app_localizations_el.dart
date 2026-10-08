@@ -456,4 +456,18 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Λήψη γλωσσικού μοντέλου (~30 MB). Περιμένετε…';
+
+  @override
+  String get download_failed_title => 'Η λήψη του πακέτου γλώσσας απέτυχε';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Δεν ήταν δυνατή η λήψη του «$pack» μετά από αρκετές προσπάθειες. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά ή μεταβείτε στο Cloud AI (δεν χρειάζεται πακέτο εκτός σύνδεσης).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Μετάβαση στο Cloud AI';
+
+  @override
+  String get send_feedback_by_email => 'Αποστολή σχολίων με email';
 }

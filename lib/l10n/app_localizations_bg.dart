@@ -453,4 +453,18 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Изтегляне на езиков модел (~30 MB). Моля, изчакайте…';
+
+  @override
+  String get download_failed_title => 'Неуспешно изтегляне на езиковия пакет';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Неуспешно изтегляне на „$pack“ след няколко опита. Проверете връзката и опитайте отново или превключете на облачен ИИ (не е нужен офлайн пакет).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Превключи на облачен ИИ';
+
+  @override
+  String get send_feedback_by_email => 'Обратна връзка по имейл';
 }

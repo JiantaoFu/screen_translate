@@ -23,6 +23,7 @@ class MainActivity: FlutterActivity() {
     private var permissionData: Intent? = null
     private val OVERLAY_CHANNEL = "com.lomoware.screen_translate/overlay"
     private val MODEL_DOWNLOAD_CHANNEL = "com.lomoware.screen_translate/model_download"
+    private val FEEDBACK_CHANNEL = "com.lomoware.screen_translate/feedback"
 
     companion object {
         // Null until the Flutter engine is attached. Services can be started
@@ -128,6 +129,47 @@ class MainActivity: FlutterActivity() {
                             mapOf("downloaded" to it.downloaded, "total" to it.total, "waiting" to it.waiting)
                         }
                         mainHandler.post { result.success(reply) }
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        // "Send feedback by email" (Settings and the download error dialog).
+        MethodChannel(binaryMessenger, FEEDBACK_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                // Installed versionName+versionCode, so the email always
+                // matches what Play shipped.
+                "getAppVersion" -> {
+                    try {
+                        val info = packageManager.getPackageInfo(packageName, 0)
+                        @Suppress("DEPRECATION")
+                        val code = if (android.os.Build.VERSION.SDK_INT >= 28) info.longVersionCode else info.versionCode.toLong()
+                        result.success("${info.versionName}+$code")
+                    } catch (e: Exception) {
+                        result.success(null)
+                    }
+                }
+                // ACTION_SENDTO with a mailto: URI only matches email apps.
+                // Subject/body ride both in the URI and as extras, since some
+                // mail apps read only one of the two.
+                "sendEmail" -> {
+                    val uri = call.argument<String>("uri")
+                    if (uri == null) {
+                        result.success(false)
+                    } else {
+                        val intent = Intent(Intent.ACTION_SENDTO, android.net.Uri.parse(uri)).apply {
+                            call.argument<String>("subject")?.let { putExtra(Intent.EXTRA_SUBJECT, it) }
+                            call.argument<String>("body")?.let { putExtra(Intent.EXTRA_TEXT, it) }
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        try {
+                            startActivity(intent)
+                            result.success(true)
+                        } catch (e: android.content.ActivityNotFoundException) {
+                            Log.w(TAG, "No email app for feedback", e)
+                            result.success(false)
+                        }
                     }
                 }
                 else -> result.notImplemented()

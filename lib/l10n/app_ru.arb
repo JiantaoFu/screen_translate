@@ -137,5 +137,9 @@
   "request_language_pair": "Запросить этот язык",
   "language_request_sent": "Спасибо! Мы зафиксировали ваш запрос.",
   "pack_waiting_for_network": "Ожидание сети…",
-  "downloading_language_model_toast": "Загрузка языковой модели (~30 МБ). Подождите…"
+  "downloading_language_model_toast": "Загрузка языковой модели (~30 МБ). Подождите…",
+  "download_failed_title": "Не удалось скачать языковой пакет",
+  "download_failed_body": "Не удалось скачать «{pack}» после нескольких попыток. Проверьте соединение и повторите, или переключитесь на облачный ИИ (офлайн-пакет не нужен).",
+  "switch_to_cloud_ai": "Перейти на облачный ИИ",
+  "send_feedback_by_email": "Отправить отзыв по почте"
 }

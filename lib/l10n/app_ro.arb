@@ -137,5 +137,9 @@
   "request_language_pair": "Solicită această limbă",
   "language_request_sent": "Mulțumim! Am notat solicitarea ta.",
   "pack_waiting_for_network": "Se așteaptă rețeaua…",
-  "downloading_language_model_toast": "Se descarcă modelul de limbă (~30 MB). Te rugăm să aștepți…"
+  "downloading_language_model_toast": "Se descarcă modelul de limbă (~30 MB). Te rugăm să aștepți…",
+  "download_failed_title": "Descărcarea pachetului de limbă a eșuat",
+  "download_failed_body": "„{pack}” nu a putut fi descărcat după mai multe încercări. Verifică conexiunea și reîncearcă sau treci la AI din cloud (nu e nevoie de pachet offline).",
+  "switch_to_cloud_ai": "Treci la AI din cloud",
+  "send_feedback_by_email": "Trimite feedback prin e-mail"
 }

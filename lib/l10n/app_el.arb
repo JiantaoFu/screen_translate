@@ -137,5 +137,9 @@
   "request_language_pair": "Αίτημα για αυτή τη γλώσσα",
   "language_request_sent": "Ευχαριστούμε! Καταγράψαμε το αίτημά σας.",
   "pack_waiting_for_network": "Αναμονή για δίκτυο…",
-  "downloading_language_model_toast": "Λήψη γλωσσικού μοντέλου (~30 MB). Περιμένετε…"
+  "downloading_language_model_toast": "Λήψη γλωσσικού μοντέλου (~30 MB). Περιμένετε…",
+  "download_failed_title": "Η λήψη του πακέτου γλώσσας απέτυχε",
+  "download_failed_body": "Δεν ήταν δυνατή η λήψη του «{pack}» μετά από αρκετές προσπάθειες. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά ή μεταβείτε στο Cloud AI (δεν χρειάζεται πακέτο εκτός σύνδεσης).",
+  "switch_to_cloud_ai": "Μετάβαση στο Cloud AI",
+  "send_feedback_by_email": "Αποστολή σχολίων με email"
 }

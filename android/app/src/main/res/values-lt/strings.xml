@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automatinis vertimas</string>
     <string name="mode_original_text">Originalus tekstas</string>
     <string name="mode_manual_translate">Rankinis vertimas</string>
+    <string name="hide_all_overlays">Slėpti viską</string>
+    <string name="overlays_hidden_toast">Vertimai paslėpti</string>
 </resources>

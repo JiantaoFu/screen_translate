@@ -137,5 +137,9 @@
   "request_language_pair": "בקשת שפה זו",
   "language_request_sent": "תודה! רשמנו את הבקשה שלך.",
   "pack_waiting_for_network": "ממתין לרשת…",
-  "downloading_language_model_toast": "מוריד מודל שפה (כ-30MB). נא להמתין…"
+  "downloading_language_model_toast": "מוריד מודל שפה (כ-30MB). נא להמתין…",
+  "download_failed_title": "הורדת חבילת השפה נכשלה",
+  "download_failed_body": "לא ניתן היה להוריד את \"{pack}\" לאחר מספר ניסיונות. בדקו את החיבור ונסו שוב, או עברו ל-AI בענן (ללא חבילה לא מקוונת).",
+  "switch_to_cloud_ai": "מעבר ל-AI בענן",
+  "send_feedback_by_email": "שליחת משוב באימייל"
 }

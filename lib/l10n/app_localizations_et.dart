@@ -451,4 +451,18 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Keelemudeli allalaadimine (~30 MB). Palun oodake…';
+
+  @override
+  String get download_failed_title => 'Keelepaketi allalaadimine ebaõnnestus';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Paketti „$pack“ ei õnnestunud mitme katse järel alla laadida. Kontrolli ühendust ja proovi uuesti või lülitu pilve AI-le (võrguühenduseta paketti pole vaja).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Lülitu pilve AI-le';
+
+  @override
+  String get send_feedback_by_email => 'Saada tagasisidet e-postiga';
 }

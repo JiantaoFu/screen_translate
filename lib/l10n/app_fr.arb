@@ -137,5 +137,9 @@
   "request_language_pair": "Demander cette langue",
   "language_request_sent": "Merci ! Votre demande a été enregistrée.",
   "pack_waiting_for_network": "En attente du réseau…",
-  "downloading_language_model_toast": "Téléchargement du modèle de langue (~30 Mo). Veuillez patienter…"
+  "downloading_language_model_toast": "Téléchargement du modèle de langue (~30 Mo). Veuillez patienter…",
+  "download_failed_title": "Échec du téléchargement du pack de langue",
+  "download_failed_body": "Impossible de télécharger « {pack} » après plusieurs essais. Vérifiez la connexion et réessayez, ou passez à l'IA cloud (aucun pack hors ligne requis).",
+  "switch_to_cloud_ai": "Passer à l'IA cloud",
+  "send_feedback_by_email": "Envoyer un commentaire par e-mail"
 }

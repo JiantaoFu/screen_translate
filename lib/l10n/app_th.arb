@@ -137,5 +137,9 @@
   "request_language_pair": "ขอภาษานี้",
   "language_request_sent": "ขอบคุณ! เราบันทึกคำขอของคุณแล้ว",
   "pack_waiting_for_network": "กำลังรอเครือข่าย…",
-  "downloading_language_model_toast": "กำลังดาวน์โหลดโมเดลภาษา (~30 MB) โปรดรอสักครู่…"
+  "downloading_language_model_toast": "กำลังดาวน์โหลดโมเดลภาษา (~30 MB) โปรดรอสักครู่…",
+  "download_failed_title": "ดาวน์โหลดแพ็กภาษาไม่สำเร็จ",
+  "download_failed_body": "ดาวน์โหลด \"{pack}\" ไม่สำเร็จหลังจากลองหลายครั้ง ตรวจสอบการเชื่อมต่อแล้วลองใหม่ หรือเปลี่ยนไปใช้ AI บนคลาวด์ (ไม่ต้องใช้แพ็กออฟไลน์)",
+  "switch_to_cloud_ai": "เปลี่ยนไปใช้ AI บนคลาวด์",
+  "send_feedback_by_email": "ส่งความคิดเห็นทางอีเมล"
 }

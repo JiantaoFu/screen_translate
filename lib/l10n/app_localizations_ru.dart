@@ -454,4 +454,18 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Загрузка языковой модели (~30 МБ). Подождите…';
+
+  @override
+  String get download_failed_title => 'Не удалось скачать языковой пакет';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Не удалось скачать «$pack» после нескольких попыток. Проверьте соединение и повторите, или переключитесь на облачный ИИ (офлайн-пакет не нужен).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Перейти на облачный ИИ';
+
+  @override
+  String get send_feedback_by_email => 'Отправить отзыв по почте';
 }

@@ -137,5 +137,9 @@
   "request_language_pair": "Bu Dili İste",
   "language_request_sent": "Teşekkürler! Talebinizi kaydettik.",
   "pack_waiting_for_network": "Ağ bekleniyor…",
-  "downloading_language_model_toast": "Dil modeli indiriliyor (~30 MB). Lütfen bekleyin…"
+  "downloading_language_model_toast": "Dil modeli indiriliyor (~30 MB). Lütfen bekleyin…",
+  "download_failed_title": "Dil paketi indirilemedi",
+  "download_failed_body": "\"{pack}\" birkaç denemeden sonra indirilemedi. Bağlantınızı kontrol edip yeniden deneyin veya Bulut yapay zekaya geçin (çevrimdışı paket gerekmez).",
+  "switch_to_cloud_ai": "Bulut yapay zekaya geç",
+  "send_feedback_by_email": "E-postayla geri bildirim gönder"
 }

@@ -6,6 +6,8 @@ import 'package:screen_translate/providers/translation_provider.dart';
 import 'package:screen_translate/screens/translation_settings_screen.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
+import 'package:screen_translate/widgets/download_error_dialog.dart';
+import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/llm_translation_service.dart';
@@ -216,9 +218,14 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                   await modelService.downloadModelWithFallback(code, onProgress: (p) {
                     if (mounted) setState(() => _downloadProgress[code] = p);
                   });
-                } catch (_) {
-                  // Swallowed — translateText() retries on demand and will
-                  // surface a real error there if it's still unavailable.
+                } catch (e) {
+                  // Background pre-download: stay silent. The service has
+                  // recorded the failure; the single download-failed dialog
+                  // appears when the user taps Translate (or a download
+                  // button in Settings), not now. Two of these can fail at
+                  // once (source and target), and a modal for something the
+                  // user didn't ask for is worse than the old silence.
+                  debugPrint('Background pre-download of "$code" failed: $e');
                 } finally {
                   if (mounted) {
                     setState(() {
@@ -325,61 +332,64 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> _trackTranslationAndPromptReview(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    int translationCount = prefs.getInt('translationCount') ?? 0;
-    int promptCount = prefs.getInt('reviewPromptCount') ?? 0;
-
-    translationCount++;
-    await prefs.setInt('translationCount', translationCount);
-
-    // Prompt at increasing translation milestones
-    final promptThresholds = [10, 50, 100, 250, 500];
-
-    if (promptCount < promptThresholds.length &&
-        translationCount >= promptThresholds[promptCount]) {
-      _showReviewPromptDialog(context);
-      await prefs.setInt('reviewPromptCount', promptCount + 1);
-    }
-  }
-
-  void _showReviewPromptDialog(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.enjoying_app),
-          content: Text(AppLocalizations.of(context)!.review_prompt_message),
-          actions: [
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.not_now),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.rate_now),
-              onPressed: () {
-                _launchInAppReview(context);
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
-        );
-      },
+    final review = ReviewPromptService(prefs);
+    await review.recordSuccessfulTranslation();
+    if (!context.mounted) return;
+    // Unavailable review API: logged only. No snackbar, no store fallback.
+    final inAppReview = InAppReview.instance;
+    await review.maybeRequestReview(
+      isAvailable: inAppReview.isAvailable,
+      requestReview: inAppReview.requestReview,
     );
   }
 
-  void _launchInAppReview(BuildContext context) async {
-    final InAppReview inAppReview = InAppReview.instance;
+  /// Quick mode: if a background pre-download of the source or target pack
+  /// failed, show the (single) download-failed dialog now that the user
+  /// actually wants to translate. Returns whether to go ahead and start.
+  /// Retry clears the failures and starts; translating downloads missing
+  /// packs on demand.
+  Future<bool> _confirmQuickPacksBeforeTranslate(
+    BuildContext context,
+    TranslationProvider provider,
+  ) async {
+    if (provider.translationMode != TranslationMode.onDevice) return true;
+    final service = ModelDownloadService();
+    final failed = <String>[
+      for (final code in {provider.sourceLanguage, provider.targetLanguage})
+        if (await service.quickDownloadStillFailed(code)) code,
+    ];
+    if (failed.isEmpty) return true;
+    if (!context.mounted) return false;
+    final localizations = AppLocalizations.of(context)!;
+    final action = await _handleDownloadFailed(
+      context,
+      failed.map(localizations.languageName).join(', '),
+    );
+    if (action != DownloadFailedAction.retry) return false;
+    failed.forEach(ModelDownloadService.clearQuickDownloadFailure);
+    return true;
+  }
 
-    if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.cannot_open_store)),
-      );
+  /// Shows the download-failed dialog. Returns the chosen action so callers
+  /// can retry their own download; Cloud AI switching is handled here.
+  Future<DownloadFailedAction> _handleDownloadFailed(
+    BuildContext context,
+    String packLabel,
+  ) async {
+    final action = await showDownloadFailedDialog(context, packLabel: packLabel);
+    if (!context.mounted) return DownloadFailedAction.dismiss;
+    if (action == DownloadFailedAction.switchToCloudAi) {
+      final provider = Provider.of<TranslationProvider>(context, listen: false);
+      await switchToCloudAi(context, openSettings: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(
+            value: provider,
+            child: const TranslationSettingsScreen(),
+          ),
+        ));
+      });
     }
+    return action;
   }
 
   @override
@@ -432,6 +442,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         await _trackTranslationAndPromptReview(context);
                                       }
                                     } else {
+                                      if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {
+                                        return;
+                                      }
+                                      if (!context.mounted) return;
                                       if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
                                         return;
                                       }
@@ -773,32 +787,40 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           );
           if (confirmed != true) return;
 
-          setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
           final modelService = ModelDownloadService();
-          try {
+          final pairName = localizations.languagePairName(source, target);
+          Future<void> download() async {
+            void progress(double p) {
+              if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+            }
             final pair = findOnnxPair(source, target);
             if (pair != null) {
-              await modelService.downloadOnnxModel(pair.key, onProgress: (p) {
-                if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-              });
+              await modelService.downloadOnnxModel(pair.key, onProgress: progress);
             } else {
               final pivot = findOnnxPivotPair(source, target);
-              if (pivot != null) {
-                await modelService.downloadOnnxPivot(pivot, onProgress: (p) {
-                  if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
-                });
+              if (pivot != null) await modelService.downloadOnnxPivot(pivot, onProgress: progress);
+            }
+          }
+
+          try {
+            // Retry goes round again, so a retry gets the same "ready"
+            // snackbar or failure dialog as the first attempt.
+            while (mounted) {
+              setState(() => _onnxDownloadProgress[selectedKey] = 0.0);
+              try {
+                await download();
+              } catch (e) {
+                if (!mounted) return;
+                final action = await _handleDownloadFailed(this.context, pairName);
+                if (action == DownloadFailedAction.retry) continue;
+                return;
               }
-            }
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(localizations.pack_is_ready_snackbar(localizations.languagePairName(selectedKey.split('|')[0], selectedKey.split('|')[1]))), backgroundColor: Colors.green),
-              );
-            }
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(localizations.download_failed_connection), backgroundColor: Colors.red),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(content: Text(localizations.pack_is_ready_snackbar(pairName)), backgroundColor: Colors.green),
+                );
+              }
+              return;
             }
           } finally {
             if (mounted) setState(() => _onnxDownloadProgress.remove(selectedKey));

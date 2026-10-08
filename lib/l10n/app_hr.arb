@@ -137,5 +137,9 @@
   "request_language_pair": "Zatraži ovaj jezik",
   "language_request_sent": "Hvala! Zabilježili smo vaš zahtjev.",
   "pack_waiting_for_network": "Čekanje mreže…",
-  "downloading_language_model_toast": "Preuzimanje jezičnog modela (~30 MB). Pričekajte…"
+  "downloading_language_model_toast": "Preuzimanje jezičnog modela (~30 MB). Pričekajte…",
+  "download_failed_title": "Preuzimanje jezičnog paketa nije uspjelo",
+  "download_failed_body": "Paket „{pack}” nije moguće preuzeti ni nakon nekoliko pokušaja. Provjerite vezu i pokušajte ponovno ili prijeđite na Cloud AI (izvanmrežni paket nije potreban).",
+  "switch_to_cloud_ai": "Prijeđi na Cloud AI",
+  "send_feedback_by_email": "Pošalji povratne informacije e-poštom"
 }

@@ -454,4 +454,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Dil modeli indiriliyor (~30 MB). Lütfen bekleyin…';
+
+  @override
+  String get download_failed_title => 'Dil paketi indirilemedi';
+
+  @override
+  String download_failed_body(String pack) {
+    return '\"$pack\" birkaç denemeden sonra indirilemedi. Bağlantınızı kontrol edip yeniden deneyin veya Bulut yapay zekaya geçin (çevrimdışı paket gerekmez).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Bulut yapay zekaya geç';
+
+  @override
+  String get send_feedback_by_email => 'E-postayla geri bildirim gönder';
 }

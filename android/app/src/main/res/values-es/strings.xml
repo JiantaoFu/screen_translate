@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Traducción automática</string>
     <string name="mode_original_text">Texto original</string>
     <string name="mode_manual_translate">Traducción manual</string>
+    <string name="hide_all_overlays">Ocultar todo</string>
+    <string name="overlays_hidden_toast">Traducciones ocultas</string>
 </resources>

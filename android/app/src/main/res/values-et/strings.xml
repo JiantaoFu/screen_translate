@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automaatne tõlge</string>
     <string name="mode_original_text">Algtekst</string>
     <string name="mode_manual_translate">Käsitsi tõlge</string>
+    <string name="hide_all_overlays">Peida kõik</string>
+    <string name="overlays_hidden_toast">Tõlked peidetud</string>
 </resources>

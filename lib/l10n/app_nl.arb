@@ -137,5 +137,9 @@
   "request_language_pair": "Deze taal aanvragen",
   "language_request_sent": "Bedankt! We hebben je verzoek genoteerd.",
   "pack_waiting_for_network": "Wachten op netwerk…",
-  "downloading_language_model_toast": "Taalmodel downloaden (~30 MB). Even geduld…"
+  "downloading_language_model_toast": "Taalmodel downloaden (~30 MB). Even geduld…",
+  "download_failed_title": "Downloaden van taalpakket mislukt",
+  "download_failed_body": "\"{pack}\" kon na meerdere pogingen niet worden gedownload. Controleer je verbinding en probeer het opnieuw, of schakel over naar Cloud-AI (geen offlinepakket nodig).",
+  "switch_to_cloud_ai": "Overschakelen naar Cloud-AI",
+  "send_feedback_by_email": "Feedback per e-mail versturen"
 }

@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automatski prijevod</string>
     <string name="mode_original_text">Izvorni tekst</string>
     <string name="mode_manual_translate">Ručni prijevod</string>
+    <string name="hide_all_overlays">Sakrij sve</string>
+    <string name="overlays_hidden_toast">Prijevodi su skriveni</string>
 </resources>

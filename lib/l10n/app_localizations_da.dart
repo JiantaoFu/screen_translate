@@ -451,4 +451,18 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Downloader sprogmodel (~30 MB). Vent venligst…';
+
+  @override
+  String get download_failed_title => 'Download af sprogpakke mislykkedes';
+
+  @override
+  String download_failed_body(String pack) {
+    return '\"$pack\" kunne ikke downloades efter flere forsøg. Tjek forbindelsen og prøv igen, eller skift til Cloud AI (ingen offlinepakke nødvendig).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Skift til Cloud AI';
+
+  @override
+  String get send_feedback_by_email => 'Send feedback via e-mail';
 }

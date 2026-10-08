@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">अपने-आप अनुवाद</string>
     <string name="mode_original_text">मूल टेक्स्ट</string>
     <string name="mode_manual_translate">मैन्युअल अनुवाद</string>
+    <string name="hide_all_overlays">सभी छिपाएं</string>
+    <string name="overlays_hidden_toast">अनुवाद छिपा दिए गए</string>
 </resources>

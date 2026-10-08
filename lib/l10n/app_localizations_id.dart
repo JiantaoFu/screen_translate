@@ -247,7 +247,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get api_key_required => 'Kunci API Diperlukan';
 
   @override
-  String get go_to_settings => 'Pergi ke Pengaturan';
+  String get go_to_settings => 'Buka Pengaturan';
 
   @override
   String get api_key_input_error => 'Silakan masukkan kunci API yang valid';
@@ -452,4 +452,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Mengunduh model bahasa (~30 MB). Harap tunggu…';
+
+  @override
+  String get download_failed_title => 'Gagal mengunduh paket bahasa';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Paket \"$pack\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi Anda lalu coba lagi, atau beralih ke AI Cloud (tidak perlu paket offline).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Beralih ke AI Cloud';
+
+  @override
+  String get send_feedback_by_email => 'Kirim masukan lewat email';
 }

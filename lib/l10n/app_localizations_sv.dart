@@ -452,4 +452,19 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Laddar ned språkmodell (~30 MB). Vänta…';
+
+  @override
+  String get download_failed_title =>
+      'Nedladdningen av språkpaketet misslyckades';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Det gick inte att ladda ned ”$pack” efter flera försök. Kontrollera anslutningen och försök igen, eller byt till Moln-AI (inget offlinepaket behövs).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Byt till Moln-AI';
+
+  @override
+  String get send_feedback_by_email => 'Skicka feedback via e-post';
 }

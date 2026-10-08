@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">স্বয়ংক্রিয় অনুবাদ</string>
     <string name="mode_original_text">মূল লেখা</string>
     <string name="mode_manual_translate">ম্যানুয়াল অনুবাদ</string>
+    <string name="hide_all_overlays">সব লুকান</string>
+    <string name="overlays_hidden_toast">অনুবাদ লুকানো হয়েছে</string>
 </resources>

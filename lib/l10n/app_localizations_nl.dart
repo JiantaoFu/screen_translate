@@ -451,4 +451,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Taalmodel downloaden (~30 MB). Even geduld…';
+
+  @override
+  String get download_failed_title => 'Downloaden van taalpakket mislukt';
+
+  @override
+  String download_failed_body(String pack) {
+    return '\"$pack\" kon na meerdere pogingen niet worden gedownload. Controleer je verbinding en probeer het opnieuw, of schakel over naar Cloud-AI (geen offlinepakket nodig).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Overschakelen naar Cloud-AI';
+
+  @override
+  String get send_feedback_by_email => 'Feedback per e-mail versturen';
 }

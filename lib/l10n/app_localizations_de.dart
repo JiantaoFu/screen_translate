@@ -458,4 +458,18 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Sprachmodell wird heruntergeladen (~30 MB). Bitte warten…';
+
+  @override
+  String get download_failed_title => 'Sprachpaket-Download fehlgeschlagen';
+
+  @override
+  String download_failed_body(String pack) {
+    return '„$pack“ konnte nach mehreren Versuchen nicht heruntergeladen werden. Verbindung prüfen und erneut versuchen, oder zu Cloud-KI wechseln (kein Offline-Paket nötig).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Zu Cloud-KI wechseln';
+
+  @override
+  String get send_feedback_by_email => 'Feedback per E-Mail senden';
 }

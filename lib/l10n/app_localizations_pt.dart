@@ -452,4 +452,18 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get downloading_language_model_toast =>
       'Baixando o modelo de idioma (~30 MB). Aguarde…';
+
+  @override
+  String get download_failed_title => 'Falha ao baixar o pacote de idioma';
+
+  @override
+  String download_failed_body(String pack) {
+    return 'Não foi possível baixar o pacote \"$pack\" após várias tentativas. Verifique sua conexão e tente novamente ou mude para a IA na nuvem (não precisa de pacote offline).';
+  }
+
+  @override
+  String get switch_to_cloud_ai => 'Usar IA na nuvem';
+
+  @override
+  String get send_feedback_by_email => 'Enviar feedback por e-mail';
 }

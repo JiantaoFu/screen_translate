@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automatisk översättning</string>
     <string name="mode_original_text">Originaltext</string>
     <string name="mode_manual_translate">Manuell översättning</string>
+    <string name="hide_all_overlays">Dölj alla</string>
+    <string name="overlays_hidden_toast">Översättningar dolda</string>
 </resources>

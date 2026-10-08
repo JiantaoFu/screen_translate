@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Dịch tự động</string>
     <string name="mode_original_text">Văn bản gốc</string>
     <string name="mode_manual_translate">Dịch thủ công</string>
+    <string name="hide_all_overlays">Ẩn tất cả</string>
+    <string name="overlays_hidden_toast">Đã ẩn bản dịch</string>
 </resources>

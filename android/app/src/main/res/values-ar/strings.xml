@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">ترجمة تلقائية</string>
     <string name="mode_original_text">النص الأصلي</string>
     <string name="mode_manual_translate">ترجمة يدوية</string>
+    <string name="hide_all_overlays">إخفاء الكل</string>
+    <string name="overlays_hidden_toast">تم إخفاء الترجمات</string>
 </resources>

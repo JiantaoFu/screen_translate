@@ -12,4 +12,6 @@
     <string name="mode_auto_translate">Automaattinen käännös</string>
     <string name="mode_original_text">Alkuperäinen teksti</string>
     <string name="mode_manual_translate">Manuaalinen käännös</string>
+    <string name="hide_all_overlays">Piilota kaikki</string>
+    <string name="overlays_hidden_toast">Käännökset piilotettu</string>
 </resources>

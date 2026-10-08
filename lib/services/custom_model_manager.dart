@@ -1,17 +1,41 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:archive/archive.dart';
-import 'package:path/path.dart' as path;
 
+import 'package:archive/archive.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:screen_translate/services/download_retry.dart';
+
+/// Quick-mode (ML Kit) backup server, used when Google's own model download
+/// fails or stalls (common on some Middle East networks).
 class CustomModelManager {
-  // IMPORTANT: This URL points to your local development machine for testing.
-  // - Use 'http://10.0.2.2:8000' for the Android Emulator.
-  // - For a physical device, replace '10.0.2.2' with your computer's
-  //   local network IP (e.g., 'http://192.168.1.5:8000').
-  // - For production, replace this with your actual public server URL.
   final String baseUrl = 'https://huggingface.co/fuji246/small-translation/resolve/main';
+
+  final http.Client Function() _clientFactory;
+  final Future<Directory> Function() _cacheDir;
+
+  /// A pack download fails only after this long with no bytes arriving,
+  /// never because of its total duration: ~30 MB on a slow link can take
+  /// many minutes.
+  final Duration stallTimeout;
+
+  /// Stalls tolerated per call before giving up; each one resumes from the
+  /// bytes already on disk.
+  final int maxAttempts;
+  final Duration retryDelay;
+
+  CustomModelManager({
+    http.Client Function()? clientFactory,
+    Future<Directory> Function()? cacheDir,
+    this.stallTimeout = const Duration(seconds: 30),
+    this.maxAttempts = 4,
+    this.retryDelay = const Duration(seconds: 2),
+  })  : _clientFactory = clientFactory ?? http.Client.new,
+        _cacheDir = cacheDir ?? _defaultCacheDir;
+
+  static Future<Directory> _defaultCacheDir() async =>
+      Directory(path.join((await getApplicationSupportDirectory()).path, 'mlkit_backup'));
 
   /// Gets the directory where the ML Kit model folder should be unzipped.
   Future<Directory> _getExtractionDir() async {
@@ -19,52 +43,75 @@ class CustomModelManager {
     return Directory(path.join(appDir.parent.path, 'no_backup'));
   }
 
-  Future<void> downloadAndInstallModel(
+  /// Downloads `<langCode>.zip` into the cache dir and returns it.
+  ///
+  /// Resumable: bytes go to `<zip>.tmp`, which is kept when a call fails, so
+  /// the next attempt (another retry, or the user tapping Retry later)
+  /// continues with an HTTP Range request instead of starting over. Before
+  /// 1.2.4 the whole zip was buffered in memory with no timeout and every
+  /// retry restarted from zero.
+  @visibleForTesting
+  Future<File> downloadZip(
     String langCode, {
     void Function(double progress)? onProgress,
   }) async {
-    final url = '$baseUrl/$langCode.zip';
-    print('Fallback: Downloading model for $langCode from $url...');
-
-    final client = http.Client();
+    final dir = await _cacheDir();
+    await dir.create(recursive: true);
+    final zip = File(path.join(dir.path, '$langCode.zip'));
+    if (await zip.exists()) return zip; // finished earlier, extraction failed
+    final client = _clientFactory();
     try {
-      final response = await client.send(http.Request('GET', Uri.parse(url)));
-
-      if (response.statusCode == 200) {
-        final total = response.contentLength;
-        final builder = BytesBuilder(copy: false);
-        await for (final chunk in response.stream) {
-          builder.add(chunk);
-          if (total != null && total > 0) onProgress?.call(builder.length / total);
-        }
-        final bytes = builder.takeBytes();
-        final archive = ZipDecoder().decodeBytes(bytes);
-        final extractionDir = await _getExtractionDir();
-
-        if (!await extractionDir.exists()) {
-          await extractionDir.create(recursive: true);
-        }
-
-        print('Unzipping and installing model files to ${extractionDir.path}...');
-        for (final file in archive) {
-          final filename = path.join(extractionDir.path, file.name);
-          if (file.isFile) {
-            final outFile = File(filename);
-            await outFile.create(recursive: true);
-            await outFile.writeAsBytes(file.content as List<int>);
-            print('Extracted: $filename');
-          }
-        }
-        print('Fallback model for $langCode installed successfully.');
-      } else {
-        await response.stream.drain<void>();
-        throw Exception('Fallback failed: HTTP ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error during fallback download for $langCode: $e');
-      rethrow;
+      await resumableDownload(
+        client: client,
+        url: '$baseUrl/$langCode.zip',
+        target: zip,
+        stallTimeout: stallTimeout,
+        maxAttempts: maxAttempts,
+        retryDelay: retryDelay,
+        onBytes: (received, total) {
+          if (total != null && total > 0) onProgress?.call((received / total).clamp(0.0, 1.0));
+        },
+      );
     } finally {
       client.close();
+    }
+    return zip;
+  }
+
+  /// Downloads and unpacks the backup pack into ML Kit's model folder.
+  ///
+  /// [isAlreadyInstalled] is checked between download and unpacking: ML
+  /// Kit's own download can't be cancelled, and if it finished meanwhile,
+  /// unpacking over its files could leave a mix of two copies.
+  Future<void> downloadAndInstallModel(
+    String langCode, {
+    void Function(double progress)? onProgress,
+    Future<bool> Function()? isAlreadyInstalled,
+  }) async {
+    debugPrint('Fallback: Downloading model for $langCode from $baseUrl...');
+    final zip = await downloadZip(langCode, onProgress: onProgress);
+    if (isAlreadyInstalled != null && await isAlreadyInstalled()) {
+      debugPrint('Fallback: $langCode was installed by ML Kit meanwhile; skipping unpack.');
+      await zip.delete();
+      return;
+    }
+    try {
+      final archive = ZipDecoder().decodeBytes(await zip.readAsBytes());
+      final extractionDir = await _getExtractionDir();
+      await extractionDir.create(recursive: true);
+      debugPrint('Unzipping and installing model files to ${extractionDir.path}...');
+      for (final file in archive) {
+        if (!file.isFile) continue;
+        final outFile = File(path.join(extractionDir.path, file.name));
+        await outFile.create(recursive: true);
+        await outFile.writeAsBytes(file.content as List<int>);
+      }
+      debugPrint('Fallback model for $langCode installed successfully.');
+      await zip.delete();
+    } catch (e) {
+      // A corrupt zip must not be reused by the next attempt.
+      if (await zip.exists()) await zip.delete();
+      rethrow;
     }
   }
 }

@@ -35,17 +35,17 @@ PHONE = (231, 450, 617, 1370)   # x, y, w, h
 # raw capture (x0, y0, x1, y1) to magnify, and where on the canvas to put it.
 SHOTS = {
     'manga': dict(
-        callout=dict(crop=(700, 120, 1080, 560), at='right', y=760),
+        callout=dict(crop=(700, 120, 1080, 560), at='right', y=900, width=380),
         text={'en-US': ('Translate manga right on the page', 'Even vertical speech bubbles'),
               'zh-CN': ('漫画对白，原地翻译', '竖排气泡也能读懂'),
               'ja-JP': ('マンガのセリフをその場で翻訳', '縦書きの吹き出しにも対応')}),
     'game': dict(
-        callout=dict(crop=(20, 1730, 1060, 2080), at='center', y=1060, width=860),
+        callout=dict(crop=(20, 1730, 1060, 2080), at='center', y=1090, width=860),
         text={'en-US': ('Play games in any language', 'Dialogue translated as you play'),
               'zh-CN': ('外语游戏，边玩边懂', '对话实时翻译'),
               'ja-JP': ('海外ゲームもそのまま遊べる', 'セリフをリアルタイムで翻訳')}),
     'webtoon': dict(
-        callout=dict(crop=(20, 110, 520, 390), at='left', y=820),
+        callout=dict(crop=(20, 110, 520, 390), at='right', y=1240, width=470),
         text={'en-US': ('Read webtoons as you scroll', 'Korean, Japanese, Chinese and more'),
               'zh-CN': ('条漫边滑边翻译', '韩语、日语等多种语言'),
               'ja-JP': ('Webtoonもスクロールしながら翻訳', '韓国語・英語など多言語対応')}),
@@ -135,23 +135,44 @@ def compose(locale, shot, raw_path, out_path):
     screen = Image.open(raw_path).convert('RGB').resize((w, h), Image.LANCZOS)
     im.paste(screen, (x, py), rounded(screen, 38))
 
-    # Magnified callout of the translated text.
+    # Magnified callout of the translated text. Without a visual link the
+    # card read as the same text drawn twice, so the source region is
+    # outlined on the phone and joined to the card by two leader lines, and
+    # the card is placed so it never covers its own source.
     co = spec.get('callout') or {}
     crop = co.get('crop')
     if crop:
+        k = w / 1080
+        sx0, sy0 = x + crop[0] * k, py + crop[1] * k
+        sx1, sy1 = x + crop[2] * k, py + crop[3] * k
         raw = Image.open(raw_path).convert('RGB')
         zoom = raw.crop(crop)
         zw = co.get('width', 520)
         zh = int(zoom.height * zw / zoom.width)
         zoom = zoom.resize((zw, zh), Image.LANCZOS)
-        cx = {'left': 40, 'right': W - zw - 40}.get(co.get('at'), (W - zw) // 2)
-        cy = co.get('y', py + h // 2 - zh // 2)
+        cx = {'left': 24, 'right': W - zw - 24}.get(co.get('at'), (W - zw) // 2)
+        cy = co['y']
+        # Leader lines: source corners to the matching card corners, drawn
+        # first so the card and the outline sit on top of them.
+        lines = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(lines)
+        below = cy > sy1
+        for scx, ccx in ((sx0, cx - 6), (sx1, cx + zw + 6)):
+            sy, ccy = (sy1, cy - 6) if below else (sy0, cy + zh + 6)
+            ld.line([(scx, sy), (ccx, ccy)], fill=ACCENT + (255,), width=6)
+        im = Image.alpha_composite(im.convert('RGBA'), lines)
         card = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        ImageDraw.Draw(card).rounded_rectangle([cx - 8, cy - 8, cx + zw + 8, cy + zh + 22], radius=30, fill=(0, 0, 0, 140))
-        im = Image.alpha_composite(im.convert('RGBA'), card.filter(ImageFilter.GaussianBlur(16))).convert('RGB')
+        ImageDraw.Draw(card).rounded_rectangle([cx - 10, cy - 10, cx + zw + 10, cy + zh + 26], radius=30, fill=(0, 0, 0, 150))
+        im = Image.alpha_composite(im, card.filter(ImageFilter.GaussianBlur(16))).convert('RGB')
         d = ImageDraw.Draw(im)
-        d.rounded_rectangle([cx - 6, cy - 6, cx + zw + 6, cy + zh + 6], radius=26, fill=WHITE)
+        d.rounded_rectangle([sx0 - 4, sy0 - 4, sx1 + 4, sy1 + 4], radius=10, outline=ACCENT, width=5)
+        d.rounded_rectangle([cx - 7, cy - 7, cx + zw + 7, cy + zh + 7], radius=26, fill=ACCENT)
         im.paste(zoom, (cx, cy), rounded(zoom, 22))
+        # Magnifier badge on the card's corner.
+        bx, by, r = cx + zw - 8, cy - 4, 30
+        d.ellipse([bx - r, by - r, bx + r, by + r], fill=ACCENT, outline=WHITE, width=4)
+        d.ellipse([bx - 13, by - 13, bx + 7, by + 7], outline=WHITE, width=5)
+        d.line([(bx + 5, by + 5), (bx + 15, by + 15)], fill=WHITE, width=6)
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     im.save(out_path)

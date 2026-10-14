@@ -6,9 +6,10 @@ Inputs: raw 1080x2400 captures in tools/store_assets/raw/<locale>/<shot>.png
 (made by capture.sh). Output: build/play_store_assets/screens/<locale>/NN_<shot>.png
 at 1080x1920 (9:16, Play's size for promotable phone screenshots).
 
-Each shot: a headline and a subline on top, the real capture in a phone
-bezel, and optionally a magnified callout of the translated text (in a
-store thumbnail the overlay text itself is too small to read).
+Each shot: a headline and a subline on top, and the real capture in a
+phone bezel, as large as fits. A magnified callout of the translated text
+was tried and dropped (it read as the text drawn twice, and looked
+cluttered); the code is kept for shots that set `callout`.
 """
 import argparse
 import os
@@ -29,23 +30,20 @@ FONTS = {
 }
 
 # Phone screen (1080x2400 capture) placement inside the 1080x1920 canvas.
-PHONE = (231, 450, 617, 1370)   # x, y, w, h
+PHONE = (196, 300, 688, 1528)   # x, y, w, h (top follows the captions)
 
 # shot id → captions per locale and an optional callout: the region of the
 # raw capture (x0, y0, x1, y1) to magnify, and where on the canvas to put it.
 SHOTS = {
     'manga': dict(
-        callout=dict(crop=(700, 120, 1080, 560), at='right', y=900, width=380),
         text={'en-US': ('Translate manga right on the page', 'Even vertical speech bubbles'),
               'zh-CN': ('漫画对白，原地翻译', '竖排气泡也能读懂'),
               'ja-JP': ('マンガのセリフをその場で翻訳', '縦書きの吹き出しにも対応')}),
     'game': dict(
-        callout=dict(crop=(20, 1730, 1060, 2080), at='center', y=1090, width=860),
         text={'en-US': ('Play games in any language', 'Dialogue translated as you play'),
               'zh-CN': ('外语游戏，边玩边懂', '对话实时翻译'),
               'ja-JP': ('海外ゲームもそのまま遊べる', 'セリフをリアルタイムで翻訳')}),
     'webtoon': dict(
-        callout=dict(crop=(20, 110, 520, 390), at='right', y=1240, width=470),
         text={'en-US': ('Read webtoons as you scroll', 'Korean, Japanese, Chinese and more'),
               'zh-CN': ('条漫边滑边翻译', '韩语、日语等多种语言'),
               'ja-JP': ('Webtoonもスクロールしながら翻訳', '韓国語・英語など多言語対応')}),
@@ -123,7 +121,7 @@ def compose(locale, shot, raw_path, out_path):
 
     # Phone with the real capture.
     x, py, w, h = PHONE
-    py = max(py, y + 40)
+    py = max(py, y + 36)
     h = min(h, H - py - 40)
     w = int(h * 1080 / 2400)
     x = (W - w) // 2

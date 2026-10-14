@@ -47,7 +47,10 @@ void main() {
         client: client,
         url: 'https://example.com/model.onnx',
         target: target,
-        stallTimeout: const Duration(milliseconds: 100),
+        // Short enough to keep the test fast, long enough that a slow file
+        // close or rename on a loaded Windows machine is not taken for a stall
+        // (100 ms once failed the final rename and retried from scratch).
+        stallTimeout: const Duration(milliseconds: 400),
         retryDelay: Duration.zero,
         maxAttempts: maxAttempts,
       );

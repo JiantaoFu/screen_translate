@@ -186,7 +186,7 @@ void main() {
     CustomModelManager manager(MockClient client, {int maxAttempts = 4}) => CustomModelManager(
           clientFactory: () => client,
           cacheDir: () async => dir,
-          stallTimeout: const Duration(milliseconds: 100),
+          stallTimeout: const Duration(milliseconds: 400), // 100 ms flaked: a slow close/rename looked like a stall
           maxAttempts: maxAttempts,
           retryDelay: Duration.zero,
         );

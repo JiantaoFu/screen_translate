@@ -475,6 +475,17 @@ class OnnxTranslationService {
 
   // ── Loading ───────────────────────────────────────────────────────────────
 
+  /// ONNX Runtime's default (ALL) optimization level fails to initialize
+  /// the fp16 packs (ko-en, th-en, id-en): "Attempting to get index by a
+  /// name which does not exist: InsertedPrecisionFreeCast_...", so those
+  /// packs never translated anything. EXTENDED loads them; other packs keep
+  /// the default.
+  @visibleForTesting
+  static String? graphOptimizationLevelFor(String langPairKey) {
+    final pair = kSupportedOnnxPairs.where((p) => p.key == langPairKey).firstOrNull;
+    return (pair?.useFp16 ?? false) ? 'extended' : null;
+  }
+
   Future<_OnnxModelBundle> _loadModel(String langPairKey) async {
     final cached = _modelCache.get(langPairKey);
     if (cached != null) return cached;
@@ -493,6 +504,7 @@ class OnnxTranslationService {
     // per-node automatically.
     final sessionOptions = OrtSessionOptions(
       providers: [OrtProvider.XNNPACK, OrtProvider.CPU],
+      graphOptimizationLevel: graphOptimizationLevelFor(langPairKey),
     );
 
     // createSession(path) is the correct API for file-system paths

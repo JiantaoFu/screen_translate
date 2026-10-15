@@ -1,5 +1,5 @@
 chat_ja.png (ja): 明日の映画、何時にする？ / 7時はどう？ / いいね！駅で会おう。 / チケットは買っておくね。 / ありがとう！楽しみ！
 chat_en.png (en): What time is the movie tomorrow? / How about seven? / Sounds good! See you there. / I will buy the tickets. / Thank you! See you tomorrow.
-chat_en_ja.png (en_ja): What time is the movie tomorrow? / How about 7 p.m.? / Sounds good! / I will buy the tickets. / See you at the station.
+chat_en_ja.png (en_ja): What time is the movie tomorrow? / How about 7 p.m.? / Sounds good! / Let me buy the tickets. / See you at the station.
 webtoon.png (ko): 고양이가 떠 있어! / 나랑 같이 가자! / 좋아, 가자!
 tavern.png (ja): マーサ / ようこそ！ 今日のおすすめはシチューです。

@@ -22,6 +22,7 @@ RAW = os.path.join(HERE, 'raw')
 OUT = os.path.join(REPO, 'build', 'play_store_assets', 'screens')
 
 W, H = 1080, 1920
+K = 1.0   # text/layout scale: 1 for phone (1080x1920), 1.333 for tablet (1440x2560)
 WHITE, SUB, ACCENT = (255, 255, 255), (203, 213, 225), (59, 130, 246)
 FONTS = {
     'en-US': ('C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/seguisb.ttf'),
@@ -122,24 +123,25 @@ def compose(locale, shot, raw_path, out_path):
 
     # Captions.
     # Headline on one line if it fits at >= 58 px, else wrap at 72 px.
-    size = 72
-    while size > 58 and d.textlength(head, font=font(bold, size)) > W - 100:
+    size = int(72 * K)
+    while size > 58 * K and d.textlength(head, font=font(bold, size)) > W - 100 * K:
         size -= 2
-    f_head, f_sub = font(bold, size), font(semi, 40)
-    y = 90
-    for line in wrap(d, head, f_head, W - 100):
+    f_head, f_sub = font(bold, size), font(semi, int(40 * K))
+    y = int(90 * K)
+    for line in wrap(d, head, f_head, W - 100 * K):
         centered(d, y, line, f_head, WHITE)
-        y += 92
-    y += 14
-    for line in wrap(d, sub, f_sub, W - 160):
+        y += int(92 * K)
+    y += int(14 * K)
+    for line in wrap(d, sub, f_sub, W - 160 * K):
         centered(d, y, line, f_sub, SUB)
-        y += 54
+        y += int(54 * K)
 
     # Phone with the real capture.
     x, py, w, h = PHONE
     py = max(py, y + 36)
     h = min(h, H - py - 40)
-    w = int(h * 1080 / 2400)
+    rw, rh = Image.open(raw_path).size
+    w = int(h * rw / rh)   # phone 1080x2400, tablet 1600x2560
     x = (W - w) // 2
     shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     ImageDraw.Draw(shadow).rounded_rectangle([x - 18, py - 10, x + w + 18, py + h + 34], radius=56, fill=(0, 0, 0, 150))
@@ -197,7 +199,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--locale', default='en-US', choices=sorted(FONTS))
     ap.add_argument('--only', help='comma-separated shot ids')
+    ap.add_argument('--device', default='phone', choices=['phone', 'tablet'])
     args = ap.parse_args()
+    global W, H, K, PHONE, RAW, OUT
+    if args.device == 'tablet':
+        # Play tablet screenshots: 9:16 for promotion; captures from the Pixel
+        # Tablet AVD in portrait (raw/tablet/<locale>/).
+        W, H, K = 1440, 2560, 1440 / 1080
+        PHONE = (0, int(300 * K), 0, H - int(300 * K) - 40)
+        RAW = os.path.join(RAW, 'tablet')
+        OUT = os.path.join(os.path.dirname(OUT), 'tablet')
     shots = args.only.split(',') if args.only else list(SHOTS)
     for i, shot in enumerate(SHOTS, 1):
         if shot not in shots:

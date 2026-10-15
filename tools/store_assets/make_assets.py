@@ -37,10 +37,21 @@ LINES = {
                        alt={'tavern_en.png': [['マーサ'], ['いらっしゃいませ！', '今日のおすすめはシチューです。']]},
                        items=[
         dict(box=(62, 1400, 336, 1455), lines=['マーサ'], size=34, align='left'),
-        dict(box=(70, 1470, 790, 1660), lines=['ようこそ！', '今日のおすすめはシチューです。'], size=40,
+        dict(box=(70, 1490, 790, 1660), lines=['ようこそ！', '今日のおすすめはシチューです。'], size=40,
              align='left', valign='top'),
     ]),
 }
+
+
+def fix_tavern_icon(im):
+    # The menu icon's three bars read as the kanji 三 at tablet scale and came
+    # back as "(M)"/"（英里）". Redraw it as three dots (no letter to read).
+    d = ImageDraw.Draw(im)
+    navy = im.getpixel((752, 100))
+    d.rectangle([746, 54, 793, 95], fill=navy)
+    gold = (232, 196, 120)
+    for cx in (754, 770, 786):
+        d.ellipse([cx - 5, 70, cx + 5, 80], fill=gold)
 
 
 def draw_lines(d, box, lines, font_path, size, ink, align='center', valign='middle'):
@@ -81,7 +92,7 @@ CHATS = {
         ('them', 'What time is the movie tomorrow?'),
         ('me', 'How about 7 p.m.?'),
         ('them', 'Sounds good!'),
-        ('me', 'I will buy the tickets.'),
+        ('me', 'Let me buy the tickets.'),   # a lone capital I read as "|" on the tablet
         ('them', 'See you at the station.'),
     ]),
 }
@@ -121,15 +132,31 @@ def draw_chat(lang):
     return im
 
 
+def manga_cjk(out):
+    # The demo video's manga page, without the final ！: on the tablet the
+    # vertical ！ was read as I and Quick mode added a stray 我
+    # ("机器人正在摧毁城市我").
+    sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'demo_video'))
+    import make_assets as demo
+    spec = demo.LINES['manga-1-jp.png']
+    im = Image.open(os.path.join(demo.ORIG, 'manga-1-jp.png')).convert('RGB')
+    demo.clear_bubble(im, spec['box'], spec['fill'])
+    demo.draw_vertical(ImageDraw.Draw(im), spec['box'], ['ロボットは', '街を壊してる'], spec['size'], spec['ink'])
+    im.save(os.path.join(out, 'manga_cjk.png'))
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'assets')
     os.makedirs(out, exist_ok=True)
+    manga_cjk(out)
     notes = []
     for lang, spec in CHATS.items():
         draw_chat(lang).save(os.path.join(out, f'chat_{lang}.png'))
         notes.append(f"chat_{lang}.png ({lang}): " + ' / '.join(t for _, t in spec['messages']))
     for name, spec in LINES.items():
         im = Image.open(os.path.join(ORIG, name)).convert('RGB')
+        if name == 'tavern.png':
+            fix_tavern_icon(im)
         d = ImageDraw.Draw(im)
         for item in spec['items']:
             draw_lines(d, item['box'], item['lines'], FONTS[spec['lang']], item['size'], spec['ink'],
@@ -139,6 +166,8 @@ def main():
             # Same artwork with other lines (Quick mode into Chinese/Japanese
             # handled the default ones badly: "猫浮动！").
             alt = Image.open(os.path.join(ORIG, name)).convert('RGB')
+            if name == 'tavern.png':
+                fix_tavern_icon(alt)
             ad = ImageDraw.Draw(alt)
             for item, lines in zip(spec['items'], alt_lines):
                 draw_lines(ad, item['box'], lines, FONTS[spec['lang']], item['size'], spec['ink'],

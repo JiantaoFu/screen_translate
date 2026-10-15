@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: [MODE=onnx|onDevice] check_lines.sh <source-lang> <runs> <image.png> [<image.png> ...]
+# Usage: [MODE=onnx|onDevice] [TARGET=en] check_lines.sh <source-lang> <runs> <image.png> [<image.png> ...]
 # Shows each image full-screen in Google Photos on the emulator with live
 # translation (<source-lang> → en, AI mode unless MODE=onDevice for Quick) running, <runs> times, and prints
 # what OCR read and what came back. Keep only lines that are right every run.
@@ -23,7 +23,7 @@ $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell settings put secure enabled_accessibility_services $PKG/.ScrollDetectionAccessibilityService
 $A shell settings put secure accessibility_enabled 1
 $A shell am force-stop $PKG
-$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=$LANG_SRC targetLanguage=en translationMode=${MODE:-onnx} >/dev/null
+$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=$LANG_SRC targetLanguage=${TARGET:-en} translationMode=${MODE:-onnx} >/dev/null
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 12
 $A shell input tap 540 1508; sleep 3    # Translate Screen
 $A shell input tap 540 1128; sleep 1.5  # capture-mode dropdown

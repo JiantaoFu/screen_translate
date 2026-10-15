@@ -47,6 +47,22 @@ SHOTS = {
         text={'en-US': ('Read webtoons as you scroll', 'Korean, Japanese, Chinese and more'),
               'zh-CN': ('条漫边滑边翻译', '韩语、日语等多种语言'),
               'ja-JP': ('Webtoonもスクロールしながら翻訳', '韓国語・英語など多言語対応')}),
+    'chat': dict(
+        text={'en-US': ('Chats and posts, too', 'Works over any app on your screen'),
+              'zh-CN': ('聊天、帖子也能翻', '任何应用里的文字都能翻译'),
+              'ja-JP': ('チャットもSNSも翻訳', '画面上のどのアプリでも使える')}),
+    'home': dict(
+        text={'en-US': ('One tap to start', 'A floating button stays on top of any app'),
+              'zh-CN': ('一键开启', '悬浮按钮常驻在任何应用上方'),
+              'ja-JP': ('ワンタップで開始', 'フローティングボタンがどのアプリにも'),}),
+    'settings': dict(
+        text={'en-US': ('Quick or AI translation', 'AI packs run on your phone, offline'),
+              'zh-CN': ('快速翻译或 AI 翻译', 'AI 语言包在手机本地运行，可离线使用'),
+              'ja-JP': ('クイック翻訳とAI翻訳', 'AIパックは端末内で動作、オフラインでも')}),
+    'languages': dict(
+        text={'en-US': ('50+ languages', 'Pick any pair'),
+              'zh-CN': ('支持 50 多种语言', '任意语言组合'),
+              'ja-JP': ('50以上の言語に対応', '好きな組み合わせで翻訳')}),
 }
 
 

@@ -1,0 +1,2 @@
+• Fixed AI translation for Korean, Thai and Indonesian: these language packs downloaded but never translated anything
+• Smaller fixes and stability improvements

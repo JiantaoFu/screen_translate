@@ -30,7 +30,12 @@ LINES = {
         dict(box=(26, 936, 278, 1060), lines=['나랑 같이 가자!'], size=31),
         dict(box=(436, 1540, 680, 1660), lines=['좋아, 가자!'], size=34),
     ]),
-    'tavern.png': dict(lang='ja', ink=(255, 255, 255), en='Mobile RPG dialogue', items=[
+    # The English listing keeps いらっしゃいませ (AI: "Welcome! Today's suggestion
+    # is stew."); Quick mode into Chinese turned it into "这不好！", so the
+    # default lettering (Chinese listing) says ようこそ instead.
+    'tavern.png': dict(lang='ja', ink=(255, 255, 255), en='Mobile RPG dialogue',
+                       alt={'tavern_en.png': [['マーサ'], ['いらっしゃいませ！', '今日のおすすめはシチューです。']]},
+                       items=[
         dict(box=(62, 1400, 336, 1455), lines=['マーサ'], size=34, align='left'),
         dict(box=(70, 1470, 790, 1660), lines=['ようこそ！', '今日のおすすめはシチューです。'], size=40,
              align='left', valign='top'),
@@ -70,8 +75,18 @@ CHATS = {
         ('me', 'I will buy the tickets.'),
         ('them', 'Thank you! See you tomorrow.'),
     ]),
+    # English lines for the Japanese listing: Quick mode into Japanese broke
+    # "Thank you!" ("youう！") and "seven" ("7つ").
+    'en_ja': dict(name='Emma', messages=[
+        ('them', 'What time is the movie tomorrow?'),
+        ('me', 'How about 7 p.m.?'),
+        ('them', 'Sounds good!'),
+        ('me', 'I will buy the tickets.'),
+        ('them', 'See you at the station.'),
+    ]),
 }
-CHAT_FONTS = {'ja': 'C:/Windows/Fonts/YuGothM.ttc', 'en': 'C:/Windows/Fonts/segoeui.ttf'}
+CHAT_FONTS = {'ja': 'C:/Windows/Fonts/YuGothM.ttc', 'en': 'C:/Windows/Fonts/segoeui.ttf',
+              'en_ja': 'C:/Windows/Fonts/segoeui.ttf'}
 
 
 def draw_chat(lang):
@@ -80,7 +95,7 @@ def draw_chat(lang):
     im = Image.new('RGB', (W, H), (236, 239, 244))
     d = ImageDraw.Draw(im)
     f_msg = ImageFont.truetype(CHAT_FONTS[lang], 46)
-    f_name = ImageFont.truetype('C:/Windows/Fonts/segoeuib.ttf' if lang == 'en' else FONTS['ja'], 50)
+    f_name = ImageFont.truetype('C:/Windows/Fonts/segoeuib.ttf' if lang.startswith('en') else FONTS['ja'], 50)
     # Header.
     d.rectangle([0, 0, W, 260], fill=(48, 92, 222))
     # Avatar without an initial: a lone letter got OCR'd and "translated".
@@ -126,7 +141,8 @@ def main():
             alt = Image.open(os.path.join(ORIG, name)).convert('RGB')
             ad = ImageDraw.Draw(alt)
             for item, lines in zip(spec['items'], alt_lines):
-                draw_lines(ad, item['box'], lines, FONTS[spec['lang']], item['size'], spec['ink'])
+                draw_lines(ad, item['box'], lines, FONTS[spec['lang']], item['size'], spec['ink'],
+                           item.get('align', 'center'), item.get('valign', 'middle'))
             alt.crop(spec.get('screen_crop', (0, 0) + alt.size)).save(os.path.join(out, alt_name))
         if 'screen_crop' in spec:
             # One phone screen of the strip, as a webtoon reader shows it

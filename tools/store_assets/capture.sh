@@ -36,9 +36,10 @@ SCENES=${*:-$(default_scenes)}
 # Content scene → image and source language.
 scene_image() {
   case $1 in
-    manga) echo manga.png;; game) echo tavern.png;;
+    manga) echo manga.png;;
+    game) [ "$(target)" = en ] && echo tavern_en.png || echo tavern.png;;
     webtoon) [ "$(target)" = en ] && echo webtoon_screen.png || echo webtoon_screen_cjk.png;;
-    chat) [ "$(target)" = en ] && echo chat_ja.png || echo chat_en.png;;
+    chat) case $(target) in en) echo chat_ja.png;; ja) echo chat_en_ja.png;; *) echo chat_en.png;; esac;;
   esac
 }
 scene_lang() {

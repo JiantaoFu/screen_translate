@@ -145,5 +145,7 @@
   "first_failure_title": "Nic se nepřeložilo. Co se stalo?",
   "first_failure_no_text": "Na obrazovce nebyl nalezen žádný text",
   "first_failure_wrong": "Překlad byl chybný",
-  "first_failure_slow": "Bylo to příliš pomalé"
+  "first_failure_slow": "Bylo to příliš pomalé",
+  "overlay_permission_not_granted": "Překlady se zatím nemohou zobrazit: zapněte pro Screen Translate „Zobrazení přes jiné aplikace“ a vraťte se.",
+  "screen_capture_not_granted": "Záznam obrazovky nebyl povolen, takže nelze nic přeložit. Klepněte znovu na Spustit a záznam povolte."
 }

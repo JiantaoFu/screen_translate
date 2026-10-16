@@ -480,4 +480,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Работало слишком медленно';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Перевод пока не может появиться: включите «Показ поверх других приложений» для Screen Translate и вернитесь.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Запись экрана не разрешена, поэтому переводить нечего. Нажмите «Старт» снова и разрешите запись экрана.';
 }

@@ -479,4 +479,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'यह बहुत धीमा था';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'अनुवाद अभी नहीं दिख सकते: Screen Translate के लिए \"दूसरे ऐप्स के ऊपर दिखाएं\" चालू करें, फिर वापस आएं।';
+
+  @override
+  String get screen_capture_not_granted =>
+      'स्क्रीन कैप्चर की अनुमति नहीं मिली, इसलिए अनुवाद नहीं हो सकता। फिर से शुरू करें पर टैप करें और स्क्रीन कैप्चर की अनुमति दें।';
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
@@ -32,16 +33,47 @@ class OverlayService {
     return result ?? false;
   }
 
-  // Ensure overlay permission
+  // Ensure overlay permission.
+  //
+  // The system "Display over other apps" page is a separate activity, so the
+  // request returns immediately. Previously we re-checked right away (always
+  // false on a fresh install) and startTranslation() returned silently: a new
+  // buyer granted the permission, came back, and nothing happened. Now we wait
+  // until the user is back in the app and then re-check, so the caller can
+  // continue straight on to the screen-capture consent.
   Future<bool> ensureOverlayPermission(BuildContext context) async {
-    bool hasPermission = await checkOverlayPermission();
-    if (!hasPermission) {
-      hasPermission = await showOverlayPermissionDialog(context);
-      
-      // Recheck permission after request
-      return await checkOverlayPermission();
+    if (await checkOverlayPermission()) return true;
+    final openedSettings = await showOverlayPermissionDialog(context);
+    if (!openedSettings) return false;
+    await waitForAppResume();
+    return recheckOverlayPermission(checkOverlayPermission);
+  }
+
+  /// Some OEM builds report the overlay grant a moment after we resume, so
+  /// poll a few times before giving up.
+  @visibleForTesting
+  static Future<bool> recheckOverlayPermission(
+    Future<bool> Function() check, {
+    int attempts = 5,
+    Duration interval = const Duration(milliseconds: 300),
+  }) async {
+    for (var i = 0; i < attempts; i++) {
+      if (await check()) return true;
+      if (i < attempts - 1) await Future.delayed(interval);
     }
-    return hasPermission;
+    return false;
+  }
+
+  /// Completes once the app has left the foreground (the settings page
+  /// opened) and come back to `resumed`, or after [timeout]. A timeout is
+  /// not a failure: the caller re-checks the permission either way, so Start
+  /// (and `isStarting`) is never held for long.
+  static Future<void> waitForAppResume({Duration timeout = const Duration(seconds: 60)}) {
+    final observer = ResumeAfterLeavingObserver();
+    WidgetsBinding.instance.addObserver(observer);
+    return observer.resumed.timeout(timeout, onTimeout: () {}).whenComplete(
+          () => WidgetsBinding.instance.removeObserver(observer),
+        );
   }
 
   // Check if we have overlay permission
@@ -158,6 +190,26 @@ class OverlayService {
       await _channel.invokeMethod('showToast', {'text': message});
     } on PlatformException catch (e) {
       print('Error showing toast: ${e.message}');
+    }
+  }
+}
+
+/// Completes [resumed] on the first `resumed` that follows a
+/// paused/inactive/hidden state. The `resumed` we are already in when the
+/// permission dialog closes must not count.
+@visibleForTesting
+class ResumeAfterLeavingObserver with WidgetsBindingObserver {
+  final Completer<void> _completer = Completer<void>();
+  bool _left = false;
+
+  Future<void> get resumed => _completer.future;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_left && !_completer.isCompleted) _completer.complete();
+    } else {
+      _left = true;
     }
   }
 }

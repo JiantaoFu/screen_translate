@@ -6,19 +6,31 @@ enum ReviewPromptOutcome { notDue, unavailable, requested, failed }
 
 /// Decides when to ask for a Play in-app review.
 ///
-/// Rules (frozen for 1.2.4):
-/// - ask once after the user's 5th successful translation;
+/// Rules (1.2.6):
+/// - ask once the user has had 3 successful translation sessions (a live
+///   session that drew at least one translation counts once, however many
+///   500 ms capture ticks it ran);
 /// - at most once per device per 90 days;
-/// - never on a device that has recorded an error (download failure, crash);
+/// - not during an app run that recorded an error (download failure, or a
+///   crash on the previous run). Until 1.2.5 this was a permanent per-device
+///   flag, so one flaky model download blocked the prompt forever; the old
+///   flag is now ignored.
 /// - if Play's in-app review API is unavailable, skip silently (log only).
 ///   Never fall back to opening the store or showing a message the user
 ///   didn't ask for.
 class ReviewPromptService {
   static const successCountKey = 'review_success_count';
   static const lastPromptAtKey = 'review_last_prompt_at_ms';
+  /// Legacy (<= 1.2.5) permanent error flag. No longer read.
   static const errorFlagKey = 'review_error_flag';
 
-  static const successThreshold = 5;
+  // Errors block the prompt for the rest of this app run only.
+  static bool _errorThisSession = false;
+
+  @visibleForTesting
+  static void resetSessionForTest() => _errorThisSession = false;
+
+  static const successThreshold = 3;
   static const cooldown = Duration(days: 90);
 
   final SharedPreferences _prefs;
@@ -33,10 +45,10 @@ class ReviewPromptService {
   }
 
   Future<void> recordError() async {
-    await _prefs.setBool(errorFlagKey, true);
+    _errorThisSession = true;
   }
 
-  bool get hasError => _prefs.getBool(errorFlagKey) ?? false;
+  bool get hasError => _errorThisSession;
 
   int get successCount => _prefs.getInt(successCountKey) ?? 0;
 

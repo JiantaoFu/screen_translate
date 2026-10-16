@@ -469,4 +469,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get first_failure_slow => '너무 느렸어요';
+
+  @override
+  String get overlay_permission_not_granted =>
+      '아직 번역을 표시할 수 없습니다. Screen Translate의 \'다른 앱 위에 표시\'를 켠 후 돌아오세요.';
+
+  @override
+  String get screen_capture_not_granted =>
+      '화면 녹화가 허용되지 않아 번역할 수 없습니다. 시작을 다시 누르고 화면 녹화를 허용하세요.';
 }

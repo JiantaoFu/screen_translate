@@ -145,5 +145,7 @@
   "first_failure_title": "Hiçbir şey çevrilmedi. Ne oldu?",
   "first_failure_no_text": "Ekranda metin bulunamadı",
   "first_failure_wrong": "Çeviri yanlıştı",
-  "first_failure_slow": "Çok yavaştı"
+  "first_failure_slow": "Çok yavaştı",
+  "overlay_permission_not_granted": "Çeviriler henüz görünemiyor: Screen Translate için \"Diğer uygulamaların üzerinde göster\"i açıp geri dönün.",
+  "screen_capture_not_granted": "Ekran kaydına izin verilmedi, bu yüzden çeviri yapılamıyor. Başlat'a tekrar dokunun ve ekran kaydına izin verin."
 }

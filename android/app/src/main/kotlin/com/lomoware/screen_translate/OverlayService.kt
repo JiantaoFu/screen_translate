@@ -1168,15 +1168,22 @@ class OverlayService : Service() {
                 val id = intent.getIntExtra("id", -1)
                 if (id >= 0) hideOverlay(id)
             }
-            "stop" -> {
-                isStopped = true
-                handler.removeCallbacks(bringToFrontRunnable)
-                bringToFrontPending = false
-                hideAllOverlays()
-                removeOverlayButtons()
-            }
+            "stop" -> stopAndRemoveAll()
         }
         return START_NOT_STICKY
+    }
+
+    /// Hides every translation box and the floating buttons. Called
+    /// directly (not via startService) when capture is stopped by the
+    /// system, because the app is then usually in the background, where
+    /// startService() throws BackgroundServiceStartNotAllowedException.
+    /// Must run on the main thread.
+    fun stopAndRemoveAll() {
+        isStopped = true
+        handler.removeCallbacks(bringToFrontRunnable)
+        bringToFrontPending = false
+        hideAllOverlays()
+        removeOverlayButtons()
     }
 
     private fun removeOverlayButtons() {

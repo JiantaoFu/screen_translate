@@ -145,5 +145,7 @@
   "first_failure_title": "Rien n'a été traduit. Que s'est-il passé ?",
   "first_failure_no_text": "Aucun texte trouvé à l'écran",
   "first_failure_wrong": "La traduction était incorrecte",
-  "first_failure_slow": "C'était trop lent"
+  "first_failure_slow": "C'était trop lent",
+  "overlay_permission_not_granted": "Les traductions ne peuvent pas encore s'afficher : activez « Afficher par-dessus les autres applis » pour Screen Translate, puis revenez.",
+  "screen_capture_not_granted": "La capture d'écran n'a pas été autorisée, rien ne peut être traduit. Appuyez de nouveau sur Démarrer et autorisez la capture."
 }

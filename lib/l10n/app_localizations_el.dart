@@ -482,4 +482,12 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Ήταν πολύ αργό';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Οι μεταφράσεις δεν μπορούν να εμφανιστούν ακόμα: ενεργοποιήστε την «Εμφάνιση πάνω από άλλες εφαρμογές» για το Screen Translate και επιστρέψτε.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Η καταγραφή οθόνης δεν επιτράπηκε, οπότε δεν γίνεται μετάφραση. Πατήστε ξανά Έναρξη και επιτρέψτε την καταγραφή.';
 }

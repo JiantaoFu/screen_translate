@@ -474,4 +474,12 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'ช้าเกินไป';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'ยังแสดงคำแปลไม่ได้: เปิด \"แสดงทับแอปอื่น\" ให้ Screen Translate แล้วกลับมาที่แอป';
+
+  @override
+  String get screen_capture_not_granted =>
+      'ไม่ได้อนุญาตการบันทึกหน้าจอ จึงแปลไม่ได้ แตะเริ่มอีกครั้งและอนุญาตการบันทึกหน้าจอ';
 }

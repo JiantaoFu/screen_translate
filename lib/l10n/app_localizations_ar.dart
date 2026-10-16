@@ -474,4 +474,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'كان بطيئًا جدًا';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'لا يمكن عرض الترجمات بعد: فعّل \"العرض فوق التطبيقات الأخرى\" لـ Screen Translate ثم ارجع.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'لم يُسمح بالتقاط الشاشة، لذا لا يمكن الترجمة. اضغط على بدء مرة أخرى واسمح بالتقاط الشاشة.';
 }

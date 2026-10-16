@@ -486,4 +486,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Es war zu langsam';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Übersetzungen können noch nicht erscheinen: Aktiviere „Über anderen Apps einblenden“ für Screen Translate und kehre zurück.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Die Bildschirmaufnahme wurde nicht erlaubt, daher kann nichts übersetzt werden. Tippe erneut auf Start und erlaube die Aufnahme.';
 }

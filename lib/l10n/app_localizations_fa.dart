@@ -478,4 +478,12 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'خیلی کند بود';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'هنوز نمی‌توان ترجمه‌ها را نشان داد: «نمایش روی برنامه‌های دیگر» را برای Screen Translate روشن کنید و برگردید.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'اجازه ضبط صفحه داده نشد، پس چیزی ترجمه نمی‌شود. دوباره روی شروع بزنید و ضبط صفحه را مجاز کنید.';
 }

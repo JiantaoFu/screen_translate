@@ -145,5 +145,7 @@
   "first_failure_title": "Nada foi traduzido. O que aconteceu?",
   "first_failure_no_text": "Nenhum texto foi encontrado na tela",
   "first_failure_wrong": "A tradução estava errada",
-  "first_failure_slow": "Estava muito lento"
+  "first_failure_slow": "Estava muito lento",
+  "overlay_permission_not_granted": "As traduções ainda não podem aparecer: ative \"Sobrepor a outros apps\" para o Screen Translate e volte.",
+  "screen_capture_not_granted": "A captura de tela não foi permitida, então nada pode ser traduzido. Toque em Iniciar de novo e permita a captura."
 }

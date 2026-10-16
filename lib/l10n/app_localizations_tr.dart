@@ -480,4 +480,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Çok yavaştı';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Çeviriler henüz görünemiyor: Screen Translate için \"Diğer uygulamaların üzerinde göster\"i açıp geri dönün.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Ekran kaydına izin verilmedi, bu yüzden çeviri yapılamıyor. Başlat\'a tekrar dokunun ve ekran kaydına izin verin.';
 }

@@ -145,5 +145,7 @@
   "first_failure_title": "Er is niets vertaald. Wat gebeurde er?",
   "first_failure_no_text": "Er is geen tekst op het scherm gevonden",
   "first_failure_wrong": "De vertaling was onjuist",
-  "first_failure_slow": "Het was te langzaam"
+  "first_failure_slow": "Het was te langzaam",
+  "overlay_permission_not_granted": "Vertalingen kunnen nog niet verschijnen: zet 'Weergeven over andere apps' aan voor Screen Translate en kom terug.",
+  "screen_capture_not_granted": "Schermopname is niet toegestaan, dus er kan niets vertaald worden. Tik opnieuw op Start en sta schermopname toe."
 }

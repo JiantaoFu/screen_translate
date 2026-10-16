@@ -145,5 +145,7 @@
   "first_failure_title": "Non è stato tradotto nulla. Cos'è successo?",
   "first_failure_no_text": "Nessun testo trovato sullo schermo",
   "first_failure_wrong": "La traduzione era sbagliata",
-  "first_failure_slow": "Era troppo lento"
+  "first_failure_slow": "Era troppo lento",
+  "overlay_permission_not_granted": "Le traduzioni non possono ancora apparire: attiva \"Mostra sopra altre app\" per Screen Translate e torna qui.",
+  "screen_capture_not_granted": "L'acquisizione dello schermo non è stata consentita, quindi non si può tradurre. Tocca di nuovo Avvia e consenti l'acquisizione."
 }

@@ -479,4 +479,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Det gick för långsamt';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Översättningar kan inte visas än: aktivera ”Visa ovanpå andra appar” för Screen Translate och kom tillbaka.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Skärminspelning tilläts inte, så inget kan översättas. Tryck på Start igen och tillåt skärminspelning.';
 }

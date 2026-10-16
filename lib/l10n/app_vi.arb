@@ -145,5 +145,7 @@
   "first_failure_title": "Không có gì được dịch. Chuyện gì đã xảy ra?",
   "first_failure_no_text": "Không tìm thấy văn bản trên màn hình",
   "first_failure_wrong": "Bản dịch bị sai",
-  "first_failure_slow": "Quá chậm"
+  "first_failure_slow": "Quá chậm",
+  "overlay_permission_not_granted": "Chưa thể hiện bản dịch: hãy bật \"Hiển thị trên ứng dụng khác\" cho Screen Translate rồi quay lại.",
+  "screen_capture_not_granted": "Chưa cho phép ghi màn hình nên không thể dịch. Nhấn Bắt đầu lần nữa và cho phép ghi màn hình."
 }

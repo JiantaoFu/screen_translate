@@ -11,6 +11,7 @@ import 'package:screen_translate/widgets/first_failure_dialog.dart';
 import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
+import '../services/overlay_service.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../services/firebase_analytics_service.dart';
@@ -278,6 +279,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Sessions are often ended from the floating button or the system stop
+    // chip, never via our Stop button; ask on return to the app too.
+    // Never on the resume that ends a permission/consent screen: skipped
+    // while Start is in progress and for a few seconds after it.
+    if (state == AppLifecycleState.resumed && mounted) {
+      final provider = context.read<TranslationProvider>();
+      if (TranslationProvider.mayPromptReviewOnResume(
+        isTranslating: provider.isTranslating,
+        isStarting: provider.isStarting,
+        startEndedAt: provider.startEndedAt,
+        now: DateTime.now(),
+      )) {
+        _trackTranslationAndPromptReview(context);
+      }
+    }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);
     } else if (state == AppLifecycleState.resumed && _onnxInterruptedByBackground.isNotEmpty) {
@@ -331,10 +347,38 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// No silent returns from Start: say what is missing and how to fix it.
+  void _explainStartOutcome(BuildContext context, StartOutcome outcome) {
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    switch (outcome) {
+      case StartOutcome.overlayDenied:
+        messenger.showSnackBar(SnackBar(
+          duration: const Duration(seconds: 8),
+          content: Text(l.overlay_permission_not_granted),
+          action: SnackBarAction(
+            label: l.grant_permission,
+            onPressed: () => OverlayService().requestOverlayPermission(),
+          ),
+        ));
+        break;
+      case StartOutcome.captureDenied:
+        messenger.showSnackBar(SnackBar(
+          duration: const Duration(seconds: 6),
+          content: Text(l.screen_capture_not_granted),
+        ));
+        break;
+      default:
+        break;
+    }
+  }
+
+  /// Successes are counted by TranslationProvider (once per live session
+  /// that drew a translation); this only asks, while we are in front.
   Future<void> _trackTranslationAndPromptReview(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final review = ReviewPromptService(prefs);
-    await review.recordSuccessfulTranslation();
     if (!context.mounted) return;
     // Unavailable review API: logged only. No snackbar, no store fallback.
     final inAppReview = InAppReview.instance;
@@ -454,7 +498,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
                                         return;
                                       }
-                                      await provider.startTranslation();
+                                      final outcome = await provider.startTranslation();
+                                      if (!context.mounted) return;
+                                      _explainStartOutcome(context, outcome);
                                     }
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(

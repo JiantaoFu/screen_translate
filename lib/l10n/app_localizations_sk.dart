@@ -476,4 +476,12 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Bolo to príliš pomalé';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Preklady sa zatiaľ nemôžu zobraziť: zapnite pre Screen Translate „Zobrazenie cez iné aplikácie“ a vráťte sa.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Záznam obrazovky nebol povolený, takže nemožno nič preložiť. Klepnite znova na Spustiť a záznam povoľte.';
 }

@@ -480,4 +480,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Działało zbyt wolno';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Tłumaczenia nie mogą się jeszcze pojawić: włącz „Wyświetlanie nad innymi aplikacjami” dla Screen Translate i wróć.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Nie zezwolono na nagrywanie ekranu, więc nie można nic przetłumaczyć. Dotknij ponownie Start i zezwól na nagrywanie.';
 }

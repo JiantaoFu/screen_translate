@@ -145,5 +145,7 @@
   "first_failure_title": "Nic nie zostało przetłumaczone. Co się stało?",
   "first_failure_no_text": "Nie znaleziono tekstu na ekranie",
   "first_failure_wrong": "Tłumaczenie było błędne",
-  "first_failure_slow": "Działało zbyt wolno"
+  "first_failure_slow": "Działało zbyt wolno",
+  "overlay_permission_not_granted": "Tłumaczenia nie mogą się jeszcze pojawić: włącz „Wyświetlanie nad innymi aplikacjami” dla Screen Translate i wróć.",
+  "screen_capture_not_granted": "Nie zezwolono na nagrywanie ekranu, więc nie można nic przetłumaczyć. Dotknij ponownie Start i zezwól na nagrywanie."
 }

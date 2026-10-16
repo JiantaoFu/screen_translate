@@ -480,4 +480,12 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'A fost prea lent';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Traducerile nu pot apărea încă: activați „Afișare peste alte aplicații” pentru Screen Translate, apoi reveniți.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Captura de ecran nu a fost permisă, deci nu se poate traduce nimic. Atingeți din nou Pornire și permiteți captura.';
 }

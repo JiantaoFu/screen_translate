@@ -9,27 +9,58 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    ReviewPromptService.resetSessionForTest();
     prefs = await SharedPreferences.getInstance();
     now = DateTime.utc(2026, 10, 5, 12);
     service = ReviewPromptService(prefs, now: () => now);
   });
 
-  test('does not prompt before the 5th success', () async {
-    for (var i = 0; i < 4; i++) {
-      await service.recordSuccessfulTranslation();
-    }
+  test('threshold is 3 successful sessions', () {
+    expect(ReviewPromptService.successThreshold, 3);
+  });
+
+  test('does not prompt before the 3rd success', () async {
+    await service.recordSuccessfulTranslation();
+    await service.recordSuccessfulTranslation();
     expect(service.shouldPrompt(), isFalse);
   });
 
-  test('prompts on the 5th success', () async {
-    for (var i = 0; i < 5; i++) {
+  test('prompts on the 3rd success', () async {
+    for (var i = 0; i < 3; i++) {
       await service.recordSuccessfulTranslation();
     }
     expect(service.shouldPrompt(), isTrue);
   });
 
-  test('never prompts after an error was recorded', () async {
-    for (var i = 0; i < 5; i++) {
+  test('success count persists across service instances (app restarts)', () async {
+    await service.recordSuccessfulTranslation();
+    await service.recordSuccessfulTranslation();
+    final again = ReviewPromptService(prefs, now: () => now);
+    await again.recordSuccessfulTranslation();
+    expect(again.successCount, 3);
+    expect(again.shouldPrompt(), isTrue);
+  });
+
+  test('legacy permanent error flag from <= 1.2.5 no longer blocks', () async {
+    await prefs.setBool(ReviewPromptService.errorFlagKey, true);
+    for (var i = 0; i < 3; i++) {
+      await service.recordSuccessfulTranslation();
+    }
+    expect(service.shouldPrompt(), isTrue);
+  });
+
+  test('an error only blocks for the current app run', () async {
+    for (var i = 0; i < 3; i++) {
+      await service.recordSuccessfulTranslation();
+    }
+    await service.recordError();
+    expect(service.shouldPrompt(), isFalse);
+    ReviewPromptService.resetSessionForTest(); // next app run
+    expect(ReviewPromptService(prefs, now: () => now).shouldPrompt(), isTrue);
+  });
+
+  test('does not prompt after an error in this run', () async {
+    for (var i = 0; i < ReviewPromptService.successThreshold; i++) {
       await service.recordSuccessfulTranslation();
     }
     await service.recordError();
@@ -37,7 +68,7 @@ void main() {
   });
 
   test('at most once per 90 days', () async {
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < ReviewPromptService.successThreshold; i++) {
       await service.recordSuccessfulTranslation();
     }
     expect(service.shouldPrompt(), isTrue);
@@ -52,7 +83,7 @@ void main() {
   });
 
   test('error recorded later also blocks a cooldown-eligible prompt', () async {
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < ReviewPromptService.successThreshold; i++) {
       await service.recordSuccessfulTranslation();
     }
     await service.markPromptShown();
@@ -63,7 +94,7 @@ void main() {
 
   group('maybeRequestReview', () {
     Future<void> reachThreshold() async {
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < ReviewPromptService.successThreshold; i++) {
         await service.recordSuccessfulTranslation();
       }
     }

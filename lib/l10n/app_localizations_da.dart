@@ -477,4 +477,12 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Det var for langsomt';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Oversættelser kan ikke vises endnu: Slå \"Vis over andre apps\" til for Screen Translate, og vend tilbage.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Skærmoptagelse blev ikke tilladt, så intet kan oversættes. Tryk på Start igen, og tillad skærmoptagelse.';
 }

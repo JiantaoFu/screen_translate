@@ -469,4 +469,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get first_failure_slow => '動作が遅すぎた';
+
+  @override
+  String get overlay_permission_not_granted =>
+      '翻訳を表示できません。Screen Translate の「他のアプリの上に重ねて表示」をオンにしてから戻ってください。';
+
+  @override
+  String get screen_capture_not_granted =>
+      '画面の録画が許可されなかったため翻訳できません。もう一度開始をタップして、画面の録画を許可してください。';
 }

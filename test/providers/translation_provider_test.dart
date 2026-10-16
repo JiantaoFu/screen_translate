@@ -341,4 +341,69 @@ void main() {
       expect(_overlaps(boxes[0], boxes[1]), false);
     });
   });
+
+  group('session success counting and system stop', () {
+    late int successes;
+    late TranslationProvider p;
+
+    setUp(() {
+      successes = 0;
+      p = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+        onSessionSucceeded: () async => successes++,
+      );
+    });
+
+    test('a session counts once however many ticks draw translations', () {
+      p.debugSetTranslating(true);
+      for (var i = 0; i < 20; i++) {
+        p.debugMarkTranslationShown();
+      }
+      expect(successes, 1);
+      expect(p.sessionProducedTranslations, isTrue);
+    });
+
+    test('projectionStopped resets state so Start works again', () {
+      p.debugSetTranslating(true);
+      var notified = 0;
+      p.addListener(() => notified++);
+      p.handleProjectionStoppedBySystem();
+      expect(p.isTranslating, isFalse);
+      expect(p.isStarting, isFalse);
+      expect(notified, 1);
+    });
+
+    test('projectionStopped when idle is a no-op', () {
+      var notified = 0;
+      p.addListener(() => notified++);
+      p.handleProjectionStoppedBySystem();
+      expect(notified, 0);
+    });
+  });
+
+  group('review prompt on resume', () {
+    final now = DateTime(2026, 10, 16, 12);
+    bool may({bool translating = false, bool starting = false, DateTime? ended}) =>
+        TranslationProvider.mayPromptReviewOnResume(
+          isTranslating: translating, isStarting: starting, startEndedAt: ended, now: now);
+
+    test('idle with no recent Start: allowed', () {
+      expect(may(), isTrue);
+      expect(may(ended: now.subtract(const Duration(minutes: 1))), isTrue);
+    });
+    test('not while translating or while Start walks permission screens', () {
+      expect(may(translating: true), isFalse);
+      expect(may(starting: true), isFalse);
+    });
+    test('not right after a Start attempt (return from settings/consent)', () {
+      expect(may(ended: now.subtract(const Duration(seconds: 2))), isFalse);
+      expect(may(ended: now.subtract(const Duration(seconds: 9))), isFalse);
+      expect(may(ended: now.subtract(const Duration(seconds: 11))), isTrue);
+    });
+  });
 }

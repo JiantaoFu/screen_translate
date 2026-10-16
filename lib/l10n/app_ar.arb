@@ -145,5 +145,7 @@
   "first_failure_title": "لم تتم ترجمة أي شيء. ماذا حدث؟",
   "first_failure_no_text": "لم يتم العثور على نص على الشاشة",
   "first_failure_wrong": "كانت الترجمة خاطئة",
-  "first_failure_slow": "كان بطيئًا جدًا"
+  "first_failure_slow": "كان بطيئًا جدًا",
+  "overlay_permission_not_granted": "لا يمكن عرض الترجمات بعد: فعّل \"العرض فوق التطبيقات الأخرى\" لـ Screen Translate ثم ارجع.",
+  "screen_capture_not_granted": "لم يُسمح بالتقاط الشاشة، لذا لا يمكن الترجمة. اضغط على بدء مرة أخرى واسمح بالتقاط الشاشة."
 }

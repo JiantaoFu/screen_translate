@@ -479,4 +479,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Terlalu lambat';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Terjemahan belum bisa muncul: aktifkan \"Tampilkan di atas aplikasi lain\" untuk Screen Translate, lalu kembali.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Perekaman layar tidak diizinkan, jadi tidak ada yang bisa diterjemahkan. Ketuk Mulai lagi dan izinkan perekaman layar.';
 }

@@ -477,4 +477,12 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'See oli liiga aeglane';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Tõlkeid ei saa veel kuvada: lülitage Screen Translate\'i jaoks sisse „Kuva teiste rakenduste peal“ ja tulge tagasi.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Ekraanisalvestust ei lubatud, seega ei saa midagi tõlkida. Puudutage uuesti Alusta ja lubage ekraanisalvestus.';
 }

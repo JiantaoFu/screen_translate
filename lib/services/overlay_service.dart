@@ -65,8 +65,10 @@ class OverlayService {
   }
 
   /// Completes once the app has left the foreground (the settings page
-  /// opened) and come back to `resumed`, or after [timeout].
-  static Future<void> waitForAppResume({Duration timeout = const Duration(minutes: 5)}) {
+  /// opened) and come back to `resumed`, or after [timeout]. A timeout is
+  /// not a failure: the caller re-checks the permission either way, so Start
+  /// (and `isStarting`) is never held for long.
+  static Future<void> waitForAppResume({Duration timeout = const Duration(seconds: 60)}) {
     final observer = ResumeAfterLeavingObserver();
     WidgetsBinding.instance.addObserver(observer);
     return observer.resumed.timeout(timeout, onTimeout: () {}).whenComplete(

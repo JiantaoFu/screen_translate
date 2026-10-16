@@ -385,4 +385,25 @@ void main() {
       expect(notified, 0);
     });
   });
+
+  group('review prompt on resume', () {
+    final now = DateTime(2026, 10, 16, 12);
+    bool may({bool translating = false, bool starting = false, DateTime? ended}) =>
+        TranslationProvider.mayPromptReviewOnResume(
+          isTranslating: translating, isStarting: starting, startEndedAt: ended, now: now);
+
+    test('idle with no recent Start: allowed', () {
+      expect(may(), isTrue);
+      expect(may(ended: now.subtract(const Duration(minutes: 1))), isTrue);
+    });
+    test('not while translating or while Start walks permission screens', () {
+      expect(may(translating: true), isFalse);
+      expect(may(starting: true), isFalse);
+    });
+    test('not right after a Start attempt (return from settings/consent)', () {
+      expect(may(ended: now.subtract(const Duration(seconds: 2))), isFalse);
+      expect(may(ended: now.subtract(const Duration(seconds: 9))), isFalse);
+      expect(may(ended: now.subtract(const Duration(seconds: 11))), isTrue);
+    });
+  });
 }

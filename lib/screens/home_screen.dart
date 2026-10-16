@@ -281,10 +281,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Sessions are often ended from the floating button or the system stop
     // chip, never via our Stop button; ask on return to the app too.
-    if (state == AppLifecycleState.resumed && mounted &&
-        !context.read<TranslationProvider>().isTranslating &&
-        !context.read<TranslationProvider>().isStarting) {
-      _trackTranslationAndPromptReview(context);
+    // Never on the resume that ends a permission/consent screen: skipped
+    // while Start is in progress and for a few seconds after it.
+    if (state == AppLifecycleState.resumed && mounted) {
+      final provider = context.read<TranslationProvider>();
+      if (TranslationProvider.mayPromptReviewOnResume(
+        isTranslating: provider.isTranslating,
+        isStarting: provider.isStarting,
+        startEndedAt: provider.startEndedAt,
+        now: DateTime.now(),
+      )) {
+        _trackTranslationAndPromptReview(context);
+      }
     }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);

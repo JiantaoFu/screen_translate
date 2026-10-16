@@ -39,7 +39,7 @@ SHOTS = {
     'manga': dict(
         text={'en-US': ('Translate manga right on the page', 'Even vertical speech bubbles'),
               'zh-CN': ('漫画对白，原地翻译', '竖排气泡也能读懂'),
-              'ja-JP': ('マンガのセリフをその場で翻訳', '縦書きの吹き出しにも対応')}),
+              'ja-JP': ('マンガのセリフをその場で翻訳', '海外コミックもそのまま読める')}),
     'game': dict(
         text={'en-US': ('Play games in any language', 'Dialogue translated as you play'),
               'zh-CN': ('外语游戏，边玩边懂', '对话实时翻译'),

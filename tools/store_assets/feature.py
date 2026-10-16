@@ -46,9 +46,7 @@ def main():
         y += 44
 
     # Right: the top of the translated manga page in a phone, tilted slightly.
-    # The listing's own capture: the Japanese listing has no manga shot
-    # (Japanese artwork translated into Japanese), so it uses the webtoon.
-    scene = 'webtoon' if args.locale == 'ja-JP' else 'manga'
+    scene = 'webtoon' if args.locale == 'ja-JP' else 'manga'   # ja: the webtoon reads better than English→Japanese manga
     raw = os.path.join(c.RAW, args.locale, scene + '.png')
     shot = Image.open(raw).convert('RGB').crop((0, 0, 1080, 1500)).resize((324, 450), Image.LANCZOS)
     phone = Image.new('RGBA', (324 + 28, 450 + 28), (0, 0, 0, 0))

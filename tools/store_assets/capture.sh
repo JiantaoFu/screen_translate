@@ -26,8 +26,8 @@ mode() { [ "$(target)" = en ] && echo onnx || echo onDevice; }
 default_scenes() {
   case $LOCALE in
     # Japanese artwork translated into Japanese makes no sense: the Japanese
-    # listing shows Korean and English sources only.
-    ja-JP) echo "webtoon chat home settings languages";;
+    # listing's manga and game use English lines (manga_en, tavern_en_lines).
+    ja-JP) echo "manga game webtoon chat home settings languages";;
     *) echo "manga game webtoon chat home settings languages";;
   esac
 }
@@ -36,8 +36,8 @@ SCENES=${*:-$(default_scenes)}
 # Content scene → image and source language.
 scene_image() {
   case $1 in
-    manga) [ "$(target)" = en ] && echo manga.png || echo manga_cjk.png;;
-    game) [ "$(target)" = en ] && echo tavern_en.png || echo tavern.png;;
+    manga) case $(target) in en) echo manga.png;; ja) echo manga_en.png;; *) echo manga_cjk.png;; esac;;
+    game) case $(target) in en) echo tavern_en.png;; ja) echo tavern_en_lines.png;; *) echo tavern.png;; esac;;
     webtoon) [ "$(target)" = en ] && echo webtoon_screen.png || echo webtoon_screen_cjk.png;;
     chat) case $(target) in en) echo chat_ja.png;; ja) echo chat_en_ja.png;; *) echo chat_en.png;; esac;;
   esac
@@ -45,6 +45,7 @@ scene_image() {
 scene_lang() {
   case $1 in
     webtoon) echo ko;;
+    manga|game) [ "$(target)" = ja ] && echo en || echo ja;;
     chat) [ "$(target)" = en ] && echo ja || echo en;;
     *) echo ja;;
   esac

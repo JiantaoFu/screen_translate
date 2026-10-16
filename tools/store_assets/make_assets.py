@@ -145,10 +145,39 @@ def manga_cjk(out):
     im.save(os.path.join(out, 'manga_cjk.png'))
 
 
+def english_for_ja(out):
+    # The Japanese listing can't show the Japanese artwork translated into
+    # Japanese, so its manga and game shots use English lines (what Japanese
+    # users translate most: English comics and games).
+    sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'demo_video'))
+    import make_assets as demo
+    spec = demo.LINES['manga-1-jp.png']
+    im = Image.open(os.path.join(demo.ORIG, 'manga-1-jp.png')).convert('RGB')
+    demo.clear_bubble(im, spec['box'], spec['fill'])
+    draw_lines(ImageDraw.Draw(im), spec['box'], ENGLISH_FOR_JA['manga'], 'C:/Windows/Fonts/arialbd.ttf', 40, (0, 0, 0))
+    im.save(os.path.join(out, 'manga_en.png'))
+
+    tav = LINES['tavern.png']
+    im = Image.open(os.path.join(ORIG, 'tavern.png')).convert('RGB')
+    fix_tavern_icon(im)
+    d = ImageDraw.Draw(im)
+    for item, lines in zip(tav['items'], ENGLISH_FOR_JA['game']):
+        draw_lines(d, item['box'], lines, 'C:/Windows/Fonts/seguisb.ttf', item['size'], tav['ink'],
+                   item.get('align', 'center'), item.get('valign', 'middle'))
+    im.save(os.path.join(out, 'tavern_en_lines.png'))
+
+
+ENGLISH_FOR_JA = {
+    'manga': ['The robot', 'is destroying', 'the city!'],   # all-caps lines were split or misread on the tablet ("CIT", "街！")
+    'game': [['Martha'], ['Welcome, traveler!', "Today's special is stew."]],
+}
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'assets')
     os.makedirs(out, exist_ok=True)
     manga_cjk(out)
+    english_for_ja(out)
     notes = []
     for lang, spec in CHATS.items():
         draw_chat(lang).save(os.path.join(out, f'chat_{lang}.png'))

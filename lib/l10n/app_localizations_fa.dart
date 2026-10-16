@@ -466,4 +466,16 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'ارسال بازخورد با ایمیل';
+
+  @override
+  String get first_failure_title => 'چیزی ترجمه نشد. چه اتفاقی افتاد؟';
+
+  @override
+  String get first_failure_no_text => 'متنی روی صفحه پیدا نشد';
+
+  @override
+  String get first_failure_wrong => 'ترجمه اشتباه بود';
+
+  @override
+  String get first_failure_slow => 'خیلی کند بود';
 }

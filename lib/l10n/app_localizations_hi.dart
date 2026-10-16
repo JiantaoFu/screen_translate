@@ -467,4 +467,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'ईमेल से फ़ीडबैक भेजें';
+
+  @override
+  String get first_failure_title => 'कुछ भी अनुवाद नहीं हुआ। क्या हुआ?';
+
+  @override
+  String get first_failure_no_text => 'स्क्रीन पर कोई टेक्स्ट नहीं मिला';
+
+  @override
+  String get first_failure_wrong => 'अनुवाद गलत था';
+
+  @override
+  String get first_failure_slow => 'यह बहुत धीमा था';
 }

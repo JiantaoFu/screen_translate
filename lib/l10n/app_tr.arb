@@ -141,5 +141,9 @@
   "download_failed_title": "Dil paketi indirilemedi",
   "download_failed_body": "\"{pack}\" birkaç denemeden sonra indirilemedi. Bağlantınızı kontrol edip yeniden deneyin veya Bulut yapay zekaya geçin (çevrimdışı paket gerekmez).",
   "switch_to_cloud_ai": "Bulut yapay zekaya geç",
-  "send_feedback_by_email": "E-postayla geri bildirim gönder"
+  "send_feedback_by_email": "E-postayla geri bildirim gönder",
+  "first_failure_title": "Hiçbir şey çevrilmedi. Ne oldu?",
+  "first_failure_no_text": "Ekranda metin bulunamadı",
+  "first_failure_wrong": "Çeviri yanlıştı",
+  "first_failure_slow": "Çok yavaştı"
 }

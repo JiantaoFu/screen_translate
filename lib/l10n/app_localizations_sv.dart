@@ -467,4 +467,16 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Skicka feedback via e-post';
+
+  @override
+  String get first_failure_title => 'Inget översattes. Vad hände?';
+
+  @override
+  String get first_failure_no_text => 'Ingen text hittades på skärmen';
+
+  @override
+  String get first_failure_wrong => 'Översättningen var fel';
+
+  @override
+  String get first_failure_slow => 'Det gick för långsamt';
 }

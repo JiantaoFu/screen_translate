@@ -462,4 +462,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'ส่งความคิดเห็นทางอีเมล';
+
+  @override
+  String get first_failure_title => 'ไม่มีอะไรถูกแปล เกิดอะไรขึ้น?';
+
+  @override
+  String get first_failure_no_text => 'ไม่พบข้อความบนหน้าจอ';
+
+  @override
+  String get first_failure_wrong => 'คำแปลไม่ถูกต้อง';
+
+  @override
+  String get first_failure_slow => 'ช้าเกินไป';
 }

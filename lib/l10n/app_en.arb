@@ -196,5 +196,9 @@
     }
   },
   "switch_to_cloud_ai": "Switch to Cloud AI",
-  "send_feedback_by_email": "Send feedback by email"
+  "send_feedback_by_email": "Send feedback by email",
+  "first_failure_title": "Nothing was translated. What happened?",
+  "first_failure_no_text": "No text was found on screen",
+  "first_failure_wrong": "The translation was wrong",
+  "first_failure_slow": "It was too slow"
 }

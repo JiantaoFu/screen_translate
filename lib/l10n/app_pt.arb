@@ -141,5 +141,9 @@
   "download_failed_title": "Falha ao baixar o pacote de idioma",
   "download_failed_body": "Não foi possível baixar o pacote \"{pack}\" após várias tentativas. Verifique sua conexão e tente novamente ou mude para a IA na nuvem (não precisa de pacote offline).",
   "switch_to_cloud_ai": "Usar IA na nuvem",
-  "send_feedback_by_email": "Enviar feedback por e-mail"
+  "send_feedback_by_email": "Enviar feedback por e-mail",
+  "first_failure_title": "Nada foi traduzido. O que aconteceu?",
+  "first_failure_no_text": "Nenhum texto foi encontrado na tela",
+  "first_failure_wrong": "A tradução estava errada",
+  "first_failure_slow": "Estava muito lento"
 }

@@ -141,5 +141,9 @@
   "download_failed_title": "语言包下载失败",
   "download_failed_body": "多次尝试后仍无法下载“{pack}”。请检查网络后重试，或改用云端 AI（无需离线语言包）。",
   "switch_to_cloud_ai": "改用云端 AI",
-  "send_feedback_by_email": "通过邮件发送反馈"
+  "send_feedback_by_email": "通过邮件发送反馈",
+  "first_failure_title": "没有翻译出任何内容。发生了什么？",
+  "first_failure_no_text": "屏幕上没有找到文字",
+  "first_failure_wrong": "翻译不对",
+  "first_failure_slow": "太慢了"
 }

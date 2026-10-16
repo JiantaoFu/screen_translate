@@ -465,4 +465,16 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Saada tagasisidet e-postiga';
+
+  @override
+  String get first_failure_title => 'Midagi ei tõlgitud. Mis juhtus?';
+
+  @override
+  String get first_failure_no_text => 'Ekraanilt ei leitud teksti';
+
+  @override
+  String get first_failure_wrong => 'Tõlge oli vale';
+
+  @override
+  String get first_failure_slow => 'See oli liiga aeglane';
 }

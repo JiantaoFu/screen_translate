@@ -16,6 +16,7 @@ import '../services/onnx_translation_service.dart';
 import '../models/ocr_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/firebase_analytics_service.dart';
+import '../services/activation_tracker.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -415,8 +416,16 @@ class TranslationProvider with ChangeNotifier {
     if (_isTranslating) return;
 
     if (Platform.isAndroid) {
+      final activation = ActivationTracker.instance;
+      activation.startRequested(
+        sourceLanguage: _sourceLanguage,
+        targetLanguage: _targetLanguage,
+        mode: _translationMode.name,
+      );
       try {
-        if (await _overlayService.ensureOverlayPermission(_context!)) {
+        final overlayGranted = await _overlayService.ensureOverlayPermission(_context!);
+        activation.overlayPermissionResult(overlayGranted);
+        if (overlayGranted) {
           // Request MediaProjection consent BEFORE showing the floating
           // control overlay. If the user backs out of (or denies) that
           // system dialog, requestScreenCapture() returns false here and we
@@ -424,6 +433,7 @@ class TranslationProvider with ChangeNotifier {
           // was started first, so a denied/cancelled consent dialog left a
           // floating button on screen with no active capture behind it.
           final captureGranted = await _startAndroidScreenCapture();
+          activation.capturePermissionResult(captureGranted);
           if (!captureGranted) {
             print('Screen capture permission denied or cancelled, not starting translation');
             return;
@@ -431,6 +441,7 @@ class TranslationProvider with ChangeNotifier {
 
           _isTranslating = true;
           _sessionProducedTranslations = false;
+          activation.liveStarted();
 
           FirebaseAnalyticsService().trackTranslation(
             sourceLanguage: _sourceLanguage,
@@ -444,6 +455,7 @@ class TranslationProvider with ChangeNotifier {
         }
       } catch (e) {
         print('Error starting translation: $e');
+        activation.failure('start', e);
         await stopTranslation();
       }
     }
@@ -535,8 +547,13 @@ class TranslationProvider with ChangeNotifier {
               // translations). Anything inside a box we're showing is ours:
               // drop it and keep that box as is.
               final coveredIds = <int>{};
+              final translatableOcr =
+                  rawOcrResults.where((r) => hasTranslatableText(r, _sourceLanguage)).toList();
+              // Counted before our own boxes are removed, so a screen whose
+              // text is all already translated is not mistaken for an empty one.
+              ActivationTracker.instance.ocrFrame(translatableOcr.length);
               final ocrResults = withoutOwnOverlayText(
-                rawOcrResults.where((r) => hasTranslatableText(r, _sourceLanguage)).toList(),
+                translatableOcr,
                 _isManualTranslationRequested
                     ? const <int, Rect>{}
                     : {for (final e in _displayedOverlays.entries) e.key: e.value.drawnRect},
@@ -842,6 +859,7 @@ class TranslationProvider with ChangeNotifier {
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
                 _sessionProducedTranslations = true;
+                ActivationTracker.instance.translationShown(newIndices.length);
                 notifyListeners();
               }
             } else {
@@ -854,6 +872,7 @@ class TranslationProvider with ChangeNotifier {
       } catch (e, stackTrace) {
         print('Error processing captured screen: $e');
         print('Stack trace: $stackTrace');
+        ActivationTracker.instance.failure('capture_tick', e);
       } finally {
         if (pendingPlaceholders.isNotEmpty) {
           try {
@@ -887,6 +906,7 @@ class TranslationProvider with ChangeNotifier {
   }
 
   Future<void> stopTranslation() async {
+    ActivationTracker.instance.liveStopped();
     _isTranslating = false;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;

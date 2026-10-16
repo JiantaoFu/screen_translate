@@ -467,4 +467,16 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Siųsti atsiliepimą el. paštu';
+
+  @override
+  String get first_failure_title => 'Nieko neišversta. Kas atsitiko?';
+
+  @override
+  String get first_failure_no_text => 'Ekrane nerasta teksto';
+
+  @override
+  String get first_failure_wrong => 'Vertimas buvo neteisingas';
+
+  @override
+  String get first_failure_slow => 'Buvo per lėta';
 }

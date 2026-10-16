@@ -467,4 +467,16 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Pošalji povratne informacije e-poštom';
+
+  @override
+  String get first_failure_title => 'Ništa nije prevedeno. Što se dogodilo?';
+
+  @override
+  String get first_failure_no_text => 'Na zaslonu nije pronađen tekst';
+
+  @override
+  String get first_failure_wrong => 'Prijevod je bio pogrešan';
+
+  @override
+  String get first_failure_slow => 'Bilo je presporo';
 }

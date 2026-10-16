@@ -461,4 +461,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'שליחת משוב באימייל';
+
+  @override
+  String get first_failure_title => 'שום דבר לא תורגם. מה קרה?';
+
+  @override
+  String get first_failure_no_text => 'לא נמצא טקסט במסך';
+
+  @override
+  String get first_failure_wrong => 'התרגום היה שגוי';
+
+  @override
+  String get first_failure_slow => 'זה היה איטי מדי';
 }

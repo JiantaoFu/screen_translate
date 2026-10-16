@@ -141,5 +141,9 @@
   "download_failed_title": "Descărcarea pachetului de limbă a eșuat",
   "download_failed_body": "„{pack}” nu a putut fi descărcat după mai multe încercări. Verifică conexiunea și reîncearcă sau treci la AI din cloud (nu e nevoie de pachet offline).",
   "switch_to_cloud_ai": "Treci la AI din cloud",
-  "send_feedback_by_email": "Trimite feedback prin e-mail"
+  "send_feedback_by_email": "Trimite feedback prin e-mail",
+  "first_failure_title": "Nu s-a tradus nimic. Ce s-a întâmplat?",
+  "first_failure_no_text": "Nu s-a găsit text pe ecran",
+  "first_failure_wrong": "Traducerea a fost greșită",
+  "first_failure_slow": "A fost prea lent"
 }

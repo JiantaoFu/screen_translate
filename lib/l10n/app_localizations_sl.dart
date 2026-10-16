@@ -468,4 +468,16 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Pošlji povratne informacije po e-pošti';
+
+  @override
+  String get first_failure_title => 'Nič ni bilo prevedeno. Kaj se je zgodilo?';
+
+  @override
+  String get first_failure_no_text => 'Na zaslonu ni bilo najdenega besedila';
+
+  @override
+  String get first_failure_wrong => 'Prevod je bil napačen';
+
+  @override
+  String get first_failure_slow => 'Bilo je prepočasno';
 }

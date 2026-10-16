@@ -466,4 +466,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Kirim masukan lewat email';
+
+  @override
+  String get first_failure_title =>
+      'Tidak ada yang diterjemahkan. Apa yang terjadi?';
+
+  @override
+  String get first_failure_no_text => 'Tidak ada teks di layar';
+
+  @override
+  String get first_failure_wrong => 'Terjemahannya salah';
+
+  @override
+  String get first_failure_slow => 'Terlalu lambat';
 }

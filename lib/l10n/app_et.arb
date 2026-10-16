@@ -141,5 +141,9 @@
   "download_failed_title": "Keelepaketi allalaadimine ebaõnnestus",
   "download_failed_body": "Paketti „{pack}“ ei õnnestunud mitme katse järel alla laadida. Kontrolli ühendust ja proovi uuesti või lülitu pilve AI-le (võrguühenduseta paketti pole vaja).",
   "switch_to_cloud_ai": "Lülitu pilve AI-le",
-  "send_feedback_by_email": "Saada tagasisidet e-postiga"
+  "send_feedback_by_email": "Saada tagasisidet e-postiga",
+  "first_failure_title": "Midagi ei tõlgitud. Mis juhtus?",
+  "first_failure_no_text": "Ekraanilt ei leitud teksti",
+  "first_failure_wrong": "Tõlge oli vale",
+  "first_failure_slow": "See oli liiga aeglane"
 }

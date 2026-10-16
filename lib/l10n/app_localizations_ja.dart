@@ -457,4 +457,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'メールでフィードバックを送る';
+
+  @override
+  String get first_failure_title => '何も翻訳されませんでした。何が起きましたか？';
+
+  @override
+  String get first_failure_no_text => '画面にテキストが見つからなかった';
+
+  @override
+  String get first_failure_wrong => '翻訳が間違っていた';
+
+  @override
+  String get first_failure_slow => '動作が遅すぎた';
 }

@@ -141,5 +141,9 @@
   "download_failed_title": "Nepavyko atsisiųsti kalbos paketo",
   "download_failed_body": "Po kelių bandymų nepavyko atsisiųsti „{pack}“. Patikrinkite ryšį ir bandykite dar kartą arba perjunkite į debesijos DI (neprisijungus naudojamas paketas nereikalingas).",
   "switch_to_cloud_ai": "Perjungti į debesijos DI",
-  "send_feedback_by_email": "Siųsti atsiliepimą el. paštu"
+  "send_feedback_by_email": "Siųsti atsiliepimą el. paštu",
+  "first_failure_title": "Nieko neišversta. Kas atsitiko?",
+  "first_failure_no_text": "Ekrane nerasta teksto",
+  "first_failure_wrong": "Vertimas buvo neteisingas",
+  "first_failure_slow": "Buvo per lėta"
 }

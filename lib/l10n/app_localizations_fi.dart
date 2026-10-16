@@ -467,4 +467,16 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Lähetä palautetta sähköpostilla';
+
+  @override
+  String get first_failure_title => 'Mitään ei käännetty. Mitä tapahtui?';
+
+  @override
+  String get first_failure_no_text => 'Näytöltä ei löytynyt tekstiä';
+
+  @override
+  String get first_failure_wrong => 'Käännös oli väärä';
+
+  @override
+  String get first_failure_slow => 'Se oli liian hidas';
 }

@@ -141,5 +141,9 @@
   "download_failed_title": "Kielipaketin lataus epäonnistui",
   "download_failed_body": "Pakettia ”{pack}” ei voitu ladata useasta yrityksestä huolimatta. Tarkista yhteys ja yritä uudelleen tai vaihda pilvi-tekoälyyn (offline-pakettia ei tarvita).",
   "switch_to_cloud_ai": "Vaihda pilvi-tekoälyyn",
-  "send_feedback_by_email": "Lähetä palautetta sähköpostilla"
+  "send_feedback_by_email": "Lähetä palautetta sähköpostilla",
+  "first_failure_title": "Mitään ei käännetty. Mitä tapahtui?",
+  "first_failure_no_text": "Näytöltä ei löytynyt tekstiä",
+  "first_failure_wrong": "Käännös oli väärä",
+  "first_failure_slow": "Se oli liian hidas"
 }

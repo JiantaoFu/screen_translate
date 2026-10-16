@@ -141,5 +141,9 @@
   "download_failed_title": "भाषा पैक डाउनलोड विफल रहा",
   "download_failed_body": "कई प्रयासों के बाद भी \"{pack}\" डाउनलोड नहीं हो सका। कनेक्शन जांचें और फिर से प्रयास करें, या क्लाउड AI पर जाएं (ऑफ़लाइन पैक की ज़रूरत नहीं)।",
   "switch_to_cloud_ai": "क्लाउड AI पर जाएं",
-  "send_feedback_by_email": "ईमेल से फ़ीडबैक भेजें"
+  "send_feedback_by_email": "ईमेल से फ़ीडबैक भेजें",
+  "first_failure_title": "कुछ भी अनुवाद नहीं हुआ। क्या हुआ?",
+  "first_failure_no_text": "स्क्रीन पर कोई टेक्स्ट नहीं मिला",
+  "first_failure_wrong": "अनुवाद गलत था",
+  "first_failure_slow": "यह बहुत धीमा था"
 }

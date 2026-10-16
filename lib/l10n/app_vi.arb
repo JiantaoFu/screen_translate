@@ -141,5 +141,9 @@
   "download_failed_title": "Tải gói ngôn ngữ thất bại",
   "download_failed_body": "Không thể tải \"{pack}\" sau nhiều lần thử. Hãy kiểm tra kết nối rồi thử lại, hoặc chuyển sang AI đám mây (không cần gói ngoại tuyến).",
   "switch_to_cloud_ai": "Chuyển sang AI đám mây",
-  "send_feedback_by_email": "Gửi phản hồi qua email"
+  "send_feedback_by_email": "Gửi phản hồi qua email",
+  "first_failure_title": "Không có gì được dịch. Chuyện gì đã xảy ra?",
+  "first_failure_no_text": "Không tìm thấy văn bản trên màn hình",
+  "first_failure_wrong": "Bản dịch bị sai",
+  "first_failure_slow": "Quá chậm"
 }

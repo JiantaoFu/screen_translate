@@ -465,4 +465,16 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Poslat zpětnou vazbu e-mailem';
+
+  @override
+  String get first_failure_title => 'Nic se nepřeložilo. Co se stalo?';
+
+  @override
+  String get first_failure_no_text => 'Na obrazovce nebyl nalezen žádný text';
+
+  @override
+  String get first_failure_wrong => 'Překlad byl chybný';
+
+  @override
+  String get first_failure_slow => 'Bylo to příliš pomalé';
 }

@@ -7,6 +7,7 @@ import 'package:screen_translate/screens/translation_settings_screen.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
 import 'package:screen_translate/widgets/download_error_dialog.dart';
+import 'package:screen_translate/widgets/first_failure_dialog.dart';
 import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
@@ -440,6 +441,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       // app invites a 1-star review.
                                       if (worked) {
                                         await _trackTranslationAndPromptReview(context);
+                                      } else if (context.mounted) {
+                                        // First session that showed nothing:
+                                        // ask once what went wrong.
+                                        await showFirstFailureFeedback(context);
                                       }
                                     } else {
                                       if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {

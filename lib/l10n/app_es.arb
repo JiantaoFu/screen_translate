@@ -141,5 +141,9 @@
   "download_failed_title": "Error al descargar el paquete de idioma",
   "download_failed_body": "No se pudo descargar el paquete \"{pack}\" tras varios intentos. Comprueba tu conexión y vuelve a intentarlo, o cambia a IA en la nube (no necesita paquete de idioma).",
   "switch_to_cloud_ai": "Cambiar a IA en la nube",
-  "send_feedback_by_email": "Enviar comentarios por correo"
+  "send_feedback_by_email": "Enviar comentarios por correo",
+  "first_failure_title": "No se tradujo nada. ¿Qué pasó?",
+  "first_failure_no_text": "No se encontró texto en la pantalla",
+  "first_failure_wrong": "La traducción era incorrecta",
+  "first_failure_slow": "Fue demasiado lento"
 }

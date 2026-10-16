@@ -141,5 +141,9 @@
   "download_failed_title": "Échec du téléchargement du pack de langue",
   "download_failed_body": "Impossible de télécharger « {pack} » après plusieurs essais. Vérifiez la connexion et réessayez, ou passez à l'IA cloud (aucun pack hors ligne requis).",
   "switch_to_cloud_ai": "Passer à l'IA cloud",
-  "send_feedback_by_email": "Envoyer un commentaire par e-mail"
+  "send_feedback_by_email": "Envoyer un commentaire par e-mail",
+  "first_failure_title": "Rien n'a été traduit. Que s'est-il passé ?",
+  "first_failure_no_text": "Aucun texte trouvé à l'écran",
+  "first_failure_wrong": "La traduction était incorrecte",
+  "first_failure_slow": "C'était trop lent"
 }

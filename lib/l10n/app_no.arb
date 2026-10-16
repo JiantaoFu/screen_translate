@@ -141,5 +141,9 @@
   "download_failed_title": "Nedlasting av språkpakke mislyktes",
   "download_failed_body": "Kunne ikke laste ned «{pack}» etter flere forsøk. Sjekk tilkoblingen og prøv igjen, eller bytt til Sky-AI (ingen frakoblet pakke nødvendig).",
   "switch_to_cloud_ai": "Bytt til Sky-AI",
-  "send_feedback_by_email": "Send tilbakemelding på e-post"
+  "send_feedback_by_email": "Send tilbakemelding på e-post",
+  "first_failure_title": "Ingenting ble oversatt. Hva skjedde?",
+  "first_failure_no_text": "Fant ingen tekst på skjermen",
+  "first_failure_wrong": "Oversettelsen var feil",
+  "first_failure_slow": "Det var for tregt"
 }

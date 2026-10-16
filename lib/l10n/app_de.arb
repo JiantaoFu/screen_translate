@@ -141,5 +141,9 @@
   "download_failed_title": "Sprachpaket-Download fehlgeschlagen",
   "download_failed_body": "„{pack}“ konnte nach mehreren Versuchen nicht heruntergeladen werden. Verbindung prüfen und erneut versuchen, oder zu Cloud-KI wechseln (kein Offline-Paket nötig).",
   "switch_to_cloud_ai": "Zu Cloud-KI wechseln",
-  "send_feedback_by_email": "Feedback per E-Mail senden"
+  "send_feedback_by_email": "Feedback per E-Mail senden",
+  "first_failure_title": "Es wurde nichts übersetzt. Was ist passiert?",
+  "first_failure_no_text": "Auf dem Bildschirm wurde kein Text gefunden",
+  "first_failure_wrong": "Die Übersetzung war falsch",
+  "first_failure_slow": "Es war zu langsam"
 }

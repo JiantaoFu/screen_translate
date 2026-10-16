@@ -464,4 +464,16 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Poslať spätnú väzbu e-mailom';
+
+  @override
+  String get first_failure_title => 'Nič sa nepreložilo. Čo sa stalo?';
+
+  @override
+  String get first_failure_no_text => 'Na obrazovke sa nenašiel žiadny text';
+
+  @override
+  String get first_failure_wrong => 'Preklad bol nesprávny';
+
+  @override
+  String get first_failure_slow => 'Bolo to príliš pomalé';
 }

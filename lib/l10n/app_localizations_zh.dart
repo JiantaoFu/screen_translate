@@ -452,4 +452,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => '通过邮件发送反馈';
+
+  @override
+  String get first_failure_title => '没有翻译出任何内容。发生了什么？';
+
+  @override
+  String get first_failure_no_text => '屏幕上没有找到文字';
+
+  @override
+  String get first_failure_wrong => '翻译不对';
+
+  @override
+  String get first_failure_slow => '太慢了';
 }

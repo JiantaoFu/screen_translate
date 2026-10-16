@@ -468,4 +468,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Envoyer un commentaire par e-mail';
+
+  @override
+  String get first_failure_title =>
+      'Rien n\'a été traduit. Que s\'est-il passé ?';
+
+  @override
+  String get first_failure_no_text => 'Aucun texte trouvé à l\'écran';
+
+  @override
+  String get first_failure_wrong => 'La traduction était incorrecte';
+
+  @override
+  String get first_failure_slow => 'C\'était trop lent';
 }

@@ -141,5 +141,9 @@
   "download_failed_title": "ভাষা প্যাক ডাউনলোড ব্যর্থ হয়েছে",
   "download_failed_body": "কয়েকবার চেষ্টার পরেও \"{pack}\" ডাউনলোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন, অথবা ক্লাউড এআই-তে যান (অফলাইন প্যাক লাগবে না)।",
   "switch_to_cloud_ai": "ক্লাউড এআই-তে যান",
-  "send_feedback_by_email": "ইমেলে মতামত পাঠান"
+  "send_feedback_by_email": "ইমেলে মতামত পাঠান",
+  "first_failure_title": "কিছুই অনুবাদ হয়নি। কী হয়েছিল?",
+  "first_failure_no_text": "স্ক্রিনে কোনো টেক্সট পাওয়া যায়নি",
+  "first_failure_wrong": "অনুবাদ ভুল ছিল",
+  "first_failure_slow": "খুব ধীর ছিল"
 }

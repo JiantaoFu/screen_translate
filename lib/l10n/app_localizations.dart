@@ -1015,6 +1015,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send feedback by email'**
   String get send_feedback_by_email;
+
+  /// No description provided for @first_failure_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was translated. What happened?'**
+  String get first_failure_title;
+
+  /// No description provided for @first_failure_no_text.
+  ///
+  /// In en, this message translates to:
+  /// **'No text was found on screen'**
+  String get first_failure_no_text;
+
+  /// No description provided for @first_failure_wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'The translation was wrong'**
+  String get first_failure_wrong;
+
+  /// No description provided for @first_failure_slow.
+  ///
+  /// In en, this message translates to:
+  /// **'It was too slow'**
+  String get first_failure_slow;
 }
 
 class _AppLocalizationsDelegate

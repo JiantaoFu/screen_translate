@@ -141,5 +141,9 @@
   "download_failed_title": "Η λήψη του πακέτου γλώσσας απέτυχε",
   "download_failed_body": "Δεν ήταν δυνατή η λήψη του «{pack}» μετά από αρκετές προσπάθειες. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά ή μεταβείτε στο Cloud AI (δεν χρειάζεται πακέτο εκτός σύνδεσης).",
   "switch_to_cloud_ai": "Μετάβαση στο Cloud AI",
-  "send_feedback_by_email": "Αποστολή σχολίων με email"
+  "send_feedback_by_email": "Αποστολή σχολίων με email",
+  "first_failure_title": "Δεν μεταφράστηκε τίποτα. Τι συνέβη;",
+  "first_failure_no_text": "Δεν βρέθηκε κείμενο στην οθόνη",
+  "first_failure_wrong": "Η μετάφραση ήταν λάθος",
+  "first_failure_slow": "Ήταν πολύ αργό"
 }

@@ -467,4 +467,16 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'ইমেলে মতামত পাঠান';
+
+  @override
+  String get first_failure_title => 'কিছুই অনুবাদ হয়নি। কী হয়েছিল?';
+
+  @override
+  String get first_failure_no_text => 'স্ক্রিনে কোনো টেক্সট পাওয়া যায়নি';
+
+  @override
+  String get first_failure_wrong => 'অনুবাদ ভুল ছিল';
+
+  @override
+  String get first_failure_slow => 'খুব ধীর ছিল';
 }

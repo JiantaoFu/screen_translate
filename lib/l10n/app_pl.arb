@@ -141,5 +141,9 @@
   "download_failed_title": "Nie udało się pobrać pakietu językowego",
   "download_failed_body": "Nie udało się pobrać „{pack}” mimo kilku prób. Sprawdź połączenie i spróbuj ponownie lub przełącz na AI w chmurze (pakiet offline nie jest potrzebny).",
   "switch_to_cloud_ai": "Przełącz na AI w chmurze",
-  "send_feedback_by_email": "Wyślij opinię e-mailem"
+  "send_feedback_by_email": "Wyślij opinię e-mailem",
+  "first_failure_title": "Nic nie zostało przetłumaczone. Co się stało?",
+  "first_failure_no_text": "Nie znaleziono tekstu na ekranie",
+  "first_failure_wrong": "Tłumaczenie było błędne",
+  "first_failure_slow": "Działało zbyt wolno"
 }

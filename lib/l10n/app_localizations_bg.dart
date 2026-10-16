@@ -467,4 +467,16 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Обратна връзка по имейл';
+
+  @override
+  String get first_failure_title => 'Нищо не беше преведено. Какво се случи?';
+
+  @override
+  String get first_failure_no_text => 'На екрана не е намерен текст';
+
+  @override
+  String get first_failure_wrong => 'Преводът беше грешен';
+
+  @override
+  String get first_failure_slow => 'Беше твърде бавно';
 }

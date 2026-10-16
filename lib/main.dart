@@ -7,6 +7,7 @@ import 'services/ocr_service.dart';
 import 'services/translation_service.dart';
 import 'services/overlay_service.dart';
 import 'services/firebase_analytics_service.dart';
+import 'services/activation_tracker.dart';
 import 'services/firebase_remote_config_service.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -77,6 +78,7 @@ Future<void> main() async {
       final analytics = FirebaseAnalyticsService();
       await analytics.init().timeout(const Duration(seconds: 5));
       await analytics.trackAppOpen();
+      await ActivationTracker.instance.recordAppOpen();
 
       // Initialize OCR Sampling Service
       final ocrSamplingService = OCRSamplingService();

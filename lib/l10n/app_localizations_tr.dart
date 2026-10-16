@@ -468,4 +468,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'E-postayla geri bildirim gönder';
+
+  @override
+  String get first_failure_title => 'Hiçbir şey çevrilmedi. Ne oldu?';
+
+  @override
+  String get first_failure_no_text => 'Ekranda metin bulunamadı';
+
+  @override
+  String get first_failure_wrong => 'Çeviri yanlıştı';
+
+  @override
+  String get first_failure_slow => 'Çok yavaştı';
 }

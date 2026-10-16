@@ -141,5 +141,9 @@
   "download_failed_title": "언어 팩 다운로드 실패",
   "download_failed_body": "여러 번 시도했지만 \"{pack}\"을(를) 다운로드하지 못했습니다. 연결을 확인한 뒤 다시 시도하거나 클라우드 AI로 전환하세요(오프라인 팩 불필요).",
   "switch_to_cloud_ai": "클라우드 AI로 전환",
-  "send_feedback_by_email": "이메일로 피드백 보내기"
+  "send_feedback_by_email": "이메일로 피드백 보내기",
+  "first_failure_title": "아무것도 번역되지 않았습니다. 무슨 일이 있었나요?",
+  "first_failure_no_text": "화면에서 텍스트를 찾지 못했어요",
+  "first_failure_wrong": "번역이 잘못되었어요",
+  "first_failure_slow": "너무 느렸어요"
 }

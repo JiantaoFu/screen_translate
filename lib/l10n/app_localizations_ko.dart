@@ -457,4 +457,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => '이메일로 피드백 보내기';
+
+  @override
+  String get first_failure_title => '아무것도 번역되지 않았습니다. 무슨 일이 있었나요?';
+
+  @override
+  String get first_failure_no_text => '화면에서 텍스트를 찾지 못했어요';
+
+  @override
+  String get first_failure_wrong => '번역이 잘못되었어요';
+
+  @override
+  String get first_failure_slow => '너무 느렸어요';
 }

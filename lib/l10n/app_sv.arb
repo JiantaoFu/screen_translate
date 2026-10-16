@@ -141,5 +141,9 @@
   "download_failed_title": "Nedladdningen av språkpaketet misslyckades",
   "download_failed_body": "Det gick inte att ladda ned ”{pack}” efter flera försök. Kontrollera anslutningen och försök igen, eller byt till Moln-AI (inget offlinepaket behövs).",
   "switch_to_cloud_ai": "Byt till Moln-AI",
-  "send_feedback_by_email": "Skicka feedback via e-post"
+  "send_feedback_by_email": "Skicka feedback via e-post",
+  "first_failure_title": "Inget översattes. Vad hände?",
+  "first_failure_no_text": "Ingen text hittades på skärmen",
+  "first_failure_wrong": "Översättningen var fel",
+  "first_failure_slow": "Det gick för långsamt"
 }

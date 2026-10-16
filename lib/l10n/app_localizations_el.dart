@@ -470,4 +470,16 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Αποστολή σχολίων με email';
+
+  @override
+  String get first_failure_title => 'Δεν μεταφράστηκε τίποτα. Τι συνέβη;';
+
+  @override
+  String get first_failure_no_text => 'Δεν βρέθηκε κείμενο στην οθόνη';
+
+  @override
+  String get first_failure_wrong => 'Η μετάφραση ήταν λάθος';
+
+  @override
+  String get first_failure_slow => 'Ήταν πολύ αργό';
 }

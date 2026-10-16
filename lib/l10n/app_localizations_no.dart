@@ -465,4 +465,16 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Send tilbakemelding på e-post';
+
+  @override
+  String get first_failure_title => 'Ingenting ble oversatt. Hva skjedde?';
+
+  @override
+  String get first_failure_no_text => 'Fant ingen tekst på skjermen';
+
+  @override
+  String get first_failure_wrong => 'Oversettelsen var feil';
+
+  @override
+  String get first_failure_slow => 'Det var for tregt';
 }

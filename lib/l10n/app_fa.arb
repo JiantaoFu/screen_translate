@@ -141,5 +141,9 @@
   "download_failed_title": "دانلود بسته زبان ناموفق بود",
   "download_failed_body": "پس از چند تلاش، دانلود «{pack}» ممکن نشد. اتصال را بررسی و دوباره تلاش کنید یا به هوش مصنوعی ابری بروید (بدون بسته آفلاین).",
   "switch_to_cloud_ai": "رفتن به هوش مصنوعی ابری",
-  "send_feedback_by_email": "ارسال بازخورد با ایمیل"
+  "send_feedback_by_email": "ارسال بازخورد با ایمیل",
+  "first_failure_title": "چیزی ترجمه نشد. چه اتفاقی افتاد؟",
+  "first_failure_no_text": "متنی روی صفحه پیدا نشد",
+  "first_failure_wrong": "ترجمه اشتباه بود",
+  "first_failure_slow": "خیلی کند بود"
 }

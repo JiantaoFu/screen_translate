@@ -141,5 +141,9 @@
   "download_failed_title": "Stiahnutie jazykového balíka zlyhalo",
   "download_failed_body": "Balík „{pack}“ sa nepodarilo stiahnuť ani po niekoľkých pokusoch. Skontrolujte pripojenie a skúste to znova, alebo prepnite na cloudové AI (offline balík nie je potrebný).",
   "switch_to_cloud_ai": "Prepnúť na cloudové AI",
-  "send_feedback_by_email": "Poslať spätnú väzbu e-mailom"
+  "send_feedback_by_email": "Poslať spätnú väzbu e-mailom",
+  "first_failure_title": "Nič sa nepreložilo. Čo sa stalo?",
+  "first_failure_no_text": "Na obrazovke sa nenašiel žiadny text",
+  "first_failure_wrong": "Preklad bol nesprávny",
+  "first_failure_slow": "Bolo to príliš pomalé"
 }

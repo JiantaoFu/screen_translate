@@ -465,4 +465,16 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Send feedback via e-mail';
+
+  @override
+  String get first_failure_title => 'Intet blev oversat. Hvad skete der?';
+
+  @override
+  String get first_failure_no_text => 'Der blev ikke fundet tekst på skærmen';
+
+  @override
+  String get first_failure_wrong => 'Oversættelsen var forkert';
+
+  @override
+  String get first_failure_slow => 'Det var for langsomt';
 }

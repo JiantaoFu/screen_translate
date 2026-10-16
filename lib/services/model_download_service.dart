@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:screen_translate/services/activation_tracker.dart';
 import 'package:screen_translate/services/custom_model_manager.dart';
 import 'package:screen_translate/services/download_retry.dart';
 import 'package:screen_translate/services/review_prompt_service.dart';
@@ -221,6 +222,7 @@ class ModelDownloadService {
     // from zero. Map it onto what's left of the bar instead of jumping back.
     double? fallbackBase;
     _quickFailed.remove(langCode);
+    final watch = Stopwatch()..start();
     final future = _downloadModelWithFallbackImpl(
       langCode,
       onFallbackProgress: (p) {
@@ -232,8 +234,16 @@ class ModelDownloadService {
       poller.cancel();
       _quickFailed.remove(langCode);
       _emitQuickProgress(langCode, 1.0);
+      ActivationTracker.instance.modelDownload(
+        kind: 'quick', key: langCode, outcome: 'completed',
+        durationMs: watch.elapsedMilliseconds,
+      );
     }, onError: (Object e, StackTrace st) {
       _quickFailed.add(langCode);
+      ActivationTracker.instance.modelDownload(
+        kind: 'quick', key: langCode, outcome: 'failed',
+        durationMs: watch.elapsedMilliseconds, failure: e.runtimeType.toString(),
+      );
       Error.throwWithStackTrace(e, st);
     }).whenComplete(() {
       poller.cancel();
@@ -465,9 +475,18 @@ class ModelDownloadService {
     // Retry/timeout already live per file in downloadFileResumable (stall
     // timeout + Range resume, since 1.2.3). Here we only record the final
     // failure so the in-app review prompt never targets this device.
+    final watch = Stopwatch()..start();
     try {
       await _downloadOnnxModelOnce(langPairKey, onProgress: onProgress);
+      ActivationTracker.instance.modelDownload(
+        kind: 'ai', key: langPairKey, outcome: 'completed',
+        durationMs: watch.elapsedMilliseconds,
+      );
     } catch (e) {
+      ActivationTracker.instance.modelDownload(
+        kind: 'ai', key: langPairKey, outcome: 'failed',
+        durationMs: watch.elapsedMilliseconds, failure: e.runtimeType.toString(),
+      );
       await _recordDownloadError();
       rethrow;
     }

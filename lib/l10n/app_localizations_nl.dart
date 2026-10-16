@@ -465,4 +465,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Feedback per e-mail versturen';
+
+  @override
+  String get first_failure_title => 'Er is niets vertaald. Wat gebeurde er?';
+
+  @override
+  String get first_failure_no_text => 'Er is geen tekst op het scherm gevonden';
+
+  @override
+  String get first_failure_wrong => 'De vertaling was onjuist';
+
+  @override
+  String get first_failure_slow => 'Het was te langzaam';
 }

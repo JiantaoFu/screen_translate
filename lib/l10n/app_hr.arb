@@ -141,5 +141,9 @@
   "download_failed_title": "Preuzimanje jezičnog paketa nije uspjelo",
   "download_failed_body": "Paket „{pack}” nije moguće preuzeti ni nakon nekoliko pokušaja. Provjerite vezu i pokušajte ponovno ili prijeđite na Cloud AI (izvanmrežni paket nije potreban).",
   "switch_to_cloud_ai": "Prijeđi na Cloud AI",
-  "send_feedback_by_email": "Pošalji povratne informacije e-poštom"
+  "send_feedback_by_email": "Pošalji povratne informacije e-poštom",
+  "first_failure_title": "Ništa nije prevedeno. Što se dogodilo?",
+  "first_failure_no_text": "Na zaslonu nije pronađen tekst",
+  "first_failure_wrong": "Prijevod je bio pogrešan",
+  "first_failure_slow": "Bilo je presporo"
 }

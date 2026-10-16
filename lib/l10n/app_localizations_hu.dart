@@ -469,4 +469,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Visszajelzés küldése e-mailben';
+
+  @override
+  String get first_failure_title => 'Semmi sem lett lefordítva. Mi történt?';
+
+  @override
+  String get first_failure_no_text => 'Nem található szöveg a képernyőn';
+
+  @override
+  String get first_failure_wrong => 'A fordítás hibás volt';
+
+  @override
+  String get first_failure_slow => 'Túl lassú volt';
 }

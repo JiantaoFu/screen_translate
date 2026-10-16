@@ -468,4 +468,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Отправить отзыв по почте';
+
+  @override
+  String get first_failure_title => 'Ничего не было переведено. Что произошло?';
+
+  @override
+  String get first_failure_no_text => 'На экране не найден текст';
+
+  @override
+  String get first_failure_wrong => 'Перевод был неверным';
+
+  @override
+  String get first_failure_slow => 'Работало слишком медленно';
 }

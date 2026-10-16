@@ -141,5 +141,9 @@
   "download_failed_title": "Download af sprogpakke mislykkedes",
   "download_failed_body": "\"{pack}\" kunne ikke downloades efter flere forsøg. Tjek forbindelsen og prøv igen, eller skift til Cloud AI (ingen offlinepakke nødvendig).",
   "switch_to_cloud_ai": "Skift til Cloud AI",
-  "send_feedback_by_email": "Send feedback via e-mail"
+  "send_feedback_by_email": "Send feedback via e-mail",
+  "first_failure_title": "Intet blev oversat. Hvad skete der?",
+  "first_failure_no_text": "Der blev ikke fundet tekst på skærmen",
+  "first_failure_wrong": "Oversættelsen var forkert",
+  "first_failure_slow": "Det var for langsomt"
 }

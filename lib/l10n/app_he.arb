@@ -141,5 +141,9 @@
   "download_failed_title": "הורדת חבילת השפה נכשלה",
   "download_failed_body": "לא ניתן היה להוריד את \"{pack}\" לאחר מספר ניסיונות. בדקו את החיבור ונסו שוב, או עברו ל-AI בענן (ללא חבילה לא מקוונת).",
   "switch_to_cloud_ai": "מעבר ל-AI בענן",
-  "send_feedback_by_email": "שליחת משוב באימייל"
+  "send_feedback_by_email": "שליחת משוב באימייל",
+  "first_failure_title": "שום דבר לא תורגם. מה קרה?",
+  "first_failure_no_text": "לא נמצא טקסט במסך",
+  "first_failure_wrong": "התרגום היה שגוי",
+  "first_failure_slow": "זה היה איטי מדי"
 }

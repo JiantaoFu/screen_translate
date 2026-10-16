@@ -468,4 +468,16 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Trimite feedback prin e-mail';
+
+  @override
+  String get first_failure_title => 'Nu s-a tradus nimic. Ce s-a întâmplat?';
+
+  @override
+  String get first_failure_no_text => 'Nu s-a găsit text pe ecran';
+
+  @override
+  String get first_failure_wrong => 'Traducerea a fost greșită';
+
+  @override
+  String get first_failure_slow => 'A fost prea lent';
 }

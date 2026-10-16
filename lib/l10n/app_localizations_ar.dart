@@ -462,4 +462,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'إرسال ملاحظات عبر البريد';
+
+  @override
+  String get first_failure_title => 'لم تتم ترجمة أي شيء. ماذا حدث؟';
+
+  @override
+  String get first_failure_no_text => 'لم يتم العثور على نص على الشاشة';
+
+  @override
+  String get first_failure_wrong => 'كانت الترجمة خاطئة';
+
+  @override
+  String get first_failure_slow => 'كان بطيئًا جدًا';
 }

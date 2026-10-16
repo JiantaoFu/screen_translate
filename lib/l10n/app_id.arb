@@ -141,5 +141,9 @@
   "download_failed_title": "Gagal mengunduh paket bahasa",
   "download_failed_body": "Paket \"{pack}\" tidak dapat diunduh setelah beberapa kali percobaan. Periksa koneksi Anda lalu coba lagi, atau beralih ke AI Cloud (tidak perlu paket offline).",
   "switch_to_cloud_ai": "Beralih ke AI Cloud",
-  "send_feedback_by_email": "Kirim masukan lewat email"
+  "send_feedback_by_email": "Kirim masukan lewat email",
+  "first_failure_title": "Tidak ada yang diterjemahkan. Apa yang terjadi?",
+  "first_failure_no_text": "Tidak ada teks di layar",
+  "first_failure_wrong": "Terjemahannya salah",
+  "first_failure_slow": "Terlalu lambat"
 }

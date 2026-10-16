@@ -465,4 +465,17 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get send_feedback_by_email => 'Gửi phản hồi qua email';
+
+  @override
+  String get first_failure_title =>
+      'Không có gì được dịch. Chuyện gì đã xảy ra?';
+
+  @override
+  String get first_failure_no_text => 'Không tìm thấy văn bản trên màn hình';
+
+  @override
+  String get first_failure_wrong => 'Bản dịch bị sai';
+
+  @override
+  String get first_failure_slow => 'Quá chậm';
 }

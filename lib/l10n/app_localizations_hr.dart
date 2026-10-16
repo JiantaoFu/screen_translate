@@ -479,4 +479,12 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Bilo je presporo';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Prijevodi se još ne mogu prikazati: uključite „Prikaz preko drugih aplikacija” za Screen Translate i vratite se.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Snimanje zaslona nije dopušteno pa se ništa ne može prevesti. Ponovno dodirnite Pokreni i dopustite snimanje.';
 }

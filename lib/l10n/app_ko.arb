@@ -145,5 +145,7 @@
   "first_failure_title": "아무것도 번역되지 않았습니다. 무슨 일이 있었나요?",
   "first_failure_no_text": "화면에서 텍스트를 찾지 못했어요",
   "first_failure_wrong": "번역이 잘못되었어요",
-  "first_failure_slow": "너무 느렸어요"
+  "first_failure_slow": "너무 느렸어요",
+  "overlay_permission_not_granted": "아직 번역을 표시할 수 없습니다. Screen Translate의 '다른 앱 위에 표시'를 켠 후 돌아오세요.",
+  "screen_capture_not_granted": "화면 녹화가 허용되지 않아 번역할 수 없습니다. 시작을 다시 누르고 화면 녹화를 허용하세요."
 }

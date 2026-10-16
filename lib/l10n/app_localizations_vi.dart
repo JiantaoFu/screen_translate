@@ -478,4 +478,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Quá chậm';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Chưa thể hiện bản dịch: hãy bật \"Hiển thị trên ứng dụng khác\" cho Screen Translate rồi quay lại.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Chưa cho phép ghi màn hình nên không thể dịch. Nhấn Bắt đầu lần nữa và cho phép ghi màn hình.';
 }

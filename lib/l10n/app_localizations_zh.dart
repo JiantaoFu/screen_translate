@@ -464,4 +464,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get first_failure_slow => '太慢了';
+
+  @override
+  String get overlay_permission_not_granted =>
+      '还无法显示翻译：请为 Screen Translate 开启“显示在其他应用上层”（悬浮窗）权限，然后返回应用。';
+
+  @override
+  String get screen_capture_not_granted => '未允许录屏，无法翻译。请再次点击开始并允许屏幕录制。';
 }

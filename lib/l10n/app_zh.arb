@@ -145,5 +145,7 @@
   "first_failure_title": "没有翻译出任何内容。发生了什么？",
   "first_failure_no_text": "屏幕上没有找到文字",
   "first_failure_wrong": "翻译不对",
-  "first_failure_slow": "太慢了"
+  "first_failure_slow": "太慢了",
+  "overlay_permission_not_granted": "还无法显示翻译：请为 Screen Translate 开启“显示在其他应用上层”（悬浮窗）权限，然后返回应用。",
+  "screen_capture_not_granted": "未允许录屏，无法翻译。请再次点击开始并允许屏幕录制。"
 }

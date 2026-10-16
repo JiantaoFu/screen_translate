@@ -472,10 +472,7 @@ class ScreenCaptureService(private val context: Context, private val activity: A
                         registerCallback(object : MediaProjection.Callback() {
                             override fun onStop() {
                                 Log.d(TAG, "MediaProjection stopped")
-                                mainHandler.post {
-                                    cleanup()
-                                    context.stopService(Intent(context, ForegroundService::class.java))
-                                }
+                                mainHandler.post { onProjectionStoppedBySystem() }
                             }
                         }, null)
                     }
@@ -505,13 +502,42 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
     }
 
+    // MediaProjection ended without the app asking: the status-bar "stop
+    // sharing" chip, the screen locking, or another app starting a capture.
+    // Our own stopProjection() clears isCapturing first, so its echo of
+    // onStop() is ignored here.
+    private fun onProjectionStoppedBySystem() {
+        if (!isCapturing.getAndSet(false)) {
+            Log.d(TAG, "onStop after an app-initiated stop, nothing to do")
+            return
+        }
+        Log.d(TAG, "Projection stopped by the system, tearing down and telling Flutter")
+        cleanup()
+        try {
+            context.stopService(Intent(context, ForegroundService::class.java))
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping foreground service", e)
+        }
+        try {
+            val messenger = MainActivity.binaryMessenger
+            if (messenger != null) {
+                MethodChannel(messenger, "com.lomoware.screen_translate/translationService")
+                    .invokeMethod("projectionStopped", null)
+            } else {
+                Log.w(TAG, "projectionStopped: Flutter engine not attached")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error notifying Flutter of projection stop", e)
+        }
+    }
+
     fun stopProjection() {
         Log.d(TAG, "Stopping projection")
         try {
+            isCapturing.set(false) // Before stop(), so onStop() knows it was us
             mediaProjection?.stop()
             mediaProjection = null
             cleanup()
-            isCapturing.set(false) // Set capturing to false when projection stops
             context.stopService(Intent(context, ForegroundService::class.java))
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping projection", e)
@@ -735,11 +761,15 @@ class ScreenCaptureService(private val context: Context, private val activity: A
             // Unregister broadcast receiver
             unregisterScrollDetectionReceiver()
 
-            // Also stop and clear all overlays
-            val intent = Intent(context, OverlayService::class.java).apply {
-                action = "stop"
+            // Also stop and clear all overlays. Call the running service
+            // directly: after a system stop we are usually in the
+            // background, where startService() throws.
+            val overlay = OverlayService.getInstance()
+            if (overlay != null) {
+                overlay.stopAndRemoveAll()
+            } else {
+                Log.d(TAG, "OverlayService not running, no overlays to remove")
             }
-            context.startService(intent)
 
             Log.d(TAG, "Cleanup complete")
         } catch (e: Exception) {

@@ -479,4 +479,12 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Buvo per lėta';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Vertimai dar negali būti rodomi: įjunkite „Rodyti virš kitų programų“ programai Screen Translate ir grįžkite.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Ekrano įrašymas neleistas, todėl nieko negalima išversti. Dar kartą bakstelėkite Pradėti ir leiskite įrašymą.';
 }

@@ -145,5 +145,7 @@
   "first_failure_title": "Ingenting ble oversatt. Hva skjedde?",
   "first_failure_no_text": "Fant ingen tekst på skjermen",
   "first_failure_wrong": "Oversettelsen var feil",
-  "first_failure_slow": "Det var for tregt"
+  "first_failure_slow": "Det var for tregt",
+  "overlay_permission_not_granted": "Oversettelser kan ikke vises ennå: slå på «Vis over andre apper» for Screen Translate, og kom tilbake.",
+  "screen_capture_not_granted": "Skjermopptak ble ikke tillatt, så ingenting kan oversettes. Trykk på Start igjen og tillat skjermopptak."
 }

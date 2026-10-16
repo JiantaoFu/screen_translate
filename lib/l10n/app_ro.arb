@@ -145,5 +145,7 @@
   "first_failure_title": "Nu s-a tradus nimic. Ce s-a întâmplat?",
   "first_failure_no_text": "Nu s-a găsit text pe ecran",
   "first_failure_wrong": "Traducerea a fost greșită",
-  "first_failure_slow": "A fost prea lent"
+  "first_failure_slow": "A fost prea lent",
+  "overlay_permission_not_granted": "Traducerile nu pot apărea încă: activați „Afișare peste alte aplicații” pentru Screen Translate, apoi reveniți.",
+  "screen_capture_not_granted": "Captura de ecran nu a fost permisă, deci nu se poate traduce nimic. Atingeți din nou Pornire și permiteți captura."
 }

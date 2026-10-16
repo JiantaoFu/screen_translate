@@ -477,4 +477,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Het was te langzaam';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Vertalingen kunnen nog niet verschijnen: zet \'Weergeven over andere apps\' aan voor Screen Translate en kom terug.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Schermopname is niet toegestaan, dus er kan niets vertaald worden. Tik opnieuw op Start en sta schermopname toe.';
 }

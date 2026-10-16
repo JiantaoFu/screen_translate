@@ -145,5 +145,7 @@
   "first_failure_title": "چیزی ترجمه نشد. چه اتفاقی افتاد؟",
   "first_failure_no_text": "متنی روی صفحه پیدا نشد",
   "first_failure_wrong": "ترجمه اشتباه بود",
-  "first_failure_slow": "خیلی کند بود"
+  "first_failure_slow": "خیلی کند بود",
+  "overlay_permission_not_granted": "هنوز نمی‌توان ترجمه‌ها را نشان داد: «نمایش روی برنامه‌های دیگر» را برای Screen Translate روشن کنید و برگردید.",
+  "screen_capture_not_granted": "اجازه ضبط صفحه داده نشد، پس چیزی ترجمه نمی‌شود. دوباره روی شروع بزنید و ضبط صفحه را مجاز کنید."
 }

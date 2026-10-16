@@ -479,4 +479,12 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'খুব ধীর ছিল';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'এখনও অনুবাদ দেখানো যাচ্ছে না: Screen Translate-এর জন্য \"অন্য অ্যাপের উপরে দেখান\" চালু করে ফিরে আসুন।';
+
+  @override
+  String get screen_capture_not_granted =>
+      'স্ক্রিন ক্যাপচারের অনুমতি দেওয়া হয়নি, তাই অনুবাদ করা যাচ্ছে না। আবার শুরু চাপুন এবং স্ক্রিন ক্যাপচারের অনুমতি দিন।';
 }

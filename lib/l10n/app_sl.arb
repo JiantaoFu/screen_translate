@@ -145,5 +145,7 @@
   "first_failure_title": "Nič ni bilo prevedeno. Kaj se je zgodilo?",
   "first_failure_no_text": "Na zaslonu ni bilo najdenega besedila",
   "first_failure_wrong": "Prevod je bil napačen",
-  "first_failure_slow": "Bilo je prepočasno"
+  "first_failure_slow": "Bilo je prepočasno",
+  "overlay_permission_not_granted": "Prevodi se še ne morejo prikazati: za Screen Translate vklopite »Prikaz prek drugih aplikacij« in se vrnite.",
+  "screen_capture_not_granted": "Snemanje zaslona ni bilo dovoljeno, zato ni mogoče ničesar prevesti. Znova tapnite Začni in dovolite snemanje."
 }

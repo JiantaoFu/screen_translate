@@ -478,4 +478,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Estava muito lento';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'As traduções ainda não podem aparecer: ative \"Sobrepor a outros apps\" para o Screen Translate e volte.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'A captura de tela não foi permitida, então nada pode ser traduzido. Toque em Iniciar de novo e permita a captura.';
 }

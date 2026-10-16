@@ -477,4 +477,12 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Bylo to příliš pomalé';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Překlady se zatím nemohou zobrazit: zapněte pro Screen Translate „Zobrazení přes jiné aplikace“ a vraťte se.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Záznam obrazovky nebyl povolen, takže nelze nic přeložit. Klepněte znovu na Spustit a záznam povolte.';
 }

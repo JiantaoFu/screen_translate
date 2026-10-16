@@ -145,5 +145,7 @@
   "first_failure_title": "Midagi ei tõlgitud. Mis juhtus?",
   "first_failure_no_text": "Ekraanilt ei leitud teksti",
   "first_failure_wrong": "Tõlge oli vale",
-  "first_failure_slow": "See oli liiga aeglane"
+  "first_failure_slow": "See oli liiga aeglane",
+  "overlay_permission_not_granted": "Tõlkeid ei saa veel kuvada: lülitage Screen Translate'i jaoks sisse „Kuva teiste rakenduste peal“ ja tulge tagasi.",
+  "screen_capture_not_granted": "Ekraanisalvestust ei lubatud, seega ei saa midagi tõlkida. Puudutage uuesti Alusta ja lubage ekraanisalvestus."
 }

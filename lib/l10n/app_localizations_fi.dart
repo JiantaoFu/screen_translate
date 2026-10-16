@@ -479,4 +479,12 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Se oli liian hidas';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Käännöksiä ei voi vielä näyttää: ota Screen Translatelle käyttöön ”Näytä muiden sovellusten päällä” ja palaa takaisin.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Näytön tallennusta ei sallittu, joten mitään ei voi kääntää. Napauta Aloita uudelleen ja salli näytön tallennus.';
 }

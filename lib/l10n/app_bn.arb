@@ -145,5 +145,7 @@
   "first_failure_title": "কিছুই অনুবাদ হয়নি। কী হয়েছিল?",
   "first_failure_no_text": "স্ক্রিনে কোনো টেক্সট পাওয়া যায়নি",
   "first_failure_wrong": "অনুবাদ ভুল ছিল",
-  "first_failure_slow": "খুব ধীর ছিল"
+  "first_failure_slow": "খুব ধীর ছিল",
+  "overlay_permission_not_granted": "এখনও অনুবাদ দেখানো যাচ্ছে না: Screen Translate-এর জন্য \"অন্য অ্যাপের উপরে দেখান\" চালু করে ফিরে আসুন।",
+  "screen_capture_not_granted": "স্ক্রিন ক্যাপচারের অনুমতি দেওয়া হয়নি, তাই অনুবাদ করা যাচ্ছে না। আবার শুরু চাপুন এবং স্ক্রিন ক্যাপচারের অনুমতি দিন।"
 }

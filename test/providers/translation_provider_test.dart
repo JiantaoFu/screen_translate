@@ -341,4 +341,48 @@ void main() {
       expect(_overlaps(boxes[0], boxes[1]), false);
     });
   });
+
+  group('session success counting and system stop', () {
+    late int successes;
+    late TranslationProvider p;
+
+    setUp(() {
+      successes = 0;
+      p = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+        onSessionSucceeded: () async => successes++,
+      );
+    });
+
+    test('a session counts once however many ticks draw translations', () {
+      p.debugSetTranslating(true);
+      for (var i = 0; i < 20; i++) {
+        p.debugMarkTranslationShown();
+      }
+      expect(successes, 1);
+      expect(p.sessionProducedTranslations, isTrue);
+    });
+
+    test('projectionStopped resets state so Start works again', () {
+      p.debugSetTranslating(true);
+      var notified = 0;
+      p.addListener(() => notified++);
+      p.handleProjectionStoppedBySystem();
+      expect(p.isTranslating, isFalse);
+      expect(p.isStarting, isFalse);
+      expect(notified, 1);
+    });
+
+    test('projectionStopped when idle is a no-op', () {
+      var notified = 0;
+      p.addListener(() => notified++);
+      p.handleProjectionStoppedBySystem();
+      expect(notified, 0);
+    });
+  });
 }

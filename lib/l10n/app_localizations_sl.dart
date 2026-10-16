@@ -480,4 +480,12 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Bilo je prepočasno';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Prevodi se še ne morejo prikazati: za Screen Translate vklopite »Prikaz prek drugih aplikacij« in se vrnite.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Snemanje zaslona ni bilo dovoljeno, zato ni mogoče ničesar prevesti. Znova tapnite Začni in dovolite snemanje.';
 }

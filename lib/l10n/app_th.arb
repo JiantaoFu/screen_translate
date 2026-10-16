@@ -145,5 +145,7 @@
   "first_failure_title": "ไม่มีอะไรถูกแปล เกิดอะไรขึ้น?",
   "first_failure_no_text": "ไม่พบข้อความบนหน้าจอ",
   "first_failure_wrong": "คำแปลไม่ถูกต้อง",
-  "first_failure_slow": "ช้าเกินไป"
+  "first_failure_slow": "ช้าเกินไป",
+  "overlay_permission_not_granted": "ยังแสดงคำแปลไม่ได้: เปิด \"แสดงทับแอปอื่น\" ให้ Screen Translate แล้วกลับมาที่แอป",
+  "screen_capture_not_granted": "ไม่ได้อนุญาตการบันทึกหน้าจอ จึงแปลไม่ได้ แตะเริ่มอีกครั้งและอนุญาตการบันทึกหน้าจอ"
 }

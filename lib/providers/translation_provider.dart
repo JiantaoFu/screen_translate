@@ -15,6 +15,7 @@ import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../models/ocr_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/review_prompt_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/activation_tracker.dart';
 
@@ -46,6 +47,10 @@ enum TranslationMode {
   /// Online LLM translation via BigModel API
   llm,
 }
+
+/// Result of [TranslationProvider.startTranslation], so the UI can explain
+/// why nothing started instead of returning silently.
+enum StartOutcome { started, alreadyRunning, overlayDenied, captureDenied, failed }
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
@@ -302,13 +307,26 @@ class TranslationProvider with ChangeNotifier {
     this._overlayService, {
     LLMTranslationService? llmTranslationService,
     OnnxTranslationService? onnxTranslationService,
-  })  : _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
+    Future<void> Function()? onSessionSucceeded,
+  })  : _onSessionSucceeded = onSessionSucceeded ?? _recordReviewSuccess,
+        _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
         _onnxTranslationService = onnxTranslationService ?? OnnxTranslationService() {
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
       initTranslationServiceChannel();
     }
     _initPreferences();
+  }
+
+  final Future<void> Function() _onSessionSucceeded;
+
+  static Future<void> _recordReviewSuccess() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await ReviewPromptService(prefs).recordSuccessfulTranslation();
+    } catch (e) {
+      print('Review success count not saved: $e');
+    }
   }
 
   bool get isTranslating => _isTranslating;
@@ -412,8 +430,22 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> startTranslation() async {
-    if (_isTranslating) return;
+  bool _isStarting = false;
+
+  /// True while Start is walking through the permission screens.
+  bool get isStarting => _isStarting;
+
+  Future<StartOutcome> startTranslation() async {
+    if (_isTranslating || _isStarting) return StartOutcome.alreadyRunning;
+    _isStarting = true;
+    try {
+      return await _startTranslation();
+    } finally {
+      _isStarting = false;
+    }
+  }
+
+  Future<StartOutcome> _startTranslation() async {
 
     if (Platform.isAndroid) {
       final activation = ActivationTracker.instance;
@@ -425,7 +457,11 @@ class TranslationProvider with ChangeNotifier {
       try {
         final overlayGranted = await _overlayService.ensureOverlayPermission(_context!);
         activation.overlayPermissionResult(overlayGranted);
-        if (overlayGranted) {
+        if (!overlayGranted) {
+          print('Overlay permission not granted after returning from settings');
+          return StartOutcome.overlayDenied;
+        }
+        {
           // Request MediaProjection consent BEFORE showing the floating
           // control overlay. If the user backs out of (or denies) that
           // system dialog, requestScreenCapture() returns false here and we
@@ -436,7 +472,7 @@ class TranslationProvider with ChangeNotifier {
           activation.capturePermissionResult(captureGranted);
           if (!captureGranted) {
             print('Screen capture permission denied or cancelled, not starting translation');
-            return;
+            return StartOutcome.captureDenied;
           }
 
           _isTranslating = true;
@@ -452,12 +488,50 @@ class TranslationProvider with ChangeNotifier {
           notifyListeners();
           await _overlayService.start();
           _startPeriodicCapture();
+          return StartOutcome.started;
         }
       } catch (e) {
         print('Error starting translation: $e');
         activation.failure('start', e);
         await stopTranslation();
+        return StartOutcome.failed;
       }
+    }
+    return StartOutcome.failed;
+  }
+
+  /// Native side reports that MediaProjection ended without us asking
+  /// (status-bar "stop sharing" chip, screen lock, another app taking over
+  /// capture). Native has already torn down capture and the floating
+  /// buttons, so only reset our state; calling back into the services from
+  /// here could start a service while we are in the background.
+  @visibleForTesting
+  void handleProjectionStoppedBySystem() {
+    if (!_isTranslating && _captureTimer == null) return;
+    print('Projection stopped by the system, resetting translation state');
+    ActivationTracker.instance.liveStopped();
+    _isTranslating = false;
+    _isProcessingCapture = false;
+    _isManualTranslationRequested = false;
+    _displayedOverlays.clear();
+    _translationToken++;
+    _nextOverlayId = 0;
+    _captureTimer?.cancel();
+    _captureTimer = null;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void debugSetTranslating(bool value) {
+    _isTranslating = value;
+    if (value) _captureTimer ??= Timer.periodic(const Duration(hours: 1), (_) {});
+  }
+
+  @visibleForTesting
+  void debugMarkTranslationShown() {
+    if (!_sessionProducedTranslations) {
+      _sessionProducedTranslations = true;
+      _onSessionSucceeded();
     }
   }
 
@@ -858,7 +932,11 @@ class TranslationProvider with ChangeNotifier {
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
-                _sessionProducedTranslations = true;
+                if (!_sessionProducedTranslations) {
+                  _sessionProducedTranslations = true;
+                  // One success per live session, not per 500 ms tick.
+                  _onSessionSucceeded();
+                }
                 ActivationTracker.instance.translationShown(newIndices.length);
                 notifyListeners();
               }
@@ -949,6 +1027,9 @@ class TranslationProvider with ChangeNotifier {
             case 'requestManualTranslation':
               print("Manual translation requested"); // Add this debug print
               requestManualTranslation();
+              break;
+            case 'projectionStopped':
+              handleProjectionStoppedBySystem();
               break;
             case 'hideAll':
             case 'cancelTranslation':

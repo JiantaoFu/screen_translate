@@ -145,5 +145,7 @@
   "first_failure_title": "Ništa nije prevedeno. Što se dogodilo?",
   "first_failure_no_text": "Na zaslonu nije pronađen tekst",
   "first_failure_wrong": "Prijevod je bio pogrešan",
-  "first_failure_slow": "Bilo je presporo"
+  "first_failure_slow": "Bilo je presporo",
+  "overlay_permission_not_granted": "Prijevodi se još ne mogu prikazati: uključite „Prikaz preko drugih aplikacija” za Screen Translate i vratite se.",
+  "screen_capture_not_granted": "Snimanje zaslona nije dopušteno pa se ništa ne može prevesti. Ponovno dodirnite Pokreni i dopustite snimanje."
 }

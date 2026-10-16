@@ -1039,6 +1039,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'It was too slow'**
   String get first_failure_slow;
+
+  /// No description provided for @overlay_permission_not_granted.
+  ///
+  /// In en, this message translates to:
+  /// **'Translations can\'t appear yet: turn on \"Display over other apps\" for Screen Translate, then come back.'**
+  String get overlay_permission_not_granted;
+
+  /// No description provided for @screen_capture_not_granted.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen capture wasn\'t allowed, so nothing can be translated. Tap Start again and allow screen capture.'**
+  String get screen_capture_not_granted;
 }
 
 class _AppLocalizationsDelegate

@@ -479,4 +479,12 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Беше твърде бавно';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'Преводите още не могат да се покажат: включете „Показване върху други приложения“ за Screen Translate и се върнете.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'Заснемането на екрана не беше разрешено, затова нищо не може да се преведе. Докоснете Старт отново и разрешете заснемането.';
 }

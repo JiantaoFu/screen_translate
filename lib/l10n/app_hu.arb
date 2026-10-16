@@ -145,5 +145,7 @@
   "first_failure_title": "Semmi sem lett lefordítva. Mi történt?",
   "first_failure_no_text": "Nem található szöveg a képernyőn",
   "first_failure_wrong": "A fordítás hibás volt",
-  "first_failure_slow": "Túl lassú volt"
+  "first_failure_slow": "Túl lassú volt",
+  "overlay_permission_not_granted": "A fordítások még nem jelenhetnek meg: kapcsolja be a „Megjelenítés más alkalmazások felett” beállítást a Screen Translate számára, majd térjen vissza.",
+  "screen_capture_not_granted": "A képernyőrögzítés nem lett engedélyezve, így nem lehet fordítani. Koppintson újra az Indításra, és engedélyezze a rögzítést."
 }

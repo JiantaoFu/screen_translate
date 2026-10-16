@@ -145,5 +145,7 @@
   "first_failure_title": "Nieko neišversta. Kas atsitiko?",
   "first_failure_no_text": "Ekrane nerasta teksto",
   "first_failure_wrong": "Vertimas buvo neteisingas",
-  "first_failure_slow": "Buvo per lėta"
+  "first_failure_slow": "Buvo per lėta",
+  "overlay_permission_not_granted": "Vertimai dar negali būti rodomi: įjunkite „Rodyti virš kitų programų“ programai Screen Translate ir grįžkite.",
+  "screen_capture_not_granted": "Ekrano įrašymas neleistas, todėl nieko negalima išversti. Dar kartą bakstelėkite Pradėti ir leiskite įrašymą."
 }

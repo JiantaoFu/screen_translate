@@ -481,4 +481,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get first_failure_slow => 'Túl lassú volt';
+
+  @override
+  String get overlay_permission_not_granted =>
+      'A fordítások még nem jelenhetnek meg: kapcsolja be a „Megjelenítés más alkalmazások felett” beállítást a Screen Translate számára, majd térjen vissza.';
+
+  @override
+  String get screen_capture_not_granted =>
+      'A képernyőrögzítés nem lett engedélyezve, így nem lehet fordítani. Koppintson újra az Indításra, és engedélyezze a rögzítést.';
 }

@@ -358,7 +358,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'במצב AI, הטקסט שזוהה במסך נשלח אל BigModel.cn ‏(Zhipu AI) באמצעות מפתח ה-API שלך. המצב הרגיל מתרגם במכשיר ואינו שולח דבר.';
+      'בינה מלאכותית בענן שולחת את הטקסט שזוהה אל BigModel.cn ‏(Zhipu AI) באמצעות מפתח ה-API שלך. מהיר ומשופר בבינה מלאכותית פועלים כולם במכשיר שלך.';
 
   @override
   String get api_key_hint_short => 'הדבק כאן את מפתח ה-API שלך';

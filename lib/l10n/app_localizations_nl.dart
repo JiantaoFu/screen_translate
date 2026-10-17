@@ -361,7 +361,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'In AI-modus wordt de op je scherm herkende tekst met je eigen API-sleutel naar BigModel.cn (Zhipu AI) verzonden. De standaardmodus vertaalt op je apparaat en verstuurt niets.';
+      'Cloud-AI stuurt herkende tekst naar BigModel.cn (Zhipu AI) met je eigen API-sleutel. Snel en AI-verbeterd draaien volledig op je apparaat.';
 
   @override
   String get api_key_hint_short => 'Plak hier je API-sleutel';

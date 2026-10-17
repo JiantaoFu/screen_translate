@@ -354,7 +354,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AIモードでは、画面上で認識されたテキストが、あなた自身のAPIキーを使ってBigModel.cn（Zhipu AI）に送信されます。標準モードは端末上で翻訳し、何も送信しません。';
+      'クラウドAIは、認識したテキストをご自身のAPIキーを使ってBigModel.cn（Zhipu AI）に送信します。クイックとAI強化は完全にデバイス上で動作します。';
 
   @override
   String get api_key_hint_short => 'ここにAPIキーを貼り付けてください';

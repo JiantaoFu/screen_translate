@@ -363,7 +363,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI modunda, ekranınızda tanınan metin kendi API anahtarınız kullanılarak BigModel.cn\'ye (Zhipu AI) gönderilir. Standart mod cihazınızda çevirir ve hiçbir şey göndermez.';
+      'Bulut Yapay Zeka, tanınan metni kendi API anahtarınızla BigModel.cn\'ye (Zhipu AI) gönderir. Hızlı ve Yapay Zeka ile Geliştirilmiş modları tamamen cihazınızda çalışır.';
 
   @override
   String get api_key_hint_short => 'API anahtarınızı buraya yapıştırın';

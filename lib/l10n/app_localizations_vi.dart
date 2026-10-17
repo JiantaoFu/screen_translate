@@ -361,7 +361,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'Ở chế độ AI, văn bản được nhận dạng trên màn hình sẽ được gửi đến BigModel.cn (Zhipu AI) bằng khóa API của chính bạn. Chế độ tiêu chuẩn dịch trên thiết bị và không gửi gì cả.';
+      'AI đám mây gửi văn bản nhận dạng được đến BigModel.cn (Zhipu AI) bằng khóa API của riêng bạn. Nhanh và Nâng cao bằng AI chạy hoàn toàn trên thiết bị của bạn.';
 
   @override
   String get api_key_hint_short => 'Dán khóa API của bạn vào đây';

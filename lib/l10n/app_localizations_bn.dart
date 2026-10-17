@@ -361,7 +361,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI মোডে, আপনার স্ক্রিনে শনাক্ত করা লেখা আপনার নিজের API কী ব্যবহার করে BigModel.cn (Zhipu AI)-এ পাঠানো হয়। স্ট্যান্ডার্ড মোড আপনার ডিভাইসেই অনুবাদ করে এবং কিছুই পাঠায় না।';
+      'ক্লাউড এআই আপনার নিজের API কী ব্যবহার করে শনাক্ত করা লেখা BigModel.cn (Zhipu AI)-এ পাঠায়। দ্রুত এবং এআই উন্নত সম্পূর্ণভাবে আপনার ডিভাইসেই চলে।';
 
   @override
   String get api_key_hint_short => 'আপনার এপিআই কী এখানে পেস্ট করুন';

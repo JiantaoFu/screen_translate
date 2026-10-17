@@ -360,7 +360,7 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'I AI-modus sendes teksten som gjenkjennes på skjermen, til BigModel.cn (Zhipu AI) med din egen API-nøkkel. Standardmodus oversetter på enheten og sender ingenting.';
+      'Sky-AI sender gjenkjent tekst til BigModel.cn (Zhipu AI) med din egen API-nøkkel. Rask og AI-forbedret kjører helt på enheten din.';
 
   @override
   String get api_key_hint_short => 'Lim inn API-nøkkelen din her';

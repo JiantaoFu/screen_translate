@@ -363,7 +363,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'در حالت هوش مصنوعی، متن شناسایی‌شده روی صفحه با کلید API خودتان به BigModel.cn ‏(Zhipu AI) ارسال می‌شود. حالت استاندارد روی دستگاه شما ترجمه می‌کند و چیزی ارسال نمی‌کند.';
+      'هوش مصنوعی ابری متن شناسایی‌شده را با کلید API خودتان به BigModel.cn ‏(Zhipu AI) می‌فرستد. حالت‌های سریع و بهبودیافته با هوش مصنوعی کاملاً روی دستگاه شما اجرا می‌شوند.';
 
   @override
   String get api_key_hint_short => 'کلید API خود را اینجا جای‌گذاری کنید';

@@ -361,7 +361,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'Dalam mode AI, teks yang dikenali di layar Anda dikirim ke BigModel.cn (Zhipu AI) menggunakan kunci API Anda sendiri. Mode standar menerjemahkan di perangkat Anda dan tidak mengirim apa pun.';
+      'AI Cloud mengirim teks yang dikenali ke BigModel.cn (Zhipu AI) menggunakan kunci API Anda sendiri. Cepat dan Ditingkatkan AI berjalan sepenuhnya di perangkat Anda.';
 
   @override
   String get api_key_hint_short => 'Tempel kunci API Anda di sini';

@@ -360,7 +360,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'In AI mode, the text recognized on your screen is sent to BigModel.cn (Zhipu AI) using your own API key. Standard mode translates on your device and sends nothing.';
+      'Cloud AI sends recognized text to BigModel.cn (Zhipu AI) using your own API key. Quick and AI Enhanced run entirely on your device.';
 
   @override
   String get api_key_hint_short => 'Paste your API key here';

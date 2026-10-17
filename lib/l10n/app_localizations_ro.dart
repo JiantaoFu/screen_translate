@@ -363,7 +363,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'În modul AI, textul recunoscut pe ecran este trimis către BigModel.cn (Zhipu AI) folosind propria ta cheie API. Modul standard traduce pe dispozitiv și nu trimite nimic.';
+      'AI în cloud trimite textul recunoscut către BigModel.cn (Zhipu AI) folosind propria ta cheie API. Rapid și Îmbunătățit cu AI rulează în întregime pe dispozitivul tău.';
 
   @override
   String get api_key_hint_short => 'Lipește cheia API aici';

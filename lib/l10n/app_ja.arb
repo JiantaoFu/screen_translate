@@ -110,7 +110,7 @@
   "connect_ai_account_title": "AIアカウントを接続",
   "connect_ai_account_prefix": "こちらから無料のAPIキーを取得してください ",
   "connect_ai_account_suffix": "、下に貼り付けてください。",
-  "ai_mode_data_notice": "AIモードでは、画面上で認識されたテキストが、あなた自身のAPIキーを使ってBigModel.cn（Zhipu AI）に送信されます。標準モードは端末上で翻訳し、何も送信しません。",
+  "ai_mode_data_notice": "クラウドAIは、認識したテキストをご自身のAPIキーを使ってBigModel.cn（Zhipu AI）に送信します。クイックとAI強化は完全にデバイス上で動作します。",
   "api_key_hint_short": "ここにAPIキーを貼り付けてください",
   "save_and_verify": "保存して確認",
   "cloud_ai_connected": "接続しました！クラウドAIの準備ができました。",

@@ -110,7 +110,7 @@
   "connect_ai_account_title": "Connectez votre compte IA",
   "connect_ai_account_prefix": "Obtenez une clé API gratuite sur ",
   "connect_ai_account_suffix": " et collez-la ci-dessous.",
-  "ai_mode_data_notice": "En mode IA, le texte reconnu sur votre écran est envoyé à BigModel.cn (Zhipu AI) avec votre propre clé API. Le mode standard traduit sur votre appareil et n’envoie rien.",
+  "ai_mode_data_notice": "IA Cloud envoie le texte reconnu à BigModel.cn (Zhipu AI) avec votre propre clé API. Rapide et Amélioré par IA fonctionnent entièrement sur votre appareil.",
   "api_key_hint_short": "Collez votre clé API ici",
   "save_and_verify": "Enregistrer et vérifier",
   "cloud_ai_connected": "Connecté ! L'IA Cloud est prête.",

@@ -362,7 +362,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI-režiimis saadetakse ekraanilt tuvastatud tekst sinu enda API-võtmega BigModel.cn-ile (Zhipu AI). Tavarežiim tõlgib seadmes ega saada midagi.';
+      'Pilve AI saadab tuvastatud teksti teie enda API-võtmega teenusele BigModel.cn (Zhipu AI). Kiire ja AI-täiustatud töötavad täielikult teie seadmes.';
 
   @override
   String get api_key_hint_short => 'Kleebi oma API-võti siia';

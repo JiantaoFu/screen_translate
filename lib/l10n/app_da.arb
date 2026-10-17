@@ -110,7 +110,7 @@
   "connect_ai_account_title": "Forbind din AI-konto",
   "connect_ai_account_prefix": "Få en gratis API-nøgle fra ",
   "connect_ai_account_suffix": " og indsæt den nedenfor.",
-  "ai_mode_data_notice": "I AI-tilstand sendes den tekst, der genkendes på din skærm, til BigModel.cn (Zhipu AI) med din egen API-nøgle. Standardtilstand oversætter på din enhed og sender intet.",
+  "ai_mode_data_notice": "Cloud AI sender genkendt tekst til BigModel.cn (Zhipu AI) med din egen API-nøgle. Hurtig og AI-forbedret kører udelukkende på din enhed.",
   "api_key_hint_short": "Indsæt din API-nøgle her",
   "save_and_verify": "Gem og verificér",
   "cloud_ai_connected": "Forbundet! Cloud AI er klar.",

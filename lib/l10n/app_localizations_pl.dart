@@ -363,7 +363,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'W trybie AI tekst rozpoznany na ekranie jest wysyłany do BigModel.cn (Zhipu AI) przy użyciu Twojego własnego klucza API. Tryb standardowy tłumaczy na urządzeniu i niczego nie wysyła.';
+      'AI w chmurze wysyła rozpoznany tekst do BigModel.cn (Zhipu AI) przy użyciu Twojego własnego klucza API. Tryby Szybkie i Ulepszone przez AI działają w całości na Twoim urządzeniu.';
 
   @override
   String get api_key_hint_short => 'Wklej tutaj swój klucz API';

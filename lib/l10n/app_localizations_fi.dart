@@ -363,7 +363,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI-tilassa näytöltä tunnistettu teksti lähetetään BigModel.cn:ään (Zhipu AI) omalla API-avaimellasi. Vakiotila kääntää laitteellasi eikä lähetä mitään.';
+      'Pilvi-tekoäly lähettää tunnistetun tekstin BigModel.cn-palveluun (Zhipu AI) omalla API-avaimellasi. Nopea ja Tekoälyllä parannettu toimivat kokonaan laitteellasi.';
 
   @override
   String get api_key_hint_short => 'Liitä API-avaimesi tähän';

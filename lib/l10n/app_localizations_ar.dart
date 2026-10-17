@@ -359,7 +359,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'في وضع الذكاء الاصطناعي، يُرسَل النص الذي يتم التعرف عليه على شاشتك إلى BigModel.cn ‏(Zhipu AI) باستخدام مفتاح API الخاص بك. أما الوضع العادي فيترجم على جهازك ولا يرسل أي شيء.';
+      'يرسل وضع \"الذكاء الاصطناعي السحابي\" النص الذي تم التعرف عليه إلى BigModel.cn ‏(Zhipu AI) باستخدام مفتاح API الخاص بك. يعمل وضعا \"سريع\" و\"محسّن بالذكاء الاصطناعي\" بالكامل على جهازك.';
 
   @override
   String get api_key_hint_short => 'الصق مفتاح API هنا';

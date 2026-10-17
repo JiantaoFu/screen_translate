@@ -352,7 +352,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI 模式下，屏幕上识别出的文字会用你自己的 API key 发送给 BigModel.cn（智谱 AI）。标准模式在手机上翻译，不会发送任何内容。';
+      '云端AI 会用你自己的 Key 把识别出的文字发送给 BigModel.cn（智谱 AI）。快速和AI增强模式完全在手机上运行。';
 
   @override
   String get api_key_hint_short => '在此粘贴你的API密钥';

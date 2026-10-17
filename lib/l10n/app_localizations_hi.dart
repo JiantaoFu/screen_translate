@@ -362,7 +362,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI मोड में, आपकी स्क्रीन पर पहचाना गया टेक्स्ट आपकी अपनी API कुंजी से BigModel.cn (Zhipu AI) को भेजा जाता है। स्टैंडर्ड मोड आपके डिवाइस पर ही अनुवाद करता है और कुछ भी नहीं भेजता।';
+      'क्लाउड AI पहचाने गए टेक्स्ट को आपकी अपनी API कुंजी से BigModel.cn (Zhipu AI) पर भेजता है। त्वरित और AI-संवर्धित पूरी तरह आपके डिवाइस पर चलते हैं।';
 
   @override
   String get api_key_hint_short => 'अपनी API कुंजी यहाँ पेस्ट करें';

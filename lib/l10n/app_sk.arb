@@ -110,7 +110,7 @@
   "connect_ai_account_title": "Pripojte svoj AI účet",
   "connect_ai_account_prefix": "Získajte bezplatný API kľúč na ",
   "connect_ai_account_suffix": " a vložte ho nižšie.",
-  "ai_mode_data_notice": "V režime AI sa text rozpoznaný na obrazovke odosiela do BigModel.cn (Zhipu AI) pomocou vášho vlastného API kľúča. Štandardný režim prekladá v zariadení a nič neodosiela.",
+  "ai_mode_data_notice": "Cloudové AI odosiela rozpoznaný text do BigModel.cn (Zhipu AI) pomocou vášho vlastného API kľúča. Rýchly a Vylepšené AI bežia úplne vo vašom zariadení.",
   "api_key_hint_short": "Vložte sem svoj API kľúč",
   "save_and_verify": "Uložiť a overiť",
   "cloud_ai_connected": "Pripojené! Cloudové AI je pripravené.",

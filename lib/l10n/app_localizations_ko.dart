@@ -354,7 +354,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'AI 모드에서는 화면에서 인식된 텍스트가 사용자 본인의 API 키로 BigModel.cn(Zhipu AI)에 전송됩니다. 표준 모드는 기기에서 번역하며 아무것도 전송하지 않습니다.';
+      '클라우드 AI는 인식된 텍스트를 사용자 본인의 API 키로 BigModel.cn(Zhipu AI)에 전송합니다. 빠름 및 AI 강화 모드는 전적으로 기기에서 실행됩니다.';
 
   @override
   String get api_key_hint_short => '여기에 API 키를 붙여넣으세요';

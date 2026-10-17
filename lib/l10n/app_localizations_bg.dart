@@ -361,7 +361,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'В режим AI разпознатият на екрана текст се изпраща до BigModel.cn (Zhipu AI) с вашия собствен API ключ. Стандартният режим превежда на устройството и не изпраща нищо.';
+      'Облачен ИИ изпраща разпознатия текст до BigModel.cn (Zhipu AI) с вашия собствен API ключ. Бързо и Подобрено с ИИ работят изцяло на устройството ви.';
 
   @override
   String get api_key_hint_short => 'Поставете вашия API ключ тук';

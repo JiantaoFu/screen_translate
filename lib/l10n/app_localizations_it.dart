@@ -363,7 +363,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get ai_mode_data_notice =>
-      'In modalità IA, il testo riconosciuto sullo schermo viene inviato a BigModel.cn (Zhipu AI) usando la tua chiave API. La modalità standard traduce sul dispositivo e non invia nulla.';
+      'IA Cloud invia il testo riconosciuto a BigModel.cn (Zhipu AI) usando la tua chiave API. Rapido e Migliorato con IA funzionano interamente sul tuo dispositivo.';
 
   @override
   String get api_key_hint_short => 'Incolla qui la tua chiave API';

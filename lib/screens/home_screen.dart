@@ -23,6 +23,8 @@ import 'dart:async';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:screen_translate/screens/image_translation_screen.dart';
+import '../lite/lite_gate.dart';
+import '../lite/paywall_screen.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -275,6 +277,82 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
+    _attachLiteGate();
+  }
+
+  // ---- Lite flavor (no-ops in the paid app: LiteGate.instance is null) ----
+
+  LiteGate? _liteGate;
+  bool _paywallOpen = false;
+
+  /// LiteGate is created right after runApp (lite only); attach when ready.
+  void _attachLiteGate() {
+    final gate = LiteGate.instance;
+    if (gate == null) {
+      LiteGate.current.addListener(_onLiteGateCreated);
+      return;
+    }
+    LiteGate.current.removeListener(_onLiteGateCreated);
+    if (identical(gate, _liteGate)) return;
+    _liteGate = gate;
+    gate.addListener(_onLiteGateChanged);
+    if (mounted) setState(() {});
+  }
+
+  void _onLiteGateCreated() {
+    if (mounted && LiteGate.instance != null) _attachLiteGate();
+  }
+
+  void _onLiteGateChanged() {
+    if (!mounted) return;
+    setState(() {}); // remaining-today line
+    // The success that used the last free translation: show the paywall now
+    // if we are in front (e.g. Stop tapped in the app), else on return.
+    if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+      _maybeShowPendingPaywall();
+    }
+  }
+
+  /// Shows the paywall once after the last free translation was used.
+  bool _maybeShowPendingPaywall() {
+    final gate = _liteGate;
+    if (gate == null || _paywallOpen || !mounted) return false;
+    if (!gate.takePendingPaywall()) return false;
+    _openPaywall(gate, 'limit_reached');
+    return true;
+  }
+
+  Future<void> _openPaywall(LiteGate gate, String trigger) async {
+    if (_paywallOpen) return;
+    _paywallOpen = true;
+    try {
+      await PaywallScreen.show(context, gate, trigger: trigger);
+    } finally {
+      _paywallOpen = false;
+    }
+  }
+
+  /// Whether a new translation may start; shows the paywall when not.
+  bool _liteAllows(String kind) {
+    final gate = _liteGate ?? LiteGate.instance;
+    if (gate == null || gate.mayStartTranslation(kind: kind)) return true;
+    _openPaywall(gate, 'limit_hit');
+    return false;
+  }
+
+  Widget _buildLiteRemaining(BuildContext context) {
+    final gate = _liteGate;
+    if (gate == null || gate.isPro) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: TextButton.icon(
+        key: const Key('lite_remaining'),
+        icon: const Icon(Icons.workspace_premium, size: 18),
+        label: Text(l.lite_remaining_today(gate.remainingFree)),
+        onPressed: () => _openPaywall(gate, 'home'),
+      ),
+    );
   }
 
   @override
@@ -285,7 +363,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // while Start is in progress and for a few seconds after it.
     if (state == AppLifecycleState.resumed && mounted) {
       final provider = context.read<TranslationProvider>();
-      if (TranslationProvider.mayPromptReviewOnResume(
+      // Lite: the paywall due after the last free translation takes this
+      // resume instead of the review prompt.
+      if (_maybeShowPendingPaywall()) {
+        // nothing else on this resume
+      } else if (TranslationProvider.mayPromptReviewOnResume(
         isTranslating: provider.isTranslating,
         isStarting: provider.isStarting,
         startEndedAt: provider.startEndedAt,
@@ -327,6 +409,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _navigateToImageTranslation(File file) {
+    if (!_liteAllows('image')) return;
     // Provide translation provider so ImageTranslationScreen can use it
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     Navigator.push(
@@ -343,6 +426,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    LiteGate.current.removeListener(_onLiteGateCreated);
+    _liteGate?.removeListener(_onLiteGateChanged);
     _intentDataStreamSubscription.cancel();
     super.dispose();
   }
@@ -483,7 +568,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       // showed translations — asking a user
                                       // whose capture just failed to rate the
                                       // app invites a 1-star review.
-                                      if (worked) {
+                                      if (worked && _maybeShowPendingPaywall()) {
+                                        // Lite: paywall instead of review.
+                                      } else if (worked) {
                                         await _trackTranslationAndPromptReview(context);
                                       } else if (context.mounted) {
                                         // First session that showed nothing:
@@ -491,6 +578,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         await showFirstFailureFeedback(context);
                                       }
                                     } else {
+                                      if (!_liteAllows('live')) return;
                                       if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {
                                         return;
                                       }
@@ -519,6 +607,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   // A second tap while the gallery is still
                                   // opening throws PlatformException(already_active).
                                   if (_isPickingImage) return;
+                                  if (!_liteAllows('image')) return;
                                   _isPickingImage = true;
                                   try {
                                     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
@@ -537,7 +626,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 },
                                 context: context,
                               ),
-                            ]
+                            ],
+                            _buildLiteRemaining(context),
                           ],
                         );
                       },

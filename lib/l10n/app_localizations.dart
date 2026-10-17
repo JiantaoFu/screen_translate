@@ -1051,6 +1051,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Screen capture wasn\'t allowed, so nothing can be translated. Tap Start again and allow screen capture.'**
   String get screen_capture_not_granted;
+
+  /// No description provided for @paywall_title.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used today\'s free translations'**
+  String get paywall_title;
+
+  /// Lite paywall body; limit = free translations per day
+  ///
+  /// In en, this message translates to:
+  /// **'Screen Translator Lite includes {limit} free translations a day. Unlock Pro once for unlimited translations.'**
+  String paywall_body(int limit);
+
+  /// No description provided for @paywall_benefit_unlimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited translations, every day'**
+  String get paywall_benefit_unlimited;
+
+  /// No description provided for @paywall_benefit_once.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time purchase, no subscription'**
+  String get paywall_benefit_once;
+
+  /// Lite paywall buy button; price is Google Play's localized price
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Pro · {price}'**
+  String paywall_unlock_button(String price);
+
+  /// No description provided for @paywall_unlock_button_no_price.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Pro'**
+  String get paywall_unlock_button_no_price;
+
+  /// No description provided for @paywall_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get paywall_restore;
+
+  /// No description provided for @paywall_not_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get paywall_not_now;
+
+  /// No description provided for @paywall_store_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play isn\'t available right now. Please try again later.'**
+  String get paywall_store_unavailable;
+
+  /// No description provided for @paywall_pro_unlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro unlocked: unlimited translations!'**
+  String get paywall_pro_unlocked;
+
+  /// No description provided for @paywall_reset_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Free translations reset at midnight.'**
+  String get paywall_reset_hint;
+
+  /// Lite home screen: free translations left today
+  ///
+  /// In en, this message translates to:
+  /// **'Free translations left today: {count}'**
+  String lite_remaining_today(int count);
 }
 
 class _AppLocalizationsDelegate

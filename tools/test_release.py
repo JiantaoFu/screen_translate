@@ -111,6 +111,18 @@ class PublishTest(unittest.TestCase):
         self.assertEqual({n["language"] for n in rel["releaseNotes"]}, {"en-US", "zh-CN"})
         self.assertNotIn("changesNotSentForReview", svc.e.calls["commit"])
 
+    def test_lite_publishes_to_the_lite_package_with_lite_artifacts(self):
+        svc = FakeService()
+        lite_aab = Path(tempfile.mkdtemp()) / "lite.aab"
+        lite_aab.write_bytes(b"lite")
+        with mock.patch.object(release, "artifacts",
+                               lambda flavor: (lite_aab, lite_aab.with_suffix(".txt"))):
+            self.assertTrue(release.publish(svc, "1.2.1", 11, args(flavor="lite"), {}))
+        self.assertEqual(svc.e.calls["bundles.upload"]["packageName"],
+                         "com.lomoware.screen_translate.lite")
+        self.assertEqual(svc.e.calls["commit"]["packageName"], "com.lomoware.screen_translate.lite")
+        self.assertNotIn("mapping.upload", svc.log)
+
     def test_play_http_keeps_resumable_uploads_working(self):
         http = release.play_http()
         # 308 = "resume incomplete" during a resumable upload, not a redirect.
@@ -288,8 +300,8 @@ class MainTest(unittest.TestCase):
         def fake_gradle(tasks, java_home):
             self.calls.append(["gradle", *tasks])
 
-        def fake_build(target, java_home, name, code):
-            self.calls.append(["build", target, name, str(code)])
+        def fake_build(target, java_home, name, code, flavor="paid"):
+            self.calls.append(["build", target, name, str(code), flavor])
             if not self.build_ok:
                 raise release.ReleaseError("the build produced nothing")
             return self.aab
@@ -315,7 +327,9 @@ class MainTest(unittest.TestCase):
             "find_java_home": lambda explicit: Path("jdk"),
             "build": fake_build,
             "stop_gradle": lambda jh: self.calls.append(["gradle", "--stop"]),
-            "play_service": lambda c: object(), "highest_version_code": lambda svc: 11,
+            "play_service": lambda c: object(), "highest_version_code": lambda svc, package=build.PACKAGE: (
+                self.calls.append(["versions", package]) or 11),
+            "check_lite_firebase": lambda: self.calls.append(["lite firebase"]),
             "publish": fake_publish,
         }.items()]
         # read_version() lives in build.py and reads build.PUBSPEC.
@@ -378,8 +392,21 @@ class MainTest(unittest.TestCase):
     def test_build_only_builds_the_aab_through_build_py(self):
         code, _ = self.main("--build-only", "--skip-tests")
         self.assertEqual(code, 0)
-        self.assertIn(["build", "aab", "1.2.1", "11"], self.calls)
+        self.assertIn(["build", "aab", "1.2.1", "11", "paid"], self.calls)
+        self.assertNotIn(["lite firebase"], self.calls)
         self.assertIn(["gradle", "--stop"], self.calls)
+
+    def test_lite_release_uses_lite_package_firebase_check_and_tag(self):
+        code, err = self.main(*self.publish_args("--bump", "patch", "--flavor", "lite"))
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn(["lite firebase"], self.calls)
+        self.assertIn(["versions", "com.lomoware.screen_translate.lite"], self.calls)
+        self.assertIn(["build", "aab", "1.2.2", "12", "lite"], self.calls)
+        self.assertIn(["git", "tag", "-a", "v1.2.2+12-lite", "-m", "1.2.2 (12) on internal"], self.calls)
+
+    def test_default_release_checks_paid_package(self):
+        self.main(*self.publish_args("--bump", "patch"))
+        self.assertIn(["versions", "com.lomoware.screen_translate"], self.calls)
 
     def test_build_failure_stops_the_release(self):
         self.build_ok = False
@@ -394,6 +421,10 @@ class MainTest(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn(b"1.2.2+12", self.pubspec.read_bytes())
         self.assertFalse(any(c[0] == "publish" for c in self.calls))
+
+
+PAID_DEFINES = "-Pdart-defines=QVBQX0ZMQVZPUj1wYWlk"  # APP_FLAVOR=paid
+LITE_DEFINES = "-Pdart-defines=QVBQX0ZMQVZPUj1saXRl"  # APP_FLAVOR=lite
 
 
 class BuildTest(unittest.TestCase):
@@ -411,14 +442,20 @@ class BuildTest(unittest.TestCase):
             if self.writes:
                 self.out.write_bytes(b"fresh")
 
-        targets = {k: (task, plat, abi, self.out, rel)
-                   for k, (task, plat, abi, _, rel) in build.TARGETS.items()}
+        self.outputs = []
+
+        def fake_output_path(target, flavor="paid"):
+            self.outputs.append((target, flavor))
+            return self.out
+
         self.patches = [mock.patch.object(build, k, v) for k, v in {
-            "ROOT": root, "TARGETS": targets, "gradle": fake_gradle,
+            "ROOT": root, "output_path": fake_output_path, "gradle": fake_gradle,
+            "check_lite_firebase": lambda: self.checks.append("lite firebase"),
             "prepare": lambda name, code: self.checks.append("prepare"),
             "check_keystore": lambda: self.checks.append("keystore"),
             "check_signature": lambda jh, path: self.checks.append("jar signature"),
-            "check_apk": lambda path, name, code, release: self.checks.append(("apk", release)),
+            "check_apk": lambda path, name, code, release, package: self.checks.append(
+                ("apk", release, package)),
         }.items()]
         for p in self.patches:
             p.start()
@@ -439,20 +476,77 @@ class BuildTest(unittest.TestCase):
 
     def test_release_apk_is_single_abi_without_split_per_abi(self):
         build.build("apk", Path("jdk"), "1.2.1", 11)
-        self.assertEqual(self.gradle_args, ["assembleRelease", "-Ptarget-platform=android-arm64",
+        self.assertEqual(self.gradle_args, ["assemblePaidRelease", PAID_DEFINES,
+                                            "-Ptarget-platform=android-arm64",
                                             "-Pabi=arm64-v8a", "-Pdisable-abi-filtering=true"])
-        self.assertEqual(self.checks, ["keystore", "prepare", ("apk", True)])
+        self.assertEqual(self.checks, ["keystore", "prepare", ("apk", True, build.PACKAGE)])
+        self.assertEqual(self.outputs, [("apk", "paid")])
 
     def test_emulator_apk_is_debug_x86_64(self):
         build.build("emulator", Path("jdk"), "1.2.1", 11)
-        self.assertEqual(self.gradle_args, ["assembleDebug", "-Ptarget-platform=android-x64",
+        self.assertEqual(self.gradle_args, ["assemblePaidDebug", PAID_DEFINES,
+                                            "-Ptarget-platform=android-x64",
                                             "-Pabi=x86_64", "-Pdisable-abi-filtering=true"])
-        self.assertEqual(self.checks, ["prepare", ("apk", False)])
+        self.assertEqual(self.checks, ["prepare", ("apk", False, build.PACKAGE)])
 
     def test_aab_has_all_abis_and_a_jar_signature_check(self):
         build.build("aab", Path("jdk"), "1.2.1", 11)
-        self.assertEqual(self.gradle_args, ["bundleRelease"])
+        self.assertEqual(self.gradle_args, ["bundlePaidRelease", PAID_DEFINES])
         self.assertEqual(self.checks, ["keystore", "prepare", "jar signature"])
+
+    def test_lite_debug_apk_uses_lite_task_package_and_dart_define(self):
+        build.build("emulator", Path("jdk"), "1.2.1", 11, "lite")
+        self.assertEqual(self.gradle_args[:2], ["assembleLiteDebug", LITE_DEFINES])
+        self.assertEqual(self.checks, ["prepare", ("apk", False, "com.lomoware.screen_translate.lite")])
+        self.assertEqual(self.outputs, [("emulator", "lite")])
+
+    def test_lite_release_requires_lite_firebase_config(self):
+        build.build("aab", Path("jdk"), "1.2.1", 11, "lite")
+        self.assertEqual(self.gradle_args, ["bundleLiteRelease", LITE_DEFINES])
+        self.assertEqual(self.checks, ["keystore", "lite firebase", "prepare", "jar signature"])
+
+    def test_unknown_flavor_is_refused(self):
+        with self.assertRaisesRegex(build.BuildError, "unknown flavor"):
+            build.build("apk", Path("jdk"), "1.2.1", 11, "pro")
+
+
+class FlavorPathTest(unittest.TestCase):
+    def test_default_paths_are_the_paid_flavor(self):
+        self.assertEqual(build.AAB, build.OUTPUTS / "bundle" / "paidRelease" / "app-paid-release.aab")
+        self.assertEqual(build.MAPPING, build.OUTPUTS / "mapping" / "paidRelease" / "mapping.txt")
+        self.assertEqual(build.output_path("apk", "lite"),
+                         build.OUTPUTS / "apk" / "lite" / "release" / "app-lite-release.apk")
+        self.assertEqual(build.output_path("emulator"),
+                         build.OUTPUTS / "apk" / "paid" / "debug" / "app-paid-debug.apk")
+
+    def test_dart_defines_are_base64(self):
+        import base64
+        self.assertEqual(base64.b64decode(build.dart_defines("lite")), b"APP_FLAVOR=lite")
+
+    def test_flavored_task(self):
+        self.assertEqual(build.flavored_task("bundleRelease", "lite"), "bundleLiteRelease")
+
+
+class LiteFirebaseTest(unittest.TestCase):
+    def write(self, data):
+        path = Path(tempfile.mkdtemp()) / "google-services.json"
+        path.write_text(data if isinstance(data, str) else __import__("json").dumps(data))
+        return path
+
+    def client(self, pkg):
+        return {"client_info": {"android_client_info": {"package_name": pkg}}}
+
+    def test_missing_file_is_refused(self):
+        with self.assertRaisesRegex(build.BuildError, "missing"):
+            build.check_lite_firebase(Path(tempfile.mkdtemp()) / "nope.json")
+
+    def test_paid_only_config_is_refused(self):
+        path = self.write({"client": [self.client("com.lomoware.screen_translate")]})
+        with self.assertRaisesRegex(build.BuildError, "no Android app com.lomoware.screen_translate.lite"):
+            build.check_lite_firebase(path)
+
+    def test_lite_config_passes(self):
+        build.check_lite_firebase(self.write({"client": [self.client("com.lomoware.screen_translate.lite")]}))
 
 
 class InstallTest(unittest.TestCase):
@@ -491,18 +585,18 @@ class CheckApkTest(unittest.TestCase):
             build.check_apk(Path("app.apk"), "1.2.1", 11, release=True)
 
     def test_matching_release_apk_passes(self):
-        self.check("package: name='x' versionCode='11' versionName='1.2.1' x\n"
+        self.check("package: name='com.lomoware.screen_translate' versionCode='11' versionName='1.2.1' x\n"
                    "native-code: 'arm64-v8a'\n", self.RELEASE_CERT)
 
     def test_abi_offset_version_code_is_refused(self):
         # What Flutter's split-per-abi did to 1.2.1+11 on arm64.
         with self.assertRaisesRegex(build.BuildError, "2011"):
-            self.check("package: name='x' versionCode='2011' versionName='1.2.1' x\n",
+            self.check("package: name='com.lomoware.screen_translate' versionCode='2011' versionName='1.2.1' x\n",
                        self.RELEASE_CERT)
 
     def test_debug_signed_release_apk_is_refused(self):
         with self.assertRaisesRegex(build.BuildError, "DEBUG"):
-            self.check("package: name='x' versionCode='11' versionName='1.2.1' x\n",
+            self.check("package: name='com.lomoware.screen_translate' versionCode='11' versionName='1.2.1' x\n",
                        "Signer #1 certificate DN: C=US, O=Android, CN=Android Debug\n")
 
 if __name__ == "__main__":

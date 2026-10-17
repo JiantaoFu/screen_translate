@@ -9,6 +9,8 @@ import '../providers/translation_provider.dart';
 import '../services/ocr_service.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import '../services/firebase_analytics_service.dart';
+import '../lite/lite_gate.dart';
+import '../lite/paywall_screen.dart';
 
 class ImageTranslationScreen extends StatefulWidget {
   final File? imageFile;
@@ -94,6 +96,16 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
         targetLanguage: translationProvider.targetLanguage,
         translationType: 'image_${translationProvider.translationMode.name}',
       );
+
+      // Lite: an image that produced text is one free translation; if it was
+      // the last one, show the paywall now, over the result.
+      final gate = LiteGate.instance;
+      if (gate != null && results.isNotEmpty) {
+        await gate.recordTranslationSuccess(kind: 'image');
+        if (mounted && gate.takePendingPaywall()) {
+          PaywallScreen.show(context, gate, trigger: 'limit_reached');
+        }
+      }
     } catch (e, stack) {
       debugPrint('[ImageTranslation] ERROR processing image: $e\n$stack');
       setState(() {

@@ -147,5 +147,17 @@
   "first_failure_wrong": "La traducción era incorrecta",
   "first_failure_slow": "Fue demasiado lento",
   "overlay_permission_not_granted": "Aún no se pueden mostrar traducciones: activa «Mostrar sobre otras apps» para Screen Translate y vuelve.",
-  "screen_capture_not_granted": "No se permitió la captura de pantalla, así que no se puede traducir. Toca Iniciar de nuevo y permite la captura."
+  "screen_capture_not_granted": "No se permitió la captura de pantalla, así que no se puede traducir. Toca Iniciar de nuevo y permite la captura.",
+  "paywall_title": "Has usado las traducciones gratis de hoy",
+  "paywall_body": "Screen Translator Lite incluye {limit} traducciones gratis al día. Desbloquea Pro una sola vez para traducir sin límites.",
+  "paywall_benefit_unlimited": "Traducciones ilimitadas, todos los días",
+  "paywall_benefit_once": "Pago único, sin suscripción",
+  "paywall_unlock_button": "Desbloquear Pro · {price}",
+  "paywall_unlock_button_no_price": "Desbloquear Pro",
+  "paywall_restore": "Restaurar compra",
+  "paywall_not_now": "Ahora no",
+  "paywall_store_unavailable": "Google Play no está disponible ahora. Inténtalo de nuevo más tarde.",
+  "paywall_pro_unlocked": "Pro desbloqueado: ¡traducciones ilimitadas!",
+  "paywall_reset_hint": "Las traducciones gratis se reinician a medianoche.",
+  "lite_remaining_today": "Traducciones gratis restantes hoy: {count}"
 }

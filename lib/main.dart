@@ -18,6 +18,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/review_prompt_service.dart';
+import 'app_flavor.dart';
+import 'lite/lite_gate.dart';
 
 Future<void> main() async {
   Logger.root.level = Level.ALL;
@@ -25,18 +27,35 @@ Future<void> main() async {
     print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
   });
   WidgetsFlutterBinding.ensureInitialized();
+  // paid or lite (a local method call, no network).
+  await AppFlavorConfig.resolve();
 
   // Run the app UI immediately so the user never gets stuck on the splash screen/logo!
   runApp(const ScreenTranslateApp());
+
+  // Lite: daily quota + Play Billing (restores purchases). Independent of
+  // Firebase so the limit and Pro work even when Firebase can't start; the
+  // limit itself is read from Remote Config whenever it's needed.
+  Future(() async {
+    try {
+      await LiteGate.initForApp();
+    } catch (e) {
+      print('Lite: billing init failed: $e');
+    }
+  });
 
   // Initialize Firebase and other network-dependent background services asynchronously
   Future(() async {
     try {
       print('Background Services: Initializing Firebase...');
       try {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ).timeout(const Duration(seconds: 10));
+        // firebase_options.dart is the paid app's config. Lite initializes
+        // from its own src/lite/google-services.json; without that file
+        // this throws and the lite app runs without Firebase.
+        await (AppFlavorConfig.isLite
+                ? Firebase.initializeApp()
+                : Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform))
+            .timeout(const Duration(seconds: 10));
       } on FirebaseException catch (e) {
         // The Android FlutterFire plugin auto-initializes the default
         // Firebase app from google-services.json via a native
@@ -92,7 +111,7 @@ class ScreenTranslateApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Screen Translate',
+      title: AppFlavorConfig.isLite ? 'Screen Translator Lite' : 'Screen Translate',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

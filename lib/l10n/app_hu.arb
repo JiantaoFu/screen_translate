@@ -147,5 +147,17 @@
   "first_failure_wrong": "A fordítás hibás volt",
   "first_failure_slow": "Túl lassú volt",
   "overlay_permission_not_granted": "A fordítások még nem jelenhetnek meg: kapcsolja be a „Megjelenítés más alkalmazások felett” beállítást a Screen Translate számára, majd térjen vissza.",
-  "screen_capture_not_granted": "A képernyőrögzítés nem lett engedélyezve, így nem lehet fordítani. Koppintson újra az Indításra, és engedélyezze a rögzítést."
+  "screen_capture_not_granted": "A képernyőrögzítés nem lett engedélyezve, így nem lehet fordítani. Koppintson újra az Indításra, és engedélyezze a rögzítést.",
+  "paywall_title": "Elhasználtad a mai ingyenes fordításokat",
+  "paywall_body": "A Screen Translator Lite naponta {limit} ingyenes fordítást tartalmaz. Oldd fel egyszer a Pro verziót a korlátlan fordításhoz.",
+  "paywall_benefit_unlimited": "Korlátlan fordítás minden nap",
+  "paywall_benefit_once": "Egyszeri vásárlás, előfizetés nélkül",
+  "paywall_unlock_button": "Pro feloldása · {price}",
+  "paywall_unlock_button_no_price": "Pro feloldása",
+  "paywall_restore": "Vásárlás visszaállítása",
+  "paywall_not_now": "Most nem",
+  "paywall_store_unavailable": "A Google Play most nem érhető el. Próbáld újra később.",
+  "paywall_pro_unlocked": "Pro feloldva: korlátlan fordítás!",
+  "paywall_reset_hint": "Az ingyenes fordítások éjfélkor nullázódnak.",
+  "lite_remaining_today": "Ma hátralévő ingyenes fordítások: {count}"
 }

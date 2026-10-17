@@ -488,4 +488,47 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Ekran kaydına izin verilmedi, bu yüzden çeviri yapılamıyor. Başlat\'a tekrar dokunun ve ekran kaydına izin verin.';
+
+  @override
+  String get paywall_title => 'Bugünkü ücretsiz çevirileri kullandınız';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite günde $limit ücretsiz çeviri içerir. Sınırsız çeviri için Pro\'yu bir kez açın.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Her gün sınırsız çeviri';
+
+  @override
+  String get paywall_benefit_once => 'Tek seferlik satın alma, abonelik yok';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro\'yu aç · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro\'yu aç';
+
+  @override
+  String get paywall_restore => 'Satın alımı geri yükle';
+
+  @override
+  String get paywall_not_now => 'Şimdi değil';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro açıldı: sınırsız çeviri!';
+
+  @override
+  String get paywall_reset_hint => 'Ücretsiz çeviriler gece yarısı sıfırlanır.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Bugün kalan ücretsiz çeviri: $count';
+  }
 }

@@ -477,4 +477,47 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       '화면 녹화가 허용되지 않아 번역할 수 없습니다. 시작을 다시 누르고 화면 녹화를 허용하세요.';
+
+  @override
+  String get paywall_title => '오늘의 무료 번역을 모두 사용했습니다';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite는 하루 $limit회 무료 번역을 제공합니다. Pro를 한 번 구매하면 무제한으로 번역할 수 있습니다.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => '매일 무제한 번역';
+
+  @override
+  String get paywall_benefit_once => '한 번 구매, 구독 없음';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro 잠금 해제 · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro 잠금 해제';
+
+  @override
+  String get paywall_restore => '구매 복원';
+
+  @override
+  String get paywall_not_now => '나중에';
+
+  @override
+  String get paywall_store_unavailable =>
+      '지금은 Google Play를 사용할 수 없습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro 잠금 해제됨: 무제한 번역!';
+
+  @override
+  String get paywall_reset_hint => '무료 번역은 자정에 초기화됩니다.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return '오늘 남은 무료 번역: $count회';
+  }
 }

@@ -486,4 +486,48 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Chưa cho phép ghi màn hình nên không thể dịch. Nhấn Bắt đầu lần nữa và cho phép ghi màn hình.';
+
+  @override
+  String get paywall_title => 'Bạn đã dùng hết lượt dịch miễn phí hôm nay';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite có $limit lượt dịch miễn phí mỗi ngày. Mở khóa Pro một lần để dịch không giới hạn.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Dịch không giới hạn mỗi ngày';
+
+  @override
+  String get paywall_benefit_once => 'Mua một lần, không đăng ký';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Mở khóa Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Mở khóa Pro';
+
+  @override
+  String get paywall_restore => 'Khôi phục giao dịch mua';
+
+  @override
+  String get paywall_not_now => 'Để sau';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play hiện không khả dụng. Vui lòng thử lại sau.';
+
+  @override
+  String get paywall_pro_unlocked => 'Đã mở khóa Pro: dịch không giới hạn!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Lượt dịch miễn phí được đặt lại lúc nửa đêm.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Lượt dịch miễn phí còn lại hôm nay: $count';
+  }
 }

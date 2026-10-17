@@ -471,4 +471,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get screen_capture_not_granted => '未允许录屏，无法翻译。请再次点击开始并允许屏幕录制。';
+
+  @override
+  String get paywall_title => '今天的免费翻译次数已用完';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite 每天可免费翻译 $limit 次。一次性解锁 Pro，即可无限翻译。';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => '每天无限次翻译';
+
+  @override
+  String get paywall_benefit_once => '一次性购买，无需订阅';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return '解锁 Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => '解锁 Pro';
+
+  @override
+  String get paywall_restore => '恢复购买';
+
+  @override
+  String get paywall_not_now => '以后再说';
+
+  @override
+  String get paywall_store_unavailable => 'Google Play 暂时不可用，请稍后再试。';
+
+  @override
+  String get paywall_pro_unlocked => '已解锁 Pro：无限翻译！';
+
+  @override
+  String get paywall_reset_hint => '免费次数将在午夜重置。';
+
+  @override
+  String lite_remaining_today(int count) {
+    return '今日剩余免费翻译：$count 次';
+  }
 }

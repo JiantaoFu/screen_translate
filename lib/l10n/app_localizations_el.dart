@@ -490,4 +490,50 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Η καταγραφή οθόνης δεν επιτράπηκε, οπότε δεν γίνεται μετάφραση. Πατήστε ξανά Έναρξη και επιτρέψτε την καταγραφή.';
+
+  @override
+  String get paywall_title =>
+      'Χρησιμοποιήσατε τις δωρεάν μεταφράσεις της ημέρας';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Το Screen Translator Lite περιλαμβάνει $limit δωρεάν μεταφράσεις την ημέρα. Ξεκλειδώστε το Pro μία φορά για απεριόριστες μεταφράσεις.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Απεριόριστες μεταφράσεις κάθε μέρα';
+
+  @override
+  String get paywall_benefit_once => 'Εφάπαξ αγορά, χωρίς συνδρομή';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Ξεκλείδωμα Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Ξεκλείδωμα Pro';
+
+  @override
+  String get paywall_restore => 'Επαναφορά αγοράς';
+
+  @override
+  String get paywall_not_now => 'Όχι τώρα';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Το Google Play δεν είναι διαθέσιμο αυτή τη στιγμή. Δοκιμάστε ξανά αργότερα.';
+
+  @override
+  String get paywall_pro_unlocked =>
+      'Το Pro ξεκλειδώθηκε: απεριόριστες μεταφράσεις!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Οι δωρεάν μεταφράσεις μηδενίζονται τα μεσάνυχτα.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Δωρεάν μεταφράσεις που απομένουν σήμερα: $count';
+  }
 }

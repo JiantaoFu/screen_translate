@@ -487,4 +487,49 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Skärminspelning tilläts inte, så inget kan översättas. Tryck på Start igen och tillåt skärminspelning.';
+
+  @override
+  String get paywall_title => 'Du har använt dagens gratis översättningar';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite innehåller $limit gratis översättningar per dag. Lås upp Pro en gång för obegränsade översättningar.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited =>
+      'Obegränsade översättningar varje dag';
+
+  @override
+  String get paywall_benefit_once => 'Engångsköp, ingen prenumeration';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Lås upp Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Lås upp Pro';
+
+  @override
+  String get paywall_restore => 'Återställ köp';
+
+  @override
+  String get paywall_not_now => 'Inte nu';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play är inte tillgängligt just nu. Försök igen senare.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro upplåst: obegränsade översättningar!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Gratis översättningar återställs vid midnatt.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Gratis översättningar kvar i dag: $count';
+  }
 }

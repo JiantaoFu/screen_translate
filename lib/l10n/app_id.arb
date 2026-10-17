@@ -147,5 +147,17 @@
   "first_failure_wrong": "Terjemahannya salah",
   "first_failure_slow": "Terlalu lambat",
   "overlay_permission_not_granted": "Terjemahan belum bisa muncul: aktifkan \"Tampilkan di atas aplikasi lain\" untuk Screen Translate, lalu kembali.",
-  "screen_capture_not_granted": "Perekaman layar tidak diizinkan, jadi tidak ada yang bisa diterjemahkan. Ketuk Mulai lagi dan izinkan perekaman layar."
+  "screen_capture_not_granted": "Perekaman layar tidak diizinkan, jadi tidak ada yang bisa diterjemahkan. Ketuk Mulai lagi dan izinkan perekaman layar.",
+  "paywall_title": "Anda telah memakai terjemahan gratis hari ini",
+  "paywall_body": "Screen Translator Lite menyertakan {limit} terjemahan gratis per hari. Buka Pro sekali untuk terjemahan tanpa batas.",
+  "paywall_benefit_unlimited": "Terjemahan tanpa batas setiap hari",
+  "paywall_benefit_once": "Sekali beli, tanpa langganan",
+  "paywall_unlock_button": "Buka Pro · {price}",
+  "paywall_unlock_button_no_price": "Buka Pro",
+  "paywall_restore": "Pulihkan pembelian",
+  "paywall_not_now": "Nanti saja",
+  "paywall_store_unavailable": "Google Play sedang tidak tersedia. Coba lagi nanti.",
+  "paywall_pro_unlocked": "Pro terbuka: terjemahan tanpa batas!",
+  "paywall_reset_hint": "Terjemahan gratis diatur ulang tengah malam.",
+  "lite_remaining_today": "Sisa terjemahan gratis hari ini: {count}"
 }

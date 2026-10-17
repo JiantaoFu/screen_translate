@@ -147,5 +147,17 @@
   "first_failure_wrong": "ترجمه اشتباه بود",
   "first_failure_slow": "خیلی کند بود",
   "overlay_permission_not_granted": "هنوز نمی‌توان ترجمه‌ها را نشان داد: «نمایش روی برنامه‌های دیگر» را برای Screen Translate روشن کنید و برگردید.",
-  "screen_capture_not_granted": "اجازه ضبط صفحه داده نشد، پس چیزی ترجمه نمی‌شود. دوباره روی شروع بزنید و ضبط صفحه را مجاز کنید."
+  "screen_capture_not_granted": "اجازه ضبط صفحه داده نشد، پس چیزی ترجمه نمی‌شود. دوباره روی شروع بزنید و ضبط صفحه را مجاز کنید.",
+  "paywall_title": "ترجمه‌های رایگان امروز را استفاده کرده‌اید",
+  "paywall_body": "Screen Translator Lite روزانه {limit} ترجمه رایگان دارد. یک بار Pro را باز کنید تا ترجمه نامحدود داشته باشید.",
+  "paywall_benefit_unlimited": "ترجمه نامحدود، هر روز",
+  "paywall_benefit_once": "خرید یک‌باره، بدون اشتراک",
+  "paywall_unlock_button": "باز کردن Pro · {price}",
+  "paywall_unlock_button_no_price": "باز کردن Pro",
+  "paywall_restore": "بازیابی خرید",
+  "paywall_not_now": "حالا نه",
+  "paywall_store_unavailable": "Google Play در حال حاضر در دسترس نیست. لطفاً بعداً دوباره امتحان کنید.",
+  "paywall_pro_unlocked": "Pro باز شد: ترجمه نامحدود!",
+  "paywall_reset_hint": "ترجمه‌های رایگان نیمه‌شب بازنشانی می‌شوند.",
+  "lite_remaining_today": "ترجمه‌های رایگان باقی‌مانده امروز: {count}"
 }

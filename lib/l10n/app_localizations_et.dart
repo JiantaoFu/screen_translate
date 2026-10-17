@@ -485,4 +485,47 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Ekraanisalvestust ei lubatud, seega ei saa midagi tõlkida. Puudutage uuesti Alusta ja lubage ekraanisalvestus.';
+
+  @override
+  String get paywall_title => 'Oled tänased tasuta tõlked ära kasutanud';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite sisaldab $limit tasuta tõlget päevas. Ava Pro ühe korra ja tõlgi piiramatult.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Piiramatud tõlked iga päev';
+
+  @override
+  String get paywall_benefit_once => 'Ühekordne ost, tellimust pole';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Ava Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Ava Pro';
+
+  @override
+  String get paywall_restore => 'Taasta ost';
+
+  @override
+  String get paywall_not_now => 'Mitte praegu';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play pole praegu saadaval. Proovi hiljem uuesti.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro avatud: piiramatud tõlked!';
+
+  @override
+  String get paywall_reset_hint => 'Tasuta tõlked lähtestatakse keskööl.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Täna jäänud tasuta tõlkeid: $count';
+  }
 }

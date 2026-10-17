@@ -147,5 +147,17 @@
   "first_failure_wrong": "Prijevod je bio pogrešan",
   "first_failure_slow": "Bilo je presporo",
   "overlay_permission_not_granted": "Prijevodi se još ne mogu prikazati: uključite „Prikaz preko drugih aplikacija” za Screen Translate i vratite se.",
-  "screen_capture_not_granted": "Snimanje zaslona nije dopušteno pa se ništa ne može prevesti. Ponovno dodirnite Pokreni i dopustite snimanje."
+  "screen_capture_not_granted": "Snimanje zaslona nije dopušteno pa se ništa ne može prevesti. Ponovno dodirnite Pokreni i dopustite snimanje.",
+  "paywall_title": "Iskoristili ste današnje besplatne prijevode",
+  "paywall_body": "Screen Translator Lite uključuje {limit} besplatnih prijevoda dnevno. Otključajte Pro jednom za neograničene prijevode.",
+  "paywall_benefit_unlimited": "Neograničeni prijevodi svaki dan",
+  "paywall_benefit_once": "Jednokratna kupnja, bez pretplate",
+  "paywall_unlock_button": "Otključaj Pro · {price}",
+  "paywall_unlock_button_no_price": "Otključaj Pro",
+  "paywall_restore": "Vrati kupnju",
+  "paywall_not_now": "Ne sada",
+  "paywall_store_unavailable": "Google Play trenutačno nije dostupan. Pokušajte ponovno kasnije.",
+  "paywall_pro_unlocked": "Pro otključan: neograničeni prijevodi!",
+  "paywall_reset_hint": "Besplatni prijevodi poništavaju se u ponoć.",
+  "lite_remaining_today": "Preostali besplatni prijevodi danas: {count}"
 }

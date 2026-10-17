@@ -487,4 +487,47 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'स्क्रीन कैप्चर की अनुमति नहीं मिली, इसलिए अनुवाद नहीं हो सकता। फिर से शुरू करें पर टैप करें और स्क्रीन कैप्चर की अनुमति दें।';
+
+  @override
+  String get paywall_title => 'आपने आज के मुफ़्त अनुवाद इस्तेमाल कर लिए हैं';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite में हर दिन $limit मुफ़्त अनुवाद मिलते हैं। असीमित अनुवाद के लिए एक बार Pro अनलॉक करें।';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'हर दिन असीमित अनुवाद';
+
+  @override
+  String get paywall_benefit_once => 'एक बार की ख़रीद, कोई सदस्यता नहीं';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro अनलॉक करें · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro अनलॉक करें';
+
+  @override
+  String get paywall_restore => 'ख़रीद बहाल करें';
+
+  @override
+  String get paywall_not_now => 'अभी नहीं';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play अभी उपलब्ध नहीं है। कृपया बाद में फिर से कोशिश करें।';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro अनलॉक हो गया: असीमित अनुवाद!';
+
+  @override
+  String get paywall_reset_hint => 'मुफ़्त अनुवाद आधी रात को रीसेट होते हैं।';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'आज बचे मुफ़्त अनुवाद: $count';
+  }
 }

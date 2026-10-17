@@ -147,5 +147,17 @@
   "first_failure_wrong": "Перевод был неверным",
   "first_failure_slow": "Работало слишком медленно",
   "overlay_permission_not_granted": "Перевод пока не может появиться: включите «Показ поверх других приложений» для Screen Translate и вернитесь.",
-  "screen_capture_not_granted": "Запись экрана не разрешена, поэтому переводить нечего. Нажмите «Старт» снова и разрешите запись экрана."
+  "screen_capture_not_granted": "Запись экрана не разрешена, поэтому переводить нечего. Нажмите «Старт» снова и разрешите запись экрана.",
+  "paywall_title": "Вы использовали бесплатные переводы на сегодня",
+  "paywall_body": "Screen Translator Lite даёт {limit} бесплатных переводов в день. Разблокируйте Pro один раз — и переводите без ограничений.",
+  "paywall_benefit_unlimited": "Безлимитные переводы каждый день",
+  "paywall_benefit_once": "Разовая покупка, без подписки",
+  "paywall_unlock_button": "Разблокировать Pro · {price}",
+  "paywall_unlock_button_no_price": "Разблокировать Pro",
+  "paywall_restore": "Восстановить покупку",
+  "paywall_not_now": "Не сейчас",
+  "paywall_store_unavailable": "Google Play сейчас недоступен. Попробуйте позже.",
+  "paywall_pro_unlocked": "Pro разблокирован: переводы без ограничений!",
+  "paywall_reset_hint": "Бесплатные переводы обновляются в полночь.",
+  "lite_remaining_today": "Осталось бесплатных переводов сегодня: {count}"
 }

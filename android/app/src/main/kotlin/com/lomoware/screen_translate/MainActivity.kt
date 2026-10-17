@@ -136,6 +136,11 @@ class MainActivity: FlutterActivity() {
         }
 
         // "Send feedback by email" (Settings and the download error dialog).
+        // Which product flavor this APK is (paid / lite); lib/app_flavor.dart.
+        MethodChannel(binaryMessenger, "com.lomoware.screen_translate/flavor").setMethodCallHandler { call, result ->
+            if (call.method == "getFlavor") result.success(BuildConfig.FLAVOR) else result.notImplemented()
+        }
+
         MethodChannel(binaryMessenger, FEEDBACK_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 // Installed versionName+versionCode, so the email always

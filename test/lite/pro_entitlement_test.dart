@@ -9,15 +9,20 @@ void main() {
   late SharedPreferences prefs;
   late FakeStore store;
   late List<PurchaseDetails> purchasedCallbacks;
+  late int revokedCallbacks;
 
-  ProEntitlement make() =>
-      ProEntitlement(prefs, store: store, onPurchased: purchasedCallbacks.add);
+  ProEntitlement make() => ProEntitlement(prefs,
+      store: store,
+      ownedPurchases: store,
+      onPurchased: purchasedCallbacks.add,
+      onRevoked: () => revokedCallbacks++);
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     store = FakeStore();
     purchasedCallbacks = [];
+    revokedCallbacks = 0;
   });
 
   test('starts free; init loads Play price and restores purchases', () async {
@@ -119,5 +124,98 @@ void main() {
     await pumpEventQueue();
     expect(store.restores, 2);
     expect(e.isPro, isTrue);
+  });
+
+  group('refund revocation (owned purchases query at app start)', () {
+    setUp(() async => prefs.setBool(ProEntitlement.prefsKey, true));
+
+    test('query ok and pro_unlock missing -> revoke, persist, callback', () async {
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      final e = make();
+      expect(e.isPro, isTrue);
+      await e.init();
+      expect(store.ownedQueries, 1);
+      expect(e.isPro, isFalse);
+      expect(prefs.getBool(ProEntitlement.prefsKey), isFalse);
+      expect(revokedCallbacks, 1);
+    });
+
+    test('only other products / non-purchased pro_unlock -> revoke', () async {
+      final e = make();
+      store.ownedResult = OwnedPurchasesResult.ok([
+        purchase(PurchaseStatus.purchased, productId: 'something_else'),
+        purchase(PurchaseStatus.pending, pendingComplete: false),
+      ]);
+      expect(await e.syncWithStore(), ProSyncOutcome.revoked);
+      expect(e.isPro, isFalse);
+    });
+
+    test('query ok and pro_unlock present -> keep', () async {
+      store.ownedResult =
+          OwnedPurchasesResult.ok([purchase(PurchaseStatus.purchased, pendingComplete: false)]);
+      final e = make();
+      expect(await e.syncWithStore(), ProSyncOutcome.unchanged);
+      expect(e.isPro, isTrue);
+      expect(revokedCallbacks, 0);
+    });
+
+    test('query ok and pro_unlock present but local free -> grant and acknowledge', () async {
+      await prefs.setBool(ProEntitlement.prefsKey, false);
+      final owned = purchase(PurchaseStatus.purchased);
+      store.ownedResult = OwnedPurchasesResult.ok([owned]);
+      final e = make();
+      expect(e.isPro, isFalse);
+      expect(await e.syncWithStore(), ProSyncOutcome.granted);
+      expect(e.isPro, isTrue);
+      expect(prefs.getBool(ProEntitlement.prefsKey), isTrue);
+      expect(store.completed, [owned]);
+      expect(purchasedCallbacks, isEmpty); // not a new purchase
+    });
+
+    test('query error (e.g. offline) -> keep pro', () async {
+      store.ownedResult = const OwnedPurchasesResult.error();
+      final e = make();
+      await e.init();
+      expect(e.isPro, isTrue);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(prefs.getBool(ProEntitlement.prefsKey), isTrue);
+      expect(revokedCallbacks, 0);
+    });
+
+    test('billing unavailable from the query -> keep pro', () async {
+      store.ownedResult = const OwnedPurchasesResult.unavailable();
+      final e = make();
+      await e.init();
+      expect(e.isPro, isTrue);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(revokedCallbacks, 0);
+    });
+
+    test('store unavailable at launch -> no query, keep pro', () async {
+      store.available = false;
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      final e = make();
+      await e.init();
+      expect(store.ownedQueries, 0);
+      expect(e.isPro, isTrue);
+    });
+
+    test('query throws -> keep pro', () async {
+      store.ownedThrows = Exception('boom');
+      final e = make();
+      await e.init();
+      expect(e.isPro, isTrue);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(revokedCallbacks, 0);
+    });
+
+    test('free user with nothing owned stays free, no revoke event', () async {
+      await prefs.setBool(ProEntitlement.prefsKey, false);
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      final e = make();
+      await e.init();
+      expect(e.isPro, isFalse);
+      expect(revokedCallbacks, 0);
+    });
   });
 }

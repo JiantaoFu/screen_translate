@@ -16,7 +16,7 @@ void main() {
 
   LiteGate make({bool enabled = true, int limit = 5}) {
     late LiteGate g;
-    final entitlement = ProEntitlement(prefs, store: store, onPurchased: (_) => g.debugOnPurchased());
+    final entitlement = ProEntitlement(prefs, store: store, ownedPurchases: store, onPurchased: (_) => g.debugOnPurchased());
     g = LiteGate(
       enabled: enabled,
       quota: DailyTranslationQuota(prefs, now: () => now, limit: () => limit),
@@ -141,5 +141,26 @@ void main() {
     expect(gate.paywallPending, isFalse);
     expect(events, isEmpty);
     expect(prefs.getInt(DailyTranslationQuota.countKey), isNull);
+  });
+
+  test('refund revocation logs pro_revoked without PII and drops pro', () async {
+    await prefs.setBool(ProEntitlement.prefsKey, true);
+    late LiteGate g;
+    final entitlement = ProEntitlement(prefs,
+        store: store,
+        ownedPurchases: store,
+        onRevoked: () => g.debugOnRevoked());
+    g = LiteGate(
+      enabled: true,
+      quota: DailyTranslationQuota(prefs, now: () => now, limit: () => 5),
+      entitlement: entitlement,
+      logEvent: (name, params) async => events.add(MapEntry(name, params)),
+    );
+    expect(g.isPro, isTrue);
+    store.ownedResult = const OwnedPurchasesResult.ok([]);
+    await entitlement.init();
+    expect(g.isPro, isFalse);
+    expect(names(), [LiteGate.evProRevoked]);
+    expect(events.single.value, {'product_id': ProEntitlement.productId});
   });
 }

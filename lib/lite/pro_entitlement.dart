@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// The parts of [InAppPurchase] the lite flavor uses; a fake in tests.
@@ -31,6 +32,74 @@ class InAppPurchaseGateway implements StoreGateway {
   Future<void> completePurchase(PurchaseDetails purchase) => _iap.completePurchase(purchase);
 }
 
+/// Outcome of asking the store which products the user owns right now.
+enum OwnedQueryStatus {
+  /// The query ran and [OwnedPurchasesResult.purchases] is authoritative.
+  ok,
+
+  /// Billing isn't usable here (no Play, not Android, not connected).
+  unavailable,
+
+  /// Play answered with an error (offline, service timeout, ...).
+  error,
+}
+
+class OwnedPurchasesResult {
+  final OwnedQueryStatus status;
+  final List<PurchaseDetails> purchases;
+
+  const OwnedPurchasesResult.ok(this.purchases) : status = OwnedQueryStatus.ok;
+  const OwnedPurchasesResult.unavailable()
+      : status = OwnedQueryStatus.unavailable,
+        purchases = const [];
+  const OwnedPurchasesResult.error()
+      : status = OwnedQueryStatus.error,
+        purchases = const [];
+}
+
+/// Asks the store for the purchases the user currently owns; a fake in tests.
+abstract class OwnedPurchasesSource {
+  Future<OwnedPurchasesResult> queryOwned();
+}
+
+/// Google Play's owned purchases (BillingClient.queryPurchasesAsync, via
+/// [InAppPurchaseAndroidPlatformAddition.queryPastPurchases]). A refunded and
+/// revoked purchase is no longer returned. Never throws.
+class PlayOwnedPurchasesSource implements OwnedPurchasesSource {
+  @override
+  Future<OwnedPurchasesResult> queryOwned() async {
+    try {
+      if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+        return const OwnedPurchasesResult.unavailable();
+      }
+      final iap = InAppPurchase.instance;
+      if (!await iap.isAvailable()) return const OwnedPurchasesResult.unavailable();
+      final res = await iap
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>()
+          .queryPastPurchases();
+      if (res.error != null) return const OwnedPurchasesResult.error();
+      return OwnedPurchasesResult.ok(res.pastPurchases);
+    } catch (_) {
+      return const OwnedPurchasesResult.error();
+    }
+  }
+}
+
+/// What [ProEntitlement.syncWithStore] did to the local Pro flag.
+enum ProSyncOutcome {
+  /// Query failed or billing unavailable: local state left as it was.
+  kept,
+
+  /// Play agrees with the local state.
+  unchanged,
+
+  /// Play has `pro_unlock` but local didn't: granted (and acknowledged).
+  granted,
+
+  /// Play answered and has no purchased `pro_unlock` (refund/revoke): revoked.
+  revoked,
+}
+
 /// Whether the lite user owns the one-time `pro_unlock` product.
 ///
 /// - Purchased/restored `pro_unlock` grants Pro and is remembered locally,
@@ -39,6 +108,11 @@ class InAppPurchaseGateway implements StoreGateway {
 ///   on Google Play (unacknowledged purchases are refunded after 3 days).
 /// - [init] restores purchases, so a reinstall or a new phone gets Pro back
 ///   without a tap; the paywall also has a Restore button.
+/// - [init] also asks Play which purchases are owned ([syncWithStore]) and
+///   revokes local Pro when Play answers successfully without `pro_unlock`
+///   (refunded + revoked in Play Console). Offline, billing unavailable or
+///   any error keeps the local state, so a paying user is never locked out
+///   by a flaky connection.
 /// - The price shown is Play's localized [ProductDetails.price], never a
 ///   hard-coded string.
 class ProEntitlement extends ChangeNotifier {
@@ -47,20 +121,31 @@ class ProEntitlement extends ChangeNotifier {
 
   final SharedPreferences _prefs;
   final StoreGateway _store;
+  final OwnedPurchasesSource _owned;
 
   /// Called once for a new purchase (not for restores): analytics.
   final void Function(PurchaseDetails purchase)? onPurchased;
+
+  /// Called when Play no longer reports `pro_unlock` and Pro is revoked.
+  final void Function()? onRevoked;
 
   StreamSubscription<List<PurchaseDetails>>? _sub;
   bool _isPro;
   bool _storeAvailable = false;
   bool _purchasePending = false;
   bool _initialized = false;
+  int _grants = 0;
   ProductDetails? _product;
   String? _lastError;
 
-  ProEntitlement(this._prefs, {StoreGateway? store, this.onPurchased})
-      : _store = store ?? InAppPurchaseGateway(),
+  ProEntitlement(
+    this._prefs, {
+    StoreGateway? store,
+    OwnedPurchasesSource? ownedPurchases,
+    this.onPurchased,
+    this.onRevoked,
+  })  : _store = store ?? InAppPurchaseGateway(),
+        _owned = ownedPurchases ?? PlayOwnedPurchasesSource(),
         _isPro = _prefs.getBool(prefsKey) ?? false;
 
   bool get isPro => _isPro;
@@ -94,6 +179,43 @@ class ProEntitlement extends ChangeNotifier {
       _lastError = e.toString();
     }
     notifyListeners();
+    if (_storeAvailable) await syncWithStore();
+  }
+
+  /// Reconciles local Pro with what Play says is owned (run at app start).
+  ///
+  /// Revokes only when the query succeeded and no `pro_unlock` is in the
+  /// purchased state; grants (and acknowledges) when Play has it but local
+  /// doesn't; otherwise keeps the current state.
+  Future<ProSyncOutcome> syncWithStore() async {
+    final grantsBefore = _grants;
+    OwnedPurchasesResult res;
+    try {
+      res = await _owned.queryOwned();
+    } catch (_) {
+      return ProSyncOutcome.kept;
+    }
+    if (res.status != OwnedQueryStatus.ok) return ProSyncOutcome.kept;
+
+    final owned = res.purchases.where((p) =>
+        p.productID == productId &&
+        (p.status == PurchaseStatus.purchased || p.status == PurchaseStatus.restored));
+    if (owned.isNotEmpty) {
+      if (_isPro) return ProSyncOutcome.unchanged;
+      await _grant();
+      for (final p in owned) {
+        if (p.pendingCompletePurchase) await _complete(p); // acknowledge
+      }
+      notifyListeners();
+      return ProSyncOutcome.granted;
+    }
+    // A purchase that landed on the stream while we were querying wins.
+    if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
+    _isPro = false;
+    await _prefs.setBool(prefsKey, false);
+    notifyListeners();
+    onRevoked?.call();
+    return ProSyncOutcome.revoked;
   }
 
   Future<void> loadProduct() async {
@@ -182,6 +304,7 @@ class ProEntitlement extends ChangeNotifier {
   }
 
   Future<void> _grant() async {
+    _grants++;
     _isPro = true;
     await _prefs.setBool(prefsKey, true);
   }

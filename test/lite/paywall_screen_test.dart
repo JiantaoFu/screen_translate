@@ -41,7 +41,7 @@ void main() {
     gate = LiteGate(
       enabled: true,
       quota: DailyTranslationQuota(prefs),
-      entitlement: ProEntitlement(prefs, store: store),
+      entitlement: ProEntitlement(prefs, store: store, ownedPurchases: store),
       logEvent: (name, params) async => events.add(name),
     );
     await gate.entitlement.init();

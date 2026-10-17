@@ -29,7 +29,7 @@ PurchaseDetails purchase(PurchaseStatus status,
   return p;
 }
 
-class FakeStore implements StoreGateway {
+class FakeStore implements StoreGateway, OwnedPurchasesSource {
   final controller = StreamController<List<PurchaseDetails>>.broadcast();
   bool available = true;
   List<ProductDetails> products = [proProduct()];
@@ -39,6 +39,20 @@ class FakeStore implements StoreGateway {
 
   /// What restorePurchases() emits (e.g. an owned pro_unlock on reinstall).
   List<PurchaseDetails> owned = [];
+
+  /// What queryOwned() answers; null means "ok, with [owned]" (Play agrees).
+  OwnedPurchasesResult? ownedResult;
+
+  /// Thrown by queryOwned() when set.
+  Object? ownedThrows;
+  int ownedQueries = 0;
+
+  @override
+  Future<OwnedPurchasesResult> queryOwned() async {
+    ownedQueries++;
+    if (ownedThrows != null) throw ownedThrows!;
+    return ownedResult ?? OwnedPurchasesResult.ok(owned);
+  }
 
   @override
   Stream<List<PurchaseDetails>> get purchaseStream => controller.stream;

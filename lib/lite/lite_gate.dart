@@ -18,12 +18,14 @@ typedef LiteEventLogger = Future<void> Function(String name, Map<String, Object>
 ///   last free translation sets [paywallPending], and the UI shows the
 ///   paywall right after (on return to the app for live sessions).
 /// - Analytics: translation_success, free_limit_hit, paywall_shown,
-///   pro_purchased (with remaining_free / daily_limit where they apply).
+///   pro_purchased (with remaining_free / daily_limit where they apply),
+///   pro_revoked (Play no longer reports pro_unlock, e.g. refunded).
 class LiteGate extends ChangeNotifier {
   static const evTranslationSuccess = 'translation_success';
   static const evFreeLimitHit = 'free_limit_hit';
   static const evPaywallShown = 'paywall_shown';
   static const evProPurchased = 'pro_purchased';
+  static const evProRevoked = 'pro_revoked';
 
   /// The app-wide gate; null until [initForApp] ran (and always in paid).
   static final ValueNotifier<LiteGate?> current = ValueNotifier<LiteGate?>(null);
@@ -49,7 +51,11 @@ class LiteGate extends ChangeNotifier {
     if (!AppFlavorConfig.isLite || current.value != null) return;
     final prefs = await SharedPreferences.getInstance();
     late final LiteGate gate;
-    final entitlement = ProEntitlement(prefs, onPurchased: (p) => gate._onPurchased());
+    final entitlement = ProEntitlement(
+      prefs,
+      onPurchased: (p) => gate._onPurchased(),
+      onRevoked: () => gate._onRevoked(),
+    );
     gate = LiteGate(
       enabled: true,
       quota: DailyTranslationQuota(prefs,
@@ -120,8 +126,15 @@ class LiteGate extends ChangeNotifier {
     });
   }
 
+  void _onRevoked() {
+    _log(evProRevoked, {'product_id': ProEntitlement.productId});
+  }
+
   @visibleForTesting
   void debugOnPurchased() => _onPurchased();
+
+  @visibleForTesting
+  void debugOnRevoked() => _onRevoked();
 
   @override
   void dispose() {

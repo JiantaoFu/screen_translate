@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Anslut ditt AI-konto",
   "connect_ai_account_prefix": "Skaffa en gratis API-nyckel från ",
   "connect_ai_account_suffix": " och klistra in den nedan.",
+  "ai_mode_data_notice": "Moln-AI skickar igenkänd text till BigModel.cn (Zhipu AI) med din egen API-nyckel. Snabb och AI-förbättrad körs helt på din enhet.",
   "api_key_hint_short": "Klistra in din API-nyckel här",
   "save_and_verify": "Spara och verifiera",
   "cloud_ai_connected": "Ansluten! Moln-AI är redo.",

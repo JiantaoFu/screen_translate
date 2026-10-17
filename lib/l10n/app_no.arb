@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Koble til AI-kontoen din",
   "connect_ai_account_prefix": "Få en gratis API-nøkkel fra ",
   "connect_ai_account_suffix": " og lim den inn nedenfor.",
+  "ai_mode_data_notice": "Sky-AI sender gjenkjent tekst til BigModel.cn (Zhipu AI) med din egen API-nøkkel. Rask og AI-forbedret kjører helt på enheten din.",
   "api_key_hint_short": "Lim inn API-nøkkelen din her",
   "save_and_verify": "Lagre og verifiser",
   "cloud_ai_connected": "Tilkoblet! Sky-AI er klar.",

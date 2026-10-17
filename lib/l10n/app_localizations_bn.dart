@@ -360,6 +360,10 @@ class AppLocalizationsBn extends AppLocalizations {
   String get connect_ai_account_suffix => ' এবং নিচে পেস্ট করুন।';
 
   @override
+  String get ai_mode_data_notice =>
+      'ক্লাউড এআই আপনার নিজের API কী ব্যবহার করে শনাক্ত করা লেখা BigModel.cn (Zhipu AI)-এ পাঠায়। দ্রুত এবং এআই উন্নত সম্পূর্ণভাবে আপনার ডিভাইসেই চলে।';
+
+  @override
   String get api_key_hint_short => 'আপনার এপিআই কী এখানে পেস্ট করুন';
 
   @override

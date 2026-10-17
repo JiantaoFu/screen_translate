@@ -353,6 +353,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get connect_ai_account_suffix => ', 아래에 붙여넣으세요.';
 
   @override
+  String get ai_mode_data_notice =>
+      '클라우드 AI는 인식된 텍스트를 사용자 본인의 API 키로 BigModel.cn(Zhipu AI)에 전송합니다. 빠름 및 AI 강화 모드는 전적으로 기기에서 실행됩니다.';
+
+  @override
   String get api_key_hint_short => '여기에 API 키를 붙여넣으세요';
 
   @override

@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Yapay zeka hesabınızı bağlayın",
   "connect_ai_account_prefix": "Buradan ücretsiz bir API anahtarı alın ",
   "connect_ai_account_suffix": " ve aşağıya yapıştırın.",
+  "ai_mode_data_notice": "Bulut Yapay Zeka, tanınan metni kendi API anahtarınızla BigModel.cn'ye (Zhipu AI) gönderir. Hızlı ve Yapay Zeka ile Geliştirilmiş modları tamamen cihazınızda çalışır.",
   "api_key_hint_short": "API anahtarınızı buraya yapıştırın",
   "save_and_verify": "Kaydet ve Doğrula",
   "cloud_ai_connected": "Bağlandı! Bulut yapay zeka hazır.",

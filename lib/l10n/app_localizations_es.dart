@@ -361,6 +361,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get connect_ai_account_suffix => ' y pégala abajo.';
 
   @override
+  String get ai_mode_data_notice =>
+      'IA en la nube envía el texto reconocido a BigModel.cn (Zhipu AI) usando tu propia clave de API. Rápido y Mejorado con IA funcionan completamente en tu dispositivo.';
+
+  @override
   String get api_key_hint_short => 'Pega aquí tu clave API';
 
   @override

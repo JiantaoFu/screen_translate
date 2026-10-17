@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Conectează-ți contul AI",
   "connect_ai_account_prefix": "Obține o cheie API gratuită de la ",
   "connect_ai_account_suffix": " și lipește-o mai jos.",
+  "ai_mode_data_notice": "AI în cloud trimite textul recunoscut către BigModel.cn (Zhipu AI) folosind propria ta cheie API. Rapid și Îmbunătățit cu AI rulează în întregime pe dispozitivul tău.",
   "api_key_hint_short": "Lipește cheia API aici",
   "save_and_verify": "Salvează și verifică",
   "cloud_ai_connected": "Conectat! AI-ul din cloud este gata.",

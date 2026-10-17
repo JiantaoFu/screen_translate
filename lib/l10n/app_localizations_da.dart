@@ -360,6 +360,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get connect_ai_account_suffix => ' og indsæt den nedenfor.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Cloud AI sender genkendt tekst til BigModel.cn (Zhipu AI) med din egen API-nøgle. Hurtig og AI-forbedret kører udelukkende på din enhed.';
+
+  @override
   String get api_key_hint_short => 'Indsæt din API-nøgle her';
 
   @override

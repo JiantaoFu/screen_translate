@@ -110,6 +110,7 @@
   "connect_ai_account_title": "连接你的AI账户",
   "connect_ai_account_prefix": "从这里获取免费的API密钥 ",
   "connect_ai_account_suffix": "，然后粘贴到下方。",
+  "ai_mode_data_notice": "云端AI 会用你自己的 Key 把识别出的文字发送给 BigModel.cn（智谱 AI）。快速和AI增强模式完全在手机上运行。",
   "api_key_hint_short": "在此粘贴你的API密钥",
   "save_and_verify": "保存并验证",
   "cloud_ai_connected": "已连接！云端AI已就绪。",

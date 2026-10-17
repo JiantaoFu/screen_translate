@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Conecte sua conta de IA",
   "connect_ai_account_prefix": "Obtenha uma chave de API gratuita em ",
   "connect_ai_account_suffix": " e cole abaixo.",
+  "ai_mode_data_notice": "IA na nuvem envia o texto reconhecido para BigModel.cn (Zhipu AI) usando sua própria chave de API. Rápido e Aprimorado por IA funcionam inteiramente no seu dispositivo.",
   "api_key_hint_short": "Cole sua chave de API aqui",
   "save_and_verify": "Salvar e verificar",
   "cloud_ai_connected": "Conectado! A IA na nuvem está pronta.",

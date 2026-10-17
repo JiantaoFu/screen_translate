@@ -110,6 +110,7 @@
   "connect_ai_account_title": "חבר את חשבון הבינה המלאכותית שלך",
   "connect_ai_account_prefix": "קבל מפתח API חינמי מ- ",
   "connect_ai_account_suffix": " והדבק אותו למטה.",
+  "ai_mode_data_notice": "בינה מלאכותית בענן שולחת את הטקסט שזוהה אל BigModel.cn ‏(Zhipu AI) באמצעות מפתח ה-API שלך. מהיר ומשופר בבינה מלאכותית פועלים כולם במכשיר שלך.",
   "api_key_hint_short": "הדבק כאן את מפתח ה-API שלך",
   "save_and_verify": "שמור ואמת",
   "cloud_ai_connected": "מחובר! הבינה המלאכותית בענן מוכנה.",

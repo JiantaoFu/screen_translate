@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Kết nối tài khoản AI của bạn",
   "connect_ai_account_prefix": "Nhận khóa API miễn phí tại ",
   "connect_ai_account_suffix": " và dán vào bên dưới.",
+  "ai_mode_data_notice": "AI đám mây gửi văn bản nhận dạng được đến BigModel.cn (Zhipu AI) bằng khóa API của riêng bạn. Nhanh và Nâng cao bằng AI chạy hoàn toàn trên thiết bị của bạn.",
   "api_key_hint_short": "Dán khóa API của bạn vào đây",
   "save_and_verify": "Lưu & Xác minh",
   "cloud_ai_connected": "Đã kết nối! AI đám mây đã sẵn sàng.",

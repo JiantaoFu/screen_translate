@@ -358,6 +358,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connect_ai_account_suffix => ' والصقه أدناه.';
 
   @override
+  String get ai_mode_data_notice =>
+      'يرسل وضع \"الذكاء الاصطناعي السحابي\" النص الذي تم التعرف عليه إلى BigModel.cn ‏(Zhipu AI) باستخدام مفتاح API الخاص بك. يعمل وضعا \"سريع\" و\"محسّن بالذكاء الاصطناعي\" بالكامل على جهازك.';
+
+  @override
   String get api_key_hint_short => 'الصق مفتاح API هنا';
 
   @override

@@ -357,6 +357,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connect_ai_account_suffix => ' והדבק אותו למטה.';
 
   @override
+  String get ai_mode_data_notice =>
+      'בינה מלאכותית בענן שולחת את הטקסט שזוהה אל BigModel.cn ‏(Zhipu AI) באמצעות מפתח ה-API שלך. מהיר ומשופר בבינה מלאכותית פועלים כולם במכשיר שלך.';
+
+  @override
   String get api_key_hint_short => 'הדבק כאן את מפתח ה-API שלך';
 
   @override

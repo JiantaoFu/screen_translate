@@ -353,6 +353,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get connect_ai_account_suffix => '、下に貼り付けてください。';
 
   @override
+  String get ai_mode_data_notice =>
+      'クラウドAIは、認識したテキストをご自身のAPIキーを使ってBigModel.cn（Zhipu AI）に送信します。クイックとAI強化は完全にデバイス上で動作します。';
+
+  @override
   String get api_key_hint_short => 'ここにAPIキーを貼り付けてください';
 
   @override

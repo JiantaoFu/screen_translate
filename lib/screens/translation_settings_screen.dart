@@ -937,6 +937,26 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               ],
             ),
           ),
+          const SizedBox(height: 10),
+          // Privacy disclosure: shown before the key is saved so users know
+          // what leaves the device in Cloud AI mode.
+          Row(
+            key: const Key('ai_mode_data_notice'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Icon(Icons.privacy_tip_outlined, size: 15, color: Colors.grey[700]),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  localizations.ai_mode_data_notice,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700], height: 1.4),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 14),
           TextField(
             controller: _apiKeyController,

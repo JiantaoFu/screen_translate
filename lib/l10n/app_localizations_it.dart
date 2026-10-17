@@ -362,6 +362,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get connect_ai_account_suffix => ' e incollala qui sotto.';
 
   @override
+  String get ai_mode_data_notice =>
+      'IA Cloud invia il testo riconosciuto a BigModel.cn (Zhipu AI) usando la tua chiave API. Rapido e Migliorato con IA funzionano interamente sul tuo dispositivo.';
+
+  @override
   String get api_key_hint_short => 'Incolla qui la tua chiave API';
 
   @override

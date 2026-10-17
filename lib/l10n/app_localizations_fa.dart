@@ -362,6 +362,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get connect_ai_account_suffix => ' و آن را در زیر جای‌گذاری کنید.';
 
   @override
+  String get ai_mode_data_notice =>
+      'هوش مصنوعی ابری متن شناسایی‌شده را با کلید API خودتان به BigModel.cn ‏(Zhipu AI) می‌فرستد. حالت‌های سریع و بهبودیافته با هوش مصنوعی کاملاً روی دستگاه شما اجرا می‌شوند.';
+
+  @override
   String get api_key_hint_short => 'کلید API خود را اینجا جای‌گذاری کنید';
 
   @override

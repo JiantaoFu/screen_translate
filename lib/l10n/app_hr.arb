@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Povežite svoj AI račun",
   "connect_ai_account_prefix": "Nabavite besplatni API ključ na ",
   "connect_ai_account_suffix": " i zalijepite ga ispod.",
+  "ai_mode_data_notice": "Cloud AI šalje prepoznati tekst na BigModel.cn (Zhipu AI) pomoću vašeg vlastitog API ključa. Brzo i Poboljšano AI-jem rade u potpunosti na vašem uređaju.",
   "api_key_hint_short": "Zalijepite svoj API ključ ovdje",
   "save_and_verify": "Spremi i potvrdi",
   "cloud_ai_connected": "Povezano! Cloud AI je spreman.",

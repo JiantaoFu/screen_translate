@@ -18,7 +18,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/review_prompt_service.dart';
-import 'services/ocr_sampling_service.dart';
 import 'app_flavor.dart';
 import 'lite/lite_gate.dart';
 
@@ -99,12 +98,6 @@ Future<void> main() async {
       await analytics.trackAppOpen();
       await ActivationTracker.instance.recordAppOpen();
 
-      // Initialize OCR Sampling Service
-      final ocrSamplingService = OCRSamplingService();
-      await ocrSamplingService.init(
-        cloudinaryCloudName: 'dyr6qobke',
-        cloudinaryUploadPreset: 'oucv1boz',
-      ).timeout(const Duration(seconds: 5));
       print('Background Services: All services initialized successfully.');
     } catch (e) {
       print('Background Services: Non-fatal initialization error: $e');

@@ -360,6 +360,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get connect_ai_account_suffix => ' a vložte ho nižšie.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Cloudové AI odosiela rozpoznaný text do BigModel.cn (Zhipu AI) pomocou vášho vlastného API kľúča. Rýchly a Vylepšené AI bežia úplne vo vašom zariadení.';
+
+  @override
   String get api_key_hint_short => 'Vložte sem svoj API kľúč';
 
   @override

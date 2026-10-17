@@ -358,6 +358,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get connect_ai_account_suffix => ' แล้ววางไว้ด้านล่าง';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI บนคลาวด์จะส่งข้อความที่จดจำได้ไปยัง BigModel.cn (Zhipu AI) โดยใช้คีย์ API ของคุณเอง โหมดด่วนและปรับปรุงด้วย AI ทำงานบนอุปกรณ์ของคุณทั้งหมด';
+
+  @override
   String get api_key_hint_short => 'วางคีย์ API ของคุณที่นี่';
 
   @override

@@ -361,6 +361,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get connect_ai_account_suffix => ' ja kleebi see allpool.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Pilve AI saadab tuvastatud teksti teie enda API-võtmega teenusele BigModel.cn (Zhipu AI). Kiire ja AI-täiustatud töötavad täielikult teie seadmes.';
+
+  @override
   String get api_key_hint_short => 'Kleebi oma API-võti siia';
 
   @override

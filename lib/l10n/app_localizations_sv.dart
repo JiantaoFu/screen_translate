@@ -361,6 +361,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get connect_ai_account_suffix => ' och klistra in den nedan.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Moln-AI skickar igenkänd text till BigModel.cn (Zhipu AI) med din egen API-nyckel. Snabb och AI-förbättrad körs helt på din enhet.';
+
+  @override
   String get api_key_hint_short => 'Klistra in din API-nyckel här';
 
   @override

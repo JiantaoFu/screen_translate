@@ -362,6 +362,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get connect_ai_account_suffix => ' și lipește-o mai jos.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI în cloud trimite textul recunoscut către BigModel.cn (Zhipu AI) folosind propria ta cheie API. Rapid și Îmbunătățit cu AI rulează în întregime pe dispozitivul tău.';
+
+  @override
   String get api_key_hint_short => 'Lipește cheia API aici';
 
   @override

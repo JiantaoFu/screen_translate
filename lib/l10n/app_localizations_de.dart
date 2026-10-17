@@ -364,6 +364,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connect_ai_account_suffix => ' und füge ihn unten ein.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Cloud-KI sendet erkannten Text mit deinem eigenen API-Schlüssel an BigModel.cn (Zhipu AI). Schnell und KI-Verbessert laufen vollständig auf deinem Gerät.';
+
+  @override
   String get api_key_hint_short => 'Füge deinen API-Schlüssel hier ein';
 
   @override

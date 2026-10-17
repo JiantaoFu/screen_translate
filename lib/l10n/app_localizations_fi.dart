@@ -362,6 +362,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get connect_ai_account_suffix => ' ja liitä se alle.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Pilvi-tekoäly lähettää tunnistetun tekstin BigModel.cn-palveluun (Zhipu AI) omalla API-avaimellasi. Nopea ja Tekoälyllä parannettu toimivat kokonaan laitteellasi.';
+
+  @override
   String get api_key_hint_short => 'Liitä API-avaimesi tähän';
 
   @override

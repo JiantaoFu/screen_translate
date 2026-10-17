@@ -360,6 +360,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get connect_ai_account_suffix => ' en plak deze hieronder.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Cloud-AI stuurt herkende tekst naar BigModel.cn (Zhipu AI) met je eigen API-sleutel. Snel en AI-verbeterd draaien volledig op je apparaat.';
+
+  @override
   String get api_key_hint_short => 'Plak hier je API-sleutel';
 
   @override

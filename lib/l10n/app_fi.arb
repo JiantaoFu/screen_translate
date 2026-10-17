@@ -106,6 +106,7 @@
   "connect_ai_account_title": "Yhdistä tekoälytilisi",
   "connect_ai_account_prefix": "Hanki ilmainen API-avain osoitteesta ",
   "connect_ai_account_suffix": " ja liitä se alle.",
+  "ai_mode_data_notice": "Pilvi-tekoäly lähettää tunnistetun tekstin BigModel.cn-palveluun (Zhipu AI) omalla API-avaimellasi. Nopea ja Tekoälyllä parannettu toimivat kokonaan laitteellasi.",
   "api_key_hint_short": "Liitä API-avaimesi tähän",
   "save_and_verify": "Tallenna ja vahvista",
   "cloud_ai_connected": "Yhdistetty! Pilvi-tekoäly on valmis.",

@@ -360,6 +360,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get connect_ai_account_suffix => ' и го поставете по-долу.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Облачен ИИ изпраща разпознатия текст до BigModel.cn (Zhipu AI) с вашия собствен API ключ. Бързо и Подобрено с ИИ работят изцяло на устройството ви.';
+
+  @override
   String get api_key_hint_short => 'Поставете вашия API ключ тук';
 
   @override

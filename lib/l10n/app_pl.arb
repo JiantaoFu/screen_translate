@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Połącz swoje konto AI",
   "connect_ai_account_prefix": "Zdobądź darmowy klucz API na ",
   "connect_ai_account_suffix": " i wklej go poniżej.",
+  "ai_mode_data_notice": "AI w chmurze wysyła rozpoznany tekst do BigModel.cn (Zhipu AI) przy użyciu Twojego własnego klucza API. Tryby Szybkie i Ulepszone przez AI działają w całości na Twoim urządzeniu.",
   "api_key_hint_short": "Wklej tutaj swój klucz API",
   "save_and_verify": "Zapisz i zweryfikuj",
   "cloud_ai_connected": "Połączono! AI w chmurze jest gotowe.",

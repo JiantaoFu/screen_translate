@@ -364,6 +364,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get connect_ai_account_suffix => ' és illessze be alább.';
 
   @override
+  String get ai_mode_data_notice =>
+      'A Felhő AI a felismert szöveget a saját API-kulcsoddal küldi el a BigModel.cn-nek (Zhipu AI). A Gyors és az AI-fejlesztett mód teljes egészében az eszközödön fut.';
+
+  @override
   String get api_key_hint_short => 'Illessze be ide az API-kulcsát';
 
   @override

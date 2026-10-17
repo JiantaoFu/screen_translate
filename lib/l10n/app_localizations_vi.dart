@@ -360,6 +360,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get connect_ai_account_suffix => ' và dán vào bên dưới.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI đám mây gửi văn bản nhận dạng được đến BigModel.cn (Zhipu AI) bằng khóa API của riêng bạn. Nhanh và Nâng cao bằng AI chạy hoàn toàn trên thiết bị của bạn.';
+
+  @override
   String get api_key_hint_short => 'Dán khóa API của bạn vào đây';
 
   @override

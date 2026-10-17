@@ -1,0 +1,3 @@
+• Smoother first use: after you allow "display over other apps", translation starts automatically, no second tap needed
+• Clear messages when a permission is missing, instead of Start doing nothing
+• Floating buttons now clean up properly when Android stops screen sharing

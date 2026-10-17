@@ -362,6 +362,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get connect_ai_account_suffix => ' ja liitä se alle.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI-tilassa näytöltä tunnistettu teksti lähetetään BigModel.cn:ään (Zhipu AI) omalla API-avaimellasi. Vakiotila kääntää laitteellasi eikä lähetä mitään.';
+
+  @override
   String get api_key_hint_short => 'Liitä API-avaimesi tähän';
 
   @override

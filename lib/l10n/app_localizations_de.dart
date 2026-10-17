@@ -364,6 +364,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connect_ai_account_suffix => ' und füge ihn unten ein.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Im KI-Modus wird der auf deinem Bildschirm erkannte Text mit deinem eigenen API-Schlüssel an BigModel.cn (Zhipu AI) gesendet. Der Standardmodus übersetzt auf deinem Gerät und sendet nichts.';
+
+  @override
   String get api_key_hint_short => 'Füge deinen API-Schlüssel hier ein';
 
   @override

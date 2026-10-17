@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Ühenda oma AI-konto",
   "connect_ai_account_prefix": "Hangi tasuta API-võti aadressilt ",
   "connect_ai_account_suffix": " ja kleebi see allpool.",
+  "ai_mode_data_notice": "AI-režiimis saadetakse ekraanilt tuvastatud tekst sinu enda API-võtmega BigModel.cn-ile (Zhipu AI). Tavarežiim tõlgib seadmes ega saada midagi.",
   "api_key_hint_short": "Kleebi oma API-võti siia",
   "save_and_verify": "Salvesta ja kontrolli",
   "cloud_ai_connected": "Ühendatud! Pilve AI on valmis.",

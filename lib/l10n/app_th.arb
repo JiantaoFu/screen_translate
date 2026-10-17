@@ -110,6 +110,7 @@
   "connect_ai_account_title": "เชื่อมต่อบัญชี AI ของคุณ",
   "connect_ai_account_prefix": "รับคีย์ API ฟรีได้ที่ ",
   "connect_ai_account_suffix": " แล้ววางไว้ด้านล่าง",
+  "ai_mode_data_notice": "ในโหมด AI ข้อความที่ตรวจพบบนหน้าจอจะถูกส่งไปยัง BigModel.cn (Zhipu AI) โดยใช้คีย์ API ของคุณเอง โหมดมาตรฐานแปลบนอุปกรณ์ของคุณและไม่ส่งข้อมูลใดๆ",
   "api_key_hint_short": "วางคีย์ API ของคุณที่นี่",
   "save_and_verify": "บันทึกและยืนยัน",
   "cloud_ai_connected": "เชื่อมต่อแล้ว! AI บนคลาวด์พร้อมใช้งาน",

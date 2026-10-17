@@ -361,6 +361,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get connect_ai_account_suffix => ' ja kleebi see allpool.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI-režiimis saadetakse ekraanilt tuvastatud tekst sinu enda API-võtmega BigModel.cn-ile (Zhipu AI). Tavarežiim tõlgib seadmes ega saada midagi.';
+
+  @override
   String get api_key_hint_short => 'Kleebi oma API-võti siia';
 
   @override

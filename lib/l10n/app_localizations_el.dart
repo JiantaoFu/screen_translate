@@ -363,6 +363,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get connect_ai_account_suffix => ' και επικολλήστε το παρακάτω.';
 
   @override
+  String get ai_mode_data_notice =>
+      'Στη λειτουργία AI, το κείμενο που αναγνωρίζεται στην οθόνη σας αποστέλλεται στο BigModel.cn (Zhipu AI) με το δικό σας κλειδί API. Η τυπική λειτουργία μεταφράζει στη συσκευή σας και δεν στέλνει τίποτα.';
+
+  @override
   String get api_key_hint_short => 'Επικολλήστε το κλειδί API σας εδώ';
 
   @override

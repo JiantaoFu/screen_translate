@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Συνδέστε τον λογαριασμό AI σας",
   "connect_ai_account_prefix": "Αποκτήστε ένα δωρεάν κλειδί API από ",
   "connect_ai_account_suffix": " και επικολλήστε το παρακάτω.",
+  "ai_mode_data_notice": "Στη λειτουργία AI, το κείμενο που αναγνωρίζεται στην οθόνη σας αποστέλλεται στο BigModel.cn (Zhipu AI) με το δικό σας κλειδί API. Η τυπική λειτουργία μεταφράζει στη συσκευή σας και δεν στέλνει τίποτα.",
   "api_key_hint_short": "Επικολλήστε το κλειδί API σας εδώ",
   "save_and_verify": "Αποθήκευση & Επαλήθευση",
   "cloud_ai_connected": "Συνδέθηκε! Το Cloud AI είναι έτοιμο.",

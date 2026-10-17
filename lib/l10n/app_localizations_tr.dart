@@ -362,6 +362,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get connect_ai_account_suffix => ' ve aşağıya yapıştırın.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI modunda, ekranınızda tanınan metin kendi API anahtarınız kullanılarak BigModel.cn\'ye (Zhipu AI) gönderilir. Standart mod cihazınızda çevirir ve hiçbir şey göndermez.';
+
+  @override
   String get api_key_hint_short => 'API anahtarınızı buraya yapıştırın';
 
   @override

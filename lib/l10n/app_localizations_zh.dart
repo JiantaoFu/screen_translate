@@ -351,6 +351,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connect_ai_account_suffix => '，然后粘贴到下方。';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI 模式下，屏幕上识别出的文字会用你自己的 API key 发送给 BigModel.cn（智谱 AI）。标准模式在手机上翻译，不会发送任何内容。';
+
+  @override
   String get api_key_hint_short => '在此粘贴你的API密钥';
 
   @override

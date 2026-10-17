@@ -362,6 +362,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get connect_ai_account_suffix => ' i zalijepite ga ispod.';
 
   @override
+  String get ai_mode_data_notice =>
+      'U AI načinu rada tekst prepoznat na zaslonu šalje se na BigModel.cn (Zhipu AI) pomoću vašeg vlastitog API ključa. Standardni način prevodi na uređaju i ništa ne šalje.';
+
+  @override
   String get api_key_hint_short => 'Zalijepite svoj API ključ ovdje';
 
   @override

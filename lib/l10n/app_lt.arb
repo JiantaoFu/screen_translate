@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Prijunkite savo DI paskyrą",
   "connect_ai_account_prefix": "Gaukite nemokamą API raktą iš ",
   "connect_ai_account_suffix": " ir įklijuokite jį žemiau.",
+  "ai_mode_data_notice": "AI režimu ekrane atpažintas tekstas siunčiamas į BigModel.cn (Zhipu AI) naudojant jūsų API raktą. Standartinis režimas verčia įrenginyje ir nieko nesiunčia.",
   "api_key_hint_short": "Įklijuokite savo API raktą čia",
   "save_and_verify": "Išsaugoti ir patvirtinti",
   "cloud_ai_connected": "Prisijungta! Debesijos DI paruoštas.",

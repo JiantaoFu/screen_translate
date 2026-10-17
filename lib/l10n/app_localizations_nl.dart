@@ -360,6 +360,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get connect_ai_account_suffix => ' en plak deze hieronder.';
 
   @override
+  String get ai_mode_data_notice =>
+      'In AI-modus wordt de op je scherm herkende tekst met je eigen API-sleutel naar BigModel.cn (Zhipu AI) verzonden. De standaardmodus vertaalt op je apparaat en verstuurt niets.';
+
+  @override
   String get api_key_hint_short => 'Plak hier je API-sleutel';
 
   @override

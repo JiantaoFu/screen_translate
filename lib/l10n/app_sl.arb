@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Povežite svoj račun UI",
   "connect_ai_account_prefix": "Pridobite brezplačen API-ključ na ",
   "connect_ai_account_suffix": " in ga prilepite spodaj.",
+  "ai_mode_data_notice": "V načinu AI se besedilo, prepoznano na zaslonu, pošlje na BigModel.cn (Zhipu AI) z vašim lastnim API-ključem. Standardni način prevaja v napravi in ničesar ne pošilja.",
   "api_key_hint_short": "Prilepite svoj API-ključ tukaj",
   "save_and_verify": "Shrani in preveri",
   "cloud_ai_connected": "Povezano! Oblačna UI je pripravljena.",

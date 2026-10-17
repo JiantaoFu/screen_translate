@@ -361,6 +361,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get connect_ai_account_suffix => ' ir įklijuokite jį žemiau.';
 
   @override
+  String get ai_mode_data_notice =>
+      'AI režimu ekrane atpažintas tekstas siunčiamas į BigModel.cn (Zhipu AI) naudojant jūsų API raktą. Standartinis režimas verčia įrenginyje ir nieko nesiunčia.';
+
+  @override
   String get api_key_hint_short => 'Įklijuokite savo API raktą čia';
 
   @override

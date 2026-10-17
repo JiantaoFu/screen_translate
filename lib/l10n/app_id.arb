@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Hubungkan akun AI Anda",
   "connect_ai_account_prefix": "Dapatkan kunci API gratis dari ",
   "connect_ai_account_suffix": " dan tempel di bawah ini.",
+  "ai_mode_data_notice": "Dalam mode AI, teks yang dikenali di layar Anda dikirim ke BigModel.cn (Zhipu AI) menggunakan kunci API Anda sendiri. Mode standar menerjemahkan di perangkat Anda dan tidak mengirim apa pun.",
   "api_key_hint_short": "Tempel kunci API Anda di sini",
   "save_and_verify": "Simpan & Verifikasi",
   "cloud_ai_connected": "Terhubung! AI Cloud siap.",

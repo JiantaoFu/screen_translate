@@ -110,6 +110,7 @@
   "connect_ai_account_title": "अपना AI खाता कनेक्ट करें",
   "connect_ai_account_prefix": "यहाँ से एक निःशुल्क API कुंजी प्राप्त करें ",
   "connect_ai_account_suffix": " और इसे नीचे पेस्ट करें।",
+  "ai_mode_data_notice": "AI मोड में, आपकी स्क्रीन पर पहचाना गया टेक्स्ट आपकी अपनी API कुंजी से BigModel.cn (Zhipu AI) को भेजा जाता है। स्टैंडर्ड मोड आपके डिवाइस पर ही अनुवाद करता है और कुछ भी नहीं भेजता।",
   "api_key_hint_short": "अपनी API कुंजी यहाँ पेस्ट करें",
   "save_and_verify": "सहेजें और सत्यापित करें",
   "cloud_ai_connected": "कनेक्ट हो गया! क्लाउड AI तैयार है।",

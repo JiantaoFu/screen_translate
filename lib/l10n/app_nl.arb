@@ -110,6 +110,7 @@
   "connect_ai_account_title": "Verbind je AI-account",
   "connect_ai_account_prefix": "Haal een gratis API-sleutel op bij ",
   "connect_ai_account_suffix": " en plak deze hieronder.",
+  "ai_mode_data_notice": "In AI-modus wordt de op je scherm herkende tekst met je eigen API-sleutel naar BigModel.cn (Zhipu AI) verzonden. De standaardmodus vertaalt op je apparaat en verstuurt niets.",
   "api_key_hint_short": "Plak hier je API-sleutel",
   "save_and_verify": "Opslaan & verifiëren",
   "cloud_ai_connected": "Verbonden! Cloud-AI is klaar.",

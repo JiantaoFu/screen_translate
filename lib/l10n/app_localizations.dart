@@ -824,6 +824,12 @@ abstract class AppLocalizations {
   /// **' and paste it below.'**
   String get connect_ai_account_suffix;
 
+  /// Privacy disclosure shown in the Cloud AI setup card, before the user saves their BigModel API key
+  ///
+  /// In en, this message translates to:
+  /// **'In AI mode, the text recognized on your screen is sent to BigModel.cn (Zhipu AI) using your own API key. Standard mode translates on your device and sends nothing.'**
+  String get ai_mode_data_notice;
+
   /// No description provided for @api_key_hint_short.
   ///
   /// In en, this message translates to:

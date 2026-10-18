@@ -17,7 +17,8 @@
 source "$(dirname "$0")/../emulator/common.sh"
 HERE="$ROOT/tools/store_assets"
 LOCALE=${1:-en-US}; shift
-OUTDIR="$HERE/raw/$LOCALE"
+RAW="${RAW:-$HERE/raw}"   # lite: RAW=<elsewhere>, keeps the paid raws
+OUTDIR="$RAW/$LOCALE"
 mkdir -p "$OUTDIR"
 PH=com.google.android.apps.photos
 
@@ -65,7 +66,7 @@ case $SIZE in
     DEVICE=tablet
     T_SCREEN="800 1517"; T_MODE="800 1218"; T_ENTIRE="740 1361"; T_START="1162 1584"
     T_GEAR="1510 2406"; T_SRC="400 1021"; T_PHOTOS="800 1900"
-    OUTDIR="$HERE/raw/tablet/$LOCALE"; mkdir -p "$OUTDIR";;
+    OUTDIR="$RAW/tablet/$LOCALE"; mkdir -p "$OUTDIR";;
   *)
     DEVICE=phone
     T_SCREEN="540 1508"; T_MODE="540 1128"; T_ENTIRE="360 1318"; T_START="894 1610"

@@ -11,6 +11,10 @@ import androidx.core.content.ContextCompat
 
 class AccessibilityPermissionActivity : AppCompatActivity() {
 
+    // How the user leaves this screen, for analytics (AccessibilityFunnelStore).
+    // Back / swipe away counts as dismissed.
+    private var closeAction = AccessibilityFunnelStore.ACTION_DISMISSED
+
     companion object {
         private const val TAG = "AccessibilityPermissionActivity"
         private const val ACCESSIBILITY_SETTINGS = android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS
@@ -44,6 +48,7 @@ class AccessibilityPermissionActivity : AppCompatActivity() {
                 // Open Accessibility Settings
                 val intent = Intent(ACCESSIBILITY_SETTINGS)
                 startActivity(intent)
+                closeAction = AccessibilityFunnelStore.ACTION_SETTINGS_OPENED
                 finish()
             } catch (e: Exception) {
                 Log.e(TAG, "Error opening accessibility settings", e)
@@ -60,7 +65,22 @@ class AccessibilityPermissionActivity : AppCompatActivity() {
         super.onResume()
         // Check if accessibility service is already enabled
         if (isAccessibilityServiceEnabled()) {
+            closeAction = AccessibilityFunnelStore.ACTION_ALREADY_ENABLED
             finish()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // onPause, not onDestroy: the activity underneath (MainActivity) is
+        // resumed before this one is destroyed, and that resume is when Dart
+        // asks for the result.
+        if (isFinishing) {
+            try {
+                AccessibilityFunnelStore.forContext(this).markPromptClosed(closeAction)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error recording accessibility prompt result", e)
+            }
         }
     }
 

@@ -15,6 +15,7 @@ import '../services/overlay_service.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../services/firebase_analytics_service.dart';
+import '../services/accessibility_funnel_reporter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -283,6 +284,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // chip, never via our Stop button; ask on return to the app too.
     // Never on the resume that ends a permission/consent screen: skipped
     // while Start is in progress and for a few seconds after it.
+    if (state == AppLifecycleState.resumed && Platform.isAndroid) {
+      // Back from the accessibility explainer or Settings.
+      AccessibilityFunnelReporter.instance.report();
+    }
     if (state == AppLifecycleState.resumed && mounted) {
       final provider = context.read<TranslationProvider>();
       if (TranslationProvider.mayPromptReviewOnResume(

@@ -45,6 +45,7 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
             // Mark that we've prompted the user
             markAccessibilityPrompted()
+            AccessibilityFunnelStore.forContext(context).markPromptShown()
         } catch (e: Exception) {
             Log.e(TAG, "Error showing accessibility dialog", e)
         }

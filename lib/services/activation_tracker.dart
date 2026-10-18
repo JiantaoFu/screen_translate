@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_analytics_service.dart';
@@ -9,10 +10,15 @@ typedef AnalyticsSink = void Function(String name, Map<String, Object> params);
 /// translation on screen. Events, in funnel order:
 ///
 ///   first_open (Firebase) -> live_start_requested -> overlay_permission_result
-///   -> capture_permission_result -> live_started -> first_translation_shown
+///   -> capture_permission_result -> live_started -> first_ocr_text_found
+///   -> first_translation_shown
 ///
-/// plus `live_stopped` (how the session ended) and `model_download`.
-/// Nothing here records screen content, only steps, counts and durations.
+/// plus `live_stopped` (how the session ended), `model_download`,
+/// `first_translation_failed` (the first thing that broke before any
+/// translation was ever shown) and the accessibility prompt
+/// (`accessibility_prompt_shown` -> `accessibility_permission_result`).
+/// Nothing here records screen content, only steps, counts, durations and
+/// exception class names.
 class ActivationTracker {
   ActivationTracker({
     AnalyticsSink? sink,
@@ -27,6 +33,11 @@ class ActivationTracker {
   static const prefFirstSeenMs = 'activation_first_seen_ms';
   static const prefFirstTranslationLogged = 'activation_first_translation_logged';
   static const prefFailureFeedbackAsked = 'activation_failure_feedback_asked';
+  static const prefFirstOcrTextLogged = 'activation_first_ocr_text_logged';
+  static const prefFirstTranslationFailedLogged = 'activation_first_translation_failed_logged';
+
+  /// Where a first translation can break, for `first_translation_failed`.
+  static const failureStages = ['start', 'capture', 'ocr', 'translate', 'render', 'model'];
 
   /// A session that ends this quickly without ever showing a translation is
   /// the "it did nothing" signal.
@@ -43,6 +54,11 @@ class ActivationTracker {
   String _pair = '';
   String _mode = '';
   final Set<String> _failuresThisSession = {};
+  // In-memory short cuts so the 500 ms capture loop doesn't read prefs on
+  // every tick once the once-per-install event is out.
+  bool _firstOcrTextDone = false;
+  bool _firstTranslationDone = false;
+  bool _firstFailureDone = false;
 
   static void _firebaseSink(String name, Map<String, Object> params) {
     FirebaseAnalyticsService().logEvent(name, params);
@@ -96,21 +112,63 @@ class ActivationTracker {
   }
 
   /// One OCR pass; [blocks] is how many translatable text blocks it found.
+  /// The first pass that finds any text fires `first_ocr_text_found`, once
+  /// per install.
   void ocrFrame(int blocks) {
     _ocrFrames++;
-    if (blocks == 0) _ocrEmptyFrames++;
+    if (blocks == 0) {
+      _ocrEmptyFrames++;
+    } else if (!_firstOcrTextDone) {
+      _firstOcrTextDone = true;
+      _firstOcrTextFound(blocks);
+    }
   }
 
-  /// Boxes were drawn on screen. Fires `first_translation_shown` once per
-  /// install, with the time since the install first ran.
+  /// Completes once `first_ocr_text_found` was sent (or skipped as already
+  /// sent); tests await it, the capture loop doesn't.
+  @visibleForTesting
+  Future<void>? pendingFirstOcrText;
+
+  void _firstOcrTextFound(int blocks) {
+    final start = _sessionStart;
+    final params = <String, Object>{
+      'mode': _mode,
+      'language_pair': _pair,
+      'text_block_count': blocks,
+      if (start != null) 'ms_since_live_start': _clock().difference(start).inMilliseconds,
+    };
+    pendingFirstOcrText = _oncePerInstall(prefFirstOcrTextLogged, () {
+      _emit('first_ocr_text_found', params);
+    });
+  }
+
+  /// Runs [send] if [key] was never set, and sets it. Never throws.
+  Future<void> _oncePerInstall(String key, void Function() send) async {
+    try {
+      final prefs = await _prefs();
+      if (prefs.getBool(key) ?? false) return;
+      await prefs.setBool(key, true);
+      send();
+    } catch (_) {}
+  }
+
+  /// [boxes] translation boxes were drawn on screen. The first call with at
+  /// least one box fires `first_translation_shown` once per install, with
+  /// the box count and the time since the install first ran.
   Future<void> translationShown(int boxes) async {
     _translationsShown += boxes;
+    if (boxes <= 0 || _firstTranslationDone) return;
+    _firstTranslationDone = true;
     try {
       final prefs = await _prefs();
       if (prefs.getBool(prefFirstTranslationLogged) ?? false) return;
       await prefs.setBool(prefFirstTranslationLogged, true);
       final firstSeen = prefs.getInt(prefFirstSeenMs);
-      final params = <String, Object>{'language_pair': _pair, 'mode': _mode};
+      final params = <String, Object>{
+        'language_pair': _pair,
+        'mode': _mode,
+        'boxes': boxes,
+      };
       if (firstSeen != null) {
         params['secs_since_install'] =
             _clock().difference(DateTime.fromMillisecondsSinceEpoch(firstSeen)).inSeconds;
@@ -176,7 +234,74 @@ class ActivationTracker {
       'duration_ms': durationMs,
       if (failure != null) 'failure': failure,
     });
+    if (outcome == 'failed') {
+      // Quick packs are ML Kit (onDevice), AI packs are ONNX; used when no
+      // session has started yet, so the mode is still unknown.
+      firstTranslationFailed(
+        stage: 'model',
+        code: failure ?? 'unknown',
+        mode: _mode.isNotEmpty ? _mode : (kind == 'ai' ? 'onnx' : 'onDevice'),
+      );
+    }
   }
+
+  /// The first failure on the way to a first translation: once per install,
+  /// and only while no translation has ever been shown on this install.
+  /// [stage] is one of [failureStages]. The `error_type` is [error]'s class
+  /// name (never its message), or [code] when the caller already has a
+  /// class-name code (model downloads); both cut to a short identifier.
+  Future<void> firstTranslationFailed({
+    required String stage,
+    Object? error,
+    String? code,
+    String? mode,
+  }) async {
+    if (_firstFailureDone || _firstTranslationDone) return;
+    _firstFailureDone = true;
+    final params = <String, Object>{
+      'stage': failureStages.contains(stage) ? stage : 'other',
+      'error_type': code != null ? shortCode(code) : errorCode(error),
+      'mode': mode ?? _mode,
+    };
+    try {
+      final prefs = await _prefs();
+      if (prefs.getBool(prefFirstTranslationLogged) ?? false) {
+        _firstTranslationDone = true;
+        return;
+      }
+    } catch (_) {}
+    await _oncePerInstall(prefFirstTranslationFailedLogged, () {
+      _emit('first_translation_failed', params);
+    });
+  }
+
+  /// Content-free code for an error: its runtime type name only. A thrown
+  /// String (`throw 'some text'`) becomes `String`, never the text.
+  @visibleForTesting
+  static String errorCode(Object? error) =>
+      error == null ? 'unknown' : shortCode(error.runtimeType.toString());
+
+  /// [raw] reduced to `[A-Za-z0-9_]`, at most 40 characters.
+  @visibleForTesting
+  static String shortCode(String raw) {
+    final code = raw.replaceAll(RegExp(r'[^A-Za-z0-9_]'), '_');
+    if (code.isEmpty) return 'unknown';
+    return code.length > 40 ? code.substring(0, 40) : code;
+  }
+
+  /// The one-time accessibility explainer (native AccessibilityPermissionActivity) was shown.
+  void accessibilityPromptShown() => _emit('accessibility_prompt_shown', <String, Object>{});
+
+  /// What the accessibility service looked like once the user left that
+  /// explainer. [action] is how they left it: `settings_opened`,
+  /// `dismissed`, `already_enabled` (closed itself) or `unknown`.
+  void accessibilityPermissionResult({required bool enabled, required String action}) =>
+      _emit('accessibility_permission_result', {
+        'enabled': _yesNo(enabled),
+        'action': accessibilityActions.contains(action) ? action : 'unknown',
+      });
+
+  static const accessibilityActions = ['settings_opened', 'dismissed', 'already_enabled', 'unknown'];
 
   /// Why a start or a capture failed, for the failures that raise no crash.
   /// Logged once per place per session: the capture loop ticks twice a second.

@@ -66,6 +66,7 @@ jobs:
 
       - name: Build lite debug APK (x86_64)
         run: |
+          flutter pub get   # writes android/local.properties, which settings.gradle reads
           (cd android && gradle wrapper --gradle-version 8.11.1)
           python tools/build.py emulator --flavor lite
           ls -l build/app/outputs/apk/lite/debug/app-lite-debug.apk

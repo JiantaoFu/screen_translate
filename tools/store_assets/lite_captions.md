@@ -4,11 +4,11 @@ Order: home, manga, game, webtoon, chat. Each is (headline, subline). They avoid
 
 ```python
 LITE_SHOTS_EN = {
-    'home':    ('5 free translations every day', 'Unlock Pro once for unlimited. No ads'),
+    'home':    ('5 free translations every day', 'Need more? One-time Pro unlock. No ads'),
     'manga':   ('Manga translator on your screen', 'Reads vertical Japanese bubbles'),
     'game':    ('Game translator, no app switching', 'Tap the bubble, read the dialogue'),
     'webtoon': ('Scroll and translate webtoons', 'Korean, Japanese, Chinese and more'),
-    'chat':    ('Screen translator with OCR', 'Any text in any app, even images'),
+    'chat':    ('Screen translator with OCR', 'Chats, posts and menus in any app'),
 }
 ```
 

@@ -12,7 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get app_title => 'Screen Translate';
 
   @override
-  String get app_title_lite => 'Screen Translate Lite';
+  String get app_title_lite => 'Screen Translator Lite';
 
   @override
   String get source_language => 'From';

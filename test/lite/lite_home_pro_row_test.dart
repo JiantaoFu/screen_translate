@@ -103,10 +103,19 @@ void main() {
     expect(find.text('解锁 Pro · ¥22.00'), findsOneWidget);
   });
 
-  test('every locale has a Lite title that keeps the app name', () async {
+  test('every locale has a Lite title; English is "Screen Translator Lite"', () async {
     for (final locale in AppLocalizations.supportedLocales) {
       final l = await AppLocalizations.delegate.load(locale);
-      expect(l.app_title_lite, '${l.app_title} Lite', reason: locale.toString());
+      // English: the store name; others: the translated app name + "Lite".
+      expect(l.app_title_lite, endsWith(' Lite'), reason: locale.toString());
+      if (l.app_title_lite != 'Screen Translator Lite') {
+        expect(l.app_title_lite, '${l.app_title} Lite', reason: locale.toString());
+      }
     }
+  });
+
+  test('English Lite title', () async {
+    final l = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(l.app_title_lite, 'Screen Translator Lite');
   });
 }

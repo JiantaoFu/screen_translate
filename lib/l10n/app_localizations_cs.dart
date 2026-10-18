@@ -12,6 +12,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get app_title => 'Překlad obrazovky';
 
   @override
+  String get app_title_lite => 'Překlad obrazovky Lite';
+
+  @override
   String get source_language => 'Z';
 
   @override

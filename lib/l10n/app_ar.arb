@@ -1,6 +1,7 @@
 {
   "@@locale": "ar",
   "app_title": "ترجمة الشاشة",
+  "app_title_lite": "ترجمة الشاشة Lite",
   "source_language": "من",
   "target_language": "إلى",
   "stop_translation": "إيقاف الترجمة",

@@ -12,6 +12,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get app_title => 'Skärmöversättning';
 
   @override
+  String get app_title_lite => 'Skärmöversättning Lite';
+
+  @override
   String get source_language => 'Från';
 
   @override

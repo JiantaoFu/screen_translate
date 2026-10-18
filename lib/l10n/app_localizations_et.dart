@@ -12,6 +12,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get app_title => 'Ekraani tõlkimine';
 
   @override
+  String get app_title_lite => 'Ekraani tõlkimine Lite';
+
+  @override
   String get source_language => 'Lähtekeel';
 
   @override

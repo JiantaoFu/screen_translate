@@ -12,6 +12,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get app_title => 'ترجمه صفحه نمایش';
 
   @override
+  String get app_title_lite => 'ترجمه صفحه نمایش Lite';
+
+  @override
   String get source_language => 'از';
 
   @override

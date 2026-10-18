@@ -12,6 +12,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get app_title => 'Ekran çevirisi';
 
   @override
+  String get app_title_lite => 'Ekran çevirisi Lite';
+
+  @override
   String get source_language => 'Kaynak';
 
   @override

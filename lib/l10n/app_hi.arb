@@ -1,6 +1,7 @@
 {
   "@@locale": "hi",
   "app_title": "स्क्रीन अनुवाद",
+  "app_title_lite": "स्क्रीन अनुवाद Lite",
   "source_language": "से",
   "target_language": "तक",
   "stop_translation": "अनुवाद रोकें",

@@ -12,6 +12,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get app_title => 'Перевод экрана';
 
   @override
+  String get app_title_lite => 'Перевод экрана Lite';
+
+  @override
   String get source_language => 'С';
 
   @override

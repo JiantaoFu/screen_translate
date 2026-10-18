@@ -12,6 +12,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get app_title => 'Bildschirmübersetzung';
 
   @override
+  String get app_title_lite => 'Bildschirmübersetzung Lite';
+
+  @override
   String get source_language => 'Von';
 
   @override

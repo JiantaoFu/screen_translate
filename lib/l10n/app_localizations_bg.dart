@@ -12,6 +12,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get app_title => 'Превод на екрана';
 
   @override
+  String get app_title_lite => 'Превод на екрана Lite';
+
+  @override
   String get source_language => 'От';
 
   @override

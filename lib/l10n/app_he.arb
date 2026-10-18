@@ -1,6 +1,7 @@
 {
   "@@locale": "he",
   "app_title": "תרגום מסך",
+  "app_title_lite": "תרגום מסך Lite",
   "source_language": "מ-",
   "target_language": "ל-",
   "stop_translation": "עצור תרגום",

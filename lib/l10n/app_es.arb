@@ -1,6 +1,7 @@
 {
   "@@locale": "es",
   "app_title": "Traductor de pantalla",
+  "app_title_lite": "Traductor de pantalla Lite",
   "stop_translation": "Parar la traducción",
   "translate_screen": "Traducir pantalla",
   "source_language": "Desde",

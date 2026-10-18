@@ -1,6 +1,7 @@
 {
   "@@locale": "fr",
   "app_title": "Traduction d'écran",
+  "app_title_lite": "Traduction d'écran Lite",
   "source_language": "De",
   "target_language": "Vers",
   "stop_translation": "Arrêter la traduction",

@@ -1,6 +1,7 @@
 {
   "@@locale": "hu",
   "app_title": "Képernyőfordítás",
+  "app_title_lite": "Képernyőfordítás Lite",
   "source_language": "Erről",
   "target_language": "Erre",
   "stop_translation": "Fordítás leállítása",

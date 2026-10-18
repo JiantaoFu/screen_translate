@@ -106,6 +106,14 @@ android {
                 println "WARNING: Release keystore not found at ${keystoreFile.absolutePath}. Falling back to DEBUG signing config for local testing."
             }
             minifyEnabled true
+            // Native debug symbols in BUNDLE-METADATA made up ~57 MB (compressed)
+            // of the ~146 MB lite AAB: whole copies of the prebuilt .so files
+            // (onnxruntime, translate_jni, flutter, libapp) for every ABI.
+            // Devices never download BUNDLE-METADATA and the libs inside the
+            // APKs are already stripped, so this changes nothing on device. To
+            // symbolicate native crashes in Play Console, upload the separate
+            // native-debug-symbols.zip (see the handoff README) for the release.
+            ndk { debugSymbolLevel 'NONE' }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

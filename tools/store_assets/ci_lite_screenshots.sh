@@ -16,6 +16,12 @@ A="adb -s ${ANDROID_SERIAL:-emulator-5554}"
 APK="$ROOT/build/app/outputs/apk/lite/debug/app-lite-debug.apk"
 
 $A wait-for-device
+# capture.sh's taps are for the 1080x2400 / 420 dpi phone AVD; the runner's
+# AVD came up at 1080x2400 but a low default density (tiny UI, taps missed).
+$A shell wm size 1080x2400
+$A shell wm density 420
+sleep 5
+$A shell wm size; $A shell wm density
 $A shell settings put global window_animation_scale 0
 $A shell settings put global transition_animation_scale 0
 $A shell settings put global animator_duration_scale 0

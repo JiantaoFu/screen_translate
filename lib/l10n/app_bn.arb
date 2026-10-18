@@ -1,6 +1,7 @@
 {
   "@@locale": "bn",
   "app_title": "স্ক্রিন অনুবাদ",
+  "app_title_lite": "স্ক্রিন অনুবাদ Lite",
   "source_language": "থেকে",
   "target_language": "তে",
   "stop_translation": "অনুবাদ বন্ধ করুন",

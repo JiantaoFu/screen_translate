@@ -12,6 +12,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get app_title => 'תרגום מסך';
 
   @override
+  String get app_title_lite => 'תרגום מסך Lite';
+
+  @override
   String get source_language => 'מ-';
 
   @override

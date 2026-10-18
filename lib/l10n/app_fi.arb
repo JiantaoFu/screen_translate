@@ -1,6 +1,7 @@
 {
   "@@locale": "fi",
   "app_title": "Näytön kääntäminen",
+  "app_title_lite": "Näytön kääntäminen Lite",
   "source_language": "Lähtökieli",
   "target_language": "Kohdekieli",
   "stop_translation": "Lopeta kääntäminen",

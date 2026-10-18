@@ -1,6 +1,7 @@
 {
   "@@locale": "ko",
   "app_title": "화면 번역",
+  "app_title_lite": "화면 번역 Lite",
   "source_language": "원본",
   "target_language": "대상",
   "stop_translation": "번역 중지",

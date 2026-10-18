@@ -12,6 +12,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get app_title => 'Terjemahan layar';
 
   @override
+  String get app_title_lite => 'Terjemahan layar Lite';
+
+  @override
   String get source_language => 'Dari';
 
   @override

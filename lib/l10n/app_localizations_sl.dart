@@ -12,6 +12,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get app_title => 'Prevajanje zaslona';
 
   @override
+  String get app_title_lite => 'Prevajanje zaslona Lite';
+
+  @override
   String get source_language => 'Iz';
 
   @override

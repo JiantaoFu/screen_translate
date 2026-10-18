@@ -12,6 +12,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get app_title => 'Dịch màn hình';
 
   @override
+  String get app_title_lite => 'Dịch màn hình Lite';
+
+  @override
   String get source_language => 'Từ';
 
   @override

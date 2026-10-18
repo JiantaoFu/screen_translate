@@ -1,6 +1,7 @@
 {
   "@@locale": "id",
   "app_title": "Terjemahan layar",
+  "app_title_lite": "Terjemahan layar Lite",
   "source_language": "Dari",
   "target_language": "Ke",
   "stop_translation": "Hentikan terjemahan",

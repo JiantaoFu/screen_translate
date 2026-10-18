@@ -12,6 +12,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get app_title => '屏幕翻译';
 
   @override
+  String get app_title_lite => '屏幕翻译 Lite';
+
+  @override
   String get source_language => '源语言';
 
   @override

@@ -12,6 +12,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get app_title => '画面翻訳';
 
   @override
+  String get app_title_lite => '画面翻訳 Lite';
+
+  @override
   String get source_language => '翻訳元';
 
   @override

@@ -12,6 +12,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get app_title => 'Preklad obrazovky';
 
   @override
+  String get app_title_lite => 'Preklad obrazovky Lite';
+
+  @override
   String get source_language => 'Z';
 
   @override

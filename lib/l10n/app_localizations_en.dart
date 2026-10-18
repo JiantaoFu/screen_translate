@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get app_title => 'Screen Translate';
 
   @override
+  String get app_title_lite => 'Screen Translate Lite';
+
+  @override
   String get source_language => 'From';
 
   @override

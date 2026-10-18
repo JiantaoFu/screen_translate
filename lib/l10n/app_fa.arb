@@ -1,6 +1,7 @@
 {
   "@@locale": "fa",
   "app_title": "ترجمه صفحه نمایش",
+  "app_title_lite": "ترجمه صفحه نمایش Lite",
   "source_language": "از",
   "target_language": "به",
   "stop_translation": "توقف ترجمه",

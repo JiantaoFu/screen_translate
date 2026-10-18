@@ -12,6 +12,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get app_title => 'Prijevod zaslona';
 
   @override
+  String get app_title_lite => 'Prijevod zaslona Lite';
+
+  @override
   String get source_language => 'Iz';
 
   @override

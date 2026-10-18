@@ -12,6 +12,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get app_title => 'স্ক্রিন অনুবাদ';
 
   @override
+  String get app_title_lite => 'স্ক্রিন অনুবাদ Lite';
+
+  @override
   String get source_language => 'থেকে';
 
   @override

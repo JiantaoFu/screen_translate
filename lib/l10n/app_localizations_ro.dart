@@ -12,6 +12,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get app_title => 'Traducere ecran';
 
   @override
+  String get app_title_lite => 'Traducere ecran Lite';
+
+  @override
   String get source_language => 'Din';
 
   @override

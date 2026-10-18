@@ -1,6 +1,10 @@
 {
   "@@locale": "en",
   "app_title": "Screen Translate",
+  "app_title_lite": "Screen Translate Lite",
+  "@app_title_lite": {
+    "description": "Home screen title in the Lite edition: the app name plus \"Lite\" (keep \"Lite\" in Latin letters)"
+  },
   "source_language": "From",
   "target_language": "To",
   "stop_translation": "Stop Translation",

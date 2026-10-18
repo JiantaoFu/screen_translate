@@ -1,6 +1,7 @@
 {
   "@@locale": "pl",
   "app_title": "Tłumaczenie ekranu",
+  "app_title_lite": "Tłumaczenie ekranu Lite",
   "source_language": "Z",
   "target_language": "Na",
   "stop_translation": "Zatrzymaj tłumaczenie",

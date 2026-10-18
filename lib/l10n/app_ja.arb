@@ -1,6 +1,7 @@
 {
   "@@locale": "ja",
   "app_title": "画面翻訳",
+  "app_title_lite": "画面翻訳 Lite",
   "source_language": "翻訳元",
   "target_language": "翻訳先",
   "stop_translation": "翻訳を停止",

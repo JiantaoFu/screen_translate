@@ -1,6 +1,7 @@
 {
   "@@locale": "ro",
   "app_title": "Traducere ecran",
+  "app_title_lite": "Traducere ecran Lite",
   "source_language": "Din",
   "target_language": "În",
   "stop_translation": "Oprește traducerea",

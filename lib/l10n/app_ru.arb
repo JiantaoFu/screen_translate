@@ -1,6 +1,7 @@
 {
   "@@locale": "ru",
   "app_title": "Перевод экрана",
+  "app_title_lite": "Перевод экрана Lite",
   "source_language": "С",
   "target_language": "На",
   "stop_translation": "Остановить перевод",

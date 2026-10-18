@@ -1,6 +1,7 @@
 {
   "@@locale": "et",
   "app_title": "Ekraani tõlkimine",
+  "app_title_lite": "Ekraani tõlkimine Lite",
   "source_language": "Lähtekeel",
   "target_language": "Sihtkeel",
   "stop_translation": "Peata tõlkimine",

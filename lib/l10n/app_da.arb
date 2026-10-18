@@ -1,6 +1,7 @@
 {
   "@@locale": "da",
   "app_title": "Skærmoversættelse",
+  "app_title_lite": "Skærmoversættelse Lite",
   "source_language": "Fra",
   "target_language": "Til",
   "stop_translation": "Stop oversættelse",

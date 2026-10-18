@@ -12,6 +12,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get app_title => 'Schermvertaling';
 
   @override
+  String get app_title_lite => 'Schermvertaling Lite';
+
+  @override
   String get source_language => 'Van';
 
   @override

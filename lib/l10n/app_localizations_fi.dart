@@ -12,6 +12,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get app_title => 'Näytön kääntäminen';
 
   @override
+  String get app_title_lite => 'Näytön kääntäminen Lite';
+
+  @override
   String get source_language => 'Lähtökieli';
 
   @override

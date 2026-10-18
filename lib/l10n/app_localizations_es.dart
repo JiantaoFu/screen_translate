@@ -12,6 +12,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get app_title => 'Traductor de pantalla';
 
   @override
+  String get app_title_lite => 'Traductor de pantalla Lite';
+
+  @override
   String get source_language => 'Desde';
 
   @override

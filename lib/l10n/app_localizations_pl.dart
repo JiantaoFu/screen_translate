@@ -12,6 +12,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get app_title => 'Tłumaczenie ekranu';
 
   @override
+  String get app_title_lite => 'Tłumaczenie ekranu Lite';
+
+  @override
   String get source_language => 'Z';
 
   @override

@@ -12,6 +12,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get app_title => '화면 번역';
 
   @override
+  String get app_title_lite => '화면 번역 Lite';
+
+  @override
   String get source_language => '원본';
 
   @override

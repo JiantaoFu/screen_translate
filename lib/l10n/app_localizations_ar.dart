@@ -12,6 +12,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get app_title => 'ترجمة الشاشة';
 
   @override
+  String get app_title_lite => 'ترجمة الشاشة Lite';
+
+  @override
   String get source_language => 'من';
 
   @override

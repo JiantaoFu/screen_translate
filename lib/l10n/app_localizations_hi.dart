@@ -12,6 +12,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get app_title => 'स्क्रीन अनुवाद';
 
   @override
+  String get app_title_lite => 'स्क्रीन अनुवाद Lite';
+
+  @override
   String get source_language => 'से';
 
   @override

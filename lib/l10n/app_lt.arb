@@ -1,6 +1,7 @@
 {
   "@@locale": "lt",
   "app_title": "Ekrano vertimas",
+  "app_title_lite": "Ekrano vertimas Lite",
   "source_language": "Iš",
   "target_language": "Į",
   "stop_translation": "Sustabdyti vertimą",

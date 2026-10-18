@@ -1,6 +1,7 @@
 {
   "@@locale": "tr",
   "app_title": "Ekran çevirisi",
+  "app_title_lite": "Ekran çevirisi Lite",
   "source_language": "Kaynak",
   "target_language": "Hedef",
   "stop_translation": "Çeviriyi durdur",

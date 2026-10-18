@@ -1,6 +1,7 @@
 {
   "@@locale": "th",
   "app_title": "แปลหน้าจอ",
+  "app_title_lite": "แปลหน้าจอ Lite",
   "source_language": "จาก",
   "target_language": "เป็น",
   "stop_translation": "หยุดการแปล",

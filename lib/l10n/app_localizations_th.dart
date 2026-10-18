@@ -12,6 +12,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get app_title => 'แปลหน้าจอ';
 
   @override
+  String get app_title_lite => 'แปลหน้าจอ Lite';
+
+  @override
   String get source_language => 'จาก';
 
   @override

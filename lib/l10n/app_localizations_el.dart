@@ -12,6 +12,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get app_title => 'Μετάφραση οθόνης';
 
   @override
+  String get app_title_lite => 'Μετάφραση οθόνης Lite';
+
+  @override
   String get source_language => 'Από';
 
   @override

@@ -1,6 +1,7 @@
 {
   "@@locale": "bg",
   "app_title": "Превод на екрана",
+  "app_title_lite": "Превод на екрана Lite",
   "source_language": "От",
   "target_language": "На",
   "stop_translation": "Спри превода",

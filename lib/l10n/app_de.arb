@@ -1,6 +1,7 @@
 {
   "@@locale": "de",
   "app_title": "Bildschirmübersetzung",
+  "app_title_lite": "Bildschirmübersetzung Lite",
   "source_language": "Von",
   "target_language": "Nach",
   "stop_translation": "Übersetzung stoppen",

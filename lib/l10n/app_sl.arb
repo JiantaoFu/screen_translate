@@ -1,6 +1,7 @@
 {
   "@@locale": "sl",
   "app_title": "Prevajanje zaslona",
+  "app_title_lite": "Prevajanje zaslona Lite",
   "source_language": "Iz",
   "target_language": "V",
   "stop_translation": "Ustavi prevajanje",

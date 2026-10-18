@@ -1,6 +1,7 @@
 {
   "@@locale": "cs",
   "app_title": "Překlad obrazovky",
+  "app_title_lite": "Překlad obrazovky Lite",
   "source_language": "Z",
   "target_language": "Do",
   "stop_translation": "Zastavit překlad",

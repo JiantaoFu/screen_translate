@@ -1,6 +1,7 @@
 {
   "@@locale": "vi",
   "app_title": "Dịch màn hình",
+  "app_title_lite": "Dịch màn hình Lite",
   "source_language": "Từ",
   "target_language": "Sang",
   "stop_translation": "Dừng dịch",

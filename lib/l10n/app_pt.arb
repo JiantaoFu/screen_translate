@@ -1,6 +1,7 @@
 {
   "@@locale": "pt",
   "app_title": "Tradução de tela",
+  "app_title_lite": "Tradução de tela Lite",
   "source_language": "De",
   "target_language": "Para",
   "stop_translation": "Parar tradução",

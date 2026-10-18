@@ -1,6 +1,7 @@
 {
   "@@locale": "nl",
   "app_title": "Schermvertaling",
+  "app_title_lite": "Schermvertaling Lite",
   "source_language": "Van",
   "target_language": "Naar",
   "stop_translation": "Vertaling stoppen",

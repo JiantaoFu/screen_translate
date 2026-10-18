@@ -12,6 +12,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get app_title => 'Képernyőfordítás';
 
   @override
+  String get app_title_lite => 'Képernyőfordítás Lite';
+
+  @override
   String get source_language => 'Erről';
 
   @override

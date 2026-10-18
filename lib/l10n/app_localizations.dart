@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'Screen Translate'**
   String get app_title;
 
+  /// Home screen title in the Lite edition: the app name plus "Lite" (keep "Lite" in Latin letters)
+  ///
+  /// In en, this message translates to:
+  /// **'Screen Translator Lite'**
+  String get app_title_lite;
+
   /// No description provided for @source_language.
   ///
   /// In en, this message translates to:

@@ -25,6 +25,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:screen_translate/screens/image_translation_screen.dart';
 import '../lite/lite_gate.dart';
 import '../lite/paywall_screen.dart';
+import '../lite/lite_home_pro_row.dart';
+import '../app_flavor.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -340,20 +342,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return false;
   }
 
-  Widget _buildLiteRemaining(BuildContext context) {
-    final gate = _liteGate;
-    if (gate == null || gate.isPro) return const SizedBox.shrink();
-    final l = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: TextButton.icon(
-        key: const Key('lite_remaining'),
-        icon: const Icon(Icons.workspace_premium, size: 18),
-        label: Text(l.lite_remaining_today(gate.remainingFree)),
-        onPressed: () => _openPaywall(gate, 'home'),
-      ),
-    );
-  }
+  Widget _buildLiteRemaining(BuildContext context) =>
+      LiteHomeProRow(gate: _liteGate, onOpenPaywall: _openPaywall);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -1254,12 +1244,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            AppLocalizations.of(context)!.app_title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          // Flexible: the Lite titles are longer ("Bildschirmübersetzung Lite").
+          Flexible(
+            child: Text(
+              AppFlavorConfig.isLite
+                  ? AppLocalizations.of(context)!.app_title_lite
+                  : AppLocalizations.of(context)!.app_title,
+              key: const Key('home_title'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Icon(Icons.translate, color: Colors.white, size: 30),

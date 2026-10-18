@@ -12,6 +12,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get app_title => 'Ekrano vertimas';
 
   @override
+  String get app_title_lite => 'Ekrano vertimas Lite';
+
+  @override
   String get source_language => 'Iš';
 
   @override

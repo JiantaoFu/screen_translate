@@ -1,6 +1,7 @@
 {
   "@@locale": "el",
   "app_title": "Μετάφραση οθόνης",
+  "app_title_lite": "Μετάφραση οθόνης Lite",
   "source_language": "Από",
   "target_language": "Προς",
   "stop_translation": "Διακοπή μετάφρασης",

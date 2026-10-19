@@ -83,7 +83,7 @@ jobs:
           disk-size: 8G
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -skin 1080x2400
           disable-animations: true
-          script: bash tools/store_assets/ci_lite_shorts.sh
+          script: SCENES= bash tools/store_assets/ci_lite_shorts.sh   # offline takes only (online takes are in run 39222442772)
 
       - uses: actions/upload-artifact@v4
         if: always()

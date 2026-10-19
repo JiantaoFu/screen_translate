@@ -27,10 +27,13 @@ $A shell am force-stop $PKG
 bash "$ROOT/tools/emulator/push_ai_pack.sh" opus-mt-ja-en
 bash "$ROOT/tools/emulator/push_ai_pack.sh" opus-mt-ko-en fp16
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
+$A shell settings put global hide_error_dialogs 1   # no ANR/crash dialogs over the recordings
 
 reset_quota() { $A shell am force-stop $PKG; python3 "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" lite_quota_day=1970-01-01 >/dev/null; }
 record() { # record <name> <scene>  (env passed through to capture.sh)
   reset_quota
+  # A "Pixel Launcher isn't responding" dialog covered the offline takes in run 39224293030.
+  $A shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS >/dev/null 2>&1
   $A shell rm -f /sdcard/rec.mp4
   $A shell screenrecord --bit-rate 4000000 --time-limit 170 /sdcard/rec.mp4 &
   rec=$!
@@ -44,7 +47,7 @@ record() { # record <name> <scene>  (env passed through to capture.sh)
   $A pull /sdcard/rec.mp4 "$OUT_DIR/rec/$1.mp4"
   cp "$ROOT/tools/store_assets/raw/en-US/$2.png" "$OUT_DIR/rec/$1.png" 2>/dev/null
 }
-for s in ${SCENES:-webtoon game}; do record $s $s; done
+for s in ${SCENES-webtoon game}; do record $s $s; done
 
 # Offline proof: Quick (ML Kit on-device) and AI Enhanced (ONNX) with all
 # networking off. Quick's ko model is downloaded online first.

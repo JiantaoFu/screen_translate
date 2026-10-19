@@ -23,7 +23,7 @@ mkdir -p "$OUTDIR"
 PH=com.google.android.apps.photos
 
 target() { case $LOCALE in zh-CN) echo zh;; ja-JP) echo ja;; *) echo en;; esac; }
-mode() { [ "$(target)" = en ] && echo onnx || echo onDevice; }
+mode() { [ -n "${MODE:-}" ] && { echo $MODE; return; }; [ "$(target)" = en ] && echo onnx || echo onDevice; }  # MODE= overrides (ci_lite_shorts.sh)
 default_scenes() {
   case $LOCALE in
     # Japanese artwork translated into Japanese makes no sense: the Japanese
@@ -98,7 +98,8 @@ start_translation() {
 }
 shot() { $A exec-out screencap -p > "$OUTDIR/$1.png"; echo "$1: $OUTDIR/$1.png"; }
 
-# Clean status bar, permissions, app UI language.
+# Clean status bar (skipped with NO_DEMO=1, e.g. to show the real airplane icon), permissions, app UI language.
+if [ -z "${NO_DEMO:-}" ]; then
 $A shell settings put global sysui_demo_allowed 1
 $A shell am broadcast -a com.android.systemui.demo -e command enter >/dev/null
 for c in "clock -e hhmm 1000" "battery -e level 100 -e plugged false" \
@@ -106,6 +107,7 @@ for c in "clock -e hhmm 1000" "battery -e level 100 -e plugged false" \
          "notifications -e visible false"; do
   $A shell am broadcast -a com.android.systemui.demo -e command $c >/dev/null
 done
+fi
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 # No "Viewing full screen" tip over the first full-screen image.
 $A shell settings put secure immersive_mode_confirmations confirmed

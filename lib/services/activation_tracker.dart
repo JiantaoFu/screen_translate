@@ -250,6 +250,12 @@ class ActivationTracker {
   /// [stage] is one of [failureStages]. The `error_type` is [error]'s class
   /// name (never its message), or [code] when the caller already has a
   /// class-name code (model downloads); both cut to a short identifier.
+  ///
+  /// [error] is content-free by construction — only its runtime type is
+  /// read. [code] cannot be: it is whatever the caller passes, reduced to a
+  /// short identifier but not otherwise inspected, so callers must pass a
+  /// class name (`e.runtimeType.toString()`) and never a message, which
+  /// could carry a file path, a URL or user content.
   Future<void> firstTranslationFailed({
     required String stage,
     Object? error,

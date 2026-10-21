@@ -11,16 +11,22 @@ class AccessibilityFunnelStoreTest {
     private val values = mutableMapOf<String, Any?>()
     private lateinit var store: AccessibilityFunnelStore
     private var enabledChecks = 0
+    private var writes = 0
 
     @Before
     fun setUp() {
         values.clear()
         enabledChecks = 0
+        writes = 0
         store = AccessibilityFunnelStore(object : AccessibilityFunnelStore.KeyValue {
             override fun getBoolean(key: String) = values[key] as? Boolean ?: false
             override fun getString(key: String) = values[key] as? String
-            override fun putBoolean(key: String, value: Boolean) { values[key] = value }
-            override fun putString(key: String, value: String?) { values[key] = value }
+            override fun write(newValues: Map<String, Any?>) {
+                writes++
+                newValues.forEach { (key, value) ->
+                    if (value == null) values.remove(key) else values[key] = value
+                }
+            }
         })
     }
 
@@ -81,5 +87,25 @@ class AccessibilityFunnelStoreTest {
         val out = take(true)
         assertTrue(out["promptShown"] as Boolean)
         assertNull(out["result"])
+    }
+
+    /**
+     * These writes are synchronous commits on the main thread (app start,
+     * and the explainer's onPause, which runs before MainActivity resumes),
+     * so each step must cost one disk write and an empty take must cost none.
+     */
+    @Test
+    fun eachStepIsASingleWriteAndAnEmptyTakeWritesNothing() {
+        store.markPromptShown()
+        assertEquals(1, writes)
+        store.markPromptClosed(AccessibilityFunnelStore.ACTION_DISMISSED)
+        assertEquals(2, writes)
+        take(false)
+        assertEquals(3, writes)
+
+        // Nothing left pending: every later start and resume reads only.
+        take(false)
+        take(false)
+        assertEquals(3, writes)
     }
 }

@@ -184,7 +184,7 @@ class MainActivity: FlutterActivity() {
                     try {
                         val store = AccessibilityFunnelStore.forContext(this)
                         result.success(store.take {
-                            AccessibilityPermissionDialog(applicationContext).isAccessibilityServiceEnabled()
+                            AccessibilityPermissionDialog.isServiceEnabled(applicationContext)
                         })
                     } catch (e: Exception) {
                         Log.e(TAG, "Error reading accessibility funnel", e)

@@ -284,10 +284,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // chip, never via our Stop button; ask on return to the app too.
     // Never on the resume that ends a permission/consent screen: skipped
     // while Start is in progress and for a few seconds after it.
-    if (state == AppLifecycleState.resumed && Platform.isAndroid) {
-      // Back from the accessibility explainer or Settings.
-      AccessibilityFunnelReporter.instance.report();
-    }
     if (state == AppLifecycleState.resumed && mounted) {
       final provider = context.read<TranslationProvider>();
       if (TranslationProvider.mayPromptReviewOnResume(
@@ -298,6 +294,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       )) {
         _trackTranslationAndPromptReview(context);
       }
+    }
+    // Back from the accessibility explainer or Settings.
+    if (state == AppLifecycleState.resumed && Platform.isAndroid) {
+      AccessibilityFunnelReporter.instance.report();
     }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);

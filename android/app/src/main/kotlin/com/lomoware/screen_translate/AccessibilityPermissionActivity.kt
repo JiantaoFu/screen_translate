@@ -84,12 +84,11 @@ class AccessibilityPermissionActivity : AppCompatActivity() {
         }
     }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        return try {
-            ScrollDetectionAccessibilityService.instance != null
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking accessibility service", e)
-            false
-        }
-    }
+    // The same check the explainer's trigger and its analytics `enabled`
+    // use. This used to be ScrollDetectionAccessibilityService.instance !=
+    // null, which lags the system setting until the service is bound: the
+    // explainer would stay open after the user had already enabled it, and
+    // their Cancel then reported action=dismissed alongside enabled=yes.
+    private fun isAccessibilityServiceEnabled(): Boolean =
+        AccessibilityPermissionDialog.isServiceEnabled(this)
 }

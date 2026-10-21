@@ -19,8 +19,14 @@ class AccessibilityFunnelStore(private val kv: KeyValue) {
     interface KeyValue {
         fun getBoolean(key: String): Boolean
         fun getString(key: String): String?
-        fun putBoolean(key: String, value: Boolean)
-        fun putString(key: String, value: String?)
+
+        /**
+         * Stores every entry as a single write. Values are Boolean or
+         * String; null removes the key. One write per call matters: these
+         * are synchronous commits (see [forContext]) on the main thread,
+         * during app start and in the explainer's onPause.
+         */
+        fun write(values: Map<String, Any?>)
     }
 
     companion object {
@@ -38,13 +44,21 @@ class AccessibilityFunnelStore(private val kv: KeyValue) {
             return AccessibilityFunnelStore(object : KeyValue {
                 override fun getBoolean(key: String) = prefs.getBoolean(key, false)
                 override fun getString(key: String) = prefs.getString(key, null)
-                // commit(), not apply(): Dart may ask right after the
-                // explainer closes, from another thread.
-                override fun putBoolean(key: String, value: Boolean) {
-                    prefs.edit().putBoolean(key, value).commit()
-                }
-                override fun putString(key: String, value: String?) {
-                    prefs.edit().putString(key, value).commit()
+                override fun write(values: Map<String, Any?>) {
+                    val editor = prefs.edit()
+                    for ((key, value) in values) {
+                        when (value) {
+                            is Boolean -> editor.putBoolean(key, value)
+                            is String -> editor.putString(key, value)
+                            null -> editor.remove(key)
+                            else -> throw IllegalArgumentException("Unsupported value for $key")
+                        }
+                    }
+                    // commit(), not apply(): Dart may ask right after the
+                    // explainer closes, from another thread, and the result
+                    // has to survive the process being killed while the user
+                    // is away in Settings.
+                    editor.commit()
                 }
             })
         }
@@ -52,36 +66,47 @@ class AccessibilityFunnelStore(private val kv: KeyValue) {
 
     /** The explainer was launched. A new showing restarts the result. */
     fun markPromptShown() {
-        kv.putBoolean(KEY_PROMPT_SHOWN, true)
-        kv.putBoolean(KEY_RESULT_PENDING, false)
-        kv.putString(KEY_ACTION, null)
+        kv.write(
+            mapOf(
+                KEY_PROMPT_SHOWN to true,
+                KEY_RESULT_PENDING to false,
+                KEY_ACTION to null,
+            )
+        )
     }
 
     /** The explainer is closing; [action] is one of the ACTION_ codes. */
     fun markPromptClosed(action: String) {
-        kv.putBoolean(KEY_RESULT_PENDING, true)
-        kv.putString(KEY_ACTION, action)
+        kv.write(
+            mapOf(
+                KEY_RESULT_PENDING to true,
+                KEY_ACTION to action,
+            )
+        )
     }
 
     /**
      * Everything not yet handed to Dart, then cleared:
      * `promptShown` (Boolean) and, once the explainer has closed,
      * `result` = {enabled: Boolean, action: String}. [isEnabled] is only
-     * asked when there is a result to report.
+     * asked when there is a result to report. Nothing pending means no
+     * write at all — this runs on every app start and resume.
      */
     fun take(isEnabled: () -> Boolean): Map<String, Any> {
         val out = mutableMapOf<String, Any>()
+        val cleared = mutableMapOf<String, Any?>()
         val promptShown = kv.getBoolean(KEY_PROMPT_SHOWN)
         out["promptShown"] = promptShown
-        if (promptShown) kv.putBoolean(KEY_PROMPT_SHOWN, false)
+        if (promptShown) cleared[KEY_PROMPT_SHOWN] = false
         if (kv.getBoolean(KEY_RESULT_PENDING)) {
             out["result"] = mapOf(
                 "enabled" to isEnabled(),
                 "action" to (kv.getString(KEY_ACTION) ?: "unknown"),
             )
-            kv.putBoolean(KEY_RESULT_PENDING, false)
-            kv.putString(KEY_ACTION, null)
+            cleared[KEY_RESULT_PENDING] = false
+            cleared[KEY_ACTION] = null
         }
+        if (cleared.isNotEmpty()) kv.write(cleared)
         return out
     }
 }

@@ -15,6 +15,7 @@ import '../services/overlay_service.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../services/firebase_analytics_service.dart';
+import '../services/accessibility_funnel_reporter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -293,6 +294,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       )) {
         _trackTranslationAndPromptReview(context);
       }
+    }
+    // Back from the accessibility explainer or Settings.
+    if (state == AppLifecycleState.resumed && Platform.isAndroid) {
+      AccessibilityFunnelReporter.instance.report();
     }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);

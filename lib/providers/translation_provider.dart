@@ -513,6 +513,7 @@ class TranslationProvider with ChangeNotifier {
       } catch (e) {
         print('Error starting translation: $e');
         activation.failure('start', e);
+        activation.firstTranslationFailed(stage: 'start', error: e);
         await stopTranslation();
         return StartOutcome.failed;
       }
@@ -603,6 +604,8 @@ class TranslationProvider with ChangeNotifier {
       // mid-cycle. On a static screen no further frame would ever be
       // queued, so `finally` asks native for a fresh one.
       var droppedStale = false;
+      // Last step the tick reached, for first_translation_failed.
+      var stage = 'capture';
 
       try {
         // Check translation mode from Android service
@@ -624,6 +627,7 @@ class TranslationProvider with ChangeNotifier {
             if (imageData != null && _isTranslating) {
               print('Timer: running OCR...');
               stopwatch.reset();
+              stage = 'ocr';
               final rawOcrResults = await _ocrService.processImage(
                 imageData,
                 currentOCRScript,
@@ -807,6 +811,7 @@ class TranslationProvider with ChangeNotifier {
                   drawn = displayBoxes[i];
                   final r = ocrResults[i];
                   if (Platform.isAndroid) {
+                    stage = 'render';
                     await _overlayService.showTranslationOverlay(
                       old.translatedText, id,
                       x: drawn.left, y: drawn.top, width: drawn.width, height: drawn.height,
@@ -832,6 +837,7 @@ class TranslationProvider with ChangeNotifier {
                   final box = displayBoxes[i];
                   if (Platform.isAndroid) {
                     pendingPlaceholders.add(idForIndex[i]!);
+                    stage = 'render';
                     await _overlayService.showTranslationOverlay(
                       '…', idForIndex[i]!,
                       x: box.left, y: box.top, width: box.width, height: box.height,
@@ -852,6 +858,7 @@ class TranslationProvider with ChangeNotifier {
                 // Only removals happened this cycle — nothing left to translate.
               } else if (_translationMode == TranslationMode.llm) {
                 final textsToTranslate = [for (final i in newIndices) ocrResults[i].text];
+                stage = 'translate';
                 final batchResults = await _llmTranslationService.translateBatch(
                   texts: textsToTranslate,
                   sourceLanguage: _sourceLanguage,
@@ -874,6 +881,7 @@ class TranslationProvider with ChangeNotifier {
                   final id = idForIndex[i]!;
                   final translated = batchResults[k];
                   if (Platform.isAndroid) {
+                    stage = 'render';
                     await _overlayService.showTranslationOverlay(
                       translated, id,
                       x: box.left, y: box.top, width: box.width, height: box.height,
@@ -900,6 +908,7 @@ class TranslationProvider with ChangeNotifier {
                   final id = idForIndex[i]!;
 
                   final tWatch = Stopwatch()..start();
+                  stage = 'translate';
                   final translatedText = await translateText(ocrResult.text);
                   tMs += tWatch.elapsedMilliseconds;
 
@@ -913,6 +922,7 @@ class TranslationProvider with ChangeNotifier {
                   final box = displayBoxes[i];
                   final rWatch = Stopwatch()..start();
                   if (Platform.isAndroid) {
+                    stage = 'render';
                     await _overlayService.showTranslationOverlay(
                       translatedText, id,
                       x: box.left, y: box.top, width: box.width, height: box.height,
@@ -971,6 +981,8 @@ class TranslationProvider with ChangeNotifier {
         print('Error processing captured screen: $e');
         print('Stack trace: $stackTrace');
         ActivationTracker.instance.failure('capture_tick', e);
+        ActivationTracker.instance.firstTranslationFailed(
+            stage: stage, error: e, mode: _translationMode.name);
       } finally {
         if (pendingPlaceholders.isNotEmpty) {
           try {

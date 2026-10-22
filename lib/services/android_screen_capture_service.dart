@@ -63,6 +63,18 @@ class AndroidScreenCaptureService {
     }
   }
 
+  /// Throw away every frame captured so far — the one still settling as well
+  /// as any already queued. Used by "Hide all": a page change queues a frame
+  /// a moment before the user presses, and delivering it afterwards draws the
+  /// page they just hid straight back.
+  Future<void> dropPendingFrame() async {
+    try {
+      await _channel.invokeMethod('dropPendingFrame');
+    } on PlatformException catch (e) {
+      print('Error dropping pending frame: ${e.message}');
+    }
+  }
+
   Future<String> getTranslationMode() async {
     try {
       final result = await _channel.invokeMethod('getTranslationMode');

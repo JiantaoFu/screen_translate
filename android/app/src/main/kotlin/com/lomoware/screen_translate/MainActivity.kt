@@ -104,6 +104,10 @@ class MainActivity: FlutterActivity() {
                     screenCaptureService?.requestFreshFrame()
                     result.success(null)
                 }
+                "dropPendingFrame" -> {
+                    screenCaptureService?.dropPendingFrame()
+                    result.success(null)
+                }
                 "getTranslationMode" -> {
                     val translationMode = OverlayService.getInstance()?.getCurrentTranslationMode() ?: "auto"
                     result.success(translationMode)

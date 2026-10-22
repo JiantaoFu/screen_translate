@@ -1082,6 +1082,17 @@ class TranslationProvider with ChangeNotifier {
               // the token again and restores the normal behaviour.
               _hiddenByUserAtToken =
                   call.method == 'hideAll' ? _translationToken : null;
+              // Bumping the token only invalidates passes already running in
+              // Dart. A page change a moment before the press has native
+              // holding a frame for us, and a *new* tick picks it up with a
+              // current token, so nothing above catches it: the page the user
+              // just hid gets translated and drawn back about a second later.
+              // Hide all has to win over anything captured before it, so drop
+              // those frames natively too. Not for cancelTranslation, which
+              // relies on the frame being reprocessed.
+              if (call.method == 'hideAll') {
+                await _androidScreenCaptureService?.dropPendingFrame();
+              }
               break;
             default:
               throw MissingPluginException();

@@ -11,6 +11,7 @@ import 'services/firebase_analytics_service.dart';
 import 'services/activation_tracker.dart';
 import 'services/accessibility_funnel_reporter.dart';
 import 'services/firebase_remote_config_service.dart';
+import 'services/startup_tasks.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
@@ -31,62 +32,98 @@ Future<void> main() async {
   // Run the app UI immediately so the user never gets stuck on the splash screen/logo!
   runApp(const ScreenTranslateApp());
 
-  // Initialize Firebase and other network-dependent background services asynchronously
-  Future(() async {
-    try {
-      print('Background Services: Initializing Firebase...');
-      try {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ).timeout(const Duration(seconds: 10));
-      } on FirebaseException catch (e) {
-        // The Android FlutterFire plugin auto-initializes the default
-        // Firebase app from google-services.json via a native
-        // ContentProvider before this Dart call ever runs, so this throws
-        // "duplicate-app" on every launch — not a real failure, just means
-        // the app is already there and usable. Anything else is a real
-        // error and should still short-circuit the block below (Crashlytics
-        // must not silently end up half-configured).
-        if (e.code != 'duplicate-app') rethrow;
-        print('Background Services: Firebase already initialized natively, continuing.');
-      }
+  // Initialize Firebase and other network-dependent background services
+  // asynchronously. Each step is isolated, and the steps that report the
+  // start of a session come before the slow ones — see runStartupTasks.
+  Future(() => runStartupTasks(backgroundStartupTasks()));
+}
 
-      // Crash reporting — this was previously a total blind spot: the only
-      // error signal anywhere in the app was a manually-called trackError()
-      // that nothing actually invoked, so native crashes and uncaught Dart
-      // exceptions were invisible. Wiring both error channels (Flutter
-      // framework errors and everything else, e.g. errors in async
-      // callbacks/isolates) is the standard FlutterFire pattern.
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
-      // A crash on the previous run marks this device as having had an
-      // error, so the in-app review prompt never asks it.
-      if (await FirebaseCrashlytics.instance.didCrashOnPreviousExecution()) {
-        final prefs = await SharedPreferences.getInstance();
-        await ReviewPromptService(prefs).recordError();
-      }
+/// Background startup, in the order it has to happen in.
+///
+/// Firebase first because everything below talks to it, then crash
+/// reporting, then everything that reports this launch to analytics, and
+/// only then the steps that can take their time (the previous-run crash
+/// check reads prefs; Remote Config fetches over the network).
+List<StartupTask> backgroundStartupTasks() => [
+      const StartupTask('Firebase', _initFirebase),
+      const StartupTask('crash reporting', _initCrashReporting),
+      StartupTask(
+        'analytics',
+        () => FirebaseAnalyticsService().init(),
+        timeout: const Duration(seconds: 5),
+      ),
+      StartupTask(
+        'app_opened',
+        () => FirebaseAnalyticsService().trackAppOpen(),
+        timeout: const Duration(seconds: 5),
+      ),
+      StartupTask(
+        'activation first-seen',
+        () => ActivationTracker.instance.recordAppOpen(),
+        timeout: const Duration(seconds: 5),
+      ),
+      if (Platform.isAndroid)
+        StartupTask(
+          'accessibility funnel',
+          () => AccessibilityFunnelReporter.instance.report(),
+          timeout: const Duration(seconds: 5),
+        ),
+      const StartupTask('previous-run crash check', _recordPreviousCrash),
+      // Remote Config's own fetch timeout is 20 s, so anything shorter here
+      // cuts it off before it can give up on its own. It runs last, where
+      // taking that long costs nothing.
+      const StartupTask(
+        'Remote Config',
+        _initRemoteConfig,
+        timeout: Duration(seconds: 25),
+      ),
+    ];
 
-      // Initialize Firebase Remote Config
-      final remoteConfig = FirebaseRemoteConfigService();
-      await remoteConfig.init().timeout(const Duration(seconds: 10));
-      remoteConfig.logAllValues();
+Future<void> _initFirebase() async {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    // The Android FlutterFire plugin auto-initializes the default
+    // Firebase app from google-services.json via a native
+    // ContentProvider before this Dart call ever runs, so this throws
+    // "duplicate-app" on every launch — not a real failure, just means
+    // the app is already there and usable. Anything else is a real error
+    // and should still be reported as a failed step.
+    if (e.code != 'duplicate-app') rethrow;
+    print('Background Services: Firebase already initialized natively, continuing.');
+  }
+}
 
-      // Initialize Firebase Analytics
-      final analytics = FirebaseAnalyticsService();
-      await analytics.init().timeout(const Duration(seconds: 5));
-      await analytics.trackAppOpen();
-      await ActivationTracker.instance.recordAppOpen();
-      if (Platform.isAndroid) await AccessibilityFunnelReporter.instance.report();
+/// Crash reporting — this was previously a total blind spot: the only error
+/// signal anywhere in the app was a manually-called trackError() that
+/// nothing actually invoked, so native crashes and uncaught Dart exceptions
+/// were invisible. Wiring both error channels (Flutter framework errors and
+/// everything else, e.g. errors in async callbacks/isolates) is the standard
+/// FlutterFire pattern.
+Future<void> _initCrashReporting() async {
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+}
 
-      print('Background Services: All services initialized successfully.');
-    } catch (e) {
-      print('Background Services: Non-fatal initialization error: $e');
-    }
-  });
+/// A crash on the previous run marks this device as having had an error, so
+/// the in-app review prompt never asks it.
+Future<void> _recordPreviousCrash() async {
+  if (await FirebaseCrashlytics.instance.didCrashOnPreviousExecution()) {
+    final prefs = await SharedPreferences.getInstance();
+    await ReviewPromptService(prefs).recordError();
+  }
+}
+
+Future<void> _initRemoteConfig() async {
+  final remoteConfig = FirebaseRemoteConfigService();
+  await remoteConfig.init();
+  remoteConfig.logAllValues();
 }
 
 class ScreenTranslateApp extends StatelessWidget {

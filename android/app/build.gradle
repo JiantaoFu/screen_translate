@@ -63,6 +63,30 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
+    // One codebase, two Play listings. tools/build.py --flavor picks one
+    // (default paid) and passes the same name to Dart as APP_FLAVOR.
+    //  paid: com.lomoware.screen_translate, unchanged; the BILLING permission
+    //        that in_app_purchase merges in is removed (src/paid manifest).
+    //  lite: com.lomoware.screen_translate.lite, daily free limit plus a
+    //        one-time "pro_unlock" Play Billing purchase.
+    flavorDimensions "edition"
+    productFlavors {
+        paid {
+            dimension "edition"
+            applicationId "com.lomoware.screen_translate"
+            manifestPlaceholders = [appLabel: "Screen Translate"]
+        }
+        lite {
+            dimension "edition"
+            applicationId "com.lomoware.screen_translate.lite"
+            manifestPlaceholders = [appLabel: "Screen Translator Lite"]
+        }
+    }
+
     signingConfigs {
         release {
             storeFile file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
@@ -82,6 +106,14 @@ android {
                 println "WARNING: Release keystore not found at ${keystoreFile.absolutePath}. Falling back to DEBUG signing config for local testing."
             }
             minifyEnabled true
+            // Native debug symbols in BUNDLE-METADATA made up ~57 MB (compressed)
+            // of the ~146 MB lite AAB: whole copies of the prebuilt .so files
+            // (onnxruntime, translate_jni, flutter, libapp) for every ABI.
+            // Devices never download BUNDLE-METADATA and the libs inside the
+            // APKs are already stripped, so this changes nothing on device. To
+            // symbolicate native crashes in Play Console, upload the separate
+            // native-debug-symbols.zip (see the handoff README) for the release.
+            ndk { debugSymbolLevel 'NONE' }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -110,4 +142,33 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// Firebase config for the lite package lives in src/lite/google-services.json
+// (the paid one stays at android/app/google-services.json; the plugin prefers
+// src/<flavor>/ when present)
+// (not in the repo until Jiantao downloads it from the Firebase console; see
+// android/app/src/lite/README.md). The root google-services.json only has the
+// paid package, so without the lite file the google-services task would fail.
+// For local/debug builds we skip that task and the app runs with Firebase
+// disabled (Remote Config defaults, no analytics); tools/build.py refuses a
+// lite *release* build without the real file.
+def liteGoogleServices = file('src/lite/google-services.json')
+if (!liteGoogleServices.exists()) {
+    println "WARNING: ${liteGoogleServices} is missing: lite builds run without Firebase " +
+            "(see android/app/src/lite/README.md)."
+    tasks.configureEach { task ->
+        if (task.name ==~ /process(Lite)\w*GoogleServices/ ||
+                task.name ==~ /\w*[Ll]ite\w*[Cc]rashlytics\w*/) {
+            task.enabled = false
+        }
+    }
+}
+
+// Pre-flavor task name kept so `./gradlew :app:testDebugUnitTest` (CLAUDE.md,
+// tools/release.py) still runs every Kotlin unit test.
+tasks.register('testDebugUnitTest') {
+    group = 'verification'
+    description = 'Runs the debug unit tests of every flavor.'
+    dependsOn 'testPaidDebugUnitTest', 'testLiteDebugUnitTest'
 }

@@ -44,6 +44,12 @@ Click **Create Configuration** and add these parameters:
 - **Type**: Number
 - **Description**: Maximum parallel translation requests
 
+#### 6. Lite: daily free translations
+- **Key**: `lite_daily_free_translations`
+- **Type**: Number
+- **Default**: `5`
+- **Description**: Lite flavor only. Successful translations per local day before the paywall (a live session that showed a translation, or an image translation, counts as one). Values below 1 fall back to 5. Ignored by the paid app and by Pro users.
+
 ## Usage in Code
 
 ### Get OCR Debug Setting

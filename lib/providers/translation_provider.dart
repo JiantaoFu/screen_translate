@@ -15,6 +15,7 @@ import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../models/ocr_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../lite/lite_gate.dart';
 import '../services/review_prompt_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/activation_tracker.dart';
@@ -321,6 +322,13 @@ class TranslationProvider with ChangeNotifier {
   final Future<void> Function() _onSessionSucceeded;
 
   static Future<void> _recordReviewSuccess() async {
+    // Lite flavor: one live session that drew a translation is one of the
+    // day's free translations (no-op in the paid app).
+    try {
+      await LiteGate.instance?.recordTranslationSuccess(kind: 'live');
+    } catch (e) {
+      print('Lite quota not updated: $e');
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       await ReviewPromptService(prefs).recordSuccessfulTranslation();

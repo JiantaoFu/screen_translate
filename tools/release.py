@@ -6,6 +6,11 @@
         --notes-dir release_notes/1.2.2
     python tools/release.py --build-only        # signed AAB only, no upload
     python tools/release.py --dry-run           # everything, but Play discards the edit
+    python tools/release.py --flavor lite --track internal   # the Lite app
+
+--flavor picks the app: paid (default: com.lomoware.screen_translate, so
+every command above is unchanged) or lite (com.lomoware.screen_translate.lite,
+its own Play listing). Lite tags are v<name>+<code>-lite.
 
 Steps (each stops the release on failure):
   1. Preflight: no uncommitted changes (nor new files under lib/ or
@@ -40,12 +45,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import (  # noqa: E402  (the shared build steps and checks)
-    AAB, MAPPING, PACKAGE, PUBSPEC, ROOT, BuildError as ReleaseError, build,
-    check_keystore, find_java_home, gradle, read_version, run, stop_gradle,
+    AAB, DEFAULT_FLAVOR, FLAVORS, MAPPING, PACKAGE, PUBSPEC, ROOT,
+    BuildError as ReleaseError, build, check_keystore, check_lite_firebase,
+    find_java_home, gradle, mapping_path, output_path, read_version, run, stop_gradle,
 )
 
 TRACKS = ("internal", "alpha", "beta", "production")
 NOTES_LIMIT = 500  # characters per language, enforced by Play
+
+
+def artifacts(flavor):
+    """(bundle, R8 mapping) that build() produces for the flavor."""
+    if flavor == DEFAULT_FLAVOR:
+        return AAB, MAPPING
+    return output_path("aab", flavor), mapping_path(flavor)
 
 
 def step(msg):
@@ -138,15 +151,15 @@ def play_api(action):
         raise ReleaseError(f"{action} failed: {e}") from e
 
 
-def highest_version_code(svc):
-    edit_id = svc.edits().insert(packageName=PACKAGE, body={}).execute()["id"]
+def highest_version_code(svc, package=PACKAGE):
+    edit_id = svc.edits().insert(packageName=package, body={}).execute()["id"]
     try:
-        tracks = svc.edits().tracks().list(packageName=PACKAGE, editId=edit_id).execute()
+        tracks = svc.edits().tracks().list(packageName=package, editId=edit_id).execute()
         return max((int(code) for track in tracks.get("tracks", [])
                     for release in track.get("releases", [])
                     for code in release.get("versionCodes", [])), default=0)
     finally:
-        svc.edits().delete(packageName=PACKAGE, editId=edit_id).execute()
+        svc.edits().delete(packageName=package, editId=edit_id).execute()
 
 
 def upload(request, what):
@@ -171,26 +184,29 @@ def publish(svc, name, code, args, notes):
     """Returns True once the release is committed on Play."""
     from googleapiclient.http import MediaFileUpload
 
+    flavor = getattr(args, "flavor", DEFAULT_FLAVOR)
+    package = FLAVORS[flavor]
+    aab, mapping = artifacts(flavor)
     edits = svc.edits()
-    edit_id = edits.insert(packageName=PACKAGE, body={}).execute()["id"]
+    edit_id = edits.insert(packageName=package, body={}).execute()["id"]
     committed = False
     try:
         bundle = upload(edits.bundles().upload(
-            packageName=PACKAGE, editId=edit_id,
+            packageName=package, editId=edit_id,
             # The bundle is large (on-device OCR/translation models); without
             # this Play refuses it over the install-size warning.
             ackBundleInstallationWarning=True,
-            media_body=MediaFileUpload(str(AAB), mimetype="application/octet-stream",
+            media_body=MediaFileUpload(str(aab), mimetype="application/octet-stream",
                                        chunksize=8 * 1024 * 1024, resumable=True)),
             "bundle")
         if int(bundle["versionCode"]) != code:
             raise ReleaseError(f"Play read versionCode {bundle['versionCode']} from the "
                                f"bundle, expected {code}")
-        if MAPPING.exists():
+        if mapping.exists():
             upload(edits.deobfuscationfiles().upload(
-                packageName=PACKAGE, editId=edit_id, apkVersionCode=code,
+                packageName=package, editId=edit_id, apkVersionCode=code,
                 deobfuscationFileType="proguard",
-                media_body=MediaFileUpload(str(MAPPING), mimetype="application/octet-stream",
+                media_body=MediaFileUpload(str(mapping), mimetype="application/octet-stream",
                                            chunksize=8 * 1024 * 1024, resumable=True)),
                 "R8 mapping")
 
@@ -202,9 +218,9 @@ def publish(svc, name, code, args, notes):
         if notes:
             release["releaseNotes"] = [{"language": lang, "text": text}
                                        for lang, text in notes.items()]
-        edits.tracks().update(packageName=PACKAGE, editId=edit_id, track=args.track,
+        edits.tracks().update(packageName=package, editId=edit_id, track=args.track,
                               body={"track": args.track, "releases": [release]}).execute()
-        edits.validate(packageName=PACKAGE, editId=edit_id).execute()
+        edits.validate(packageName=package, editId=edit_id).execute()
         print("  Play validated the edit")
 
         if args.dry_run:
@@ -216,7 +232,7 @@ def publish(svc, name, code, args, notes):
                 f"Publish {name} ({code}) to '{args.track}' ({rollout})?"):
             print("  not published")
             return False
-        commit = {"packageName": PACKAGE, "editId": edit_id}
+        commit = {"packageName": package, "editId": edit_id}
         if args.changes_not_sent_for_review:
             commit["changesNotSentForReview"] = True
         edits.commit(**commit).execute()
@@ -225,7 +241,7 @@ def publish(svc, name, code, args, notes):
     finally:
         if not committed:
             try:
-                edits.delete(packageName=PACKAGE, editId=edit_id).execute()
+                edits.delete(packageName=package, editId=edit_id).execute()
             except Exception:
                 pass
 
@@ -236,6 +252,8 @@ def publish(svc, name, code, args, notes):
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--flavor", choices=FLAVORS, default=DEFAULT_FLAVOR,
+                   help="paid (default) or lite (com.lomoware.screen_translate.lite)")
     p.add_argument("--track", choices=TRACKS, default="internal")
     p.add_argument("--rollout", type=float, default=1.0,
                    help="fraction of users for a staged rollout, e.g. 0.2 (default: all)")
@@ -281,6 +299,10 @@ def main():
         # build() checks this again; checking here fails before ~10 minutes of
         # tests and building instead of after.
         check_keystore()
+        if args.flavor == "lite":
+            check_lite_firebase()
+        package = FLAVORS[args.flavor]
+        print(f"  app: {package} ({args.flavor})")
         java_home = find_java_home(args.java_home)
         print(f"  JDK: {java_home}")
         branch = git("rev-parse", "--abbrev-ref", "HEAD")
@@ -308,7 +330,7 @@ def main():
         print(f"  version {name} ({code})")
         if svc:
             with play_api("Reading versions from Google Play"):
-                on_play = highest_version_code(svc)
+                on_play = highest_version_code(svc, package)
             print(f"  highest versionCode on Play: {on_play}")
             if code <= on_play:
                 raise ReleaseError(f"versionCode {code} must be higher than {on_play} "
@@ -322,7 +344,8 @@ def main():
 
         step("Building the signed release App Bundle")
         used_gradle = True
-        build("aab", java_home, name, code)  # tools/build.py: same build as `build.py aab`
+        # tools/build.py: same build as `build.py aab [--flavor lite]`
+        build("aab", java_home, name, code, args.flavor)
         built = True
 
         if uploading:
@@ -336,7 +359,7 @@ def main():
                 if bumped:
                     git("add", "pubspec.yaml")
                     git("commit", "-m", f"Release {name} ({code})")
-                tag = f"v{name}+{code}"
+                tag = f"v{name}+{code}" + ("" if args.flavor == DEFAULT_FLAVOR else f"-{args.flavor}")
                 git("tag", "-a", tag, "-m", f"{name} ({code}) on {args.track}")
                 print(f"  tagged {tag}")
                 if args.push:
@@ -365,7 +388,7 @@ def main():
     if published:
         print(f"\nPublished {name} ({code}) to '{args.track}' in {minutes:.1f} min.")
     elif args.build_only:
-        print(f"\nBuilt {name} ({code}) in {minutes:.1f} min: {AAB}")
+        print(f"\nBuilt {name} ({code}) in {minutes:.1f} min: {artifacts(args.flavor)[0]}")
     else:
         print(f"\nDone in {minutes:.1f} min; nothing was published.")
     return 0

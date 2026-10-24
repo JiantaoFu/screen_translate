@@ -42,7 +42,8 @@ python3 "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=ja targetLa
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell cmd locale set-app-locales $PKG --locales en-US
 # The Japanese page used for the scroll part.
-(cd "$ROOT/tools/a11y_demo" && python3 -m http.server 8765 >/dev/null 2>&1 &)
+python3 -m http.server 8765 --directory "$ROOT/tools/a11y_demo" >/dev/null 2>&1 &
+HTTP=$!
 $A reverse tcp:8765 tcp:8765
 URL=http://localhost:8765/demo.html
 $A shell 'echo "_ --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line'
@@ -144,4 +145,5 @@ if [ -s "$OUT_DIR/list.txt" ]; then
 fi
 ls -l "$OUT_DIR"
 $A logcat -d > "$OUT_DIR/logcat.txt"
+kill $HTTP 2>/dev/null   # a leftover child keeps the CI step from finishing
 exit 0

@@ -125,14 +125,22 @@ wait_done 0 && step "first translation complete" || step "WARNING: no 'Translati
 sleep 4; shot 07_translated
 
 # Chrome sends no TYPE_VIEW_SCROLLED to the service (A/B probe: 0 events with
-# and without canRetrieveWindowContent), so the scroll part uses Settings in
-# Japanese, a native list that does deliver scroll events.
-step "8. native app (Settings, Japanese) -> scroll -> re-translation"
-$A shell cmd locale set-app-locales com.android.settings --locales ja-JP
-$A shell am force-stop com.android.settings
+# and without canRetrieveWindowContent), so the scroll part uses a native list
+# (Settings delivers them too but hides third-party overlays).
+step "8. native app (Clock city list, Japanese) -> scroll -> re-translation"
+# Settings hides third-party overlays, so use the Clock world-city list.
+CLOCK=""
+for c in com.google.android.deskclock/com.android.deskclock.worldclock.CitySelectionActivity \
+         com.android.deskclock/com.android.deskclock.worldclock.CitySelectionActivity; do
+  $A shell pm list packages | tr -d '\r' | grep -qx "package:${c%%/*}" && { CLOCK=$c; break; }
+done
+step "clock activity: ${CLOCK:-none}"
+$A shell cmd locale set-app-locales "${CLOCK%%/*}" --locales ja-JP
+$A shell am force-stop "${CLOCK%%/*}"
 n0=$($A logcat -d -s flutter:I | grep -c 'Translations complete')
-$A shell am start -a android.settings.SETTINGS >/dev/null 2>&1
-wait_done "$n0" && step "settings translated" || step "WARNING: settings not translated within 60 s"
+$A shell am start -n "$CLOCK" >/dev/null 2>&1; sleep 3
+step "top: $($A shell dumpsys activity activities | grep -m1 topResumedActivity | tr -d '\r')"
+wait_done "$n0" && step "clock list translated" || step "WARNING: clock list not translated within 60 s"
 sleep 4; shot 08_settings
 for i in 1 2; do
   before=$($A logcat -d -s flutter:I | grep -c 'Translations complete')

@@ -2,7 +2,8 @@
 # CI driver for the Lite accessibility-disclosure demo video
 # (.github/workflows/lite-a11y-demo.yml). Runs inside
 # reactivecircus/android-emulator-runner with the lite debug APK built.
-# Records (adb screenrecord) on a fresh install:
+# Records (adb screenrecord) on a fresh install: first the "No thanks" path
+# (translate with the service off), then a reset and the Agree path:
 #   app opens -> Translate Screen -> screen-capture consent -> the
 #   Accessibility disclosure dialog -> "Agree" -> Android Accessibility
 #   settings -> the service is turned on -> back to the app -> a Japanese
@@ -57,8 +58,42 @@ $A shell pm list packages | tr -d '\r' | sed 's/package://' | grep -E 'chrome|ht
 $A shell rm -f /sdcard/rec_stop /sdcard/a11y_*.mp4
 $A shell 'i=0; while [ ! -f /sdcard/rec_stop ]; do i=$((i+1)); screenrecord --bit-rate 6000000 --time-limit 170 /sdcard/a11y_$i.mp4; done' &
 REC=$!
+step "recording started"
 sleep 2
 $A logcat -c
+
+wait_done() { for _ in $(seq 1 30); do sleep 2
+  [ "$($A logcat -d -s flutter:I | grep -c 'Translations complete')" -gt "$1" ] && return 0; done; return 1; }
+consent() {
+  $A shell input tap $T_SCREEN; sleep 3
+  $A shell input tap $T_MODE; sleep 1.5
+  $A shell input tap $T_ENTIRE; sleep 1.5
+  $A shell input tap $T_START; sleep 4
+}
+open_page() {
+  $A shell am start -a android.intent.action.VIEW -d $URL -n com.android.chrome/com.google.android.apps.chrome.Main >/dev/null 2>&1
+  sleep 8
+  $UI tap '^(Accept & continue|Use without an account|No thanks|Got it)$' --timeout 3 >/dev/null && sleep 3
+  $UI tap '^(No thanks|Got it)$' --timeout 3 >/dev/null && sleep 3
+}
+
+step "0. No thanks path: open the app, decline, translate with the service off"
+$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+if $UI find 'Accessibility Service \(Optional\)' --timeout 25 | tee -a "$LOG"; then
+  sleep 3; shot 00_dialog
+  $UI tap '^No thanks$' --timeout 5 | tee -a "$LOG"; sleep 2
+else step "FAILED: dialog not shown (No thanks path)"; fi
+step "service: $($A shell settings get secure enabled_accessibility_services | tr -d '\r')"
+consent; shot 00_translating
+$A logcat -c
+open_page
+wait_done 0 && step "No thanks path: page translated" || step "WARNING: No thanks path not translated within 60 s"
+sleep 4; shot 00_translated
+step "reset: stop the app and clear its disclosure state, page closed"
+$A shell am force-stop $PKG
+$A shell am force-stop com.android.chrome
+$A shell run-as $PKG rm -f shared_prefs/AccessibilityPrefs.xml
+$A shell input keyevent HOME; sleep 2
 
 step "1. open the app (the disclosure dialog appears on first launch)"
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 3; shot 01_open
@@ -102,46 +137,20 @@ $A shell input keyevent BACK; sleep 1; $A shell input keyevent BACK; sleep 1
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 5; shot 06_back_in_app
 
 step "6b. Translate Screen + screen-capture consent"
-$A shell input tap $T_SCREEN; sleep 3
-$A shell input tap $T_MODE; sleep 1.5
-$A shell input tap $T_ENTIRE; sleep 1.5
-$A shell input tap $T_START; sleep 4; shot 06_translating
+consent; shot 06_translating
 
 step "7. Japanese page in another app"
 $A logcat -c
 opened=""
-$A shell am start -a android.intent.action.VIEW -d $URL -n com.android.chrome/com.google.android.apps.chrome.Main >/dev/null 2>&1
-sleep 8
+open_page
 top=$($A shell dumpsys activity activities | grep -m1 topResumedActivity | tr -d '\r')
 step "viewer: $top"
 echo "$top" | grep -q 'chrome.*Main\|ChromeTabbedActivity' && opened=yes
 [ -n "$opened" ] || step "FAILED: no viewer opened the page"
-# Chrome first-run screens, if any.
-$UI tap '^(Accept & continue|Use without an account|No thanks|Got it)$' --timeout 3 >/dev/null && sleep 3
-$UI tap '^(No thanks|Got it)$' --timeout 3 >/dev/null && sleep 3
-wait_done() { for _ in $(seq 1 30); do sleep 2
-  [ "$($A logcat -d -s flutter:I | grep -c 'Translations complete')" -gt "$1" ] && return 0; done; return 1; }
 wait_done 0 && step "first translation complete" || step "WARNING: no 'Translations complete' within 60 s"
 sleep 4; shot 07_translated
 
-# Chrome sends no TYPE_VIEW_SCROLLED to the service (A/B probe: 0 events with
-# and without canRetrieveWindowContent), so the scroll part uses a native list
-# (Settings delivers them too but hides third-party overlays).
-step "8. native app (Clock city list, Japanese) -> scroll -> re-translation"
-# Settings hides third-party overlays, so use the Clock world-city list.
-CLOCK=""
-for c in com.google.android.deskclock/com.android.deskclock.worldclock.CitySelectionActivity \
-         com.android.deskclock/com.android.deskclock.worldclock.CitySelectionActivity; do
-  $A shell pm list packages | tr -d '\r' | grep -qx "package:${c%%/*}" && { CLOCK=$c; break; }
-done
-step "clock activity: ${CLOCK:-none}"
-$A shell cmd locale set-app-locales "${CLOCK%%/*}" --locales ja-JP
-$A shell am force-stop "${CLOCK%%/*}"
-n0=$($A logcat -d -s flutter:I | grep -c 'Translations complete')
-$A shell am start -n "$CLOCK" >/dev/null 2>&1; sleep 3
-step "top: $($A shell dumpsys activity activities | grep -m1 topResumedActivity | tr -d '\r')"
-wait_done "$n0" && step "clock list translated" || step "WARNING: clock list not translated within 60 s"
-sleep 4; shot 08_settings
+step "8. scroll -> re-translation"
 for i in 1 2; do
   before=$($A logcat -d -s flutter:I | grep -c 'Translations complete')
   s0=$($A logcat -d | grep -c 'Scroll event received')

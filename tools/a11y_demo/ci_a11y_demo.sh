@@ -49,6 +49,9 @@ $A reverse tcp:8765 tcp:8765
 URL=http://localhost:8765/demo.html
 $A shell 'echo "_ --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line'
 $A shell am set-debug-app --persistent com.android.chrome
+# No Chrome notification popups on camera.
+$A shell pm revoke com.android.chrome android.permission.POST_NOTIFICATIONS 2>/dev/null
+$A shell appops set com.android.chrome POST_NOTIFICATION ignore 2>/dev/null
 # The setup launch above already showed (and marked as shown) the
 # disclosure dialog; forget that so it appears again on camera.
 $A shell run-as $PKG rm -f shared_prefs/AccessibilityPrefs.xml
@@ -160,6 +163,7 @@ for i in 1 2; do
   step "scroll $i: $(( $($A logcat -d | grep -c 'Scroll event received') - s0 )) 'Scroll event received' lines"
   sleep 4; shot 09_scroll_$i
 done
+$A shell touch /sdcard/rec_stop; $A shell pkill -INT screenrecord   # stop right after scroll 2
 $A logcat -d | grep -E 'Scroll event received|Significant Scroll|Foreground window changed' | tail -30 | tee -a "$LOG"
 
 # --- stop recording and fetch

@@ -61,4 +61,22 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getInt(prefNoTextPromptCount), 1);
   });
+
+  testWidgets('prompt hides the target language (ja-JP device: target ja)', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showNoTextSourcePrompt(context, currentSource: 'en', targetLanguage: 'ja'),
+          child: const Text('go'),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    expect(find.text('日本語'), findsNothing);
+    for (final label in ['한국어', '中文', 'English']) {
+      expect(find.text(label), findsOneWidget);
+    }
+    expect(find.byType(OutlinedButton), findsNWidgets(3));
+  });
 }

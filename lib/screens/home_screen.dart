@@ -509,7 +509,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 sessionFoundNoText: provider.sessionFoundNoText) &&
                                             context.mounted) {
                                           final picked = await showNoTextSourcePrompt(context,
-                                              currentSource: provider.sourceLanguage);
+                                              currentSource: provider.sourceLanguage,
+                                              targetLanguage: provider.targetLanguage);
                                           if (picked != null && context.mounted) {
                                             provider.setSourceLanguage(picked);
                                             await _startLiveTranslation(context, provider);

@@ -27,8 +27,10 @@ Future<bool> shouldOfferSourceLanguages({required bool sessionFoundNoText}) asyn
 }
 
 /// One-line "No text found" prompt with a button per likely source language.
+/// The target language is left out (translating ja→ja would show nothing).
 /// Returns the language code tapped, or null when dismissed.
-Future<String?> showNoTextSourcePrompt(BuildContext context, {required String currentSource}) async {
+Future<String?> showNoTextSourcePrompt(BuildContext context,
+    {required String currentSource, String? targetLanguage}) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setInt(prefNoTextPromptCount, (prefs.getInt(prefNoTextPromptCount) ?? 0) + 1);
   if (!context.mounted) return null;
@@ -44,7 +46,8 @@ Future<String?> showNoTextSourcePrompt(BuildContext context, {required String cu
           spacing: 8,
           children: [
             for (final e in noTextSourceChoices.entries)
-              OutlinedButton(
+              if (e.key != targetLanguage)
+                OutlinedButton(
                 key: Key('no_text_source_${e.key}'),
                 onPressed: () => Navigator.pop(dialogContext, e.key),
                 child: Text(e.value),

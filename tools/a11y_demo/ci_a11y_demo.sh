@@ -124,15 +124,26 @@ wait_done() { for _ in $(seq 1 30); do sleep 2
 wait_done 0 && step "first translation complete" || step "WARNING: no 'Translations complete' within 60 s"
 sleep 4; shot 07_translated
 
-step "8. scroll -> re-translation"
+# Chrome sends no TYPE_VIEW_SCROLLED to the service (A/B probe: 0 events with
+# and without canRetrieveWindowContent), so the scroll part uses Settings in
+# Japanese, a native list that does deliver scroll events.
+step "8. native app (Settings, Japanese) -> scroll -> re-translation"
+$A shell cmd locale set-app-locales com.android.settings --locales ja-JP
+$A shell am force-stop com.android.settings
+n0=$($A logcat -d -s flutter:I | grep -c 'Translations complete')
+$A shell am start -a android.settings.SETTINGS >/dev/null 2>&1
+wait_done "$n0" && step "settings translated" || step "WARNING: settings not translated within 60 s"
+sleep 4; shot 08_settings
 for i in 1 2; do
   before=$($A logcat -d -s flutter:I | grep -c 'Translations complete')
-  $A shell input swipe 540 1900 540 800 700
+  s0=$($A logcat -d | grep -c 'Scroll event received')
+  $A shell input swipe 540 1900 540 1000 700
   sleep 1
   if wait_done "$before"; then step "scroll $i: re-translated"; else step "WARNING scroll $i: no new translation"; fi
-  sleep 4; shot 08_scroll_$i
+  step "scroll $i: $(( $($A logcat -d | grep -c 'Scroll event received') - s0 )) 'Scroll event received' lines"
+  sleep 4; shot 09_scroll_$i
 done
-$A logcat -d | grep -E 'Scroll event received|Significant Scroll|Foreground window changed' | tail -20 | tee -a "$LOG"
+$A logcat -d | grep -E 'Scroll event received|Significant Scroll|Foreground window changed' | tail -30 | tee -a "$LOG"
 
 # --- stop recording and fetch
 $A shell touch /sdcard/rec_stop

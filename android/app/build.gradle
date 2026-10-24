@@ -53,7 +53,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        // Hotfix release name; versionCode still comes from pubspec (17).
+        versionName "1.2.6.1"
         // -Pabi=arm64-v8a -Pdisable-abi-filtering=true (tools/build.py) packs one
         // ABI into a single APK.
         // Unlike Flutter's split-per-abi it keeps versionCode as-is, so a

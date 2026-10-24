@@ -42,7 +42,14 @@ python3 "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=ja targetLa
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell cmd locale set-app-locales $PKG --locales en-US
 # The Japanese page used for the scroll part.
-$A push "$ROOT/tools/a11y_demo/demo.html" /sdcard/Download/demo.html >/dev/null
+(cd "$ROOT/tools/a11y_demo" && python3 -m http.server 8765 >/dev/null 2>&1 &)
+$A reverse tcp:8765 tcp:8765
+URL=http://localhost:8765/demo.html
+$A shell 'echo "_ --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line'
+$A shell am set-debug-app --persistent com.android.chrome
+# The setup launch above already showed (and marked as shown) the
+# disclosure dialog; forget that so it appears again on camera.
+$A shell run-as $PKG rm -f shared_prefs/AccessibilityPrefs.xml
 $A shell pm list packages | tr -d '\r' | sed 's/package://' | grep -E 'chrome|htmlviewer|webview|photos' | tee -a "$LOG"
 
 # --- recording: back-to-back 170 s segments until /sdcard/rec_stop exists
@@ -52,18 +59,12 @@ REC=$!
 sleep 2
 $A logcat -c
 
-step "1. open the app"
-$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 10; shot 01_home
-
-step "2. Translate Screen + screen-capture consent"
-$A shell input tap $T_SCREEN; sleep 3
-$A shell input tap $T_MODE; sleep 1.5
-$A shell input tap $T_ENTIRE; sleep 1.5
-$A shell input tap $T_START; sleep 3
+step "1. open the app (the disclosure dialog appears on first launch)"
+$A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 3; shot 01_open
 
 step "3. disclosure dialog"
-if $UI find 'Accessibility Service \(Optional\)' --timeout 20 | tee -a "$LOG"; then
-  sleep 6; shot 03_dialog            # hold so the text is readable
+if $UI find 'Accessibility Service \(Optional\)' --timeout 25 | tee -a "$LOG"; then
+  sleep 8; shot 03_dialog            # hold so the text is readable
   step "4. tap Agree"
   $UI tap '^Agree$' --timeout 5 | tee -a "$LOG"; sleep 4
 else
@@ -99,17 +100,20 @@ step "6. back to the app"
 $A shell input keyevent BACK; sleep 1; $A shell input keyevent BACK; sleep 1
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 5; shot 06_back_in_app
 
+step "6b. Translate Screen + screen-capture consent"
+$A shell input tap $T_SCREEN; sleep 3
+$A shell input tap $T_MODE; sleep 1.5
+$A shell input tap $T_ENTIRE; sleep 1.5
+$A shell input tap $T_START; sleep 4; shot 06_translating
+
 step "7. Japanese page in another app"
 $A logcat -c
 opened=""
-for target in "-n com.android.chrome/com.google.android.apps.chrome.Main" \
-              "-n com.android.htmlviewer/.HTMLViewerActivity" ""; do
-  $A shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/demo.html -t text/html $target >/dev/null 2>&1
-  sleep 6
-  top=$($A shell dumpsys activity activities | grep -m1 -E 'topResumedActivity|mResumedActivity' | tr -d '\r')
-  step "viewer ($target): $top"
-  if ! echo "$top" | grep -q "$PKG\|launcher"; then opened=yes; break; fi
-done
+$A shell am start -a android.intent.action.VIEW -d $URL -n com.android.chrome/com.google.android.apps.chrome.Main >/dev/null 2>&1
+sleep 8
+top=$($A shell dumpsys activity activities | grep -m1 topResumedActivity | tr -d '\r')
+step "viewer: $top"
+echo "$top" | grep -q 'chrome.*Main\|ChromeTabbedActivity' && opened=yes
 [ -n "$opened" ] || step "FAILED: no viewer opened the page"
 # Chrome first-run screens, if any.
 $UI tap '^(Accept & continue|Use without an account|No thanks|Got it)$' --timeout 3 >/dev/null && sleep 3

@@ -14,8 +14,7 @@ class ImageTranslationScreen extends StatefulWidget {
   final File? imageFile;
   final Uint8List? memoryImage;
 
-  const ImageTranslationScreen({Key? key, this.imageFile, this.memoryImage})
-      : super(key: key);
+  const ImageTranslationScreen({Key? key, this.imageFile, this.memoryImage}) : super(key: key);
 
   @override
   _ImageTranslationScreenState createState() => _ImageTranslationScreenState();
@@ -47,8 +46,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
     debugPrint('[ImageTranslation] Starting image processing...');
 
     try {
-      final translationProvider =
-          Provider.of<TranslationProvider>(context, listen: false);
+      final translationProvider = Provider.of<TranslationProvider>(context, listen: false);
       final ocrService = OCRService();
 
       List<OCRResult> results = [];
@@ -60,8 +58,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
           mergeAggressiveness: translationProvider.mergeAggressiveness,
         );
       } else if (widget.imageFile != null) {
-        debugPrint(
-            '[ImageTranslation] Processing image file via OCR: ${widget.imageFile!.path}');
+        debugPrint('[ImageTranslation] Processing image file via OCR: ${widget.imageFile!.path}');
         results = await ocrService.processFile(
           widget.imageFile!,
           translationProvider.currentOCRScript,
@@ -70,25 +67,20 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       }
 
       final ocrMs = stopwatch.elapsedMilliseconds;
-      debugPrint(
-          '[ImageTranslation] OCR completed in ${ocrMs}ms. Found ${results.length} text blocks.');
+      debugPrint('[ImageTranslation] OCR completed in ${ocrMs}ms. Found ${results.length} text blocks.');
       for (var i = 0; i < results.length; i++) {
         debugPrint('[ImageTranslation] OCR Block $i: "${results[i].text}"');
       }
 
       stopwatch.reset();
       final textsToTranslate = results.map((r) => r.text).toList();
-      debugPrint(
-          '[ImageTranslation] Requesting batch translation for ${textsToTranslate.length} texts (mode=${translationProvider.translationMode.name})...');
-
-      final translated =
-          await translationProvider.translateBatch(textsToTranslate);
+      debugPrint('[ImageTranslation] Requesting batch translation for ${textsToTranslate.length} texts (mode=${translationProvider.translationMode.name})...');
+      
+      final translated = await translationProvider.translateBatch(textsToTranslate);
       final transMs = stopwatch.elapsedMilliseconds;
-      debugPrint(
-          '[ImageTranslation] Batch translation completed in ${transMs}ms.');
+      debugPrint('[ImageTranslation] Batch translation completed in ${transMs}ms.');
       for (var i = 0; i < translated.length; i++) {
-        debugPrint(
-            '[ImageTranslation] Result Block $i: "${results[i].text}" -> "${translated[i]}"');
+        debugPrint('[ImageTranslation] Result Block $i: "${results[i].text}" -> "${translated[i]}"');
       }
 
       setState(() {
@@ -109,9 +101,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  AppLocalizations.of(context)!.error_prefix(e.toString()))),
+          SnackBar(content: Text(AppLocalizations.of(context)!.error_prefix(e.toString()))),
         );
       }
     }
@@ -158,11 +148,11 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
 
   List<Widget> _buildOverlays(BoxConstraints constraints) {
     if (_ocrResults.isEmpty) return [];
-
+    
     // Attempting to calculate scale based on the first result's imgWidth/imgHeight
     final imgWidth = _ocrResults.first.imgWidth;
     final imgHeight = _ocrResults.first.imgHeight;
-
+    
     if (imgWidth == 0 || imgHeight == 0) return [];
 
     // Calculate how the image is scaled in the view (assuming BoxFit.contain centered)
@@ -214,8 +204,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       for (int j = 0; j < baseBoxes.length; j++) {
         if (j == i) continue;
         final other = baseBoxes[j];
-        final horizontalOverlap =
-            base.left < other.right && base.right > other.left;
+        final horizontalOverlap = base.left < other.right && base.right > other.left;
         if (!horizontalOverlap) continue;
         if (other.bottom <= base.top) {
           padTop = min(padTop, max(0.0, (base.top - other.bottom) / 2));
@@ -225,10 +214,8 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       }
 
       paddedBoxes.add(Rect.fromLTWH(
-        base.left - desiredPad,
-        base.top - padTop,
-        base.width + desiredPad * 2,
-        base.height + padTop + padBottom,
+        base.left - desiredPad, base.top - padTop,
+        base.width + desiredPad * 2, base.height + padTop + padBottom,
       ));
     }
 
@@ -241,8 +228,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
     List<Widget> overlays = [];
     for (int i = 0; i < _ocrResults.length; i++) {
       final result = _ocrResults[i];
-      final translatedText =
-          i < _translatedTexts.length ? _translatedTexts[i] : result.text;
+      final translatedText = i < _translatedTexts.length ? _translatedTexts[i] : result.text;
       final box = boxes[i];
 
       overlays.add(
@@ -260,16 +246,14 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
             // since it's the more specific (descendant) recognizer.
             onPanUpdate: (details) {
               setState(() {
-                _manualOffsets[i] =
-                    (_manualOffsets[i] ?? Offset.zero) + details.delta;
+                _manualOffsets[i] = (_manualOffsets[i] ?? Offset.zero) + details.delta;
               });
             },
             // Matches the live "Screen Translate" overlay's double-tap
             // expand — the box's own font can be scaled down to the 6sp
             // floor when a translation runs much longer than its source
             // line, so this is the escape hatch to actually read it.
-            onDoubleTap: () =>
-                _showExpandedText(translatedText, result.isLight),
+            onDoubleTap: () => _showExpandedText(translatedText, result.isLight),
             child: Container(
               // Container.clipBehavior only takes effect with a decoration —
               // color: alone takes a fast path (ColoredBox) that ignores it.
@@ -291,8 +275,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
                 style: TextStyle(
                   color: result.overlayColor,
                   backgroundColor: result.backgroundColor,
-                  fontSize:
-                      100, // Large base size so it can scale down to fit perfectly
+                  fontSize: 100, // Large base size so it can scale down to fit perfectly
                 ),
                 minFontSize: 6,
                 maxLines: 15,
@@ -374,8 +357,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       double minTop = box.top;
       for (final j in finalized) {
         final other = result[j];
-        final horizontalOverlap =
-            box.left < other.right && box.right > other.left;
+        final horizontalOverlap = box.left < other.right && box.right > other.left;
         if (horizontalOverlap) {
           minTop = max(minTop, other.bottom);
         }

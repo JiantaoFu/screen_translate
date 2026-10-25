@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/activation_tracker.dart';
-import 'package:screen_translate/widgets/download_error_dialog.dart'
-    show sendFeedbackEmail;
+import 'package:screen_translate/widgets/download_error_dialog.dart' show sendFeedbackEmail;
 
 /// One-tap "what went wrong?" after the first live session that translated
 /// nothing. Shown once per install: that session is the one that decides

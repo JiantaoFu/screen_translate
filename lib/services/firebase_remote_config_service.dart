@@ -2,8 +2,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseRemoteConfigService {
-  static final FirebaseRemoteConfigService _instance =
-      FirebaseRemoteConfigService._internal();
+  static final FirebaseRemoteConfigService _instance = FirebaseRemoteConfigService._internal();
   late FirebaseRemoteConfig _remoteConfig;
   final Logger _logger = Logger('FirebaseRemoteConfigService');
 
@@ -33,8 +32,7 @@ class FirebaseRemoteConfigService {
       await _remoteConfig.setConfigSettings(
         RemoteConfigSettings(
           fetchTimeout: const Duration(seconds: 20),
-          minimumFetchInterval:
-              const Duration(seconds: 0), // Dev: fetch every time
+          minimumFetchInterval: const Duration(seconds: 0), // Dev: fetch every time
         ),
       );
 

@@ -76,12 +76,10 @@ void main() {
     expect(CustomModelManager().stallTimeout, const Duration(seconds: 30));
   });
 
-  test('a stalled Google download falls through to the backup server',
-      () async {
+  test('a stalled Google download falls through to the backup server', () async {
     final google = _FakeGoogle(hang: true);
     final backup = _FakeBackup();
-    await ModelDownloadService.withManagers(google, backup)
-        .downloadModelWithFallback('ar');
+    await ModelDownloadService.withManagers(google, backup).downloadModelWithFallback('ar');
     expect(google.downloadCalls, 1);
     expect(backup.calls, 1);
     expect(ModelDownloadService.quickDownloadFailed('ar'), isFalse);
@@ -90,10 +88,8 @@ void main() {
   test('after Google fails once, retries go straight to the backup', () async {
     final google = _FakeGoogle(hang: true);
     final backup = _FakeBackup(failures: 2);
-    await ModelDownloadService.withManagers(google, backup)
-        .downloadModelWithFallback('fa');
-    expect(google.downloadCalls, 1,
-        reason: 'Google must not eat 2 minutes per retry');
+    await ModelDownloadService.withManagers(google, backup).downloadModelWithFallback('fa');
+    expect(google.downloadCalls, 1, reason: 'Google must not eat 2 minutes per retry');
     expect(backup.calls, 3);
   });
 
@@ -108,17 +104,13 @@ void main() {
     expect(backup.calls, 1);
   });
 
-  test('a background failure is recorded silently and cleared on the next try',
-      () async {
-    final service = ModelDownloadService.withManagers(
-        _FakeGoogle(hang: false), _FakeBackup(failures: 99));
-    await expectLater(
-        service.downloadModelWithFallback('he'), throwsA(anything));
+  test('a background failure is recorded silently and cleared on the next try', () async {
+    final service = ModelDownloadService.withManagers(_FakeGoogle(hang: false), _FakeBackup(failures: 99));
+    await expectLater(service.downloadModelWithFallback('he'), throwsA(anything));
     expect(ModelDownloadService.quickDownloadFailed('he'), isTrue);
     expect(ModelDownloadService.quickDownloadFailed('en'), isFalse);
 
-    final ok = ModelDownloadService.withManagers(
-        _FakeGoogle(hang: false), _FakeBackup());
+    final ok = ModelDownloadService.withManagers(_FakeGoogle(hang: false), _FakeBackup());
     final retry = ok.downloadModelWithFallback('he');
     expect(ModelDownloadService.quickDownloadFailed('he'), isFalse,
         reason: 'a running retry is not a failure');
@@ -127,23 +119,18 @@ void main() {
   });
 
   test('clearQuickDownloadFailure forgets a recorded failure', () async {
-    final service = ModelDownloadService.withManagers(
-        _FakeGoogle(hang: false), _FakeBackup(failures: 99));
-    await expectLater(
-        service.downloadModelWithFallback('ur'), throwsA(anything));
+    final service = ModelDownloadService.withManagers(_FakeGoogle(hang: false), _FakeBackup(failures: 99));
+    await expectLater(service.downloadModelWithFallback('ur'), throwsA(anything));
     ModelDownloadService.clearQuickDownloadFailure('ur');
     expect(ModelDownloadService.quickDownloadFailed('ur'), isFalse);
   });
 
-  test('a recorded failure is dropped once the pack is on disk after all',
-      () async {
+  test('a recorded failure is dropped once the pack is on disk after all', () async {
     // Google's DownloadManager keeps going after our 2-minute timeout and
     // can finish after the backup failed too.
     final google = _FakeGoogle(hang: false);
-    final service =
-        ModelDownloadService.withManagers(google, _FakeBackup(failures: 99));
-    await expectLater(
-        service.downloadModelWithFallback('ar'), throwsA(anything));
+    final service = ModelDownloadService.withManagers(google, _FakeBackup(failures: 99));
+    await expectLater(service.downloadModelWithFallback('ar'), throwsA(anything));
     expect(await service.quickDownloadStillFailed('ar'), isTrue);
 
     google.downloaded = true;
@@ -153,8 +140,7 @@ void main() {
     expect(await service.quickDownloadStillFailed('en'), isFalse);
   });
 
-  test('the backup is told whether Google installed the pack meanwhile',
-      () async {
+  test('the backup is told whether Google installed the pack meanwhile', () async {
     final google = _FakeGoogle(hang: true);
     final backup = _FakeBackup();
     final service = ModelDownloadService.withManagers(google, backup);
@@ -171,15 +157,13 @@ void main() {
 
     /// Serves [body] with Range support. Requests up to [stallUntil] send
     /// half of what they promise and then stall.
-    MockClient server(List<String?> ranges,
-        {int stallUntil = 0, Duration chunkDelay = Duration.zero}) {
+    MockClient server(List<String?> ranges, {int stallUntil = 0, Duration chunkDelay = Duration.zero}) {
       var n = 0;
       return MockClient.streaming((request, _) async {
         n++;
         final range = request.headers['range'];
         ranges.add(range);
-        final start =
-            range == null ? 0 : int.parse(range.substring(6, range.length - 1));
+        final start = range == null ? 0 : int.parse(range.substring(6, range.length - 1));
         final rest = body.sublist(start);
         final controller = StreamController<List<int>>();
         if (n <= stallUntil) {
@@ -193,43 +177,31 @@ void main() {
             await controller.close();
           }();
         }
-        return http.StreamedResponse(
-            controller.stream, range == null ? 200 : 206,
+        return http.StreamedResponse(controller.stream, range == null ? 200 : 206,
             contentLength: rest.length,
-            headers: range == null
-                ? {}
-                : {
-                    'content-range':
-                        'bytes $start-${body.length - 1}/${body.length}'
-                  });
+            headers: range == null ? {} : {'content-range': 'bytes $start-${body.length - 1}/${body.length}'});
       });
     }
 
-    CustomModelManager manager(MockClient client, {int maxAttempts = 4}) =>
-        CustomModelManager(
+    CustomModelManager manager(MockClient client, {int maxAttempts = 4}) => CustomModelManager(
           clientFactory: () => client,
           cacheDir: () async => dir,
-          stallTimeout: const Duration(
-              milliseconds:
-                  400), // 100 ms flaked: a slow close/rename looked like a stall
+          stallTimeout: const Duration(milliseconds: 400), // 100 ms flaked: a slow close/rename looked like a stall
           maxAttempts: maxAttempts,
           retryDelay: Duration.zero,
         );
 
     test('a stalled backup download resumes with a Range request', () async {
       final ranges = <String?>[];
-      final zip =
-          await manager(server(ranges, stallUntil: 1)).downloadZip('ar');
+      final zip = await manager(server(ranges, stallUntil: 1)).downloadZip('ar');
       expect(zip.readAsBytesSync(), body);
       expect(ranges, [null, 'bytes=500-']);
     });
 
-    test('the partial file survives a failed call and the next call resumes it',
-        () async {
+    test('the partial file survives a failed call and the next call resumes it', () async {
       final ranges = <String?>[];
       final client = server(ranges, stallUntil: 1);
-      await expectLater(
-          manager(client, maxAttempts: 1).downloadZip('fa'), throwsA(anything));
+      await expectLater(manager(client, maxAttempts: 1).downloadZip('fa'), throwsA(anything));
       expect(File('${dir.path}/fa.zip.tmp').lengthSync(), 500);
       final zip = await manager(client, maxAttempts: 1).downloadZip('fa');
       expect(zip.readAsBytesSync(), body);
@@ -238,18 +210,14 @@ void main() {
 
     test('no unpacking over a pack ML Kit installed meanwhile', () async {
       // The served bytes aren't a zip, so unpacking would throw.
-      await manager(server([]))
-          .downloadAndInstallModel('ja', isAlreadyInstalled: () async => true);
-      expect(File('${dir.path}/ja.zip').existsSync(), isFalse,
-          reason: 'downloaded zip is cleaned up');
+      await manager(server([])).downloadAndInstallModel('ja', isAlreadyInstalled: () async => true);
+      expect(File('${dir.path}/ja.zip').existsSync(), isFalse, reason: 'downloaded zip is cleaned up');
     });
 
     test('slow but steady is never cut off: only a stall fails', () async {
       // 10 chunks 60 ms apart = ~600 ms total, 6x the 100 ms stall timeout.
       final ranges = <String?>[];
-      final zip = await manager(
-              server(ranges, chunkDelay: const Duration(milliseconds: 60)),
-              maxAttempts: 1)
+      final zip = await manager(server(ranges, chunkDelay: const Duration(milliseconds: 60)), maxAttempts: 1)
           .downloadZip('tr');
       expect(zip.readAsBytesSync(), body);
       expect(ranges, [null]);

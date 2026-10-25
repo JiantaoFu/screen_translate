@@ -17,8 +17,7 @@ void main() {
     events = [];
     calls = 0;
     reporter = AccessibilityFunnelReporter(
-      tracker:
-          ActivationTracker(sink: (name, params) => events.add((name, params))),
+      tracker: ActivationTracker(sink: (name, params) => events.add((name, params))),
     );
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
@@ -82,8 +81,7 @@ void main() {
     await expectLater(reporter.report(), completes);
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-            channel, (call) async => throw PlatformException(code: 'x'));
+        .setMockMethodCallHandler(channel, (call) async => throw PlatformException(code: 'x'));
     await expectLater(reporter.report(), completes);
     expect(events, isEmpty);
   });

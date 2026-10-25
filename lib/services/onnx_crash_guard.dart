@@ -46,7 +46,6 @@ class OnnxCrashGuard {
     await strikes();
     return _cpuOnly;
   }
-
   Future<bool> disabled() async => await strikes() >= 2;
 
   /// Runs [body] with the marker set. Nested calls (pivot pairs) share it.

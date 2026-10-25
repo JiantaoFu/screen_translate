@@ -10,8 +10,7 @@ import 'package:screen_translate/services/download_retry.dart';
 /// Quick-mode (ML Kit) backup server, used when Google's own model download
 /// fails or stalls (common on some Middle East networks).
 class CustomModelManager {
-  final String baseUrl =
-      'https://huggingface.co/fuji246/small-translation/resolve/main';
+  final String baseUrl = 'https://huggingface.co/fuji246/small-translation/resolve/main';
 
   final http.Client Function() _clientFactory;
   final Future<Directory> Function() _cacheDir;
@@ -35,8 +34,8 @@ class CustomModelManager {
   })  : _clientFactory = clientFactory ?? http.Client.new,
         _cacheDir = cacheDir ?? _defaultCacheDir;
 
-  static Future<Directory> _defaultCacheDir() async => Directory(
-      path.join((await getApplicationSupportDirectory()).path, 'mlkit_backup'));
+  static Future<Directory> _defaultCacheDir() async =>
+      Directory(path.join((await getApplicationSupportDirectory()).path, 'mlkit_backup'));
 
   /// Gets the directory where the ML Kit model folder should be unzipped.
   Future<Directory> _getExtractionDir() async {
@@ -70,8 +69,7 @@ class CustomModelManager {
         maxAttempts: maxAttempts,
         retryDelay: retryDelay,
         onBytes: (received, total) {
-          if (total != null && total > 0)
-            onProgress?.call((received / total).clamp(0.0, 1.0));
+          if (total != null && total > 0) onProgress?.call((received / total).clamp(0.0, 1.0));
         },
       );
     } finally {
@@ -93,8 +91,7 @@ class CustomModelManager {
     debugPrint('Fallback: Downloading model for $langCode from $baseUrl...');
     final zip = await downloadZip(langCode, onProgress: onProgress);
     if (isAlreadyInstalled != null && await isAlreadyInstalled()) {
-      debugPrint(
-          'Fallback: $langCode was installed by ML Kit meanwhile; skipping unpack.');
+      debugPrint('Fallback: $langCode was installed by ML Kit meanwhile; skipping unpack.');
       await zip.delete();
       return;
     }
@@ -102,8 +99,7 @@ class CustomModelManager {
       final archive = ZipDecoder().decodeBytes(await zip.readAsBytes());
       final extractionDir = await _getExtractionDir();
       await extractionDir.create(recursive: true);
-      debugPrint(
-          'Unzipping and installing model files to ${extractionDir.path}...');
+      debugPrint('Unzipping and installing model files to ${extractionDir.path}...');
       for (final file in archive) {
         if (!file.isFile) continue;
         final outFile = File(path.join(extractionDir.path, file.name));

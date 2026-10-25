@@ -19,12 +19,10 @@ const noTextPromptMaxShows = 3;
 /// Whether to offer other source languages: the session OCR'd frames but
 /// found no text at all, and this install has not translated anything yet
 /// (only the first sessions — later the user already knows the app works).
-Future<bool> shouldOfferSourceLanguages(
-    {required bool sessionFoundNoText}) async {
+Future<bool> shouldOfferSourceLanguages({required bool sessionFoundNoText}) async {
   if (!sessionFoundNoText) return false;
   final prefs = await SharedPreferences.getInstance();
-  if (prefs.getBool(ActivationTracker.prefFirstTranslationLogged) ?? false)
-    return false;
+  if (prefs.getBool(ActivationTracker.prefFirstTranslationLogged) ?? false) return false;
   return (prefs.getInt(prefNoTextPromptCount) ?? 0) < noTextPromptMaxShows;
 }
 
@@ -34,8 +32,7 @@ Future<bool> shouldOfferSourceLanguages(
 Future<String?> showNoTextSourcePrompt(BuildContext context,
     {required String currentSource, String? targetLanguage}) async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setInt(
-      prefNoTextPromptCount, (prefs.getInt(prefNoTextPromptCount) ?? 0) + 1);
+  await prefs.setInt(prefNoTextPromptCount, (prefs.getInt(prefNoTextPromptCount) ?? 0) + 1);
   if (!context.mounted) return null;
   return showDialog<String>(
     context: context,
@@ -51,10 +48,10 @@ Future<String?> showNoTextSourcePrompt(BuildContext context,
             for (final e in noTextSourceChoices.entries)
               if (e.key != targetLanguage)
                 OutlinedButton(
-                  key: Key('no_text_source_${e.key}'),
-                  onPressed: () => Navigator.pop(dialogContext, e.key),
-                  child: Text(e.value),
-                ),
+                key: Key('no_text_source_${e.key}'),
+                onPressed: () => Navigator.pop(dialogContext, e.key),
+                child: Text(e.value),
+              ),
           ],
         ),
       ],

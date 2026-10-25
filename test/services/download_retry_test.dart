@@ -58,8 +58,7 @@ void main() {
         calls++;
         throw Exception('boom $calls');
       }, maxRetries: 2, initialBackoff: Duration.zero, sleep: (_) async {}),
-      throwsA(isA<Exception>()
-          .having((e) => e.toString(), 'msg', contains('boom 3'))),
+      throwsA(isA<Exception>().having((e) => e.toString(), 'msg', contains('boom 3'))),
     );
     expect(calls, 3);
   });

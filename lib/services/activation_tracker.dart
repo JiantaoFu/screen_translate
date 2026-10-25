@@ -31,22 +31,13 @@ class ActivationTracker {
   static final ActivationTracker instance = ActivationTracker();
 
   static const prefFirstSeenMs = 'activation_first_seen_ms';
-  static const prefFirstTranslationLogged =
-      'activation_first_translation_logged';
+  static const prefFirstTranslationLogged = 'activation_first_translation_logged';
   static const prefFailureFeedbackAsked = 'activation_failure_feedback_asked';
   static const prefFirstOcrTextLogged = 'activation_first_ocr_text_logged';
-  static const prefFirstTranslationFailedLogged =
-      'activation_first_translation_failed_logged';
+  static const prefFirstTranslationFailedLogged = 'activation_first_translation_failed_logged';
 
   /// Where a first translation can break, for `first_translation_failed`.
-  static const failureStages = [
-    'start',
-    'capture',
-    'ocr',
-    'translate',
-    'render',
-    'model'
-  ];
+  static const failureStages = ['start', 'capture', 'ocr', 'translate', 'render', 'model'];
 
   /// A session that ends this quickly without ever showing a translation is
   /// the "it did nothing" signal.
@@ -144,8 +135,7 @@ class ActivationTracker {
       'mode': _mode,
       'language_pair': _pair,
       'text_block_count': blocks,
-      if (start != null)
-        'ms_since_live_start': _clock().difference(start).inMilliseconds,
+      if (start != null) 'ms_since_live_start': _clock().difference(start).inMilliseconds,
     };
     pendingFirstOcrText = _oncePerInstall(prefFirstOcrTextLogged, () {
       _emit('first_ocr_text_found', params);
@@ -180,9 +170,8 @@ class ActivationTracker {
         'boxes': boxes,
       };
       if (firstSeen != null) {
-        params['secs_since_install'] = _clock()
-            .difference(DateTime.fromMillisecondsSinceEpoch(firstSeen))
-            .inSeconds;
+        params['secs_since_install'] =
+            _clock().difference(DateTime.fromMillisecondsSinceEpoch(firstSeen)).inSeconds;
       }
       _emit('first_translation_shown', params);
     } catch (_) {}
@@ -227,13 +216,7 @@ class ActivationTracker {
 
   /// `no_text`, `wrong`, `slow`, `other` (opened the email form) or
   /// `skipped` (closed the dialog).
-  static const failureReasons = [
-    'no_text',
-    'wrong',
-    'slow',
-    'other',
-    'skipped'
-  ];
+  static const failureReasons = ['no_text', 'wrong', 'slow', 'other', 'skipped'];
 
   /// [kind] is `quick` (ML Kit) or `ai` (ONNX pack); [failure] is a short
   /// error class, never a message that could carry user content.
@@ -313,25 +296,18 @@ class ActivationTracker {
   }
 
   /// The one-time accessibility explainer (native AccessibilityPermissionActivity) was shown.
-  void accessibilityPromptShown() =>
-      _emit('accessibility_prompt_shown', <String, Object>{});
+  void accessibilityPromptShown() => _emit('accessibility_prompt_shown', <String, Object>{});
 
   /// What the accessibility service looked like once the user left that
   /// explainer. [action] is how they left it: `settings_opened`,
   /// `dismissed`, `already_enabled` (closed itself) or `unknown`.
-  void accessibilityPermissionResult(
-          {required bool enabled, required String action}) =>
+  void accessibilityPermissionResult({required bool enabled, required String action}) =>
       _emit('accessibility_permission_result', {
         'enabled': _yesNo(enabled),
         'action': accessibilityActions.contains(action) ? action : 'unknown',
       });
 
-  static const accessibilityActions = [
-    'settings_opened',
-    'dismissed',
-    'already_enabled',
-    'unknown'
-  ];
+  static const accessibilityActions = ['settings_opened', 'dismissed', 'already_enabled', 'unknown'];
 
   /// Why a start or a capture failed, for the failures that raise no crash.
   /// Logged once per place per session: the capture loop ticks twice a second.

@@ -68,9 +68,7 @@ Future<void> resumableDownload({
       final IOSink sink;
       if (response.statusCode == 206 && offset > 0) {
         total = _totalFromContentRange(response.headers['content-range']) ??
-            (response.contentLength == null
-                ? null
-                : offset + response.contentLength!);
+            (response.contentLength == null ? null : offset + response.contentLength!);
         sink = tmp.openWrite(mode: FileMode.append);
       } else if (response.statusCode == 200) {
         offset = 0; // server ignored the Range: start over
@@ -83,11 +81,8 @@ Future<void> resumableDownload({
           await tmp.delete();
           throw Exception('Download: range not satisfiable, restarting $url');
         }
-        final retryable = response.statusCode >= 500 ||
-            response.statusCode == 408 ||
-            response.statusCode == 429;
-        final error =
-            HttpException('Download: HTTP ${response.statusCode} for $url');
+        final retryable = response.statusCode >= 500 || response.statusCode == 408 || response.statusCode == 429;
+        final error = HttpException('Download: HTTP ${response.statusCode} for $url');
         if (!retryable) throw _NonRetryable(error);
         throw error;
       }
@@ -104,8 +99,7 @@ Future<void> resumableDownload({
         await sink.close().timeout(stallTimeout);
       }
       if (total != null && received < total) {
-        throw Exception(
-            'Download: connection closed at $received of $total bytes');
+        throw Exception('Download: connection closed at $received of $total bytes');
       }
       await tmp.rename(target.path).timeout(stallTimeout);
       return;
@@ -125,6 +119,7 @@ int? _totalFromContentRange(String? header) {
   final total = header?.split('/').last;
   return total == null ? null : int.tryParse(total);
 }
+
 
 /// An HTTP error that retrying won't fix (e.g. 404).
 class _NonRetryable implements Exception {

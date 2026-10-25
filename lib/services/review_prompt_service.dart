@@ -21,7 +21,6 @@ enum ReviewPromptOutcome { notDue, unavailable, requested, failed }
 class ReviewPromptService {
   static const successCountKey = 'review_success_count';
   static const lastPromptAtKey = 'review_last_prompt_at_ms';
-
   /// Legacy (<= 1.2.5) permanent error flag. No longer read.
   static const errorFlagKey = 'review_error_flag';
 

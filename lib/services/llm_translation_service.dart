@@ -43,12 +43,12 @@ class LRUCache<K, V> {
 
   V? get(K key) {
     if (!_cache.containsKey(key)) return null;
-
+    
     // Move the accessed item to the end (most recently used)
     V value = _cache[key]!;
     _cache.remove(key);
     _cache[key] = value;
-
+    
     return value;
   }
 
@@ -56,12 +56,12 @@ class LRUCache<K, V> {
     // If key already exists, remove it first
     if (_cache.containsKey(key)) {
       _cache.remove(key);
-    }
+    } 
     // If cache is full, remove the least recently used item (first item)
     else if (_cache.length >= maxSize) {
       _cache.remove(_cache.keys.first);
     }
-
+    
     // Add new item (which goes to the end)
     _cache[key] = value;
   }
@@ -74,15 +74,15 @@ class LLMTranslationService {
   late final LRUCache<String, String> _translationCache;
 
   // Concurrency control for LLM translations
-  final int _maxConcurrentTranslations = 20; // Configurable limit
+  final int _maxConcurrentTranslations = 20;  // Configurable limit
   final Queue<_TranslationTask> _translationQueue = Queue();
   final Set<_TranslationTask> _activeTranslations = {};
   Timer? _queueProcessingTimer;
 
-  LLMTranslationService(
-      {String baseUrl =
-          'https://open.bigmodel.cn/api/paas/v4/chat/completions'})
-      : _baseUrl = baseUrl {
+  LLMTranslationService({
+    String baseUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+  }) : 
+    _baseUrl = baseUrl {
     _translationCache = LRUCache<String, String>(100); // 100 item cache
     // Start periodic queue processing
     _startQueueProcessingTimer();
@@ -91,8 +91,7 @@ class LLMTranslationService {
   void _startQueueProcessingTimer() {
     // Check and process queue every 500 milliseconds
     _queueProcessingTimer = Timer.periodic(Duration(milliseconds: 500), (_) {
-      if (_activeTranslations.length < _maxConcurrentTranslations &&
-          _translationQueue.isNotEmpty) {
+      if (_activeTranslations.length < _maxConcurrentTranslations && _translationQueue.isNotEmpty) {
         _processTranslationQueue();
       }
     });
@@ -134,12 +133,12 @@ class LLMTranslationService {
     try {
       // Retrieve the stored API key
       final storedApiKey = await _secureStorage.read(key: _apiKeyStorageKey);
-
+      
       // Check if the API key exists and is not empty
       if (storedApiKey == null || storedApiKey.isEmpty) {
         return false;
       }
-
+      
       try {
         // Attempt API validation using chat completions endpoint
         final response = await http.post(
@@ -151,12 +150,15 @@ class LLMTranslationService {
           body: jsonEncode({
             'model': 'GLM-4-Flash',
             'messages': [
-              {'role': 'user', 'content': 'Hello, can you verify my API key?'}
+              {
+                'role': 'user',
+                'content': 'Hello, can you verify my API key?'
+              }
             ],
             'max_tokens': 10, // Limit response to minimize unnecessary tokens
           }),
         );
-
+        
         // Check if the response indicates a valid key
         // Successful responses are typically 200 or 201
         return response.statusCode == 200 || response.statusCode == 201;
@@ -234,17 +236,17 @@ class LLMTranslationService {
   }
 
   // Generate a unique cache key based on translation parameters
-  String _generateCacheKey(
-      String text, String sourceLanguage, String targetLanguage) {
+  String _generateCacheKey(String text, String sourceLanguage, String targetLanguage) {
     return '$sourceLanguage:$targetLanguage:$text';
   }
 
-  Future<String> translateText(
-      {required String text,
-      required String sourceLanguage,
-      required String targetLanguage}) async {
+  Future<String> translateText({
+    required String text, 
+    required String sourceLanguage, 
+    required String targetLanguage
+  }) async {
     final cacheKey = _generateCacheKey(text, sourceLanguage, targetLanguage);
-
+    
     // Check cache first
     final cachedTranslation = _translationCache.get(cacheKey);
     if (cachedTranslation != null) {
@@ -259,7 +261,7 @@ class LLMTranslationService {
     );
 
     _translationQueue.add(task);
-
+    
     // Ensure queue processing is active
     if (_queueProcessingTimer == null || !_queueProcessingTimer!.isActive) {
       _startQueueProcessingTimer();
@@ -280,15 +282,14 @@ class LLMTranslationService {
     required String targetLanguage,
   }) async {
     if (texts.isEmpty) return [];
-
+    
     // Check cache for each text
     List<String> results = List.filled(texts.length, '');
     List<int> uncashedIndices = [];
     List<String> uncashedTexts = [];
-
+    
     for (int i = 0; i < texts.length; i++) {
-      final cacheKey =
-          _generateCacheKey(texts[i], sourceLanguage, targetLanguage);
+      final cacheKey = _generateCacheKey(texts[i], sourceLanguage, targetLanguage);
       final cachedTranslation = _translationCache.get(cacheKey);
       if (cachedTranslation != null) {
         results[i] = cachedTranslation;
@@ -297,12 +298,12 @@ class LLMTranslationService {
         uncashedTexts.add(texts[i]);
       }
     }
-
+    
     if (uncashedTexts.isEmpty) return results;
 
     // Convert uncashed texts to a JSON string
     final jsonInput = jsonEncode(uncashedTexts);
-
+    
     // Create a special translation task for the batch
     final task = _TranslationTask(
       text: "BATCH:$jsonInput", // Use a prefix to distinguish batch requests
@@ -321,20 +322,16 @@ class LLMTranslationService {
       try {
         final decoded = jsonDecode(batchResultStr);
         if (decoded is List) {
-          for (int i = 0;
-              i < decoded.length && i < uncashedIndices.length;
-              i++) {
+          for (int i = 0; i < decoded.length && i < uncashedIndices.length; i++) {
             results[uncashedIndices[i]] = decoded[i].toString();
             // Cache the result
-            final cacheKey = _generateCacheKey(
-                uncashedTexts[i], sourceLanguage, targetLanguage);
+            final cacheKey = _generateCacheKey(uncashedTexts[i], sourceLanguage, targetLanguage);
             _translationCache.put(cacheKey, decoded[i].toString());
           }
         } else {
           // Fallback if LLM didn't return a JSON array
           for (int i = 0; i < uncashedIndices.length; i++) {
-            results[uncashedIndices[i]] =
-                uncashedTexts[i]; // Return original on failure
+            results[uncashedIndices[i]] = uncashedTexts[i]; // Return original on failure
           }
         }
       } catch (e) {
@@ -352,16 +349,16 @@ class LLMTranslationService {
     return results;
   }
 
-  Future<String> _performTranslation(
-      {required String text,
-      required String sourceLanguage,
-      required String targetLanguage}) async {
+  Future<String> _performTranslation({
+    required String text, 
+    required String sourceLanguage, 
+    required String targetLanguage
+  }) async {
     // Retrieve the stored API key
     final storedApiKey = await getApiKey();
-
+    
     if (storedApiKey == null || storedApiKey.isEmpty) {
-      throw StateError(
-          'No API key configured. Please set up LLM translation in settings.');
+      throw StateError('No API key configured. Please set up LLM translation in settings.');
     }
 
     final isBatch = text.startsWith('BATCH:');
@@ -378,7 +375,7 @@ class LLMTranslationService {
           'model': 'GLM-4-Flash',
           'messages': [
             {
-              'role': 'system',
+              'role': 'system', 
               'content': '''
 # Role: Translation Expert
 
@@ -415,8 +412,8 @@ Maintain the exact same array length. DO NOT output any markdown blocks or expla
 '''
             },
             {
-              'role': 'user',
-              'content': isBatch
+              'role': 'user', 
+              'content': isBatch 
                   ? 'Translate the following JSON array of strings from $sourceLanguage to $targetLanguage:\n\n$actualText'
                   : 'Translate the following text from $sourceLanguage to $targetLanguage:\n\n$actualText'
             }
@@ -428,8 +425,7 @@ Maintain the exact same array length. DO NOT output any markdown blocks or expla
         final jsonResponse = jsonDecode(response.body);
         return jsonResponse['choices'][0]['message']['content'].trim();
       } else if (response.statusCode == 401) {
-        throw StateError(
-            'Invalid API key. Please check your LLM translation settings.');
+        throw StateError('Invalid API key. Please check your LLM translation settings.');
       } else if (response.statusCode == 429) {
         throw StateError('Rate limit exceeded. Please try again later.');
       } else {
@@ -442,8 +438,7 @@ Maintain the exact same array length. DO NOT output any markdown blocks or expla
   }
 
   // Method to cancel a specific translation task
-  Future<void> cancelTranslation(
-      String text, String sourceLanguage, String targetLanguage) async {
+  Future<void> cancelTranslation(String text, String sourceLanguage, String targetLanguage) async {
     final taskToCancel = _TranslationTask(
       text: text,
       sourceLanguage: sourceLanguage,

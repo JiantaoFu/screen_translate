@@ -62,13 +62,11 @@ class ModelDownloadService {
   /// listener and gets the live feed, whether it started the download or
   /// joined one already running.
   static final Map<String, double> _onnxProgress = {};
-  static final Map<String, List<DownloadProgressCallback>>
-      _onnxProgressListeners = {};
+  static final Map<String, List<DownloadProgressCallback>> _onnxProgressListeners = {};
 
   static void _emitOnnxProgress(String key, double progress) {
     _onnxProgress[key] = progress;
-    for (final cb in List<DownloadProgressCallback>.of(
-        _onnxProgressListeners[key] ?? const [])) {
+    for (final cb in List<DownloadProgressCallback>.of(_onnxProgressListeners[key] ?? const [])) {
       cb(progress);
     }
   }
@@ -78,8 +76,7 @@ class ModelDownloadService {
         _customModelManager = CustomModelManager();
 
   @visibleForTesting
-  ModelDownloadService.withManagers(
-      this._googleModelManager, this._customModelManager);
+  ModelDownloadService.withManagers(this._googleModelManager, this._customModelManager);
 
   // ── Google ML Kit helpers ─────────────────────────────────────────────────
 
@@ -94,25 +91,21 @@ class ModelDownloadService {
   /// fetching model metadata before any bytes move, and the UI shows an
   /// indeterminate spinner then rather than a made-up percentage.
   static final Map<String, double> _quickProgress = {};
-  static final Map<String, List<DownloadProgressCallback>>
-      _quickProgressListeners = {};
+  static final Map<String, List<DownloadProgressCallback>> _quickProgressListeners = {};
   static final Map<String, bool> _quickWaiting = {};
-  static final Map<String, List<WaitingForNetworkCallback>>
-      _quickWaitingListeners = {};
+  static final Map<String, List<WaitingForNetworkCallback>> _quickWaitingListeners = {};
 
-  static const _nativeChannel =
-      MethodChannel('com.lomoware.screen_translate/model_download');
+  static const _nativeChannel = MethodChannel('com.lomoware.screen_translate/model_download');
 
   /// Reads the state of the ML Kit download for a language. ML Kit's own
   /// API reports nothing until the download finishes, but it downloads
   /// through Android's DownloadManager, which the native side reads.
   /// Returns null when no such download is running. Replaceable in tests.
   @visibleForTesting
-  static Future<QuickDownloadReading?> Function(String langCode)
-      quickProgressProbe = (langCode) async {
+  static Future<QuickDownloadReading?> Function(String langCode) quickProgressProbe = (langCode) async {
     try {
-      final result = await _nativeChannel.invokeMapMethod<String, Object?>(
-          'getMlKitDownloadProgress', {'lang': langCode});
+      final result = await _nativeChannel
+          .invokeMapMethod<String, Object?>('getMlKitDownloadProgress', {'lang': langCode});
       if (result == null) return null;
       final downloaded = result['downloaded'] as int? ?? 0;
       final total = result['total'] as int? ?? -1;
@@ -130,8 +123,7 @@ class ModelDownloadService {
 
   static void _emitQuickProgress(String langCode, double progress) {
     _quickProgress[langCode] = progress;
-    for (final cb in List<DownloadProgressCallback>.of(
-        _quickProgressListeners[langCode] ?? const [])) {
+    for (final cb in List<DownloadProgressCallback>.of(_quickProgressListeners[langCode] ?? const [])) {
       cb(progress);
     }
   }
@@ -139,8 +131,7 @@ class ModelDownloadService {
   static void _emitQuickWaiting(String langCode, bool waiting) {
     if ((_quickWaiting[langCode] ?? false) == waiting) return;
     _quickWaiting[langCode] = waiting;
-    for (final cb in List<WaitingForNetworkCallback>.of(
-        _quickWaitingListeners[langCode] ?? const [])) {
+    for (final cb in List<WaitingForNetworkCallback>.of(_quickWaitingListeners[langCode] ?? const [])) {
       cb(waiting);
     }
   }
@@ -158,11 +149,9 @@ class ModelDownloadService {
   /// when the user actually starts translating or taps download.
   static final Set<String> _quickFailed = {};
 
-  static bool quickDownloadFailed(String langCode) =>
-      _quickFailed.contains(langCode);
+  static bool quickDownloadFailed(String langCode) => _quickFailed.contains(langCode);
 
-  static void clearQuickDownloadFailure(String langCode) =>
-      _quickFailed.remove(langCode);
+  static void clearQuickDownloadFailure(String langCode) => _quickFailed.remove(langCode);
 
   /// [quickDownloadFailed], checked against the disk: a pack that arrived
   /// after we gave up (Google's DownloadManager keeps going past
@@ -204,9 +193,7 @@ class ModelDownloadService {
       if (current != null) onProgress(current);
     }
     if (onWaitingForNetwork != null) {
-      _quickWaitingListeners
-          .putIfAbsent(langCode, () => [])
-          .add(onWaitingForNetwork);
+      _quickWaitingListeners.putIfAbsent(langCode, () => []).add(onWaitingForNetwork);
       if (_quickWaiting[langCode] ?? false) onWaitingForNetwork(true);
     }
 
@@ -219,8 +206,7 @@ class ModelDownloadService {
     var lastProgress = 0.0;
     final poller = Timer.periodic(quickProgressPollInterval, (_) async {
       final reading = await quickProgressProbe(langCode);
-      if (reading == null || !_activeQuickDownloads.containsKey(langCode))
-        return;
+      if (reading == null || !_activeQuickDownloads.containsKey(langCode)) return;
       _emitQuickWaiting(langCode, reading.waiting);
       final p = reading.progress;
       if (p == null) return;
@@ -241,8 +227,7 @@ class ModelDownloadService {
       langCode,
       onFallbackProgress: (p) {
         final base = fallbackBase ??= lastProgress;
-        lastProgress =
-            (base + p.clamp(0.0, 1.0) * (0.99 - base)).clamp(0.0, 0.99);
+        lastProgress = (base + p.clamp(0.0, 1.0) * (0.99 - base)).clamp(0.0, 0.99);
         _emitQuickProgress(langCode, lastProgress);
       },
     ).then((_) {
@@ -250,19 +235,14 @@ class ModelDownloadService {
       _quickFailed.remove(langCode);
       _emitQuickProgress(langCode, 1.0);
       ActivationTracker.instance.modelDownload(
-        kind: 'quick',
-        key: langCode,
-        outcome: 'completed',
+        kind: 'quick', key: langCode, outcome: 'completed',
         durationMs: watch.elapsedMilliseconds,
       );
     }, onError: (Object e, StackTrace st) {
       _quickFailed.add(langCode);
       ActivationTracker.instance.modelDownload(
-        kind: 'quick',
-        key: langCode,
-        outcome: 'failed',
-        durationMs: watch.elapsedMilliseconds,
-        failure: e.runtimeType.toString(),
+        kind: 'quick', key: langCode, outcome: 'failed',
+        durationMs: watch.elapsedMilliseconds, failure: e.runtimeType.toString(),
       );
       Error.throwWithStackTrace(e, st);
     }).whenComplete(() {
@@ -355,15 +335,12 @@ class ModelDownloadService {
     required DownloadProgressCallback onFallbackProgress,
   }) async {
     try {
-      if (skipGoogle)
-        throw StateError('Google already failed in this download');
-      debugPrint(
-          'Attempting to download ML Kit model for "$langCode" from Google...');
+      if (skipGoogle) throw StateError('Google already failed in this download');
+      debugPrint('Attempting to download ML Kit model for "$langCode" from Google...');
       await _googleModelManager
           .downloadModel(langCode, isWifiRequired: false)
           .timeout(quickGoogleTimeout);
-      debugPrint(
-          'ML Kit model for "$langCode" downloaded successfully from Google.');
+      debugPrint('ML Kit model for "$langCode" downloaded successfully from Google.');
     } catch (e) {
       onGoogleFailed();
       debugPrint('Failed to download from Google. Reason: $e');
@@ -377,8 +354,7 @@ class ModelDownloadService {
           onProgress: onFallbackProgress,
           isAlreadyInstalled: () => _isDownloadedSafe(langCode),
         );
-        debugPrint(
-            'ML Kit model for "$langCode" downloaded successfully from custom server.');
+        debugPrint('ML Kit model for "$langCode" downloaded successfully from custom server.');
       } catch (fallbackError) {
         debugPrint('Fallback download also failed. Reason: $fallbackError');
         throw Exception(
@@ -429,8 +405,7 @@ class ModelDownloadService {
     }
 
     if (_activeOnnxDownloads.containsKey(langPairKey)) {
-      debugPrint(
-          'OnnxDownload: "$langPairKey" already in progress, reusing...');
+      debugPrint('OnnxDownload: "$langPairKey" already in progress, reusing...');
       return _activeOnnxDownloads[langPairKey]!;
     }
 
@@ -438,8 +413,7 @@ class ModelDownloadService {
       langPairKey,
       onProgress: (p) => _emitOnnxProgress(langPairKey, p),
     ).whenComplete(() {
-      debugPrint(
-          'OnnxDownload: [$langPairKey] whenComplete fired, removing from active map.');
+      debugPrint('OnnxDownload: [$langPairKey] whenComplete fired, removing from active map.');
       _activeOnnxDownloads.remove(langPairKey);
       _onnxProgress.remove(langPairKey);
       _onnxProgressListeners.remove(langPairKey);
@@ -451,8 +425,7 @@ class ModelDownloadService {
     // so the caller can catch the error and update the UI.
     future.catchError((_) {});
 
-    debugPrint(
-        'OnnxDownload: [$langPairKey] downloadOnnxModel() returning future to caller.');
+    debugPrint('OnnxDownload: [$langPairKey] downloadOnnxModel() returning future to caller.');
     return future;
   }
 
@@ -468,9 +441,7 @@ class ModelDownloadService {
     final service = OnnxTranslationService();
     final firstReady = await service.isModelReady(pivot.firstHopKey);
     final secondReady = await service.isModelReady(pivot.secondHopKey);
-    return (firstReady && secondReady)
-        ? OnnxModelStatus.ready
-        : OnnxModelStatus.notDownloaded;
+    return (firstReady && secondReady) ? OnnxModelStatus.ready : OnnxModelStatus.notDownloaded;
   }
 
   /// Downloads whichever hop(s) of [pivot] aren't already present — e.g. if
@@ -493,8 +464,7 @@ class ModelDownloadService {
         legs[i],
         onProgress: (p) => onProgress?.call((i + p) / legs.length),
       );
-      debugPrint(
-          'OnnxDownload: [pivot] leg ${legs[i]} awaited-return complete (${i + 1}/${legs.length}).');
+      debugPrint('OnnxDownload: [pivot] leg ${legs[i]} awaited-return complete (${i + 1}/${legs.length}).');
     }
   }
 
@@ -509,18 +479,13 @@ class ModelDownloadService {
     try {
       await _downloadOnnxModelOnce(langPairKey, onProgress: onProgress);
       ActivationTracker.instance.modelDownload(
-        kind: 'ai',
-        key: langPairKey,
-        outcome: 'completed',
+        kind: 'ai', key: langPairKey, outcome: 'completed',
         durationMs: watch.elapsedMilliseconds,
       );
     } catch (e) {
       ActivationTracker.instance.modelDownload(
-        kind: 'ai',
-        key: langPairKey,
-        outcome: 'failed',
-        durationMs: watch.elapsedMilliseconds,
-        failure: e.runtimeType.toString(),
+        kind: 'ai', key: langPairKey, outcome: 'failed',
+        durationMs: watch.elapsedMilliseconds, failure: e.runtimeType.toString(),
       );
       await _recordDownloadError();
       rethrow;
@@ -550,7 +515,7 @@ class ModelDownloadService {
     final pair = kSupportedOnnxPairs.firstWhere(
       (p) => p.key == langPairKey,
       orElse: () => const OnnxLangPair(
-          key: '', sourceBcp: '', targetBcp: '', displayName: ''),
+        key: '', sourceBcp: '', targetBcp: '', displayName: ''),
     );
 
     // Self-hosted pairs (not pre-converted on onnx-community) live in a
@@ -559,25 +524,21 @@ class ModelDownloadService {
     final String baseUrl;
     final Map<String, String> filesToDownload;
     if (pair.customRepo != null) {
-      baseUrl =
-          'https://huggingface.co/${pair.customRepo}/resolve/main/$langPairKey';
+      baseUrl = 'https://huggingface.co/${pair.customRepo}/resolve/main/$langPairKey';
       filesToDownload = {
         'encoder_model_quantized.onnx': 'encoder_model.onnx',
         'decoder_model_quantized.onnx': 'decoder_model.onnx',
-        'decoder_with_past_model_quantized.onnx':
-            'decoder_with_past_model.onnx',
+        'decoder_with_past_model_quantized.onnx': 'decoder_with_past_model.onnx',
         'source.spm': 'source.spm',
         'vocab.json': 'vocab.json',
       };
     } else {
-      baseUrl =
-          'https://huggingface.co/onnx-community/$langPairKey/resolve/main';
+      baseUrl = 'https://huggingface.co/onnx-community/$langPairKey/resolve/main';
       final suffix = pair.useFp16 ? 'fp16' : 'quantized';
       filesToDownload = {
         'onnx/encoder_model_$suffix.onnx': 'encoder_model.onnx',
         'onnx/decoder_model_$suffix.onnx': 'decoder_model.onnx',
-        'onnx/decoder_with_past_model_$suffix.onnx':
-            'decoder_with_past_model.onnx',
+        'onnx/decoder_with_past_model_$suffix.onnx': 'decoder_with_past_model.onnx',
         'source.spm': 'source.spm',
         'vocab.json': 'vocab.json',
       };
@@ -597,8 +558,7 @@ class ModelDownloadService {
         if (await finalFile.exists()) {
           completedFiles++;
           onProgress?.call(completedFiles / totalFiles);
-          debugPrint(
-              'OnnxDownload: [$localName] already present, skipping ($completedFiles/$totalFiles).');
+          debugPrint('OnnxDownload: [$localName] already present, skipping ($completedFiles/$totalFiles).');
           continue;
         }
 
@@ -612,8 +572,7 @@ class ModelDownloadService {
             // Cap in-flight progress below 100% — the file isn't done until
             // it's flushed and renamed, and "100% but still working" can't
             // be told apart from "100% and stuck".
-            final fileProgress =
-                total == null ? 0.0 : (received / total).clamp(0.0, 0.99);
+            final fileProgress = total == null ? 0.0 : (received / total).clamp(0.0, 0.99);
             onProgress?.call((completedFiles + fileProgress) / totalFiles);
           },
         );
@@ -621,8 +580,7 @@ class ModelDownloadService {
 
         completedFiles++;
         onProgress?.call(completedFiles / totalFiles);
-        debugPrint(
-            'OnnxDownload: [$localName] complete ($completedFiles/$totalFiles files).');
+        debugPrint('OnnxDownload: [$localName] complete ($completedFiles/$totalFiles files).');
       }
 
       debugPrint('OnnxDownload: "$langPairKey" ready at ${targetDir.path}');
@@ -636,11 +594,9 @@ class ModelDownloadService {
       // start of the next attempt.
       rethrow;
     } finally {
-      debugPrint(
-          'OnnxDownload: [$langPairKey] finally block — closing client...');
+      debugPrint('OnnxDownload: [$langPairKey] finally block — closing client...');
       client.close();
-      debugPrint(
-          'OnnxDownload: [$langPairKey] client closed, _downloadOnnxModelImpl returning.');
+      debugPrint('OnnxDownload: [$langPairKey] client closed, _downloadOnnxModelImpl returning.');
     }
   }
 

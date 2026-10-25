@@ -4,8 +4,7 @@ import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/widgets/download_error_dialog.dart';
 
 void main() {
-  Future<BuildContext> pumpHost(WidgetTester tester,
-      {Size size = const Size(360, 640)}) async {
+  Future<BuildContext> pumpHost(WidgetTester tester, {Size size = const Size(360, 640)}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
@@ -21,8 +20,7 @@ void main() {
     return ctx;
   }
 
-  testWidgets('at most one dialog at a time: a second call returns dismiss',
-      (tester) async {
+  testWidgets('at most one dialog at a time: a second call returns dismiss', (tester) async {
     final ctx = await pumpHost(tester);
     final first = showDownloadFailedDialog(ctx, packLabel: 'Arabic');
     await tester.pumpAndSettle();
@@ -60,15 +58,8 @@ void main() {
     expect(isDownloadFailedDialogShowing, isFalse);
   });
 
-  for (final locale in const [
-    Locale('en'),
-    Locale('es'),
-    Locale('pt'),
-    Locale('id'),
-    Locale('de')
-  ]) {
-    testWidgets('four buttons fit on a small phone without overflow ($locale)',
-        (tester) async {
+  for (final locale in const [Locale('en'), Locale('es'), Locale('pt'), Locale('id'), Locale('de')]) {
+    testWidgets('four buttons fit on a small phone without overflow ($locale)', (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -90,10 +81,7 @@ void main() {
       final dialogRect = tester.getRect(find.byType(AlertDialog));
       for (final e in find.byType(TextButton).evaluate()) {
         final r = tester.getRect(find.byWidget(e.widget));
-        expect(
-            dialogRect.contains(r.topLeft) &&
-                dialogRect.contains(r.bottomRight - const Offset(0.1, 0.1)),
-            isTrue);
+        expect(dialogRect.contains(r.topLeft) && dialogRect.contains(r.bottomRight - const Offset(0.1, 0.1)), isTrue);
       }
       Navigator.of(ctx).pop();
       await tester.pumpAndSettle();

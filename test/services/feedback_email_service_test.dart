@@ -24,8 +24,7 @@ void main() {
     final uri = feedbackMailto(subject: 'Send Feedback', body: body);
     expect(uri.scheme, 'mailto');
     expect(uri.path, kSupportEmail);
-    expect(uri.toString(), isNot(contains('+')),
-        reason: 'spaces must be %20, not +');
+    expect(uri.toString(), isNot(contains('+')), reason: 'spaces must be %20, not +');
     expect(uri.queryParameters['subject'], 'Send Feedback');
     expect(uri.queryParameters['body'], body);
   });

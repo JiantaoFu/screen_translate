@@ -9,8 +9,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  Future<Locale> startWithDeviceLocale(
-      WidgetTester tester, Locale device) async {
+  Future<Locale> startWithDeviceLocale(WidgetTester tester, Locale device) async {
     tester.platformDispatcher.localesTestValue = [device];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     await tester.pumpWidget(const ScreenTranslateApp());
@@ -21,37 +20,23 @@ void main() {
     return Localizations.localeOf(context);
   }
 
-  testWidgets('a device language the app lacks falls back to English',
-      (tester) async {
-    expect(
-        (await startWithDeviceLocale(tester, const Locale('uk'))).languageCode,
-        'en');
+  testWidgets('a device language the app lacks falls back to English', (tester) async {
+    expect((await startWithDeviceLocale(tester, const Locale('uk'))).languageCode, 'en');
   });
 
-  testWidgets('Norwegian Bokmål (nb) uses the Norwegian translation',
-      (tester) async {
-    expect(
-        (await startWithDeviceLocale(tester, const Locale('nb', 'NO')))
-            .languageCode,
-        'no');
+  testWidgets('Norwegian Bokmål (nb) uses the Norwegian translation', (tester) async {
+    expect((await startWithDeviceLocale(tester, const Locale('nb', 'NO'))).languageCode, 'no');
   });
 
   testWidgets('legacy Hebrew code is recognised', (tester) async {
-    expect(
-        (await startWithDeviceLocale(tester, const Locale('iw'))).languageCode,
-        'he');
+    expect((await startWithDeviceLocale(tester, const Locale('iw'))).languageCode, 'he');
   });
 
   testWidgets('legacy Indonesian code is recognised', (tester) async {
-    expect(
-        (await startWithDeviceLocale(tester, const Locale('in'))).languageCode,
-        'id');
+    expect((await startWithDeviceLocale(tester, const Locale('in'))).languageCode, 'id');
   });
 
   testWidgets('a supported device language is used as is', (tester) async {
-    expect(
-        (await startWithDeviceLocale(tester, const Locale('ja', 'JP')))
-            .languageCode,
-        'ja');
+    expect((await startWithDeviceLocale(tester, const Locale('ja', 'JP'))).languageCode, 'ja');
   });
 }

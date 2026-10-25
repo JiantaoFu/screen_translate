@@ -22,8 +22,7 @@ void main() {
     originalInterval = ModelDownloadService.quickProgressPollInterval;
     ModelDownloadService.quickProgressProbe =
         (_) async => (progress: probeValue, waiting: probeWaiting);
-    ModelDownloadService.quickProgressPollInterval =
-        const Duration(milliseconds: 5);
+    ModelDownloadService.quickProgressPollInterval = const Duration(milliseconds: 5);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(mlKitChannel, (call) async {
       await mlKitDownload.future;
@@ -42,8 +41,7 @@ void main() {
 
   test('reports real progress, never backwards, 100% only when done', () async {
     final seen = <double>[];
-    final download = ModelDownloadService()
-        .downloadModelWithFallback('zh', onProgress: seen.add);
+    final download = ModelDownloadService().downloadModelWithFallback('zh', onProgress: seen.add);
     expect(ModelDownloadService.isQuickDownloading('zh'), isTrue);
 
     await tick();
@@ -65,20 +63,16 @@ void main() {
     expect(ModelDownloadService.isQuickDownloading('zh'), isFalse);
   });
 
-  test('a second caller joins the running download and gets its progress',
-      () async {
+  test('a second caller joins the running download and gets its progress', () async {
     final first = <double>[];
     final second = <double>[];
-    final a = ModelDownloadService()
-        .downloadModelWithFallback('ja', onProgress: first.add);
+    final a = ModelDownloadService().downloadModelWithFallback('ja', onProgress: first.add);
     probeValue = 0.5;
     await tick();
 
-    final b = ModelDownloadService()
-        .downloadModelWithFallback('ja', onProgress: second.add);
+    final b = ModelDownloadService().downloadModelWithFallback('ja', onProgress: second.add);
     expect(identical(a, b), isTrue);
-    expect(second.first, 0.5,
-        reason: 'joiner gets the current progress immediately');
+    expect(second.first, 0.5, reason: 'joiner gets the current progress immediately');
 
     mlKitDownload.complete();
     await b;
@@ -86,8 +80,7 @@ void main() {
     expect(second.last, 1.0);
   });
 
-  test('reports when the download stalls waiting for the network and resumes',
-      () async {
+  test('reports when the download stalls waiting for the network and resumes', () async {
     final waiting = <bool>[];
     final download = ModelDownloadService()
         .downloadModelWithFallback('ko', onWaitingForNetwork: waiting.add);
@@ -97,8 +90,7 @@ void main() {
 
     // A screen opened mid-stall learns about it straight away.
     final joined = <bool>[];
-    ModelDownloadService()
-        .downloadModelWithFallback('ko', onWaitingForNetwork: joined.add);
+    ModelDownloadService().downloadModelWithFallback('ko', onWaitingForNetwork: joined.add);
     expect(joined, [true]);
 
     probeWaiting = false;

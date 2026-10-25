@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'screentranslation-cff83.firebasestorage.app',
     measurementId: 'G-SBR5QRVVRG',
   );
+
 }

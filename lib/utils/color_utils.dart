@@ -5,8 +5,7 @@ import 'package:image/image.dart' as img;
 
 class ColorUtils {
   /// Extract dominant color from NV21 formatted byte array using weighted average
-  static Color extractDominantColorFromNV21(
-      Uint8List bytes, int width, int height) {
+  static Color extractDominantColorFromNV21(Uint8List bytes, int width, int height) {
     try {
       // Check if the byte array is large enough for NV21 format
       if (bytes.length < width * height * 1.5) {
@@ -17,128 +16,92 @@ class ColorUtils {
       // Strategic sampling points with weights
       final samplePoints = [
         // Top row (9 points)
-        Point(width ~/ 16, height ~/ 16), // Top-left corner (weight: 1.0)
-        Point(width ~/ 8, height ~/ 16), // Top-left first third (weight: 1.1)
-        Point(width ~/ 4, height ~/ 16), // Top-left middle (weight: 1.2)
-        Point(
-            3 * width ~/ 8, height ~/ 16), // Top-left two-thirds (weight: 1.1)
-        Point(width ~/ 2, height ~/ 16), // Top middle (weight: 1.3)
-        Point(
-            5 * width ~/ 8, height ~/ 16), // Top-right two-thirds (weight: 1.1)
-        Point(3 * width ~/ 4, height ~/ 16), // Top-right middle (weight: 1.2)
-        Point(7 * width ~/ 8,
-            height ~/ 16), // Top-right first third (weight: 1.1)
-        Point(15 * width ~/ 16, height ~/ 16), // Top-right corner (weight: 1.0)
+        Point(width ~/ 16, height ~/ 16),       // Top-left corner (weight: 1.0)
+        Point(width ~/ 8, height ~/ 16),         // Top-left first third (weight: 1.1)
+        Point(width ~/ 4, height ~/ 16),         // Top-left middle (weight: 1.2)
+        Point(3 * width ~/ 8, height ~/ 16),     // Top-left two-thirds (weight: 1.1)
+        Point(width ~/ 2, height ~/ 16),         // Top middle (weight: 1.3)
+        Point(5 * width ~/ 8, height ~/ 16),     // Top-right two-thirds (weight: 1.1)
+        Point(3 * width ~/ 4, height ~/ 16),     // Top-right middle (weight: 1.2)
+        Point(7 * width ~/ 8, height ~/ 16),     // Top-right first third (weight: 1.1)
+        Point(15 * width ~/ 16, height ~/ 16),   // Top-right corner (weight: 1.0)
 
         // Upper-middle row (9 points)
-        Point(width ~/ 16,
-            height ~/ 4), // Left upper-middle first third (weight: 1.1)
-        Point(
-            width ~/ 8, height ~/ 4), // Left upper-middle middle (weight: 1.2)
-        Point(width ~/ 4,
-            height ~/ 4), // Left upper-middle two-thirds (weight: 1.1)
-        Point(3 * width ~/ 8,
-            height ~/ 4), // Center-left upper-middle (weight: 1.3)
-        Point(width ~/ 2, height ~/ 4), // Center upper-middle (weight: 1.4)
-        Point(5 * width ~/ 8,
-            height ~/ 4), // Center-right upper-middle (weight: 1.3)
-        Point(3 * width ~/ 4,
-            height ~/ 4), // Right upper-middle two-thirds (weight: 1.1)
-        Point(7 * width ~/ 8,
-            height ~/ 4), // Right upper-middle middle (weight: 1.2)
-        Point(15 * width ~/ 16,
-            height ~/ 4), // Right upper-middle first third (weight: 1.1)
+        Point(width ~/ 16, height ~/ 4),         // Left upper-middle first third (weight: 1.1)
+        Point(width ~/ 8, height ~/ 4),          // Left upper-middle middle (weight: 1.2)
+        Point(width ~/ 4, height ~/ 4),          // Left upper-middle two-thirds (weight: 1.1)
+        Point(3 * width ~/ 8, height ~/ 4),      // Center-left upper-middle (weight: 1.3)
+        Point(width ~/ 2, height ~/ 4),          // Center upper-middle (weight: 1.4)
+        Point(5 * width ~/ 8, height ~/ 4),      // Center-right upper-middle (weight: 1.3)
+        Point(3 * width ~/ 4, height ~/ 4),      // Right upper-middle two-thirds (weight: 1.1)
+        Point(7 * width ~/ 8, height ~/ 4),      // Right upper-middle middle (weight: 1.2)
+        Point(15 * width ~/ 16, height ~/ 4),    // Right upper-middle first third (weight: 1.1)
 
         // Middle row (9 points)
-        Point(
-            width ~/ 16, height ~/ 2), // Left middle first third (weight: 1.2)
-        Point(width ~/ 8, height ~/ 2), // Left middle middle (weight: 1.3)
-        Point(width ~/ 4, height ~/ 2), // Left middle two-thirds (weight: 1.2)
-        Point(3 * width ~/ 8, height ~/ 2), // Center-left middle (weight: 1.4)
-        Point(width ~/ 2, height ~/ 2), // Exact center (weight: 1.5)
-        Point(5 * width ~/ 8, height ~/ 2), // Center-right middle (weight: 1.4)
-        Point(3 * width ~/ 4,
-            height ~/ 2), // Right middle two-thirds (weight: 1.2)
-        Point(7 * width ~/ 8, height ~/ 2), // Right middle middle (weight: 1.3)
-        Point(15 * width ~/ 16,
-            height ~/ 2), // Right middle first third (weight: 1.2)
+        Point(width ~/ 16, height ~/ 2),         // Left middle first third (weight: 1.2)
+        Point(width ~/ 8, height ~/ 2),          // Left middle middle (weight: 1.3)
+        Point(width ~/ 4, height ~/ 2),          // Left middle two-thirds (weight: 1.2)
+        Point(3 * width ~/ 8, height ~/ 2),      // Center-left middle (weight: 1.4)
+        Point(width ~/ 2, height ~/ 2),          // Exact center (weight: 1.5)
+        Point(5 * width ~/ 8, height ~/ 2),      // Center-right middle (weight: 1.4)
+        Point(3 * width ~/ 4, height ~/ 2),      // Right middle two-thirds (weight: 1.2)
+        Point(7 * width ~/ 8, height ~/ 2),      // Right middle middle (weight: 1.3)
+        Point(15 * width ~/ 16, height ~/ 2),    // Right middle first third (weight: 1.2)
 
         // Lower-middle row (9 points)
-        Point(width ~/ 16,
-            3 * height ~/ 4), // Left lower-middle first third (weight: 1.1)
-        Point(width ~/ 8,
-            3 * height ~/ 4), // Left lower-middle middle (weight: 1.2)
-        Point(width ~/ 4,
-            3 * height ~/ 4), // Left lower-middle two-thirds (weight: 1.1)
-        Point(3 * width ~/ 8,
-            3 * height ~/ 4), // Center-left lower-middle (weight: 1.3)
-        Point(width ~/ 2, 3 * height ~/ 4), // Center lower-middle (weight: 1.4)
-        Point(5 * width ~/ 8,
-            3 * height ~/ 4), // Center-right lower-middle (weight: 1.3)
-        Point(3 * width ~/ 4,
-            3 * height ~/ 4), // Right lower-middle two-thirds (weight: 1.1)
-        Point(7 * width ~/ 8,
-            3 * height ~/ 4), // Right lower-middle middle (weight: 1.2)
-        Point(15 * width ~/ 16,
-            3 * height ~/ 4), // Right lower-middle first third (weight: 1.1)
+        Point(width ~/ 16, 3 * height ~/ 4),     // Left lower-middle first third (weight: 1.1)
+        Point(width ~/ 8, 3 * height ~/ 4),      // Left lower-middle middle (weight: 1.2)
+        Point(width ~/ 4, 3 * height ~/ 4),      // Left lower-middle two-thirds (weight: 1.1)
+        Point(3 * width ~/ 8, 3 * height ~/ 4),  // Center-left lower-middle (weight: 1.3)
+        Point(width ~/ 2, 3 * height ~/ 4),      // Center lower-middle (weight: 1.4)
+        Point(5 * width ~/ 8, 3 * height ~/ 4),  // Center-right lower-middle (weight: 1.3)
+        Point(3 * width ~/ 4, 3 * height ~/ 4),  // Right lower-middle two-thirds (weight: 1.1)
+        Point(7 * width ~/ 8, 3 * height ~/ 4),  // Right lower-middle middle (weight: 1.2)
+        Point(15 * width ~/ 16, 3 * height ~/ 4),// Right lower-middle first third (weight: 1.1)
 
         // Bottom row (9 points)
-        Point(
-            width ~/ 16, 15 * height ~/ 16), // Bottom-left corner (weight: 1.0)
-        Point(width ~/ 8,
-            15 * height ~/ 16), // Bottom-left first third (weight: 1.1)
-        Point(
-            width ~/ 4, 15 * height ~/ 16), // Bottom-left middle (weight: 1.2)
-        Point(3 * width ~/ 8,
-            15 * height ~/ 16), // Bottom-left two-thirds (weight: 1.1)
-        Point(width ~/ 2, 15 * height ~/ 16), // Bottom middle (weight: 1.3)
-        Point(5 * width ~/ 8,
-            15 * height ~/ 16), // Bottom-right two-thirds (weight: 1.1)
-        Point(3 * width ~/ 4,
-            15 * height ~/ 16), // Bottom-right middle (weight: 1.2)
-        Point(7 * width ~/ 8,
-            15 * height ~/ 16), // Bottom-right first third (weight: 1.1)
-        Point(15 * width ~/ 16,
-            15 * height ~/ 16) // Bottom-right corner (weight: 1.0)
+        Point(width ~/ 16, 15 * height ~/ 16),   // Bottom-left corner (weight: 1.0)
+        Point(width ~/ 8, 15 * height ~/ 16),    // Bottom-left first third (weight: 1.1)
+        Point(width ~/ 4, 15 * height ~/ 16),    // Bottom-left middle (weight: 1.2)
+        Point(3 * width ~/ 8, 15 * height ~/ 16),// Bottom-left two-thirds (weight: 1.1)
+        Point(width ~/ 2, 15 * height ~/ 16),    // Bottom middle (weight: 1.3)
+        Point(5 * width ~/ 8, 15 * height ~/ 16),// Bottom-right two-thirds (weight: 1.1)
+        Point(3 * width ~/ 4, 15 * height ~/ 16),// Bottom-right middle (weight: 1.2)
+        Point(7 * width ~/ 8, 15 * height ~/ 16),// Bottom-right first third (weight: 1.1)
+        Point(15 * width ~/ 16, 15 * height ~/ 16)// Bottom-right corner (weight: 1.0)
       ];
 
       // Weighted color sampling
       final weightedColors = samplePoints.asMap().map((index, point) {
-        final color =
-            _getColorFromBytesNV21(bytes, width, height, point.x, point.y);
+        final color = _getColorFromBytesNV21(bytes, width, height, point.x, point.y);
         final weight = _getWeightForIndex(index);
         return MapEntry(index, {'color': color, 'weight': weight});
       });
 
       // Calculate weighted average for each color channel
-      final totalWeight = weightedColors.values
-          .map((e) => e['weight'] as double)
-          .reduce((a, b) => a + b);
-
+      final totalWeight = weightedColors.values.map((e) => e['weight'] as double).reduce((a, b) => a + b);
+      
       final avgRed = weightedColors.values.map((e) {
-            return ((e['color'] as Color).red.toDouble() *
-                (e['weight'] as double));
-          }).reduce((a, b) => a + b) /
-          totalWeight;
+        return ((e['color'] as Color).red.toDouble() * (e['weight'] as double));
+      }).reduce((a, b) => a + b) / totalWeight;
 
       final avgGreen = weightedColors.values.map((e) {
-            return ((e['color'] as Color).green.toDouble() *
-                (e['weight'] as double));
-          }).reduce((a, b) => a + b) /
-          totalWeight;
+        return ((e['color'] as Color).green.toDouble() * (e['weight'] as double));
+      }).reduce((a, b) => a + b) / totalWeight;
 
       final avgBlue = weightedColors.values.map((e) {
-            return ((e['color'] as Color).blue.toDouble() *
-                (e['weight'] as double));
-          }).reduce((a, b) => a + b) /
-          totalWeight;
+        return ((e['color'] as Color).blue.toDouble() * (e['weight'] as double));
+      }).reduce((a, b) => a + b) / totalWeight;
 
       // Create dominant color
-      final dominantColor = Color.fromRGBO(avgRed.toInt().clamp(0, 255),
-          avgGreen.toInt().clamp(0, 255), avgBlue.toInt().clamp(0, 255), 1.0);
+      final dominantColor = Color.fromRGBO(
+        avgRed.toInt().clamp(0, 255), 
+        avgGreen.toInt().clamp(0, 255), 
+        avgBlue.toInt().clamp(0, 255), 
+        1.0
+      );
 
-      print(
-          'Weighted Dominant Color: #${dominantColor.value.toRadixString(16)}');
+      print('Weighted Dominant Color: #${dominantColor.value.toRadixString(16)}');
 
       return dominantColor;
     } catch (e) {
@@ -164,9 +127,7 @@ class ColorUtils {
     double regionHeight,
   ) {
     try {
-      if (bytes.length < imgWidth * imgHeight * 1.5 ||
-          regionWidth <= 0 ||
-          regionHeight <= 0) {
+      if (bytes.length < imgWidth * imgHeight * 1.5 || regionWidth <= 0 || regionHeight <= 0) {
         return Colors.white;
       }
 
@@ -181,8 +142,7 @@ class ColorUtils {
         for (int j = 0; j < gridSize; j++) {
           final sx = left + ((right - left) * (i + 0.5) / gridSize).toInt();
           final sy = top + ((bottom - top) * (j + 0.5) / gridSize).toInt();
-          final color =
-              _getColorFromBytesNV21(bytes, imgWidth, imgHeight, sx, sy);
+          final color = _getColorFromBytesNV21(bytes, imgWidth, imgHeight, sx, sy);
           totalR += color.red;
           totalG += color.green;
           totalB += color.blue;
@@ -190,8 +150,7 @@ class ColorUtils {
         }
       }
 
-      return Color.fromRGBO(
-          totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
+      return Color.fromRGBO(totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
     } catch (e) {
       print('NV21 region color extraction error: $e');
       return Colors.white;
@@ -214,10 +173,8 @@ class ColorUtils {
 
       final left = regionX.toInt().clamp(0, image.width - 1);
       final top = regionY.toInt().clamp(0, image.height - 1);
-      final right =
-          (regionX + regionWidth).toInt().clamp(left + 1, image.width);
-      final bottom =
-          (regionY + regionHeight).toInt().clamp(top + 1, image.height);
+      final right = (regionX + regionWidth).toInt().clamp(left + 1, image.width);
+      final bottom = (regionY + regionHeight).toInt().clamp(top + 1, image.height);
 
       const gridSize = 3;
       int totalR = 0, totalG = 0, totalB = 0, count = 0;
@@ -233,8 +190,7 @@ class ColorUtils {
         }
       }
 
-      return Color.fromRGBO(
-          totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
+      return Color.fromRGBO(totalR ~/ count, totalG ~/ count, totalB ~/ count, 1.0);
     } catch (e) {
       print('Image region color extraction error: $e');
       return Colors.white;
@@ -264,8 +220,7 @@ class ColorUtils {
 
   /// [extractSurroundColorFromNV21] for a decoded image (static
   /// "Translate Image" path).
-  static Color extractSurroundColorFromImage(
-      img.Image image, Rect box, double pad) {
+  static Color extractSurroundColorFromImage(img.Image image, Rect box, double pad) {
     return _ringMedian(box, pad, image.width, image.height, (x, y) {
       final p = image.getPixel(x, y);
       return Color.fromRGBO(p.r.toInt(), p.g.toInt(), p.b.toInt(), 1.0);
@@ -352,8 +307,7 @@ class ColorUtils {
   }
 
   /// Get color from specific point in NV21 byte array
-  static Color _getColorFromBytesNV21(
-      Uint8List bytes, int width, int height, int x, int y) {
+  static Color _getColorFromBytesNV21(Uint8List bytes, int width, int height, int x, int y) {
     try {
       if (y < 0 || y >= height || x < 0 || x >= width) {
         return Colors.white;
@@ -370,9 +324,7 @@ class ColorUtils {
 
       // Convert YUV to RGB
       final r = (y_value + 1.402 * (v - 128)).toInt().clamp(0, 255);
-      final g = (y_value - 0.34414 * (u - 128) - 0.71414 * (v - 128))
-          .toInt()
-          .clamp(0, 255);
+      final g = (y_value - 0.34414 * (u - 128) - 0.71414 * (v - 128)).toInt().clamp(0, 255);
       final b = (y_value + 1.772 * (u - 128)).toInt().clamp(0, 255);
 
       return Color.fromRGBO(r, g, b, 1.0);

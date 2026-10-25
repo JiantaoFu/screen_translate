@@ -5,5 +5,4 @@
     android:accessibilityFlags="flagRequestFilterKeyEvents"
     android:accessibilityFeedbackType="feedbackVisual"
     android:notificationTimeout="100"
-    android:canRetrieveWindowContent="true"
     android:settingsActivity=".ScrollDetectionAccessibilityActivity" />

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate 스크롤 감지</string>
-    <string name="accessibility_service_description">다른 앱의 스크롤을 감지하여 끊김 없이 번역할 수 있게 합니다. 내용이 바뀌는 시점을 파악해 번역을 정확하게 업데이트합니다.</string>
-    <string name="accessibility_permission_title">접근성 서비스 필요</string>
-    <string name="accessibility_permission_message">Screen Translate는 스크롤을 감지하고 여러 앱의 내용을 번역하기 위해 접근성 서비스가 필요합니다.</string>
-    <string name="accessibility_permission_benefits">장점:\n• 스크롤하는 동안에도 끊김 없는 번역\n• 여러 앱에서 작동\n• 번역 정확도 향상</string>
-    <string name="accessibility_permission_how_to">사용 설정 방법:\n1. \'사용\'을(를) 탭하세요\n2. 접근성 설정에서 \'Screen Translate 스크롤 감지\'을(를) 찾으세요\n3. 서비스를 켜세요</string>
-    <string name="btn_enable_accessibility">사용</string>
-    <string name="btn_cancel">취소</string>
+    <string name="accessibility_service_description">화면 번역은 Android 접근성 서비스를 사용해 스크롤하거나 다른 앱으로 전환할 때를 감지할 수 있습니다. 이를 통해 화면이 바뀌면 자동으로 다시 번역하고, 앱을 전환하면 번역 오버레이를 숨기거나 업데이트합니다. 접근성 서비스는 앞에 있는 앱의 이름만 사용합니다. 화면의 텍스트를 읽거나 탭·제스처를 수행하지 않으며, 개인 데이터를 수집하거나 전송하지 않습니다. 직접 켠 후에만 실행됩니다. 선택 사항: 사용하지 않아도 수동으로 번역할 수 있으며, 설정 &gt; 접근성에서 언제든지 끌 수 있습니다.</string>
+    <string name="accessibility_permission_title">접근성 서비스(선택 사항)</string>
+    <string name="accessibility_permission_message">화면 번역은 Android 접근성 서비스를 사용해 스크롤하거나 다른 앱으로 전환할 때를 감지할 수 있습니다. 이를 통해 화면이 바뀌면 자동으로 다시 번역하고, 앱을 전환하면 번역 오버레이를 숨기거나 업데이트합니다.</string>
+    <string name="accessibility_permission_benefits">접근성 서비스는 앞에 있는 앱의 이름만 사용합니다. 화면의 텍스트를 읽거나 탭·제스처를 수행하지 않으며, 개인 데이터를 수집하거나 전송하지 않습니다. 직접 켠 후에만 실행됩니다.\n\n선택 사항: 사용하지 않아도 수동으로 번역할 수 있으며, 설정 &gt; 접근성에서 언제든지 끌 수 있습니다.</string>
+    <string name="accessibility_permission_how_to">켜는 방법:\n1. “동의” 탭\n2. 접근성 설정에서 “Screen Translate 스크롤 감지” 찾기\n3. 서비스 켜기</string>
+    <string name="btn_enable_accessibility">동의</string>
+    <string name="btn_cancel">괜찮습니다</string>
     <string name="tap_outside_to_close">바깥쪽을 탭하여 닫기</string>
     <string name="mode_auto_translate">자동 번역</string>
     <string name="mode_original_text">원문</string>

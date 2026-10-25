@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Wykrywanie przewijania Screen Translate</string>
-    <string name="accessibility_service_description">Pozwala Screen Translate wykrywać przewijanie w innych aplikacjach, aby tłumaczenie działało płynnie. Usługa rozpoznaje zmiany treści, dzięki czemu tłumaczenia są dokładnie aktualizowane.</string>
-    <string name="accessibility_permission_title">Wymagana usługa ułatwień dostępu</string>
-    <string name="accessibility_permission_message">Screen Translate potrzebuje usługi ułatwień dostępu, aby wykrywać przewijanie i tłumaczyć treści w różnych aplikacjach.</string>
-    <string name="accessibility_permission_benefits">Korzyści:\n• Płynne tłumaczenie podczas przewijania\n• Działa w wielu aplikacjach\n• Dokładniejsze tłumaczenia</string>
-    <string name="accessibility_permission_how_to">Jak włączyć:\n1. Kliknij „Włącz”\n2. Znajdź „Wykrywanie przewijania Screen Translate” w ustawieniach ułatwień dostępu\n3. Włącz usługę</string>
-    <string name="btn_enable_accessibility">Włącz</string>
-    <string name="btn_cancel">Anuluj</string>
+    <string name="accessibility_service_description">Screen Translate może używać usługi ułatwień dostępu Androida, aby wykrywać przewijanie lub przejście do innej aplikacji – dzięki temu automatycznie tłumaczy ponownie, gdy ekran się zmienia, oraz ukrywa lub aktualizuje nakładkę tłumaczenia po zmianie aplikacji. Usługa używa tylko nazwy aplikacji na pierwszym planie; nie odczytuje tekstu na ekranie, nie wykonuje dotknięć ani gestów i nie zbiera ani nie przesyła Twoich danych osobowych. Działa dopiero po tym, jak sam ją włączysz. Opcjonalnie: bez niej nadal możesz tłumaczyć ręcznie; wyłączysz ją w dowolnej chwili w Ustawienia &gt; Ułatwienia dostępu.</string>
+    <string name="accessibility_permission_title">Usługa ułatwień dostępu (opcjonalna)</string>
+    <string name="accessibility_permission_message">Screen Translate może używać usługi ułatwień dostępu Androida, aby wykrywać przewijanie lub przejście do innej aplikacji – dzięki temu automatycznie tłumaczy ponownie, gdy ekran się zmienia, oraz ukrywa lub aktualizuje nakładkę tłumaczenia po zmianie aplikacji.</string>
+    <string name="accessibility_permission_benefits">Usługa używa tylko nazwy aplikacji na pierwszym planie; nie odczytuje tekstu na ekranie, nie wykonuje dotknięć ani gestów i nie zbiera ani nie przesyła Twoich danych osobowych. Działa dopiero po tym, jak sam ją włączysz.\n\nOpcjonalnie: bez niej nadal możesz tłumaczyć ręcznie; wyłączysz ją w dowolnej chwili w Ustawienia &gt; Ułatwienia dostępu.</string>
+    <string name="accessibility_permission_how_to">Jak włączyć:\n1. Kliknij „Zgadzam się”\n2. Znajdź „Wykrywanie przewijania Screen Translate” w ustawieniach ułatwień dostępu\n3. Włącz usługę</string>
+    <string name="btn_enable_accessibility">Zgadzam się</string>
+    <string name="btn_cancel">Nie, dziękuję</string>
     <string name="tap_outside_to_close">Kliknij poza oknem, aby zamknąć</string>
     <string name="mode_auto_translate">Tłumaczenie automatyczne</string>
     <string name="mode_original_text">Tekst oryginalny</string>

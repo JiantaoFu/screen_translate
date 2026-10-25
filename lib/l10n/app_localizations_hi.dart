@@ -294,7 +294,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'इस डिवाइस पर AI Enhanced अचानक बंद हो गया, इसलिए इसके बजाय त्वरित अनुवाद का उपयोग किया जा रहा है।';
+      'इस डिवाइस पर AI Enhanced अचानक बंद हो गया, इसलिए इसके बजाय त्वरित अनुवाद का उपयोग किया जा रहा है। आप इसे सेटिंग्स में फिर से चालू कर सकते हैं।';
 
   @override
   String get mode_ai_enhanced_subtitle =>

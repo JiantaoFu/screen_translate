@@ -92,7 +92,7 @@
   "mode_quick_title": "Hurtig",
   "mode_quick_subtitle": "Øjeblikkelig · Altid tilgængelig · Ingen opsætning nødvendig",
   "mode_ai_enhanced_title": "AI-forbedret",
-  "onnx_disabled_notice": "AI Enhanced stoppede uventet på denne enhed, så hurtig oversættelse bruges i stedet.",
+  "onnx_disabled_notice": "AI Enhanced stoppede uventet på denne enhed, så hurtig oversættelse bruges i stedet. Du kan slå det til igen i Indstillinger.",
   "mode_ai_enhanced_subtitle": "Bedre kvalitet · Fungerer offline · Download en sprogpakke",
   "mode_cloud_ai_title": "Cloud AI",
   "mode_cloud_ai_subtitle": "Bedste kvalitet · Kræver internet · API-nøgle påkrævet",

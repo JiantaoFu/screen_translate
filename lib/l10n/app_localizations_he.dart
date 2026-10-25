@@ -292,7 +292,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced נעצר באופן בלתי צפוי במכשיר זה, ולכן נעשה שימוש בתרגום מהיר במקומו.';
+      'AI Enhanced נעצר באופן בלתי צפוי במכשיר זה, ולכן נעשה שימוש בתרגום מהיר במקומו. אפשר להפעיל אותו מחדש בהגדרות.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

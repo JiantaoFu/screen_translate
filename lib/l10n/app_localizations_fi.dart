@@ -294,7 +294,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced pysähtyi odottamatta tällä laitteella, joten sen sijaan käytetään pikakäännöstä.';
+      'AI Enhanced pysähtyi odottamatta tällä laitteella, joten sen sijaan käytetään pikakäännöstä. Voit ottaa sen uudelleen käyttöön asetuksista.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

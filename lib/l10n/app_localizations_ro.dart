@@ -295,7 +295,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced s-a oprit neașteptat pe acest dispozitiv, așa că se folosește traducerea rapidă.';
+      'AI Enhanced s-a oprit neașteptat pe acest dispozitiv, așa că se folosește traducerea rapidă. Îl puteți reactiva din Setări.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

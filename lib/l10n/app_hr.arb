@@ -92,7 +92,7 @@
   "mode_quick_title": "Brzo",
   "mode_quick_subtitle": "Trenutno · Uvijek dostupno · Nije potrebno postavljanje",
   "mode_ai_enhanced_title": "Poboljšano AI-jem",
-  "onnx_disabled_notice": "AI Enhanced neočekivano se zaustavio na ovom uređaju pa se umjesto njega koristi brzi prijevod.",
+  "onnx_disabled_notice": "AI Enhanced neočekivano se zaustavio na ovom uređaju pa se umjesto njega koristi brzi prijevod. Možete ga ponovno uključiti u Postavkama.",
   "mode_ai_enhanced_subtitle": "Bolja kvaliteta · Radi bez interneta · Preuzmite jezični paket",
   "mode_cloud_ai_title": "Cloud AI",
   "mode_cloud_ai_subtitle": "Najbolja kvaliteta · Zahtijeva internet · Potreban API ključ",

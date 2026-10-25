@@ -292,7 +292,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'توقف AI Enhanced بشكل غير متوقع على هذا الجهاز، لذا يُستخدم الترجمة السريعة بدلاً منه.';
+      'توقف AI Enhanced بشكل غير متوقع على هذا الجهاز، لذا يُستخدم الترجمة السريعة بدلاً منه. يمكنك إعادة تشغيله من الإعدادات.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

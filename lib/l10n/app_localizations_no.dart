@@ -293,7 +293,7 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced stoppet uventet på denne enheten, så rask oversettelse brukes i stedet.';
+      'AI Enhanced stoppet uventet på denne enheten, så rask oversettelse brukes i stedet. Du kan slå det på igjen i Innstillinger.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

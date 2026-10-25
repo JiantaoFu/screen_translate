@@ -294,7 +294,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced berhenti tiba-tiba di perangkat ini, jadi terjemahan Cepat digunakan sebagai gantinya.';
+      'AI Enhanced berhenti tiba-tiba di perangkat ini, jadi terjemahan Cepat digunakan sebagai gantinya. Anda dapat mengaktifkannya kembali di Setelan.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

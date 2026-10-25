@@ -295,7 +295,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced неожиданно остановился на этом устройстве, поэтому вместо него используется быстрый перевод.';
+      'AI Enhanced неожиданно остановился на этом устройстве, поэтому вместо него используется быстрый перевод. Его можно снова включить в настройках.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

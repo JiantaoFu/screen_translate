@@ -294,7 +294,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced se je na tej napravi nepričakovano ustavil, zato se namesto njega uporablja hitri prevod.';
+      'AI Enhanced se je na tej napravi nepričakovano ustavil, zato se namesto njega uporablja hitri prevod. Znova ga lahko vklopite v Nastavitvah.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

@@ -294,7 +294,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced netikėtai sustojo šiame įrenginyje, todėl vietoj jo naudojamas greitasis vertimas.';
+      'AI Enhanced netikėtai sustojo šiame įrenginyje, todėl vietoj jo naudojamas greitasis vertimas. Galite vėl jį įjungti nustatymuose.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

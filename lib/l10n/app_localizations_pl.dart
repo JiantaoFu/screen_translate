@@ -294,7 +294,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced nieoczekiwanie przestał działać na tym urządzeniu, dlatego zamiast niego używane jest szybkie tłumaczenie.';
+      'AI Enhanced nieoczekiwanie przestał działać na tym urządzeniu, dlatego zamiast niego używane jest szybkie tłumaczenie. Możesz włączyć go ponownie w Ustawieniach.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

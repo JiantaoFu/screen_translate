@@ -292,7 +292,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced หยุดทำงานโดยไม่คาดคิดบนอุปกรณ์นี้ จึงใช้การแปลแบบด่วนแทน';
+      'AI Enhanced หยุดทำงานโดยไม่คาดคิดบนอุปกรณ์นี้ จึงใช้การแปลแบบด่วนแทนคุณสามารถเปิดใช้อีกครั้งได้ในการตั้งค่า';
 
   @override
   String get mode_ai_enhanced_subtitle =>

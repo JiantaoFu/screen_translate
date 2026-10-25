@@ -69,6 +69,18 @@ class OnnxCrashGuard {
     }
   }
 
+  /// The user explicitly picked AI Enhanced again: clear the disabled state
+  /// and the consecutive-crash count. CPU-only stays on (XNNPACK is the
+  /// suspected SIGILL path). Returns true if ONNX had been disabled.
+  Future<bool> reEnable() async {
+    final wasDisabled = await disabled();
+    final p = await _prefs();
+    _strikes = 0;
+    await p.setInt(kStrikes, 0);
+    await p.setBool(kNoticeShown, false);
+    return wasDisabled;
+  }
+
   /// True exactly once after ONNX was disabled on this device.
   Future<bool> takeDisabledNotice() async {
     if (!await disabled()) return false;

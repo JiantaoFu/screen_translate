@@ -290,7 +290,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'このデバイスでAI Enhancedが予期せず停止したため、代わりにクイック翻訳を使用します。';
+      'このデバイスでAI Enhancedが予期せず停止したため、代わりにクイック翻訳を使用します。設定から再びオンにできます。';
 
   @override
   String get mode_ai_enhanced_subtitle => 'より高品質 · オフラインで動作 · 言語パックをダウンロード';

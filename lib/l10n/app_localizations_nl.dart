@@ -294,7 +294,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced is onverwacht gestopt op dit apparaat, daarom wordt in plaats daarvan snelle vertaling gebruikt.';
+      'AI Enhanced is onverwacht gestopt op dit apparaat, daarom wordt in plaats daarvan snelle vertaling gebruikt. Je kunt het weer inschakelen in Instellingen.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

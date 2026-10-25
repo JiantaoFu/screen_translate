@@ -552,7 +552,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     required TranslationProvider provider,
   }) {
     return GestureDetector(
-      onTap: () => provider.setTranslationMode(mode),
+      onTap: () => provider.setTranslationMode(mode, userInitiated: true),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(

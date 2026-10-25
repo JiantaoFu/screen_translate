@@ -88,7 +88,7 @@
   "mode_quick_title": "Nopea",
   "mode_quick_subtitle": "Välitön · Aina saatavilla · Ei vaadi asennusta",
   "mode_ai_enhanced_title": "Tekoälyllä parannettu",
-  "onnx_disabled_notice": "AI Enhanced pysähtyi odottamatta tällä laitteella, joten sen sijaan käytetään pikakäännöstä.",
+  "onnx_disabled_notice": "AI Enhanced pysähtyi odottamatta tällä laitteella, joten sen sijaan käytetään pikakäännöstä. Voit ottaa sen uudelleen käyttöön asetuksista.",
   "mode_ai_enhanced_subtitle": "Parempi laatu · Toimii offline · Lataa kielipaketti",
   "mode_cloud_ai_title": "Pilvi-tekoäly",
   "mode_cloud_ai_subtitle": "Paras laatu · Vaatii internetin · API-avain vaaditaan",

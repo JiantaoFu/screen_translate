@@ -294,7 +294,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced bu cihazda beklenmedik şekilde durdu, bu yüzden bunun yerine Hızlı çeviri kullanılıyor.';
+      'AI Enhanced bu cihazda beklenmedik şekilde durdu, bu yüzden bunun yerine Hızlı çeviri kullanılıyor. Ayarlar\'dan yeniden açabilirsiniz.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

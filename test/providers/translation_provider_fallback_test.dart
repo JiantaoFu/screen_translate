@@ -1,3 +1,4 @@
+import 'package:screen_translate/services/onnx_crash_guard.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:screen_translate/services/onnx_translation_service.dart';
@@ -82,6 +83,35 @@ void main() {
       await provider.translateText('d');
       expect(provider.debugOnnxSkips,
           ['error_fallback', 'error_fallback', 'crash_marker_disabled']);
+    });
+
+    test('Picking AI Enhanced in Settings re-enables an auto-disabled ONNX', () async {
+      SharedPreferences.setMockInitialValues({OnnxCrashGuard.kStrikes: 2});
+      provider.setTranslationMode(TranslationMode.onnx);
+      mockOnnx.throwError = const OnnxUnavailableException('crash_marker_disabled');
+      await provider.translateText('a');
+      expect(provider.onnxUnavailable, isTrue);
+
+      mockOnnx.throwError = null;
+      provider.setTranslationMode(TranslationMode.onnx, userInitiated: true);
+      await provider.debugReEnable;
+      expect(provider.onnxUnavailable, isFalse);
+      expect(await mockOnnx.guard.disabled(), isFalse);
+      expect(provider.debugOnnxSkips.last, 'reenabled');
+    });
+
+    test('Non-user mode changes do not re-enable ONNX', () async {
+      SharedPreferences.setMockInitialValues({OnnxCrashGuard.kStrikes: 2});
+      provider.setTranslationMode(TranslationMode.onnx);
+      expect(provider.debugReEnable, isNull);
+      expect(await mockOnnx.guard.disabled(), isTrue);
+    });
+
+    test('Picking AI Enhanced when not disabled logs nothing', () async {
+      SharedPreferences.setMockInitialValues({});
+      provider.setTranslationMode(TranslationMode.onnx, userInitiated: true);
+      await provider.debugReEnable;
+      expect(provider.debugOnnxSkips, isEmpty);
     });
 
     test('Service downgrade callback is wired to the provider log', () async {

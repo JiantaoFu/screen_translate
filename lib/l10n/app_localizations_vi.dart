@@ -294,7 +294,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced đã dừng đột ngột trên thiết bị này, nên bản dịch Nhanh được dùng thay thế.';
+      'AI Enhanced đã dừng đột ngột trên thiết bị này, nên bản dịch Nhanh được dùng thay thế. Bạn có thể bật lại trong Cài đặt.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

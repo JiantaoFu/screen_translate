@@ -294,7 +294,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced si è interrotto in modo imprevisto su questo dispositivo, quindi viene usata la traduzione rapida.';
+      'AI Enhanced si è interrotto in modo imprevisto su questo dispositivo, quindi viene usata la traduzione rapida. Puoi riattivarlo nelle Impostazioni.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

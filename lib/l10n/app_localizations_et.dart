@@ -294,7 +294,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced peatus selles seadmes ootamatult, seega kasutatakse selle asemel kiirtõlget.';
+      'AI Enhanced peatus selles seadmes ootamatult, seega kasutatakse selle asemel kiirtõlget. Saate selle seadetes uuesti sisse lülitada.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

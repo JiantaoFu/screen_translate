@@ -83,4 +83,39 @@ void main() {
     expect(await b.disabled(), isFalse);
     expect(await b.cpuOnly(), isTrue);
   });
+
+  test('reEnable clears the disabled state and count, keeps CPU-only', () async {
+    SharedPreferences.setMockInitialValues({
+      OnnxCrashGuard.kStrikes: 2,
+      OnnxCrashGuard.kCpuOnly: true,
+      OnnxCrashGuard.kNoticeShown: true,
+    });
+    final g = relaunch();
+    expect(await g.disabled(), isTrue);
+    expect(await g.reEnable(), isTrue);
+    expect(await g.disabled(), isFalse);
+    final next = relaunch();
+    expect(await next.strikes(), 0);
+    expect(await next.disabled(), isFalse);
+    expect(await next.cpuOnly(), isTrue);
+  });
+
+  test('after reEnable, the notice can show again on a new disable', () async {
+    SharedPreferences.setMockInitialValues({
+      OnnxCrashGuard.kStrikes: 2,
+      OnnxCrashGuard.kNoticeShown: true,
+    });
+    await relaunch().reEnable();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(OnnxCrashGuard.kInFlight, true);
+    await relaunch().strikes();
+    await prefs.setBool(OnnxCrashGuard.kInFlight, true);
+    final g = relaunch();
+    expect(await g.disabled(), isTrue);
+    expect(await g.takeDisabledNotice(), isTrue);
+  });
+
+  test('reEnable when not disabled reports false', () async {
+    expect(await relaunch().reEnable(), isFalse);
+  });
 }

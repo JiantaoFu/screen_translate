@@ -295,7 +295,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'Az AI Enhanced váratlanul leállt ezen az eszközön, ezért helyette a gyors fordítás működik.';
+      'Az AI Enhanced váratlanul leállt ezen az eszközön, ezért helyette a gyors fordítás működik. A Beállításokban újra bekapcsolhatja.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

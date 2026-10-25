@@ -293,7 +293,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'এই ডিভাইসে AI Enhanced অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে, তাই এর পরিবর্তে দ্রুত অনুবাদ ব্যবহার করা হচ্ছে।';
+      'এই ডিভাইসে AI Enhanced অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে, তাই এর পরিবর্তে দ্রুত অনুবাদ ব্যবহার করা হচ্ছে। আপনি সেটিংসে এটি আবার চালু করতে পারেন।';
 
   @override
   String get mode_ai_enhanced_subtitle =>

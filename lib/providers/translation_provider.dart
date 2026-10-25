@@ -440,8 +440,11 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setTranslationMode(TranslationMode mode) {
+  /// [userInitiated]: picked by the user in Settings. Picking AI Enhanced
+  /// there re-enables it if it was auto-disabled after native crashes.
+  void setTranslationMode(TranslationMode mode, {bool userInitiated = false}) {
     _translationMode = mode;
+    if (userInitiated && mode == TranslationMode.onnx) _reEnableOnnx();
     SharedPreferences.getInstance().then((p) => p.setString(_prefTranslationMode, mode.name));
     notifyListeners();
   }
@@ -1192,6 +1195,22 @@ class TranslationProvider with ChangeNotifier {
 
   @visibleForTesting
   final List<String> debugOnnxSkips = [];
+
+  @visibleForTesting
+  Future<void>? debugReEnable;
+
+  void _reEnableOnnx() {
+    _onnxUnavailable = false;
+    _sessionOnnxFailures = 0;
+    _loggedOnnxSkips.clear();
+    debugReEnable = _onnxTranslationService.crashGuard.reEnable().then((wasDisabled) {
+      if (!wasDisabled) return;
+      debugOnnxSkips.add('reenabled');
+      try {
+        FirebaseAnalyticsService().logEvent('onnx_reenabled', {'source': 'settings'});
+      } catch (_) {}
+    }).catchError((_) {});
+  }
 
   /// `onnx_skipped` Analytics event + Crashlytics non-fatal.
   void _logOnnxSkipped(String reason, [Object? error, StackTrace? st]) {

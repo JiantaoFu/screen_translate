@@ -295,7 +295,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get onnx_disabled_notice =>
-      'AI Enhanced در این دستگاه به‌طور غیرمنتظره متوقف شد، بنابراین به‌جای آن از ترجمه سریع استفاده می‌شود.';
+      'AI Enhanced در این دستگاه به‌طور غیرمنتظره متوقف شد، بنابراین به‌جای آن از ترجمه سریع استفاده می‌شود. می‌توانید آن را در تنظیمات دوباره روشن کنید.';
 
   @override
   String get mode_ai_enhanced_subtitle =>

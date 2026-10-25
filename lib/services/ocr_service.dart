@@ -22,7 +22,9 @@ extension ColorAdaptation on Color {
 
   // Create a contrasting color for text overlay
   Color getContrastColor() {
-    return isLight() ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.7);
+    return isLight()
+        ? Colors.black.withOpacity(0.7)
+        : Colors.white.withOpacity(0.7);
   }
 
   String toLoggableString() {
@@ -94,23 +96,29 @@ class OCRService {
   /// Take the robot or town!"). Lines are reordered only when every line is a
   /// tall column; horizontal text keeps ML Kit's order.
   @visibleForTesting
-  static String readingOrderText(List<(String, Rect)> lines, TextRecognitionScript script) {
-    final cjk = script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese;
-    final vertical = lines.length > 1 && lines.every((l) => l.$2.height > l.$2.width * 1.5);
+  static String readingOrderText(
+      List<(String, Rect)> lines, TextRecognitionScript script) {
+    final cjk = script == TextRecognitionScript.japanese ||
+        script == TextRecognitionScript.chinese;
+    final vertical =
+        lines.length > 1 && lines.every((l) => l.$2.height > l.$2.width * 1.5);
     if (!cjk || !vertical) return lines.map((l) => l.$1).join('\n');
-    final sorted = [...lines]..sort((a, b) => b.$2.center.dx.compareTo(a.$2.center.dx));
+    final sorted = [...lines]
+      ..sort((a, b) => b.$2.center.dx.compareTo(a.$2.center.dx));
     return sorted.map((l) => l.$1).join('\n');
   }
 
   static String _blockText(TextBlock block, TextRecognitionScript script) =>
-      readingOrderText([for (final l in block.lines) (l.text, l.boundingBox)], script);
+      readingOrderText(
+          [for (final l in block.lines) (l.text, l.boundingBox)], script);
 
   @visibleForTesting
   List<OCRResult> mergeNearbyBlocksForTest(
     List<OCRResult> blocks,
     TextRecognitionScript script, {
     double mergeAggressiveness = 1.5,
-  }) => _mergeNearbyBlocks(blocks, script, mergeAggressiveness);
+  }) =>
+      _mergeNearbyBlocks(blocks, script, mergeAggressiveness);
 
   List<OCRResult> _mergeNearbyBlocks(
     List<OCRResult> initialResults,
@@ -142,8 +150,10 @@ class OCRService {
           final b = initialResults[j];
 
           // Calculate distance between bounding boxes
-          final dx = max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
-          final dy = max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
+          final dx =
+              max(0.0, max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
+          final dy =
+              max(0.0, max(a.y - (b.y + b.height), b.y - (a.y + a.height)));
           final distance = sqrt(dx * dx + dy * dy);
 
           // Use each block's ORIGINAL glyph size, not recomputed from the
@@ -191,7 +201,8 @@ class OCRService {
           // of unrelated messages into nonsense (confirmed from a real
           // screenshot: "O quê? Sentindo-se inseguro ab qual show você
           // assistência" is two different messages glued together).
-          final sameBackground = _colorsSimilar(a.backgroundColor, b.backgroundColor);
+          final sameBackground =
+              _colorsSimilar(a.backgroundColor, b.backgroundColor);
 
           if (distance < threshold && sameBackground) {
             // Merge these two blocks!
@@ -200,17 +211,21 @@ class OCRService {
             // Determine concatenation order
             if ((a.y - b.y).abs() > min(a.height, b.height) * 0.5) {
               // Vertical alignment: top-to-bottom
-              mergedText = a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+              mergedText =
+                  a.y < b.y ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
             } else {
               // Horizontal alignment:
               // For Japanese/Chinese manga, vertical text reads Right-to-Left
               // So if it's primarily vertical script (height > width), smaller X means it comes AFTER larger X.
               // We'll use a simple heuristic: if a is to the left of b, and it's CJK, it might be R-to-L.
               // But appending with a space is safest.
-              if (script == TextRecognitionScript.japanese || script == TextRecognitionScript.chinese) {
-                 mergedText = a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
+              if (script == TextRecognitionScript.japanese ||
+                  script == TextRecognitionScript.chinese) {
+                mergedText =
+                    a.x > b.x ? '${a.text}\n${b.text}' : '${b.text}\n${a.text}';
               } else {
-                 mergedText = a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
+                mergedText =
+                    a.x < b.x ? '${a.text} ${b.text}' : '${b.text} ${a.text}';
               }
             }
 
@@ -219,7 +234,8 @@ class OCRService {
             final newRight = max(a.x + a.width, b.x + b.width);
             final newBottom = max(a.y + a.height, b.y + b.height);
 
-            _logger.info('Merging blocks: {${a.text}} and {${b.text}} -> {${mergedText}}');
+            _logger.info(
+                'Merging blocks: {${a.text}} and {${b.text}} -> {${mergedText}}');
 
             initialResults[i] = OCRResult(
               text: mergedText,
@@ -248,10 +264,10 @@ class OCRService {
   }
 
   Future<List<OCRResult>> processImage(
-    Map<String, dynamic> imageData,
-    TextRecognitionScript script,
-    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
-  ) async {
+      Map<String, dynamic> imageData, TextRecognitionScript script,
+      {bool? drawDebugBoxes,
+      int? minTextLength,
+      double mergeAggressiveness = 1.5}) async {
     try {
       // Get configuration from Firebase Remote Config
       final remoteConfig = FirebaseRemoteConfigService();
@@ -270,14 +286,17 @@ class OCRService {
       final physicalScreenH = window.physicalSize.height.toInt();
       final devicePixelRatio = window.devicePixelRatio;
       _logger.info('Image size: ${width}x${height}');
-      _logger.info('Screen physical size: ${physicalScreenW}x${physicalScreenH}, devicePixelRatio=$devicePixelRatio');
+      _logger.info(
+          'Screen physical size: ${physicalScreenW}x${physicalScreenH}, devicePixelRatio=$devicePixelRatio');
 
       // Get system paddings (status bar / navbar) in physical pixels
       final paddingTop = window.viewPadding.top;
       final paddingBottom = window.viewPadding.bottom;
-      _logger.info('Window viewPadding: top=${paddingTop}, bottom=${paddingBottom}');
+      _logger.info(
+          'Window viewPadding: top=${paddingTop}, bottom=${paddingBottom}');
       // Content area height (where the app content is laid out)
-      final contentHeight = physicalScreenH - paddingTop.toInt() - paddingBottom.toInt();
+      final contentHeight =
+          physicalScreenH - paddingTop.toInt() - paddingBottom.toInt();
       _logger.info('Content area height: $contentHeight');
 
       final InputImage image = InputImage.fromBytes(
@@ -317,7 +336,11 @@ class OCRService {
           // is tall, and height-based padding reached past its bubble.
           final pad = min(boundingBox.width, boundingBox.height) * 0.3;
           final localColor = ColorUtils.extractSurroundColorFromNV21(
-            imageBytes, width, height, boundingBox, pad,
+            imageBytes,
+            width,
+            height,
+            boundingBox,
+            pad,
           );
           initialResults.add(OCRResult(
             text: _blockText(block, script),
@@ -332,7 +355,8 @@ class OCRService {
         }
       }
 
-      final results = _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
+      final results =
+          _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
 
       // Sample each final (post-merge) box's own background locally rather
       // than using one dominant color for the whole screen — a home screen
@@ -340,7 +364,13 @@ class OCRService {
       // piece of text, and a single global color clashed with most of them.
       for (final result in results) {
         final localColor = ColorUtils.extractRegionColorFromNV21(
-          imageBytes, width, height, result.x, result.y, result.width, result.height,
+          imageBytes,
+          width,
+          height,
+          result.x,
+          result.y,
+          result.width,
+          result.height,
         );
         result.backgroundColor = localColor;
         result.overlayColor = localColor.getContrastColor();
@@ -352,11 +382,7 @@ class OCRService {
       // Optional: Draw and save bounding boxes for debugging
       if (drawDebugBoxes) {
         final debugImagePath = await drawAndSaveBoundingBoxes(
-          imageBytes,
-          width,
-          height,
-          recognizedText.blocks
-        );
+            imageBytes, width, height, recognizedText.blocks);
 
         if (debugImagePath != null) {
           _logger.info('Debug bounding boxes image saved at: $debugImagePath');
@@ -370,11 +396,10 @@ class OCRService {
     }
   }
 
-  Future<List<OCRResult>> processFile(
-    File file,
-    TextRecognitionScript script,
-    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
-  ) async {
+  Future<List<OCRResult>> processFile(File file, TextRecognitionScript script,
+      {bool? drawDebugBoxes,
+      int? minTextLength,
+      double mergeAggressiveness = 1.5}) async {
     try {
       final remoteConfig = FirebaseRemoteConfigService();
       drawDebugBoxes ??= remoteConfig.isDebugOCRBoxesEnabled();
@@ -385,7 +410,8 @@ class OCRService {
       final textRecognizer = getTextRecognizer(script);
 
       final stopwatch = Stopwatch()..start();
-      final RecognizedText recognizedText = await textRecognizer.processImage(image);
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(image);
       stopwatch.stop();
 
       // Decode once for both dimensions and per-block local color sampling
@@ -414,7 +440,9 @@ class OCRService {
           if (decodedForColor != null) {
             final pad = min(boundingBox.width, boundingBox.height) * 0.3;
             localColor = ColorUtils.extractSurroundColorFromImage(
-              decodedForColor, boundingBox, pad,
+              decodedForColor,
+              boundingBox,
+              pad,
             );
           }
           initialResults.add(OCRResult(
@@ -430,7 +458,8 @@ class OCRService {
         }
       }
 
-      final results = _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
+      final results =
+          _mergeNearbyBlocks(initialResults, script, mergeAggressiveness);
 
       // Resample each final (post-merge) box's own background locally,
       // same as processImage() above — a fresh sample of the whole merged
@@ -439,7 +468,11 @@ class OCRService {
       if (decodedForColor != null) {
         for (final result in results) {
           final localColor = ColorUtils.extractRegionColorFromImage(
-            decodedForColor, result.x, result.y, result.width, result.height,
+            decodedForColor,
+            result.x,
+            result.y,
+            result.width,
+            result.height,
           );
           result.backgroundColor = localColor;
           result.overlayColor = localColor.getContrastColor();
@@ -455,20 +488,17 @@ class OCRService {
   }
 
   // Utility method to convert NV21 to RGB using image package
-  Uint8List convertNV21toRGB(
-    Uint8List nv21Bytes,
-    int width,
-    int height
-  ) {
+  Uint8List convertNV21toRGB(Uint8List nv21Bytes, int width, int height) {
     try {
       _logger.info('Converting NV21 to RGB: $width x $height');
       _logger.info('Input NV21 bytes length: ${nv21Bytes.length}');
 
       // Validate input - match Kotlin's size calculation
-      final expectedNV21Size = width * height + 2 * ((height + 1) ~/ 2) * ((width + 1) ~/ 2);
+      final expectedNV21Size =
+          width * height + 2 * ((height + 1) ~/ 2) * ((width + 1) ~/ 2);
       if (nv21Bytes.length != expectedNV21Size) {
         _logger.severe('Invalid NV21 byte array size. '
-          'Expected $expectedNV21Size, got ${nv21Bytes.length}');
+            'Expected $expectedNV21Size, got ${nv21Bytes.length}');
         return Uint8List(0);
       }
 
@@ -518,14 +548,11 @@ class OCRService {
     }
   }
 
-  Future<ui.Image?> drawBoundingBoxes(
-    Uint8List imageBytes,
-    int width,
-    int height,
-    List<TextBlock> blocks
-  ) async {
+  Future<ui.Image?> drawBoundingBoxes(Uint8List imageBytes, int width,
+      int height, List<TextBlock> blocks) async {
     try {
-      _logger.info('Drawing bounding boxes: Image bytes length ${imageBytes.length}');
+      _logger.info(
+          'Drawing bounding boxes: Image bytes length ${imageBytes.length}');
 
       // Validate image bytes
       if (imageBytes.isEmpty) {
@@ -548,48 +575,33 @@ class OCRService {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0;
 
-      final textPaintFill = Paint()
-        ..color = Colors.black.withOpacity(0.7);
+      final textPaintFill = Paint()..color = Colors.black.withOpacity(0.7);
 
       for (final block in blocks) {
         final rect = block.boundingBox;
 
         // Draw bounding box
         canvas.drawRect(
-          Rect.fromLTWH(
-            rect.left,
-            rect.top,
-            rect.width,
-            rect.height
-          ),
-          boxPaint
-        );
+            Rect.fromLTWH(rect.left, rect.top, rect.width, rect.height),
+            boxPaint);
 
         // Draw text background
-        final textRect = Rect.fromLTWH(
-          rect.left,
-          rect.top - 20,
-          rect.width,
-          20
-        );
+        final textRect =
+            Rect.fromLTWH(rect.left, rect.top - 20, rect.width, 20);
         canvas.drawRect(textRect, textPaintFill);
 
         // Draw text
         final textPainter = TextPainter(
-          text: TextSpan(
-            text: block.text,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            )
-          ),
-          textDirection: TextDirection.ltr
-        )..layout(maxWidth: rect.width);
+            text: TextSpan(
+                text: block.text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                )),
+            textDirection: TextDirection.ltr)
+          ..layout(maxWidth: rect.width);
 
-        textPainter.paint(
-          canvas,
-          Offset(rect.left, rect.top - 20)
-        );
+        textPainter.paint(canvas, Offset(rect.left, rect.top - 20));
       }
 
       // Finish recording and convert to image
@@ -601,12 +613,8 @@ class OCRService {
     }
   }
 
-  Future<String?> drawAndSaveBoundingBoxes(
-    Uint8List imageBytes,
-    int width,
-    int height,
-    List<TextBlock> blocks
-  ) async {
+  Future<String?> drawAndSaveBoundingBoxes(Uint8List imageBytes, int width,
+      int height, List<TextBlock> blocks) async {
     try {
       // Convert NV21 to RGB/PNG
       final convertedBytes = convertNV21toRGB(imageBytes, width, height);
@@ -616,7 +624,8 @@ class OCRService {
         return null;
       }
 
-      final debugImage = await drawBoundingBoxes(convertedBytes, width, height, blocks);
+      final debugImage =
+          await drawBoundingBoxes(convertedBytes, width, height, blocks);
 
       if (debugImage == null) {
         _logger.severe('Failed to create debug image');
@@ -624,7 +633,8 @@ class OCRService {
       }
 
       // Convert ui.Image to ByteData with PNG format
-      final byteData = await debugImage.toByteData(format: ui.ImageByteFormat.png);
+      final byteData =
+          await debugImage.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData == null) {
         _logger.severe('Failed to convert debug image to ByteData');

@@ -186,18 +186,13 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun isLowMemory(): Boolean {
+    private fun lowMemoryReason(): String? {
         val am = appContext?.getSystemService(android.content.Context.ACTIVITY_SERVICE)
-            as? android.app.ActivityManager ?: return false
-        if (am.isLowRamDevice) return true
+            as? android.app.ActivityManager ?: return null
+        if (am.isLowRamDevice) return "low_ram_device"
         val info = android.app.ActivityManager.MemoryInfo()
         am.getMemoryInfo(info)
-        return info.lowMemory || info.availMem < LOW_MEMORY_BYTES
-    }
-
-    companion object {
-        /** A loaded pack (3 sessions + KV cache) needs a few hundred MB. */
-        const val LOW_MEMORY_BYTES = 600L * 1024 * 1024
+        return if (info.lowMemory) "low_memory" else null
     }
 
     override fun onAttachedToEngine(
@@ -222,10 +217,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
     ): Unit =
         synchronized(lock) {
             when (call.method) {
-                "isLowMemory" -> {
-                    // ScreenTranslate: skip loading a model pack when the
-                    // device is low-RAM or already short on memory.
-                    result.success(isLowMemory())
+                "lowMemoryReason" -> {
+                    // ScreenTranslate: skip loading a model pack only when
+                    // Android itself reports a low-RAM device or low memory.
+                    result.success(lowMemoryReason())
                 }
                 "getPlatformVersion" -> {
                     result.success("Android ${android.os.Build.VERSION.RELEASE}")

@@ -32,7 +32,8 @@ void main() {
     expect(service.shouldPrompt(), isTrue);
   });
 
-  test('success count persists across service instances (app restarts)', () async {
+  test('success count persists across service instances (app restarts)',
+      () async {
     await service.recordSuccessfulTranslation();
     await service.recordSuccessfulTranslation();
     final again = ReviewPromptService(prefs, now: () => now);
@@ -99,7 +100,8 @@ void main() {
       }
     }
 
-    test('review API unavailable: no request, silent, not marked as shown', () async {
+    test('review API unavailable: no request, silent, not marked as shown',
+        () async {
       await reachThreshold();
       var requested = 0;
       final logs = <String>[];
@@ -136,7 +138,8 @@ void main() {
       );
       expect(outcome, ReviewPromptOutcome.requested);
       expect(requested, 1);
-      expect(service.lastPromptAt!.millisecondsSinceEpoch, now.millisecondsSinceEpoch);
+      expect(service.lastPromptAt!.millisecondsSinceEpoch,
+          now.millisecondsSinceEpoch);
       expect(
         await service.maybeRequestReview(
           isAvailable: () async => true,

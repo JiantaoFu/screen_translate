@@ -12,12 +12,15 @@ import 'activation_tracker.dart';
 /// it (and come back from Settings, if they went there). Native clears what
 /// it hands over, so each is sent once.
 class AccessibilityFunnelReporter {
-  AccessibilityFunnelReporter({MethodChannel? channel, ActivationTracker? tracker})
+  AccessibilityFunnelReporter(
+      {MethodChannel? channel, ActivationTracker? tracker})
       : _channel = channel ?? defaultChannel,
         _tracker = tracker ?? ActivationTracker.instance;
 
-  static const defaultChannel = MethodChannel('com.lomoware.screen_translate/accessibility');
-  static final AccessibilityFunnelReporter instance = AccessibilityFunnelReporter();
+  static const defaultChannel =
+      MethodChannel('com.lomoware.screen_translate/accessibility');
+  static final AccessibilityFunnelReporter instance =
+      AccessibilityFunnelReporter();
 
   final MethodChannel _channel;
   final ActivationTracker _tracker;
@@ -25,18 +28,22 @@ class AccessibilityFunnelReporter {
 
   /// Safe to call often: concurrent calls share one native round trip, and
   /// a missing or failing native side is ignored.
-  Future<void> report() => _inFlight ??= _report().whenComplete(() => _inFlight = null);
+  Future<void> report() =>
+      _inFlight ??= _report().whenComplete(() => _inFlight = null);
 
   Future<void> _report() async {
     try {
-      final state = await _channel.invokeMapMethod<String, Object?>('takeAccessibilityFunnel');
+      final state = await _channel
+          .invokeMapMethod<String, Object?>('takeAccessibilityFunnel');
       if (state == null) return;
       if (state['promptShown'] == true) _tracker.accessibilityPromptShown();
       final result = state['result'];
       if (result is Map) {
         _tracker.accessibilityPermissionResult(
           enabled: result['enabled'] == true,
-          action: result['action'] is String ? result['action'] as String : 'unknown',
+          action: result['action'] is String
+              ? result['action'] as String
+              : 'unknown',
         );
       }
     } catch (_) {

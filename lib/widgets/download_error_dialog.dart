@@ -69,7 +69,8 @@ Future<DownloadFailedAction> showDownloadFailedDialog(
         content: Text(localizations.download_failed_body(packLabel)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, DownloadFailedAction.dismiss),
+            onPressed: () =>
+                Navigator.pop(dialogContext, DownloadFailedAction.dismiss),
             child: Text(localizations.close),
           ),
           TextButton(
@@ -80,8 +81,8 @@ Future<DownloadFailedAction> showDownloadFailedDialog(
             child: Text(localizations.send_feedback_by_email),
           ),
           TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, DownloadFailedAction.switchToCloudAi),
+            onPressed: () => Navigator.pop(
+                dialogContext, DownloadFailedAction.switchToCloudAi),
             child: Text(localizations.switch_to_cloud_ai),
           ),
           TextButton(
@@ -113,7 +114,9 @@ Future<void> switchToCloudAi(
   if (hasApiKey) {
     provider.setTranslationMode(TranslationMode.llm);
     messenger?.showSnackBar(
-      SnackBar(content: Text(localizations.cloud_ai_connected), backgroundColor: Colors.green),
+      SnackBar(
+          content: Text(localizations.cloud_ai_connected),
+          backgroundColor: Colors.green),
     );
     return;
   }

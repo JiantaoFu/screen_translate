@@ -36,7 +36,8 @@ double _distance(Color a, Color b) {
 }
 
 void main() {
-  test('vertical columns in one bubble get the bubble colour, not ink or art', () {
+  test('vertical columns in one bubble get the bubble colour, not ink or art',
+      () {
     final bytes = _frame();
     Color surround(Rect r) => ColorUtils.extractSurroundColorFromNV21(
         bytes, _w, _h, r, r.shortestSide * 0.3);

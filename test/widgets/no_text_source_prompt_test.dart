@@ -31,27 +31,33 @@ void main() {
   });
 
   test('offered only before the first translation, at most 3 times', () async {
-    expect(await shouldOfferSourceLanguages(sessionFoundNoText: false), isFalse);
+    expect(
+        await shouldOfferSourceLanguages(sessionFoundNoText: false), isFalse);
     expect(await shouldOfferSourceLanguages(sessionFoundNoText: true), isTrue);
-    SharedPreferences.setMockInitialValues({prefNoTextPromptCount: noTextPromptMaxShows});
+    SharedPreferences.setMockInitialValues(
+        {prefNoTextPromptCount: noTextPromptMaxShows});
     expect(await shouldOfferSourceLanguages(sessionFoundNoText: true), isFalse);
-    SharedPreferences.setMockInitialValues({ActivationTracker.prefFirstTranslationLogged: true});
+    SharedPreferences.setMockInitialValues(
+        {ActivationTracker.prefFirstTranslationLogged: true});
     expect(await shouldOfferSourceLanguages(sessionFoundNoText: true), isFalse);
   });
 
-  testWidgets('prompt shows four languages and returns the tapped one', (tester) async {
+  testWidgets('prompt shows four languages and returns the tapped one',
+      (tester) async {
     String? picked;
     await tester.pumpWidget(MaterialApp(
       home: Builder(
         builder: (context) => TextButton(
-          onPressed: () async => picked = await showNoTextSourcePrompt(context, currentSource: 'en'),
+          onPressed: () async => picked =
+              await showNoTextSourcePrompt(context, currentSource: 'en'),
           child: const Text('go'),
         ),
       ),
     ));
     await tester.tap(find.text('go'));
     await tester.pumpAndSettle();
-    expect(find.text('No text found. Try another source language?'), findsOneWidget);
+    expect(find.text('No text found. Try another source language?'),
+        findsOneWidget);
     for (final label in ['日本語', '한국어', '中文', 'English']) {
       expect(find.text(label), findsOneWidget);
     }
@@ -62,11 +68,13 @@ void main() {
     expect(prefs.getInt(prefNoTextPromptCount), 1);
   });
 
-  testWidgets('prompt hides the target language (ja-JP device: target ja)', (tester) async {
+  testWidgets('prompt hides the target language (ja-JP device: target ja)',
+      (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Builder(
         builder: (context) => TextButton(
-          onPressed: () => showNoTextSourcePrompt(context, currentSource: 'en', targetLanguage: 'ja'),
+          onPressed: () => showNoTextSourcePrompt(context,
+              currentSource: 'en', targetLanguage: 'ja'),
           child: const Text('go'),
         ),
       ),

@@ -44,7 +44,8 @@ class ModelStatusDropdown extends StatefulWidget {
   _ModelStatusDropdownState createState() => _ModelStatusDropdownState();
 }
 
-class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTickerProviderStateMixin {
+class _ModelStatusDropdownState extends State<ModelStatusDropdown>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
   /// Quick-mode (on-device) language codes currently being pre-warmed in the
@@ -101,11 +102,14 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 children: [
                   if (progress != null)
                     Text('${(progress * 100).toStringAsFixed(0)}%',
-                        style: const TextStyle(fontSize: 11, color: Colors.orange)),
+                        style: const TextStyle(
+                            fontSize: 11, color: Colors.orange)),
                   const SizedBox(width: 4),
                   SizedBox(
-                    width: 14, height: 14,
-                    child: CircularProgressIndicator(value: progress, strokeWidth: 2),
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                        value: progress, strokeWidth: 2),
                   ),
                 ],
               );
@@ -133,7 +137,8 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
 
     // Dynamically get the localized language name
     if (TranslationProvider.supportedLanguages.keys.contains(languageCode)) {
-      return localizations?.getLocalizedValue('language_$languageCode') ?? languageCode;
+      return localizations?.getLocalizedValue('language_$languageCode') ??
+          languageCode;
     }
 
     // Fallback to the original language code
@@ -144,7 +149,8 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
   Widget build(BuildContext context) {
     return Consumer<TranslationProvider>(
       builder: (context, provider, child) {
-        final displayCodes = TranslationProvider.supportedLanguages.keys.toList();
+        final displayCodes =
+            TranslationProvider.supportedLanguages.keys.toList();
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -162,36 +168,36 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
             underline: SizedBox(), // Remove underline
             icon: Icon(Icons.arrow_drop_down, color: Colors.blue),
             isExpanded: true,
-            items: displayCodes
-              .map((String code) {
-                return DropdownMenuItem<String>(
-                  value: code,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _getLocalizedLanguageName(context, code),
-                          style: TextStyle(fontSize: 14),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+            items: displayCodes.map((String code) {
+              return DropdownMenuItem<String>(
+                value: code,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _getLocalizedLanguageName(context, code),
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(width: 4),
-                      // Check download status
-                      _buildModelStatusIcon(code, provider.translationMode),
-                    ],
-                  ),
-                );
-              }).toList(),
+                    ),
+                    SizedBox(width: 4),
+                    // Check download status
+                    _buildModelStatusIcon(code, provider.translationMode),
+                  ],
+                ),
+              );
+            }).toList(),
             onChanged: (selectedCode) {
               final isSameLanguage = widget.isSourceLanguage
-                ? selectedCode == provider.targetLanguage
-                : selectedCode == provider.sourceLanguage;
+                  ? selectedCode == provider.targetLanguage
+                  : selectedCode == provider.sourceLanguage;
 
               if (isSameLanguage) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.source_and_target_cannot_be_the_same),
+                    content: Text(AppLocalizations.of(context)!
+                        .source_and_target_cannot_be_the_same),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -219,7 +225,8 @@ class _ModelStatusDropdownState extends State<ModelStatusDropdown> with SingleTi
                 if (isDownloaded || _downloadingCodes.contains(code)) return;
                 if (mounted) setState(() => _downloadingCodes.add(code));
                 try {
-                  await modelService.downloadModelWithFallback(code, onProgress: (p) {
+                  await modelService.downloadModelWithFallback(code,
+                      onProgress: (p) {
                     if (mounted) setState(() => _downloadProgress[code] = p);
                   });
                 } catch (e) {
@@ -277,7 +284,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowOnnxDisabledNote());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _maybeShowOnnxDisabledNote());
   }
 
   // One-time note when AI Enhanced was turned off on this device after it
@@ -320,7 +328,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);
-    } else if (state == AppLifecycleState.resumed && _onnxInterruptedByBackground.isNotEmpty) {
+    } else if (state == AppLifecycleState.resumed &&
+        _onnxInterruptedByBackground.isNotEmpty) {
       final toResume = _onnxInterruptedByBackground.toList();
       _onnxInterruptedByBackground.clear();
       for (final key in toResume) {
@@ -332,7 +341,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _initSharingIntent() {
     // For sharing images coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
+    _intentDataStreamSubscription = ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen((List<SharedMediaFile> value) {
       if (value.isNotEmpty) {
         _navigateToImageTranslation(File(value.first.path));
       }
@@ -341,7 +352,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
 
     // For sharing images coming from outside the app while the app is closed
-    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
+    ReceiveSharingIntent.instance
+        .getInitialMedia()
+        .then((List<SharedMediaFile> value) {
       if (value.isNotEmpty) {
         // clear the intent so it doesn't fire again
         ReceiveSharingIntent.instance.reset();
@@ -373,7 +386,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   /// No silent returns from Start: say what is missing and how to fix it.
   /// Downloads whatever the current pair needs, then starts live translation.
-  Future<void> _startLiveTranslation(BuildContext context, TranslationProvider provider) async {
+  Future<void> _startLiveTranslation(
+      BuildContext context, TranslationProvider provider) async {
     if (!await _confirmQuickPacksBeforeTranslate(context, provider)) return;
     if (!context.mounted) return;
     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
@@ -455,7 +469,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     BuildContext context,
     String packLabel,
   ) async {
-    final action = await showDownloadFailedDialog(context, packLabel: packLabel);
+    final action =
+        await showDownloadFailedDialog(context, packLabel: packLabel);
     if (!context.mounted) return DownloadFailedAction.dismiss;
     if (action == DownloadFailedAction.switchToCloudAi) {
       final provider = Provider.of<TranslationProvider>(context, listen: false);
@@ -486,115 +501,146 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             // vertically whenever it does fit.
             Expanded(
               child: LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-              child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Language Selection Row
-                    _buildLanguageSelector(context),
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Language Selection Row
+                          _buildLanguageSelector(context),
 
-                    SizedBox(height: 20),
+                          SizedBox(height: 20),
 
-                    _buildTranslationModeToggle(context),
+                          _buildTranslationModeToggle(context),
 
-                    Consumer<TranslationProvider>(
-                      builder: (context, provider, child) {
-                        return Column(
-                          children: [
-                            if (Platform.isAndroid)
-                              _buildActionButton(
-                                icon: Icons.screenshot,
-                                label: provider.isTranslating ? AppLocalizations.of(context)!.stop_translation : AppLocalizations.of(context)!.translate_screen,
-                                onTap: () async {
-                                  try {
-                                    if (provider.isTranslating) {
-                                      final worked = provider.sessionProducedTranslations;
-                                      provider.stopTranslation();
-                                      // Only count sessions that actually
-                                      // showed translations — asking a user
-                                      // whose capture just failed to rate the
-                                      // app invites a 1-star review.
-                                      if (worked) {
-                                        await _trackTranslationAndPromptReview(context);
-                                      } else if (context.mounted) {
-                                        // OCR found no text at all: most likely
-                                        // the wrong source language. Offer the
-                                        // common ones and retry right away.
-                                        if (await shouldOfferSourceLanguages(
-                                                sessionFoundNoText: provider.sessionFoundNoText) &&
-                                            context.mounted) {
-                                          final picked = await showNoTextSourcePrompt(context,
-                                              currentSource: provider.sourceLanguage,
-                                              targetLanguage: provider.targetLanguage);
-                                          if (picked != null && context.mounted) {
-                                            provider.setSourceLanguage(picked);
-                                            await _startLiveTranslation(context, provider);
+                          Consumer<TranslationProvider>(
+                            builder: (context, provider, child) {
+                              return Column(
+                                children: [
+                                  if (Platform.isAndroid)
+                                    _buildActionButton(
+                                      icon: Icons.screenshot,
+                                      label: provider.isTranslating
+                                          ? AppLocalizations.of(context)!
+                                              .stop_translation
+                                          : AppLocalizations.of(context)!
+                                              .translate_screen,
+                                      onTap: () async {
+                                        try {
+                                          if (provider.isTranslating) {
+                                            final worked = provider
+                                                .sessionProducedTranslations;
+                                            provider.stopTranslation();
+                                            // Only count sessions that actually
+                                            // showed translations — asking a user
+                                            // whose capture just failed to rate the
+                                            // app invites a 1-star review.
+                                            if (worked) {
+                                              await _trackTranslationAndPromptReview(
+                                                  context);
+                                            } else if (context.mounted) {
+                                              // OCR found no text at all: most likely
+                                              // the wrong source language. Offer the
+                                              // common ones and retry right away.
+                                              if (await shouldOfferSourceLanguages(
+                                                      sessionFoundNoText: provider
+                                                          .sessionFoundNoText) &&
+                                                  context.mounted) {
+                                                final picked =
+                                                    await showNoTextSourcePrompt(
+                                                        context,
+                                                        currentSource: provider
+                                                            .sourceLanguage,
+                                                        targetLanguage: provider
+                                                            .targetLanguage);
+                                                if (picked != null &&
+                                                    context.mounted) {
+                                                  provider.setSourceLanguage(
+                                                      picked);
+                                                  await _startLiveTranslation(
+                                                      context, provider);
+                                                  return;
+                                                }
+                                              }
+                                              // First session that showed nothing:
+                                              // ask once what went wrong.
+                                              if (context.mounted)
+                                                await showFirstFailureFeedback(
+                                                    context);
+                                            }
+                                          } else {
+                                            await _startLiveTranslation(
+                                                context, provider);
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .error_prefix(
+                                                            e.toString()))),
+                                          );
+                                        }
+                                      },
+                                      context: context,
+                                    ),
+                                  if (Platform.isIOS || Platform.isAndroid) ...[
+                                    if (Platform.isAndroid)
+                                      SizedBox(height: 15),
+                                    _buildActionButton(
+                                      icon: Icons.image,
+                                      label: AppLocalizations.of(context)!
+                                          .translate_image_button,
+                                      onTap: () async {
+                                        // A second tap while the gallery is still
+                                        // opening throws PlatformException(already_active).
+                                        if (_isPickingImage) return;
+                                        _isPickingImage = true;
+                                        try {
+                                          if (!await _ensureOnnxModelReadyForCurrentPair(
+                                              context, provider)) {
                                             return;
                                           }
+                                          final picker = ImagePicker();
+                                          final pickedFile =
+                                              await picker.pickImage(
+                                                  source: ImageSource.gallery);
+                                          if (pickedFile != null) {
+                                            _navigateToImageTranslation(
+                                                File(pickedFile.path));
+                                          }
+                                        } on PlatformException catch (e) {
+                                          debugPrint('Image picker failed: $e');
+                                        } finally {
+                                          _isPickingImage = false;
                                         }
-                                        // First session that showed nothing:
-                                        // ask once what went wrong.
-                                        if (context.mounted) await showFirstFailureFeedback(context);
-                                      }
-                                    } else {
-                                      await _startLiveTranslation(context, provider);
-                                    }
-                                  } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(AppLocalizations.of(context)!.error_prefix(e.toString()))),
-                                    );
-                                  }
-                                },
-                                context: context,
-                              ),
-                            if (Platform.isIOS || Platform.isAndroid) ...[
-                              if (Platform.isAndroid) SizedBox(height: 15),
-                              _buildActionButton(
-                                icon: Icons.image,
-                                label: AppLocalizations.of(context)!.translate_image_button,
-                                onTap: () async {
-                                  // A second tap while the gallery is still
-                                  // opening throws PlatformException(already_active).
-                                  if (_isPickingImage) return;
-                                  _isPickingImage = true;
-                                  try {
-                                    if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
-                                      return;
-                                    }
-                                    final picker = ImagePicker();
-                                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                                    if (pickedFile != null) {
-                                      _navigateToImageTranslation(File(pickedFile.path));
-                                    }
-                                  } on PlatformException catch (e) {
-                                    debugPrint('Image picker failed: $e');
-                                  } finally {
-                                    _isPickingImage = false;
-                                  }
-                                },
-                                context: context,
-                              ),
-                            ]
-                          ],
-                        );
-                      },
-                    ),
+                                      },
+                                      context: context,
+                                    ),
+                                  ]
+                                ],
+                              );
+                            },
+                          ),
 
-                    SizedBox(height: 20),
+                          SizedBox(height: 20),
 
-                    Consumer<TranslationProvider>(
-                      builder: (context, provider, child) {
-                        return SizedBox.shrink(); // Removed: now in settings screen
-                      },
+                          Consumer<TranslationProvider>(
+                            builder: (context, provider, child) {
+                              return SizedBox
+                                  .shrink(); // Removed: now in settings screen
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              ),
-              ),
               ),
             ),
           ],
@@ -602,7 +648,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final provider = Provider.of<TranslationProvider>(context, listen: false);
+          final provider =
+              Provider.of<TranslationProvider>(context, listen: false);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -631,8 +678,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// selection.
   List<(String source, String target, String displayName)> _allOnnxPairs() {
     return [
-      for (final p in kSupportedOnnxPairs) (p.sourceBcp, p.targetBcp, p.displayName),
-      for (final piv in kSupportedOnnxPivotPairs) (piv.sourceBcp, piv.targetBcp, piv.displayName),
+      for (final p in kSupportedOnnxPairs)
+        (p.sourceBcp, p.targetBcp, p.displayName),
+      for (final piv in kSupportedOnnxPivotPairs)
+        (piv.sourceBcp, piv.targetBcp, piv.displayName),
     ];
   }
 
@@ -672,7 +721,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // doesn't work with no explanation why. This is also the one place we
     // actually learn which language pairs people want that we don't have
     // yet, so surface a way to tell us instead of a dead-end prompt.
-    if (findOnnxPair(source, target) == null && findOnnxPivotPair(source, target) == null) {
+    if (findOnnxPair(source, target) == null &&
+        findOnnxPivotPair(source, target) == null) {
       if (!context.mounted) return false;
       await showDialog(
         context: context,
@@ -694,7 +744,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   );
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(localizations.language_request_sent)),
+                    SnackBar(
+                        content: Text(localizations.language_request_sent)),
                   );
                 },
               ),
@@ -748,7 +799,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// attached — ModelDownloadService.downloadOnnxModel() is safe to call
   /// again mid-download; it registers this onProgress as an extra listener
   /// on the same underlying operation rather than starting a duplicate one.
-  Future<void> _joinOnnxDownload(String key, String source, String target) async {
+  Future<void> _joinOnnxDownload(
+      String key, String source, String target) async {
     if (_onnxDownloadProgress.containsKey(key)) return;
     final pair = findOnnxPair(source, target);
     final pivot = pair == null ? findOnnxPivotPair(source, target) : null;
@@ -773,7 +825,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  Widget _buildOnnxPairSelector(BuildContext context, TranslationProvider provider) {
+  Widget _buildOnnxPairSelector(
+      BuildContext context, TranslationProvider provider) {
     final pairs = _allOnnxPairs();
     final currentKey = '${provider.sourceLanguage}|${provider.targetLanguage}';
     final hasCurrentPair = pairs.any((p) => '${p.$1}|${p.$2}' == currentKey);
@@ -806,12 +859,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(AppLocalizations.of(context)!.languagePairName(p.$1, p.$2), style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
+                  child: Text(
+                      AppLocalizations.of(context)!
+                          .languagePairName(p.$1, p.$2),
+                      style: TextStyle(fontSize: 14),
+                      overflow: TextOverflow.ellipsis),
                 ),
                 SizedBox(width: 4),
                 _onnxDownloadProgress.containsKey(key)
                     ? SizedBox(
-                        width: 14, height: 14,
+                        width: 14,
+                        height: 14,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           value: _onnxDownloadProgress[key],
@@ -829,13 +887,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               _joinOnnxDownload(key, p.$1, p.$2);
                             });
                             return const SizedBox(
-                              width: 14, height: 14,
+                              width: 14,
+                              height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             );
                           }
                           return snapshot.data == OnnxModelStatus.ready
-                              ? Icon(Icons.check_circle, color: Colors.green, size: 16)
-                              : Icon(Icons.download, color: Colors.orange, size: 16);
+                              ? Icon(Icons.check_circle,
+                                  color: Colors.green, size: 16)
+                              : Icon(Icons.download,
+                                  color: Colors.orange, size: 16);
                         },
                       ),
               ],
@@ -853,7 +914,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           // more to do here but wait for that to finish.
           provider.setSourceLanguage(source);
           provider.setTargetLanguage(target);
-          if (status == OnnxModelStatus.ready || status == OnnxModelStatus.downloading) {
+          if (status == OnnxModelStatus.ready ||
+              status == OnnxModelStatus.downloading) {
             return;
           }
 
@@ -871,8 +933,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               title: Text(localizations.download_ai_model_title),
               content: Text(localizations.download_ai_model_description),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
-                ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(localizations.download_model)),
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(localizations.cancel)),
+                ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(localizations.download_model)),
               ],
             ),
           );
@@ -882,14 +948,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           final pairName = localizations.languagePairName(source, target);
           Future<void> download() async {
             void progress(double p) {
-              if (mounted) setState(() => _onnxDownloadProgress[selectedKey] = p);
+              if (mounted)
+                setState(() => _onnxDownloadProgress[selectedKey] = p);
             }
+
             final pair = findOnnxPair(source, target);
             if (pair != null) {
-              await modelService.downloadOnnxModel(pair.key, onProgress: progress);
+              await modelService.downloadOnnxModel(pair.key,
+                  onProgress: progress);
             } else {
               final pivot = findOnnxPivotPair(source, target);
-              if (pivot != null) await modelService.downloadOnnxPivot(pivot, onProgress: progress);
+              if (pivot != null)
+                await modelService.downloadOnnxPivot(pivot,
+                    onProgress: progress);
             }
           }
 
@@ -902,19 +973,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 await download();
               } catch (e) {
                 if (!mounted) return;
-                final action = await _handleDownloadFailed(this.context, pairName);
+                final action =
+                    await _handleDownloadFailed(this.context, pairName);
                 if (action == DownloadFailedAction.retry) continue;
                 return;
               }
               if (mounted) {
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(localizations.pack_is_ready_snackbar(pairName)), backgroundColor: Colors.green),
+                  SnackBar(
+                      content:
+                          Text(localizations.pack_is_ready_snackbar(pairName)),
+                      backgroundColor: Colors.green),
                 );
               }
               return;
             }
           } finally {
-            if (mounted) setState(() => _onnxDownloadProgress.remove(selectedKey));
+            if (mounted)
+              setState(() => _onnxDownloadProgress.remove(selectedKey));
           }
         },
       ),
@@ -935,7 +1011,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded( // Changed from Flexible to Expanded
+              Expanded(
+                // Changed from Flexible to Expanded
                 flex: 2,
                 child: ModelStatusDropdown(
                   value: provider.sourceLanguage,
@@ -946,7 +1023,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   isSourceLanguage: true,
                 ),
               ),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: IconButton(
@@ -955,8 +1031,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   constraints: BoxConstraints(minWidth: 40),
                 ),
               ),
-
-              Expanded( // Changed from Flexible to Expanded
+              Expanded(
+                // Changed from Flexible to Expanded
                 flex: 2,
                 child: ModelStatusDropdown(
                   value: provider.targetLanguage,
@@ -989,8 +1065,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Text(
                     localizations.translation_mode_title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   IconButton(
                     icon: Icon(Icons.info_outline, size: 20),
@@ -1004,16 +1080,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${localizations.translation_mode_on_device}:',
-                                style: Theme.of(context).textTheme.titleSmall
-                              ),
-                              Text(localizations.translation_mode_on_device_description),
+                                  '${localizations.translation_mode_on_device}:',
+                                  style:
+                                      Theme.of(context).textTheme.titleSmall),
+                              Text(localizations
+                                  .translation_mode_on_device_description),
                               SizedBox(height: 10),
-                              Text(
-                                '${localizations.translation_mode_ai}:',
-                                style: Theme.of(context).textTheme.titleSmall
-                              ),
-                              Text(localizations.translation_mode_ai_description),
+                              Text('${localizations.translation_mode_ai}:',
+                                  style:
+                                      Theme.of(context).textTheme.titleSmall),
+                              Text(localizations
+                                  .translation_mode_ai_description),
                             ],
                           ),
                           actions: [
@@ -1031,19 +1108,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Text(
                 localizations.choose_translation_text,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
+                      color: Colors.grey[600],
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               ToggleButtons(
                 isSelected: [
-                  translationProvider.translationMode == TranslationMode.onDevice,
+                  translationProvider.translationMode ==
+                      TranslationMode.onDevice,
                   translationProvider.translationMode == TranslationMode.onnx,
                   translationProvider.translationMode == TranslationMode.llm,
                 ],
                 onPressed: (index) async {
-                  if (index == 1) { // ONNX mode selected
+                  if (index == 1) {
+                    // ONNX mode selected
                     // Check if at least one ONNX model is downloaded
                     final svc = ModelDownloadService();
                     var anyReady = false;
@@ -1060,7 +1139,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text(localizations.download_language_pack_title),
+                            title: Text(
+                                localizations.download_language_pack_title),
                             content: Text(
                               localizations.download_language_pack_content,
                             ),
@@ -1077,12 +1157,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   // arrival — that's the pack the user is
                                   // actually trying to set up, not whatever
                                   // mode was active before this dialog.
-                                  translationProvider.setTranslationMode(TranslationMode.onnx);
+                                  translationProvider
+                                      .setTranslationMode(TranslationMode.onnx);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => ChangeNotifierProvider.value(
+                                      builder: (_) =>
+                                          ChangeNotifierProvider.value(
                                         value: translationProvider,
-                                        child: const TranslationSettingsScreen(),
+                                        child:
+                                            const TranslationSettingsScreen(),
                                       ),
                                     ),
                                   );
@@ -1094,8 +1177,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       );
                       return; // Do not switch mode
                     }
-                  } else if (index == 2) { // LLM mode selected
-                    final hasApiKey = await LLMTranslationService.isApiKeyConfigured();
+                  } else if (index == 2) {
+                    // LLM mode selected
+                    final hasApiKey =
+                        await LLMTranslationService.isApiKeyConfigured();
 
                     if (!hasApiKey) {
                       await showDialog(
@@ -1103,7 +1188,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text(localizations.api_key_required),
-                            content: Text(localizations.cloud_ai_api_key_required_content),
+                            content: Text(localizations
+                                .cloud_ai_api_key_required_content),
                             actions: [
                               TextButton(
                                 child: Text(localizations.cancel),
@@ -1117,12 +1203,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   // arrival — that's what the user was
                                   // trying to set up, not whatever mode was
                                   // active before this dialog.
-                                  translationProvider.setTranslationMode(TranslationMode.llm);
+                                  translationProvider
+                                      .setTranslationMode(TranslationMode.llm);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => ChangeNotifierProvider.value(
+                                      builder: (_) =>
+                                          ChangeNotifierProvider.value(
                                         value: translationProvider,
-                                        child: const TranslationSettingsScreen(),
+                                        child:
+                                            const TranslationSettingsScreen(),
                                       ),
                                     ),
                                   );
@@ -1150,35 +1239,41 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 borderRadius: BorderRadius.circular(10),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.flash_on_rounded, size: 14),
                         const SizedBox(width: 4),
-                        Text(localizations.mode_quick_title, style: const TextStyle(fontSize: 14)),
+                        Text(localizations.mode_quick_title,
+                            style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.memory_rounded, size: 14),
                         const SizedBox(width: 4),
-                        Text(localizations.mode_ai_short_label, style: const TextStyle(fontSize: 14)),
+                        Text(localizations.mode_ai_short_label,
+                            style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.cloud_rounded, size: 14),
                         const SizedBox(width: 4),
-                        Text(localizations.mode_cloud_short_label, style: const TextStyle(fontSize: 14)),
+                        Text(localizations.mode_cloud_short_label,
+                            style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),

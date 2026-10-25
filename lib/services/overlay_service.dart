@@ -13,7 +13,8 @@ class OverlayService {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.overlay_permission_required),
-        content: Text(AppLocalizations.of(context)!.overlay_permission_required_content),
+        content: Text(
+            AppLocalizations.of(context)!.overlay_permission_required_content),
         actions: [
           TextButton(
             child: Text(AppLocalizations.of(context)!.cancel),
@@ -29,7 +30,7 @@ class OverlayService {
         ],
       ),
     );
-    
+
     return result ?? false;
   }
 
@@ -68,7 +69,8 @@ class OverlayService {
   /// opened) and come back to `resumed`, or after [timeout]. A timeout is
   /// not a failure: the caller re-checks the permission either way, so Start
   /// (and `isStarting`) is never held for long.
-  static Future<void> waitForAppResume({Duration timeout = const Duration(seconds: 60)}) {
+  static Future<void> waitForAppResume(
+      {Duration timeout = const Duration(seconds: 60)}) {
     final observer = ResumeAfterLeavingObserver();
     WidgetsBinding.instance.addObserver(observer);
     return observer.resumed.timeout(timeout, onTimeout: () {}).whenComplete(
@@ -79,7 +81,8 @@ class OverlayService {
   // Check if we have overlay permission
   Future<bool> checkOverlayPermission() async {
     try {
-      final bool hasPermission = await _channel.invokeMethod('checkOverlayPermission');
+      final bool hasPermission =
+          await _channel.invokeMethod('checkOverlayPermission');
       return hasPermission;
     } on PlatformException catch (e) {
       print('Error checking overlay permission: ${e.message}');
@@ -90,7 +93,8 @@ class OverlayService {
   // Request overlay permission
   Future<bool> requestOverlayPermission() async {
     try {
-      final bool granted = await _channel.invokeMethod('requestOverlayPermission');
+      final bool granted =
+          await _channel.invokeMethod('requestOverlayPermission');
       return granted;
     } on PlatformException catch (e) {
       print('Error requesting overlay permission: ${e.message}');
@@ -99,12 +103,22 @@ class OverlayService {
   }
 
   // Show overlay with translated text
-  Future<bool> showTranslationOverlay(String text, int id, {double? x, double? y, double? width, double? height, Color? overlayColor, Color? backgroundColor, bool? isLight, double? imgWidth, double? imgHeight}) async {
+  Future<bool> showTranslationOverlay(String text, int id,
+      {double? x,
+      double? y,
+      double? width,
+      double? height,
+      Color? overlayColor,
+      Color? backgroundColor,
+      bool? isLight,
+      double? imgWidth,
+      double? imgHeight}) async {
     try {
       final colorValue = overlayColor?.value;
       final bgColorValue = backgroundColor?.value;
-      print('OverlayService.show: id=$id, colorValue=$colorValue (type=${colorValue.runtimeType}), bgColorValue=$bgColorValue (type=${bgColorValue.runtimeType})');
-      
+      print(
+          'OverlayService.show: id=$id, colorValue=$colorValue (type=${colorValue.runtimeType}), bgColorValue=$bgColorValue (type=${bgColorValue.runtimeType})');
+
       final args = {
         'text': text,
         'id': id,
@@ -118,9 +132,11 @@ class OverlayService {
         'imgWidth': imgWidth,
         'imgHeight': imgHeight,
       };
-      print('OverlayService.show: invoking method channel with args keys=${args.keys.toList()}');
-      
-      final bool shown = await _channel.invokeMethod('showTranslationOverlay', args);
+      print(
+          'OverlayService.show: invoking method channel with args keys=${args.keys.toList()}');
+
+      final bool shown =
+          await _channel.invokeMethod('showTranslationOverlay', args);
       print('OverlayService.show: result=$shown');
       return shown;
     } on PlatformException catch (e) {
@@ -153,7 +169,8 @@ class OverlayService {
   // tearing down and rebuilding everything on every change.
   Future<bool> hideTranslationOverlayById(int id) async {
     try {
-      final bool hidden = await _channel.invokeMethod('hideTranslationOverlayById', {'id': id});
+      final bool hidden =
+          await _channel.invokeMethod('hideTranslationOverlayById', {'id': id});
       return hidden;
     } on PlatformException catch (e) {
       print('Error hiding translation overlay $id: ${e.message}');

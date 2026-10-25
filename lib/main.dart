@@ -24,7 +24,8 @@ import 'services/review_prompt_service.dart';
 Future<void> main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
-    print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
+    print(
+        '${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
   });
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -48,7 +49,8 @@ Future<void> main() async {
         // error and should still short-circuit the block below (Crashlytics
         // must not silently end up half-configured).
         if (e.code != 'duplicate-app') rethrow;
-        print('Background Services: Firebase already initialized natively, continuing.');
+        print(
+            'Background Services: Firebase already initialized natively, continuing.');
       }
 
       // Crash reporting — this was previously a total blind spot: the only
@@ -58,7 +60,8 @@ Future<void> main() async {
       // framework errors and everything else, e.g. errors in async
       // callbacks/isolates) is the standard FlutterFire pattern.
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
       PlatformDispatcher.instance.onError = (error, stack) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
@@ -80,7 +83,8 @@ Future<void> main() async {
       await analytics.init().timeout(const Duration(seconds: 5));
       await analytics.trackAppOpen();
       await ActivationTracker.instance.recordAppOpen();
-      if (Platform.isAndroid) await AccessibilityFunnelReporter.instance.report();
+      if (Platform.isAndroid)
+        await AccessibilityFunnelReporter.instance.report();
 
       print('Background Services: All services initialized successfully.');
     } catch (e) {

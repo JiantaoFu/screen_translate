@@ -6,13 +6,22 @@ import 'package:screen_translate/providers/translation_provider.dart';
 
 import '../mocks/fake_services.dart';
 
-OCRResult _box(String text, double x, double y, double w, double h) => OCRResult(
-      text: text, x: x, y: y, width: w, height: h,
-      imgWidth: 1080, imgHeight: 2400,
+OCRResult _box(String text, double x, double y, double w, double h) =>
+    OCRResult(
+      text: text,
+      x: x,
+      y: y,
+      width: w,
+      height: h,
+      imgWidth: 1080,
+      imgHeight: 2400,
     );
 
 bool _overlaps(Rect a, Rect b) =>
-    a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    a.left < b.right &&
+    a.right > b.left &&
+    a.top < b.bottom &&
+    a.bottom > b.top;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -90,27 +99,43 @@ void main() {
     test('restored mode falls back to Quick when it cannot run', () async {
       Future<bool> withKey() async => true;
       Future<bool> noKey() async => false;
-      expect(await TranslationProvider.restoredTranslationMode(null, hasApiKey: withKey),
+      expect(
+          await TranslationProvider.restoredTranslationMode(null,
+              hasApiKey: withKey),
           TranslationMode.onDevice);
-      expect(await TranslationProvider.restoredTranslationMode('bogus', hasApiKey: withKey),
+      expect(
+          await TranslationProvider.restoredTranslationMode('bogus',
+              hasApiKey: withKey),
           TranslationMode.onDevice);
-      expect(await TranslationProvider.restoredTranslationMode('onnx', hasApiKey: noKey),
+      expect(
+          await TranslationProvider.restoredTranslationMode('onnx',
+              hasApiKey: noKey),
           TranslationMode.onnx);
-      expect(await TranslationProvider.restoredTranslationMode('llm', hasApiKey: withKey),
+      expect(
+          await TranslationProvider.restoredTranslationMode('llm',
+              hasApiKey: withKey),
           TranslationMode.llm);
       // Cloud is selected by the settings dialog before a key exists.
-      expect(await TranslationProvider.restoredTranslationMode('llm', hasApiKey: noKey),
+      expect(
+          await TranslationProvider.restoredTranslationMode('llm',
+              hasApiKey: noKey),
           TranslationMode.onDevice);
     });
 
     test('Japanese/Chinese line breaks are joined before translation', () {
-      expect(TranslationProvider.sourceTextForTranslation('たすけて!あの\nロボットが街を\n壊している!', 'ja'),
+      expect(
+          TranslationProvider.sourceTextForTranslation(
+              'たすけて!あの\nロボットが街を\n壊している!', 'ja'),
           'たすけて!あのロボットが街を壊している!');
-      expect(TranslationProvider.sourceTextForTranslation('勇者よ。 \n 気をつけて', 'ja'), '勇者よ。気をつけて');
+      expect(
+          TranslationProvider.sourceTextForTranslation('勇者よ。 \n 気をつけて', 'ja'),
+          '勇者よ。気をつけて');
       // A space only where two Latin-script ends meet.
-      expect(TranslationProvider.sourceTextForTranslation('HP\nMP 回復', 'zh'), 'HP MP 回復');
+      expect(TranslationProvider.sourceTextForTranslation('HP\nMP 回復', 'zh'),
+          'HP MP 回復');
       // Other source languages are untouched.
-      expect(TranslationProvider.sourceTextForTranslation('Hello\nworld', 'en'), 'Hello\nworld');
+      expect(TranslationProvider.sourceTextForTranslation('Hello\nworld', 'en'),
+          'Hello\nworld');
     });
 
     test('setters update languages and mode, and notify listeners', () {
@@ -136,7 +161,8 @@ void main() {
       expect(provider.isChineseToEnglish, true);
     });
 
-    test('merge aggressiveness is loaded from and persisted to preferences', () async {
+    test('merge aggressiveness is loaded from and persisted to preferences',
+        () async {
       SharedPreferences.setMockInitialValues({'mergeAggressiveness': 2.5});
       final p = TranslationProvider(
         null,
@@ -218,23 +244,38 @@ void main() {
     const box = Rect.fromLTWH(90, 2080, 780, 66);
 
     test('the rest of the same line right after the box', () {
-      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(880, 2086, 90, 55)), isTrue);
+      expect(
+          TranslationProvider.continuesText(
+              box, const Rect.fromLTWH(880, 2086, 90, 55)),
+          isTrue);
     });
 
     test('the next line at the same indent', () {
-      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(95, 2150, 800, 55)), isTrue);
+      expect(
+          TranslationProvider.continuesText(
+              box, const Rect.fromLTWH(95, 2150, 800, 55)),
+          isTrue);
     });
 
     test('text far along the same row is not a continuation', () {
-      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(1000, 2086, 60, 55)), isFalse);
+      expect(
+          TranslationProvider.continuesText(
+              box, const Rect.fromLTWH(1000, 2086, 60, 55)),
+          isFalse);
     });
 
     test('text just below but not aligned (e.g. read off a video) is not', () {
-      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(400, 2160, 200, 40)), isFalse);
+      expect(
+          TranslationProvider.continuesText(
+              box, const Rect.fromLTWH(400, 2160, 200, 40)),
+          isFalse);
     });
 
     test('text well below the box is not', () {
-      expect(TranslationProvider.continuesText(box, const Rect.fromLTWH(95, 2300, 800, 55)), isFalse);
+      expect(
+          TranslationProvider.continuesText(
+              box, const Rect.fromLTWH(95, 2300, 800, 55)),
+          isFalse);
     });
   });
 
@@ -246,27 +287,40 @@ void main() {
 
     test('new text overlapping a box marks just that box', () {
       // OCR read lines 1-3 of the dialogue as one block, partly under box 1.
-      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(80, 2070, 800, 220)]), {1});
+      expect(
+          TranslationProvider.staleOverlayIds(
+              drawn, const [Rect.fromLTWH(80, 2070, 800, 220)]),
+          {1});
     });
 
     test('new text continuing past a box marks it', () {
-      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(95, 2150, 800, 55)]), {1});
+      expect(
+          TranslationProvider.staleOverlayIds(
+              drawn, const [Rect.fromLTWH(95, 2150, 800, 55)]),
+          {1});
     });
 
     test('new text directly above a box (text growing upward) marks it', () {
       // A bottom-anchored line wrapped: the earlier line moved up above box 1.
-      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(95, 2020, 800, 55)]), {1});
+      expect(
+          TranslationProvider.staleOverlayIds(
+              drawn, const [Rect.fromLTWH(95, 2020, 800, 55)]),
+          {1});
     });
 
     test('unrelated new text marks nothing', () {
-      expect(TranslationProvider.staleOverlayIds(drawn, const [Rect.fromLTWH(100, 1200, 600, 60)]), isEmpty);
+      expect(
+          TranslationProvider.staleOverlayIds(
+              drawn, const [Rect.fromLTWH(100, 1200, 600, 60)]),
+          isEmpty);
       expect(TranslationProvider.staleOverlayIds(drawn, const []), isEmpty);
     });
   });
 
   group('hasTranslatableText', () {
     test('skips clocks and counters, keeps text in any script', () {
-      bool t(String s) => TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10));
+      bool t(String s) =>
+          TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10));
       expect(t('01:52'), isFalse);
       expect(t('12,345 / 99%'), isFalse);
       expect(t('Hello'), isTrue);
@@ -276,16 +330,23 @@ void main() {
     });
 
     test('nothing is translated while our own app is in front', () {
-      expect(TranslationProvider.isOwnAppInFront(AppLifecycleState.resumed), isTrue);
-      for (final s in [AppLifecycleState.inactive, AppLifecycleState.paused,
-                       AppLifecycleState.hidden, AppLifecycleState.detached, null]) {
+      expect(TranslationProvider.isOwnAppInFront(AppLifecycleState.resumed),
+          isTrue);
+      for (final s in [
+        AppLifecycleState.inactive,
+        AppLifecycleState.paused,
+        AppLifecycleState.hidden,
+        AppLifecycleState.detached,
+        null
+      ]) {
         expect(TranslationProvider.isOwnAppInFront(s), isFalse);
       }
     });
 
     test('needs a letter in the source language script', () {
       bool t(String s, String source) =>
-          TranslationProvider.hasTranslatableText(_box(s, 0, 0, 10, 10), source);
+          TranslationProvider.hasTranslatableText(
+              _box(s, 0, 0, 10, 10), source);
       // ja→en: English UI, dates and status-bar labels are already readable.
       expect(t('Trash', 'ja'), isFalse);
       expect(t('Oct 1', 'ja'), isFalse);
@@ -309,12 +370,18 @@ void main() {
 
   group('computeDisplayBoxes', () {
     test('pads an isolated box on every side', () {
-      final boxes = provider.computeDisplayBoxesForTest([_box('a', 100, 100, 200, 40)]);
+      final boxes =
+          provider.computeDisplayBoxesForTest([_box('a', 100, 100, 200, 40)]);
       const pad = 40 * 0.15;
-      expect(boxes.single, const Rect.fromLTWH(100 - pad, 100 - pad, 200 + pad * 2, 40 + pad * 2));
+      expect(
+          boxes.single,
+          const Rect.fromLTWH(
+              100 - pad, 100 - pad, 200 + pad * 2, 40 + pad * 2));
     });
 
-    test('same-row neighbors with a small gap do not overlap or get pushed down', () {
+    test(
+        'same-row neighbors with a small gap do not overlap or get pushed down',
+        () {
       // Two adjacent tabs 4px apart — less than the 2 × 6px default side pad.
       final left = _box('Home', 100, 100, 100, 40);
       final right = _box('Settings', 204, 100, 100, 40);
@@ -390,9 +457,15 @@ void main() {
 
   group('review prompt on resume', () {
     final now = DateTime(2026, 10, 16, 12);
-    bool may({bool translating = false, bool starting = false, DateTime? ended}) =>
+    bool may(
+            {bool translating = false,
+            bool starting = false,
+            DateTime? ended}) =>
         TranslationProvider.mayPromptReviewOnResume(
-          isTranslating: translating, isStarting: starting, startEndedAt: ended, now: now);
+            isTranslating: translating,
+            isStarting: starting,
+            startEndedAt: ended,
+            now: now);
 
     test('idle with no recent Start: allowed', () {
       expect(may(), isTrue);

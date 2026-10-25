@@ -26,5 +26,6 @@ Locale resolveAppLocale(Locale? device, Iterable<Locale> supported) {
 /// Localized strings for code with no BuildContext (e.g. services), in the
 /// same language the UI resolves to.
 AppLocalizations deviceAppLocalizations() => lookupAppLocalizations(
-      resolveAppLocale(PlatformDispatcher.instance.locale, AppLocalizations.supportedLocales),
+      resolveAppLocale(PlatformDispatcher.instance.locale,
+          AppLocalizations.supportedLocales),
     );

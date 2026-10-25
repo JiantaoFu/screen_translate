@@ -3,7 +3,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAnalyticsService {
-  static final FirebaseAnalyticsService _instance = FirebaseAnalyticsService._internal();
+  static final FirebaseAnalyticsService _instance =
+      FirebaseAnalyticsService._internal();
   late FirebaseAnalytics _analytics;
   final Logger _logger = Logger('FirebaseAnalyticsService');
 
@@ -40,7 +41,8 @@ class FirebaseAnalyticsService {
         name: sanitizedName,
         parameters: sanitizedParams,
       );
-      _logger.info('Event logged: $sanitizedName with params: $sanitizedParams');
+      _logger
+          .info('Event logged: $sanitizedName with params: $sanitizedParams');
     } catch (e) {
       _logger.severe('Error logging event: $e');
     }
@@ -248,9 +250,7 @@ class FirebaseAnalyticsService {
       // Firebase accepts String, int, double, and bool parameter values
       if (value is String) {
         // Firebase has a 100 character limit for parameter values
-        sanitized[key] = value.length > 100
-            ? value.substring(0, 100)
-            : value;
+        sanitized[key] = value.length > 100 ? value.substring(0, 100) : value;
       } else if (value is int || value is double || value is bool) {
         sanitized[key] = value;
       } else {

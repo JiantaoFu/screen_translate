@@ -23,9 +23,11 @@ class OnnxLangPair {
   final String sourceBcp;
   final String targetBcp;
   final String displayName;
+
   /// If true, download fp16 ONNX files instead of quantized (for models that
   /// don't have a _quantized variant on onnx-community).
   final bool useFp16;
+
   /// If set, download this pair from "huggingface.co/<customRepo>/<key>/"
   /// instead of the default "huggingface.co/onnx-community/<key>/onnx/" —
   /// used for pairs we've converted and hosted ourselves (not available
@@ -43,8 +45,7 @@ class OnnxLangPair {
   });
 
   @override
-  bool operator ==(Object other) =>
-      other is OnnxLangPair && other.key == key;
+  bool operator ==(Object other) => other is OnnxLangPair && other.key == key;
 
   @override
   int get hashCode => key.hashCode;
@@ -160,8 +161,8 @@ const List<OnnxLangPair> kSupportedOnnxPairs = [
 
 OnnxLangPair? findOnnxPair(String source, String target) {
   try {
-    return kSupportedOnnxPairs
-        .firstWhere((pair) => pair.sourceBcp == source && pair.targetBcp == target);
+    return kSupportedOnnxPairs.firstWhere(
+        (pair) => pair.sourceBcp == source && pair.targetBcp == target);
   } catch (_) {
     return null;
   }
@@ -300,7 +301,8 @@ const int _kMaxNewTokensCeiling = 256;
 /// cap (fast decode) for the short single-line text screen-OCR usually
 /// produces.
 int _maxNewTokensFor(int inputTokenCount) {
-  return (inputTokenCount * 3).clamp(_kMaxNewTokensFloor, _kMaxNewTokensCeiling);
+  return (inputTokenCount * 3)
+      .clamp(_kMaxNewTokensFloor, _kMaxNewTokensCeiling);
 }
 
 /// Fraction of the source token count that must be generated before EOS is
@@ -348,13 +350,15 @@ String _mosesTokenizeEnglish(String text) {
   final buffer = StringBuffer();
   int lastEnd = 0;
   for (final match in _kUrlPattern.allMatches(normalized)) {
-    buffer.write(_splitPunctuationAndContractions(normalized.substring(lastEnd, match.start)));
+    buffer.write(_splitPunctuationAndContractions(
+        normalized.substring(lastEnd, match.start)));
 
     // Strip trailing punctuation off the greedy \S+ URL match -- it belongs
     // to the surrounding sentence, not the URL -- then split it normally.
     var url = match.group(0)!;
     var trailing = '';
-    while (url.isNotEmpty && _kUrlTrailingPunctuation.contains(url[url.length - 1])) {
+    while (url.isNotEmpty &&
+        _kUrlTrailingPunctuation.contains(url[url.length - 1])) {
       trailing = url[url.length - 1] + trailing;
       url = url.substring(0, url.length - 1);
     }
@@ -388,9 +392,9 @@ String _splitPunctuationAndContractions(String text) {
     (RegExp(r"'ve", caseSensitive: false), " 've"),
     (RegExp(r"'re", caseSensitive: false), " 're"),
     (RegExp(r"'ll", caseSensitive: false), " 'll"),
-    (RegExp(r"'m",  caseSensitive: false), " 'm"),
-    (RegExp(r"'s",  caseSensitive: false), " 's"),
-    (RegExp(r"'d",  caseSensitive: false), " 'd"),
+    (RegExp(r"'m", caseSensitive: false), " 'm"),
+    (RegExp(r"'s", caseSensitive: false), " 's"),
+    (RegExp(r"'d", caseSensitive: false), " 'd"),
   ];
   for (final (pattern, replacement) in contractions) {
     s = s.replaceAll(pattern, replacement);
@@ -412,9 +416,8 @@ String _splitPunctuationAndContractions(String text) {
 /// Token IDs sourced from the vocab.json of onnx-community/opus-mt-en-zh.
 /// key  ->  prefix-token-id  (null means no prefix needed)
 const Map<String, int?> _kLangPrefixTokenId = {
-  'opus-mt-en-zh': 5,   // >>cmn_Hans<< (token 5 in shared vocab)
+  'opus-mt-en-zh': 5, // >>cmn_Hans<< (token 5 in shared vocab)
 };
-
 
 class _ModelLRUCache {
   final int maxSize;
@@ -453,22 +456,26 @@ class _ModelLRUCache {
 class OnnxTranslationService {
   final _modelCache = _ModelLRUCache(2);
   final OnnxCrashGuard crashGuard;
-  final Future<bool> Function() _isLowMemory;
+  final Future<String?> Function() _lowMemoryReason;
 
-  OnnxTranslationService({OnnxCrashGuard? crashGuard, Future<bool> Function()? isLowMemory})
+  /// Called with an `onnx_skipped` reason whenever ONNX is skipped or
+  /// downgraded (the provider logs it to Analytics/Crashlytics).
+  void Function(String reason)? onSkipped;
+
+  OnnxTranslationService(
+      {OnnxCrashGuard? crashGuard, Future<String?> Function()? lowMemoryReason})
       : crashGuard = crashGuard ?? OnnxCrashGuard(),
-        _isLowMemory = isLowMemory ?? _platformLowMemory;
+        _lowMemoryReason = lowMemoryReason ?? _platformLowMemoryReason;
 
   static const _memChannel = MethodChannel('flutter_onnxruntime');
 
-  /// Loading a pack needs a few hundred MB; on a low-RAM device or when the
-  /// system is already short on memory the process can be OOM-killed.
-  static Future<bool> _platformLowMemory() async {
-    if (!Platform.isAndroid) return false;
+  /// 'low_ram_device' / 'low_memory' when Android says so, else null.
+  static Future<String?> _platformLowMemoryReason() async {
+    if (!Platform.isAndroid) return null;
     try {
-      return await _memChannel.invokeMethod<bool>('isLowMemory') ?? false;
+      return await _memChannel.invokeMethod<String>('lowMemoryReason');
     } catch (_) {
-      return false;
+      return null;
     }
   }
 
@@ -503,7 +510,8 @@ class OnnxTranslationService {
   /// the default.
   @visibleForTesting
   static String? graphOptimizationLevelFor(String langPairKey) {
-    final pair = kSupportedOnnxPairs.where((p) => p.key == langPairKey).firstOrNull;
+    final pair =
+        kSupportedOnnxPairs.where((p) => p.key == langPairKey).firstOrNull;
     return (pair?.useFp16 ?? false) ? 'extended' : null;
   }
 
@@ -512,7 +520,8 @@ class OnnxTranslationService {
       xnnpack ? [OrtProvider.XNNPACK, OrtProvider.CPU] : [OrtProvider.CPU];
 
   Future<List<OrtSession>> _createSessions(
-      OnnxRuntime ort, Directory dir, String langPairKey, {required bool xnnpack}) async {
+      OnnxRuntime ort, Directory dir, String langPairKey,
+      {required bool xnnpack}) async {
     final sessionOptions = OrtSessionOptions(
       providers: providersFor(xnnpack: xnnpack),
       graphOptimizationLevel: graphOptimizationLevelFor(langPairKey),
@@ -520,13 +529,20 @@ class OnnxTranslationService {
     final created = <OrtSession>[];
     try {
       // createSession(path) is the correct API for file-system paths
-      for (final f in ['encoder_model.onnx', 'decoder_model.onnx', 'decoder_with_past_model.onnx']) {
-        created.add(await ort.createSession(p.join(dir.path, f), options: sessionOptions));
+      for (final f in [
+        'encoder_model.onnx',
+        'decoder_model.onnx',
+        'decoder_with_past_model.onnx'
+      ]) {
+        created.add(await ort.createSession(p.join(dir.path, f),
+            options: sessionOptions));
       }
       return created;
     } catch (_) {
       for (final s in created) {
-        try { await s.close(); } catch (_) {}
+        try {
+          await s.close();
+        } catch (_) {}
       }
       rethrow;
     }
@@ -551,12 +567,15 @@ class OnnxTranslationService {
     // After a native crash inside ONNX (see OnnxCrashGuard) XNNPACK is
     // dropped: SIGILLs in libonnxruntime.so point at CPU-specific kernels.
     final useXnnpack = !await crashGuard.cpuOnly();
+    if (!useXnnpack) onSkipped?.call('crash_marker_cpu');
     List<OrtSession> sessions;
     try {
-      sessions = await _createSessions(ort, dir, langPairKey, xnnpack: useXnnpack);
+      sessions =
+          await _createSessions(ort, dir, langPairKey, xnnpack: useXnnpack);
     } catch (e) {
       if (!useXnnpack) rethrow;
       debugPrint('OnnxTranslation: XNNPACK load failed ($e), retrying on CPU');
+      onSkipped?.call('xnnpack_load_failed_cpu');
       sessions = await _createSessions(ort, dir, langPairKey, xnnpack: false);
     }
     final [encoder, decoder, decoderWithPast] = sessions;
@@ -573,7 +592,8 @@ class OnnxTranslationService {
       await File(p.join(dir.path, 'vocab.json')).readAsString(),
     ) as Map<String, dynamic>;
     final vocab = <String, int>{
-      for (final entry in vocabJson.entries) entry.key: (entry.value as num).toInt(),
+      for (final entry in vocabJson.entries)
+        entry.key: (entry.value as num).toInt(),
     };
     final idToPiece = <int, String>{
       for (final entry in vocab.entries) entry.value: entry.key,
@@ -614,12 +634,14 @@ class OnnxTranslationService {
     required String targetLanguage,
   }) async {
     if (await crashGuard.disabled()) {
-      throw const OnnxUnavailableException('disabled after native crashes');
+      throw const OnnxUnavailableException('crash_marker_disabled');
     }
-    return crashGuard.guard(() => _translate(text, sourceLanguage, targetLanguage));
+    return crashGuard
+        .guard(() => _translate(text, sourceLanguage, targetLanguage));
   }
 
-  Future<String> _translate(String text, String sourceLanguage, String targetLanguage) async {
+  Future<String> _translate(
+      String text, String sourceLanguage, String targetLanguage) async {
     final pair = findOnnxPair(sourceLanguage, targetLanguage);
     if (pair == null) {
       final pivot = findOnnxPivotPair(sourceLanguage, targetLanguage);
@@ -635,8 +657,9 @@ class OnnxTranslationService {
     if (!await isModelReady(pair.key)) {
       throw OnnxModelNotReadyException(pair.key);
     }
-    if (_modelCache.get(pair.key) == null && await _isLowMemory()) {
-      throw const OnnxUnavailableException('low memory');
+    if (_modelCache.get(pair.key) == null) {
+      final reason = await _lowMemoryReason();
+      if (reason != null) throw OnnxUnavailableException(reason);
     }
     final bundle = await _loadModel(pair.key);
     // Look up the language-prefix token ID for this model pair (may be null).
@@ -667,7 +690,8 @@ class OnnxTranslationService {
     // screenshots do constantly) feeds the model an input outside its
     // training distribution and silently degrades translation quality with
     // no visible error.
-    final preprocessed = isEnglishSource ? _mosesTokenizeEnglish(sourceText) : sourceText;
+    final preprocessed =
+        isEnglishSource ? _mosesTokenizeEnglish(sourceText) : sourceText;
     debugPrint('[ONNX] Moses pre-tokenized: "$preprocessed"');
 
     final pieces = bundle.sourceTokenizer.tokenize(preprocessed);
@@ -676,7 +700,9 @@ class OnnxTranslationService {
 
     // Map pieces through the model's real vocab (vocab.json), NOT the
     // .spm file's internal piece IDs — those are different vocabularies.
-    var inputIds = [for (final piece in pieces) bundle.vocab[piece] ?? bundle.unkId];
+    var inputIds = [
+      for (final piece in pieces) bundle.vocab[piece] ?? bundle.unkId
+    ];
 
     // Prepend language-direction prefix if required (e.g. >>cmn_Hans<< = 5)
     if (langPrefixId != null) {
@@ -699,21 +725,28 @@ class OnnxTranslationService {
         Int64List.fromList(inputIds), [1, inputIds.length]);
     final attnMaskTensor = await OrtValue.fromList(
         Int64List.fromList(attnMask), [1, attnMask.length]);
-    final decStartTensor = await OrtValue.fromList(
-        Int64List.fromList([bundle.padId]), [1, 1]);
+    final decStartTensor =
+        await OrtValue.fromList(Int64List.fromList([bundle.padId]), [1, 1]);
 
     // All OrtValues that must be freed at the end
-    final toRelease = <OrtValue>[inputIdsTensor, attnMaskTensor, decStartTensor];
+    final toRelease = <OrtValue>[
+      inputIdsTensor,
+      attnMaskTensor,
+      decStartTensor
+    ];
 
     // ── 2. Encoder ────────────────────────────────────────────────────────────
     // Build inputs strictly from session.inputNames
     final encMap = <String, OrtValue>{};
     for (final name in bundle.encoder.inputNames) {
-      if (name.contains('input_ids'))      encMap[name] = inputIdsTensor;
+      if (name.contains('input_ids'))
+        encMap[name] = inputIdsTensor;
       else if (name.contains('attention_mask')) encMap[name] = attnMaskTensor;
     }
     final encOut = await bundle.encoder.run(
-      encMap.isNotEmpty ? encMap : {'input_ids': inputIdsTensor, 'attention_mask': attnMaskTensor},
+      encMap.isNotEmpty
+          ? encMap
+          : {'input_ids': inputIdsTensor, 'attention_mask': attnMaskTensor},
     );
 
     // The encoder's primary output is last_hidden_state (or the first output)
@@ -734,25 +767,30 @@ class OnnxTranslationService {
     for (final name in bundle.decoder.inputNames) {
       if (name == 'input_ids' || name.contains('input_ids')) {
         dec1Map[name] = decStartTensor;
-      } else if (name.contains('hidden_states') || name.contains('encoder_hidden')) {
+      } else if (name.contains('hidden_states') ||
+          name.contains('encoder_hidden')) {
         dec1Map[name] = encHidden;
       } else if (name.contains('attention_mask')) {
         dec1Map[name] = attnMaskTensor;
       }
     }
     final firstOut = await bundle.decoder.run(
-      dec1Map.isNotEmpty ? dec1Map : {
-        'input_ids': decStartTensor,
-        'encoder_hidden_states': encHidden,
-        'encoder_attention_mask': attnMaskTensor,
-      },
+      dec1Map.isNotEmpty
+          ? dec1Map
+          : {
+              'input_ids': decStartTensor,
+              'encoder_hidden_states': encHidden,
+              'encoder_attention_mask': attnMaskTensor,
+            },
     );
 
     final logits0 = firstOut['logits'] ??
         (firstOut.isNotEmpty ? firstOut.values.first : null);
     if (logits0 == null) {
       for (final v in toRelease) v.dispose();
-      for (final v in firstOut.values) { v?.dispose(); }
+      for (final v in firstOut.values) {
+        v?.dispose();
+      }
       return '';
     }
 
@@ -765,7 +803,8 @@ class OnnxTranslationService {
     // Extract past_key_values from first decoder output
     var pastKV = _renamePresentToPast(firstOut);
     for (final v in firstOut.values) {
-      if (v != null && v != logits0 && !pastKV.containsValue(v)) toRelease.add(v);
+      if (v != null && v != logits0 && !pastKV.containsValue(v))
+        toRelease.add(v);
     }
     toRelease.add(logits0);
 
@@ -784,10 +823,11 @@ class OnnxTranslationService {
     // unchecked this loops all the way to maxNewTokens, producing a wall of
     // repeated garbage once PAD is stripped back out at decode time.
     for (int step = 1; step < maxNewTokens; step++) {
-      if (generated.last == bundle.eosId || generated.last == bundle.padId) break;
+      if (generated.last == bundle.eosId || generated.last == bundle.padId)
+        break;
 
-      final stepTok = await OrtValue.fromList(
-          Int64List.fromList([generated.last]), [1, 1]);
+      final stepTok =
+          await OrtValue.fromList(Int64List.fromList([generated.last]), [1, 1]);
 
       // Build strictly from session.inputNames
       final stepMap = <String, OrtValue>{};
@@ -804,17 +844,21 @@ class OnnxTranslationService {
       }
 
       final stepOut = await bundle.decoderWithPast.run(
-        stepMap.isNotEmpty ? stepMap : {
-          'input_ids': stepTok,
-          'encoder_attention_mask': attnMaskTensor,
-          ...pastKV,
-        },
+        stepMap.isNotEmpty
+            ? stepMap
+            : {
+                'input_ids': stepTok,
+                'encoder_attention_mask': attnMaskTensor,
+                ...pastKV,
+              },
       );
 
       final stepLogits = stepOut['logits'] ??
           (stepOut.isNotEmpty ? stepOut.values.first : null);
       if (stepLogits == null) {
-        for (final v in stepOut.values) { v?.dispose(); }
+        for (final v in stepOut.values) {
+          v?.dispose();
+        }
         toRelease.add(stepTok);
         break;
       }
@@ -845,8 +889,12 @@ class OnnxTranslationService {
     }
 
     // ── 5. Release all tensors ─────────────────────────────────────────────────
-    for (final v in toRelease) { v.dispose(); }
-    for (final v in pastKV.values) { v.dispose(); }
+    for (final v in toRelease) {
+      v.dispose();
+    }
+    for (final v in pastKV.values) {
+      v.dispose();
+    }
 
     // ── 6. Decode output token IDs ─────────────────────────────────────────────
     // Map generated IDs back to pieces via vocab.json (inverse), NOT via a
@@ -901,7 +949,10 @@ class OnnxTranslationService {
       if (generatedSet.contains(i)) {
         val = val < 0 ? val * 1.3 : val / 1.3;
       }
-      if (val > bestVal) { bestVal = val; best = i; }
+      if (val > bestVal) {
+        bestVal = val;
+        best = i;
+      }
     }
     return best;
   }
@@ -915,7 +966,6 @@ class OnnxTranslationService {
           entry.key.replaceFirst('present.', 'past_key_values.'): entry.value!,
     };
   }
-
 
   Future<void> dispose() async {
     await _modelCache.clear();
@@ -933,8 +983,8 @@ class OnnxModelNotReadyException implements Exception {
       'OnnxModelNotReadyException: Model "$langPairKey" is not downloaded yet.';
 }
 
-/// ONNX is skipped on this device (repeated native crashes or low memory);
-/// callers fall back to ML Kit.
+/// ONNX is skipped (reason: crash_marker_disabled, low_ram_device,
+/// low_memory); callers fall back to ML Kit.
 class OnnxUnavailableException implements Exception {
   final String reason;
   const OnnxUnavailableException(this.reason);

@@ -39,7 +39,10 @@ void main() {
     test('never granted returns false after the attempts', () async {
       var calls = 0;
       final ok = await OverlayService.recheckOverlayPermission(
-        () async { calls++; return false; },
+        () async {
+          calls++;
+          return false;
+        },
         interval: Duration.zero,
       );
       expect(ok, isFalse);

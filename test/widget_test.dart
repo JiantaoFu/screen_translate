@@ -8,7 +8,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('App starts and renders the home screen', (WidgetTester tester) async {
+  testWidgets('App starts and renders the home screen',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const ScreenTranslateApp());
     await tester.pump();
 

@@ -4,9 +4,16 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:screen_translate/models/ocr_result.dart';
 import 'package:screen_translate/services/ocr_service.dart';
 
-OCRResult _block(String text, double x, double y, double w, double h) => OCRResult(
-      text: text, x: x, y: y, width: w, height: h,
-      backgroundColor: Colors.white, imgWidth: 1080, imgHeight: 2400,
+OCRResult _block(String text, double x, double y, double w, double h) =>
+    OCRResult(
+      text: text,
+      x: x,
+      y: y,
+      width: w,
+      height: h,
+      backgroundColor: Colors.white,
+      imgWidth: 1080,
+      imgHeight: 2400,
     );
 
 void main() {
@@ -19,14 +26,18 @@ void main() {
   ];
 
   for (final order in [
-    [0, 1, 2], [2, 1, 0], [1, 0, 2], [2, 0, 1], [0, 2, 1], [1, 2, 0],
+    [0, 1, 2],
+    [2, 1, 0],
+    [1, 0, 2],
+    [2, 0, 1],
+    [0, 2, 1],
+    [1, 2, 0],
   ]) {
     test('vertical columns merge right-to-left (input order $order)', () {
       final merged = OCRService().mergeNearbyBlocksForTest(
-        [for (final i in order) columns[i]], TextRecognitionScript.japanese);
+          [for (final i in order) columns[i]], TextRecognitionScript.japanese);
       expect(merged, hasLength(1));
-      expect(merged.single.text.split('\n'),
-          ['たすけて!あの', 'ロボットが街を', '壊している!']);
+      expect(merged.single.text.split('\n'), ['たすけて!あの', 'ロボットが街を', '壊している!']);
     });
   }
 
@@ -39,7 +50,10 @@ void main() {
     ];
 
     test('vertical Japanese and Chinese columns read right to left', () {
-      for (final script in [TextRecognitionScript.japanese, TextRecognitionScript.chinese]) {
+      for (final script in [
+        TextRecognitionScript.japanese,
+        TextRecognitionScript.chinese
+      ]) {
         expect(OCRService.readingOrderText(lines, script).split('\n'),
             ['たすけて!あの', 'ロボットが街を', '壊している!']);
       }
@@ -50,9 +64,14 @@ void main() {
         ('勇者よ、城の北の塔に魔王が待っている。', Rect.fromLTWH(110, 930, 1150, 60)),
         ('気をつけて進むのじゃ。', Rect.fromLTWH(110, 1030, 640, 60)),
       ];
-      expect(OCRService.readingOrderText(horizontal, TextRecognitionScript.japanese).split('\n'),
+      expect(
+          OCRService.readingOrderText(
+                  horizontal, TextRecognitionScript.japanese)
+              .split('\n'),
           ['勇者よ、城の北の塔に魔王が待っている。', '気をつけて進むのじゃ。']);
-      expect(OCRService.readingOrderText(lines, TextRecognitionScript.latin).split('\n'),
+      expect(
+          OCRService.readingOrderText(lines, TextRecognitionScript.latin)
+              .split('\n'),
           ['壊している!', 'ロボットが街を', 'たすけて!あの']);
     });
   });

@@ -43,45 +43,123 @@ class _LanguagePack {
   final OnnxPivotPair? pivot;
 
   const _LanguagePack({required OnnxLangPair pair})
-      : pair = pair, pivot = null;
+      : pair = pair,
+        pivot = null;
   const _LanguagePack.pivot({required OnnxPivotPair pivot})
-      : pair = null, pivot = pivot;
+      : pair = null,
+        pivot = pivot;
 
   /// Stable identity used for status/progress tracking — the underlying
   /// pair's key, or a synthesized one for pivots (which have no model files
   /// of their own, just two hops).
-  String get key => pair?.key ?? 'pivot:${pivot!.sourceBcp}-${pivot!.targetBcp}';
+  String get key =>
+      pair?.key ?? 'pivot:${pivot!.sourceBcp}-${pivot!.targetBcp}';
   String get sourceBcp => pair?.sourceBcp ?? pivot!.sourceBcp;
   String get targetBcp => pair?.targetBcp ?? pivot!.targetBcp;
   String get sourceFlag => _flagFor(sourceBcp);
   String get targetFlag => _flagFor(targetBcp);
+
   /// Download size in MB; a pivot downloads both of its hops.
   int? get downloadMb => pair != null
       ? kOnnxPackDownloadMb[pair!.key]
-      : (kOnnxPackDownloadMb[pivot!.firstHopKey] ?? 0) + (kOnnxPackDownloadMb[pivot!.secondHopKey] ?? 0);
+      : (kOnnxPackDownloadMb[pivot!.firstHopKey] ?? 0) +
+          (kOnnxPackDownloadMb[pivot!.secondHopKey] ?? 0);
 }
 
 /// "230–550 MB": the range of single-pack sizes, rounded to 10 MB.
 String _packSizeRange() {
-  final sizes = [for (final lp in _kLanguagePacks) if (lp.pair != null) lp.downloadMb].whereType<int>();
+  final sizes = [
+    for (final lp in _kLanguagePacks)
+      if (lp.pair != null) lp.downloadMb
+  ].whereType<int>();
   int round10(int v) => (v / 10).round() * 10;
   return '${round10(sizes.reduce(min))}–${round10(sizes.reduce(max))} MB';
 }
 
 const _kLanguagePacks = [
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-en-zh', sourceBcp: 'en', targetBcp: 'zh', displayName: 'English → Chinese')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-zh-en', sourceBcp: 'zh', targetBcp: 'en', displayName: 'Chinese → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-ja-en', sourceBcp: 'ja', targetBcp: 'en', displayName: 'Japanese → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-ko-en', sourceBcp: 'ko', targetBcp: 'en', displayName: 'Korean → English', useFp16: true)),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-th-en', sourceBcp: 'th', targetBcp: 'en', displayName: 'Thai → English', useFp16: true)),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-vi-en', sourceBcp: 'vi', targetBcp: 'en', displayName: 'Vietnamese → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-id-en', sourceBcp: 'id', targetBcp: 'en', displayName: 'Indonesian → English', useFp16: true)),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-de-en', sourceBcp: 'de', targetBcp: 'en', displayName: 'German → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-es-en', sourceBcp: 'es', targetBcp: 'en', displayName: 'Spanish → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-fr-en', sourceBcp: 'fr', targetBcp: 'en', displayName: 'French → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-ru-en', sourceBcp: 'ru', targetBcp: 'en', displayName: 'Russian → English')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-ja-es', sourceBcp: 'ja', targetBcp: 'es', displayName: 'Japanese → Spanish', customRepo: 'fuji246/small-translation')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-en-es', sourceBcp: 'en', targetBcp: 'es', displayName: 'English → Spanish', customRepo: 'fuji246/small-translation')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-en-zh',
+          sourceBcp: 'en',
+          targetBcp: 'zh',
+          displayName: 'English → Chinese')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-zh-en',
+          sourceBcp: 'zh',
+          targetBcp: 'en',
+          displayName: 'Chinese → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-ja-en',
+          sourceBcp: 'ja',
+          targetBcp: 'en',
+          displayName: 'Japanese → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-ko-en',
+          sourceBcp: 'ko',
+          targetBcp: 'en',
+          displayName: 'Korean → English',
+          useFp16: true)),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-th-en',
+          sourceBcp: 'th',
+          targetBcp: 'en',
+          displayName: 'Thai → English',
+          useFp16: true)),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-vi-en',
+          sourceBcp: 'vi',
+          targetBcp: 'en',
+          displayName: 'Vietnamese → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-id-en',
+          sourceBcp: 'id',
+          targetBcp: 'en',
+          displayName: 'Indonesian → English',
+          useFp16: true)),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-de-en',
+          sourceBcp: 'de',
+          targetBcp: 'en',
+          displayName: 'German → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-es-en',
+          sourceBcp: 'es',
+          targetBcp: 'en',
+          displayName: 'Spanish → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-fr-en',
+          sourceBcp: 'fr',
+          targetBcp: 'en',
+          displayName: 'French → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-ru-en',
+          sourceBcp: 'ru',
+          targetBcp: 'en',
+          displayName: 'Russian → English')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-ja-es',
+          sourceBcp: 'ja',
+          targetBcp: 'es',
+          displayName: 'Japanese → Spanish',
+          customRepo: 'fuji246/small-translation')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-en-es',
+          sourceBcp: 'en',
+          targetBcp: 'es',
+          displayName: 'English → Spanish',
+          customRepo: 'fuji246/small-translation')),
   _LanguagePack.pivot(
     pivot: OnnxPivotPair(
       sourceBcp: 'zh',
@@ -91,8 +169,20 @@ const _kLanguagePacks = [
       secondHopKey: 'opus-mt-en-es',
     ),
   ),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-ja-pt', sourceBcp: 'ja', targetBcp: 'pt', displayName: 'Japanese → Portuguese', customRepo: 'fuji246/small-translation')),
-  _LanguagePack(pair: OnnxLangPair(key: 'opus-mt-tc-big-en-pt', sourceBcp: 'en', targetBcp: 'pt', displayName: 'English → Portuguese', customRepo: 'fuji246/small-translation')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-ja-pt',
+          sourceBcp: 'ja',
+          targetBcp: 'pt',
+          displayName: 'Japanese → Portuguese',
+          customRepo: 'fuji246/small-translation')),
+  _LanguagePack(
+      pair: OnnxLangPair(
+          key: 'opus-mt-tc-big-en-pt',
+          sourceBcp: 'en',
+          targetBcp: 'pt',
+          displayName: 'English → Portuguese',
+          customRepo: 'fuji246/small-translation')),
   _LanguagePack.pivot(
     pivot: OnnxPivotPair(
       sourceBcp: 'zh',
@@ -110,7 +200,8 @@ class TranslationSettingsScreen extends StatefulWidget {
   const TranslationSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  _TranslationSettingsScreenState createState() => _TranslationSettingsScreenState();
+  _TranslationSettingsScreenState createState() =>
+      _TranslationSettingsScreenState();
 }
 
 class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
@@ -142,6 +233,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   final Set<String> _quickDownloading = {};
   final Set<String> _quickError = {};
   final Map<String, double> _quickProgress = {};
+
   /// Quick downloads Android has paused to wait for the network.
   final Set<String> _quickWaiting = {};
 
@@ -174,7 +266,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _interruptedByBackground.add(lp.key);
         }
       }
-    } else if (state == AppLifecycleState.resumed && _interruptedByBackground.isNotEmpty) {
+    } else if (state == AppLifecycleState.resumed &&
+        _interruptedByBackground.isNotEmpty) {
       final toResume = _kLanguagePacks
           .where((lp) => _interruptedByBackground.contains(lp.key))
           .toList();
@@ -243,7 +336,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   /// failure show the download-failed dialog; joining a download started
   /// elsewhere, or resuming one after the app returns to the foreground,
   /// fails quietly into the row's error state.
-  Future<void> _downloadPack(_LanguagePack lp, {bool userInitiated = false}) async {
+  Future<void> _downloadPack(_LanguagePack lp,
+      {bool userInitiated = false}) async {
     _joinedDownloads.add(lp.key);
     setState(() {
       _packStatus[lp.key] = OnnxModelStatus.downloading;
@@ -255,11 +349,14 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         if (mounted) setState(() => _packProgress[lp.key] = p);
       };
       if (lp.pivot != null) {
-        await ModelDownloadService().downloadOnnxPivot(lp.pivot!, onProgress: onProgress);
+        await ModelDownloadService()
+            .downloadOnnxPivot(lp.pivot!, onProgress: onProgress);
       } else {
-        await ModelDownloadService().downloadOnnxModel(lp.pair!.key, onProgress: onProgress);
+        await ModelDownloadService()
+            .downloadOnnxModel(lp.pair!.key, onProgress: onProgress);
       }
-      debugPrint('UI: Download completed for ${lp.key}, updating state to ready...');
+      debugPrint(
+          'UI: Download completed for ${lp.key}, updating state to ready...');
       _joinedDownloads.remove(lp.key);
       if (mounted) {
         setState(() {
@@ -267,7 +364,11 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           _packProgress.remove(lp.key);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(AppLocalizations.of(context)!.languagePairName(lp.sourceBcp, lp.targetBcp))), backgroundColor: Colors.green),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!
+                  .pack_is_ready_snackbar(AppLocalizations.of(context)!
+                      .languagePairName(lp.sourceBcp, lp.targetBcp))),
+              backgroundColor: Colors.green),
         );
       }
     } catch (e, stack) {
@@ -305,7 +406,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     Provider.of<TranslationProvider>(context, listen: false)
         .setTranslationMode(TranslationMode.llm);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(AppLocalizations.of(context)!.cloud_ai_api_key_required_content),
+      content:
+          Text(AppLocalizations.of(context)!.cloud_ai_api_key_required_content),
     ));
   }
 
@@ -315,9 +417,12 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
       context: context,
       builder: (_) => AlertDialog(
         title: Text(localizations.remove_language_pack_title),
-        content: Text(localizations.remove_ai_pack_confirm(localizations.languagePairName(lp.sourceBcp, lp.targetBcp))),
+        content: Text(localizations.remove_ai_pack_confirm(
+            localizations.languagePairName(lp.sourceBcp, lp.targetBcp))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(localizations.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -340,7 +445,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   }
 
   /// See [_downloadPack] for [userInitiated].
-  Future<void> _downloadQuickLang(String code, {bool userInitiated = false}) async {
+  Future<void> _downloadQuickLang(String code,
+      {bool userInitiated = false}) async {
     setState(() {
       _quickDownloading.add(code);
       _quickError.remove(code);
@@ -372,7 +478,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(AppLocalizations.of(context)!.languageName(code))),
+            content: Text(AppLocalizations.of(context)!.pack_is_ready_snackbar(
+                AppLocalizations.of(context)!.languageName(code))),
             backgroundColor: Colors.green,
           ),
         );
@@ -410,7 +517,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         title: Text(localizations.remove_language_pack_title),
         content: Text(localizations.remove_quick_pack_confirm(name)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(localizations.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(localizations.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -425,7 +534,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
       setState(() => _quickDownloaded[code] = !success);
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizations.failed_to_remove_pack), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text(localizations.failed_to_remove_pack),
+              backgroundColor: Colors.red),
         );
       }
     }
@@ -438,7 +549,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     final key = _apiKeyController.text.trim();
     if (key.length < 10) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations.api_key_input_error), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text(localizations.api_key_input_error),
+            backgroundColor: Colors.red),
       );
       return;
     }
@@ -450,14 +563,19 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     setState(() => _isSavingApiKey = false);
     if (valid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations.cloud_ai_connected), backgroundColor: Colors.green),
+        SnackBar(
+            content: Text(localizations.cloud_ai_connected),
+            backgroundColor: Colors.green),
       );
-      Provider.of<TranslationProvider>(context, listen: false).setTranslationMode(TranslationMode.llm);
+      Provider.of<TranslationProvider>(context, listen: false)
+          .setTranslationMode(TranslationMode.llm);
     } else {
       await svc.clearApiKey();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations.api_key_save_error), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text(localizations.api_key_save_error),
+            backgroundColor: Colors.red),
       );
     }
   }
@@ -559,8 +677,10 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           color: Colors.white,
           borderRadius: selected
               ? const BorderRadius.only(
-                  topLeft: Radius.circular(16), topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(4), bottomRight: Radius.circular(4))
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(4))
               : BorderRadius.circular(16),
           border: Border.all(
             color: selected ? iconColor.withOpacity(0.6) : Colors.transparent,
@@ -568,7 +688,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: selected ? iconColor.withOpacity(0.15) : Colors.black.withOpacity(0.05),
+              color: selected
+                  ? iconColor.withOpacity(0.15)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: selected ? 14 : 6,
               offset: const Offset(0, 3),
             ),
@@ -579,7 +701,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           child: Row(
             children: [
               Container(
-                width: 44, height: 44,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: iconColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -599,18 +722,23 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                         )),
                     const SizedBox(height: 3),
                     Text(subtitle,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.3)),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            height: 1.3)),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                width: 22, height: 22,
+                width: 22,
+                height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: selected ? iconColor : Colors.grey.shade300, width: 2),
+                      color: selected ? iconColor : Colors.grey.shade300,
+                      width: 2),
                   color: selected ? iconColor : Colors.transparent,
                 ),
                 child: selected
@@ -644,11 +772,16 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Row(
               children: [
-                const Icon(Icons.download_for_offline_outlined, color: indigo, size: 16),
+                const Icon(Icons.download_for_offline_outlined,
+                    color: indigo, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  AppLocalizations.of(context)!.language_packs_header(_packSizeRange()),
-                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: indigo),
+                  AppLocalizations.of(context)!
+                      .language_packs_header(_packSizeRange()),
+                  style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: indigo),
                 ),
               ],
             ),
@@ -684,7 +817,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 Text(lp.sourceFlag, style: const TextStyle(fontSize: 18)),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 2),
-                  child: Icon(Icons.arrow_forward, size: 12, color: Colors.grey),
+                  child:
+                      Icon(Icons.arrow_forward, size: 12, color: Colors.grey),
                 ),
                 Text(lp.targetFlag, style: const TextStyle(fontSize: 18)),
                 const SizedBox(width: 12),
@@ -692,28 +826,38 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppLocalizations.of(context)!.languagePairName(lp.sourceBcp, lp.targetBcp),
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                      Text(
+                          AppLocalizations.of(context)!
+                              .languagePairName(lp.sourceBcp, lp.targetBcp),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 13.5)),
                       if (isDownloading)
-                        Text(localizations.pack_downloading_progress(((progress ?? 0) * 100).toStringAsFixed(0)),
+                        Text(
+                            localizations.pack_downloading_progress(
+                                ((progress ?? 0) * 100).toStringAsFixed(0)),
                             style: const TextStyle(fontSize: 11, color: indigo))
                       else if (isReady)
                         Text(localizations.pack_ready_to_use,
-                            style: TextStyle(fontSize: 11, color: Colors.green[600]))
+                            style: TextStyle(
+                                fontSize: 11, color: Colors.green[600]))
                       else if (isError)
                         Text(localizations.pack_failed_tap_retry,
-                            style: TextStyle(fontSize: 11, color: Colors.red[400]))
+                            style:
+                                TextStyle(fontSize: 11, color: Colors.red[400]))
                       else if (lp.downloadMb != null)
                         Text('${lp.downloadMb} MB',
-                            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                            style: TextStyle(
+                                fontSize: 11, color: Colors.grey[600])),
                     ],
                   ),
                 ),
                 if (isDownloading)
                   SizedBox(
-                    width: 26, height: 26,
+                    width: 26,
+                    height: 26,
                     child: CircularProgressIndicator(
-                      value: progress, strokeWidth: 2.5,
+                      value: progress,
+                      strokeWidth: 2.5,
                       color: indigo,
                     ),
                   )
@@ -721,17 +865,21 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   GestureDetector(
                     onTap: () => _deletePack(lp),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Colors.green.shade50,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Colors.green.shade200),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 14),
+                        Icon(Icons.check_circle_rounded,
+                            color: Colors.green[600], size: 14),
                         const SizedBox(width: 4),
                         Text(localizations.pack_ready_badge,
-                            style: TextStyle(color: Colors.green[700], fontSize: 12,
+                            style: TextStyle(
+                                color: Colors.green[700],
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600)),
                       ]),
                     ),
@@ -740,7 +888,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                   GestureDetector(
                     onTap: () => _downloadPack(lp, userInitiated: true),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: isError ? Colors.red.shade600 : indigo,
                         borderRadius: BorderRadius.circular(20),
@@ -749,8 +898,13 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                         Icon(isError ? Icons.refresh : Icons.download_rounded,
                             color: Colors.white, size: 14),
                         const SizedBox(width: 4),
-                        Text(isError ? localizations.retry : localizations.download_model,
-                            style: const TextStyle(color: Colors.white, fontSize: 12,
+                        Text(
+                            isError
+                                ? localizations.retry
+                                : localizations.download_model,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600)),
                       ]),
                     ),
@@ -762,7 +916,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: progress, minHeight: 4,
+                  value: progress,
+                  minHeight: 4,
                   backgroundColor: const Color(0xFFE0DFFF),
                   valueColor: const AlwaysStoppedAnimation(indigo),
                 ),
@@ -795,11 +950,15 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Row(
               children: [
-                const Icon(Icons.download_for_offline_outlined, color: orange, size: 16),
+                const Icon(Icons.download_for_offline_outlined,
+                    color: orange, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   AppLocalizations.of(context)!.language_packs_header('30 MB'),
-                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: orange),
+                  style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: orange),
                 ),
               ],
             ),
@@ -836,39 +995,50 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                  Text(name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 13.5)),
                   if (isDownloading)
-                    Text(_quickWaiting.contains(code)
+                    Text(
+                        _quickWaiting.contains(code)
                             ? localizations.pack_waiting_for_network
                             : progress == null
                                 ? localizations.downloading
-                                : localizations.pack_downloading_progress((progress * 100).toStringAsFixed(0)),
+                                : localizations.pack_downloading_progress(
+                                    (progress * 100).toStringAsFixed(0)),
                         style: const TextStyle(fontSize: 11, color: orange))
                   else if (isError)
-                    Text(localizations.pack_failed_tap_retry, style: TextStyle(fontSize: 11, color: Colors.red[400])),
+                    Text(localizations.pack_failed_tap_retry,
+                        style: TextStyle(fontSize: 11, color: Colors.red[400])),
                 ],
               ),
             ),
             if (isDownloading)
               SizedBox(
-                width: 26, height: 26,
-                child: CircularProgressIndicator(value: progress, strokeWidth: 2.5, color: orange),
+                width: 26,
+                height: 26,
+                child: CircularProgressIndicator(
+                    value: progress, strokeWidth: 2.5, color: orange),
               )
             else if (isReady)
               GestureDetector(
                 onTap: () => _deleteQuickLang(code),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.green.shade50,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.green.shade200),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 14),
+                    Icon(Icons.check_circle_rounded,
+                        color: Colors.green[600], size: 14),
                     const SizedBox(width: 4),
                     Text(localizations.pack_ready_badge,
-                        style: TextStyle(color: Colors.green[700], fontSize: 12,
+                        style: TextStyle(
+                            color: Colors.green[700],
+                            fontSize: 12,
                             fontWeight: FontWeight.w600)),
                   ]),
                 ),
@@ -877,7 +1047,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               GestureDetector(
                 onTap: () => _downloadQuickLang(code, userInitiated: true),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: isError ? Colors.red.shade600 : orange,
                     borderRadius: BorderRadius.circular(20),
@@ -886,8 +1057,13 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                     Icon(isError ? Icons.refresh : Icons.download_rounded,
                         color: Colors.white, size: 14),
                     const SizedBox(width: 4),
-                    Text(isError ? localizations.retry : localizations.download_model,
-                        style: const TextStyle(color: Colors.white, fontSize: 12,
+                    Text(
+                        isError
+                            ? localizations.retry
+                            : localizations.download_model,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.w600)),
                   ]),
                 ),
@@ -917,16 +1093,19 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(localizations.connect_ai_account_title,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: teal)),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700, fontSize: 14, color: teal)),
           const SizedBox(height: 4),
           RichText(
             text: TextSpan(
-              style: TextStyle(fontSize: 12.5, color: Colors.grey[600], height: 1.4),
+              style: TextStyle(
+                  fontSize: 12.5, color: Colors.grey[600], height: 1.4),
               children: [
                 TextSpan(text: localizations.connect_ai_account_prefix),
                 TextSpan(
                   text: 'BigModel.cn',
-                  style: const TextStyle(color: teal, decoration: TextDecoration.underline),
+                  style: const TextStyle(
+                      color: teal, decoration: TextDecoration.underline),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () => launchUrl(
                           Uri.parse('https://open.bigmodel.cn/'),
@@ -946,13 +1125,15 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 1),
-                child: Icon(Icons.privacy_tip_outlined, size: 15, color: Colors.grey[700]),
+                child: Icon(Icons.privacy_tip_outlined,
+                    size: 15, color: Colors.grey[700]),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   localizations.ai_mode_data_notice,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700], height: 1.4),
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey[700], height: 1.4),
                 ),
               ),
             ],
@@ -966,7 +1147,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Colors.teal.shade200),
@@ -980,9 +1162,12 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 borderSide: BorderSide(color: teal, width: 2),
               ),
               suffixIcon: IconButton(
-                icon: Icon(_apiKeyObscured ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey[400], size: 20),
-                onPressed: () => setState(() => _apiKeyObscured = !_apiKeyObscured),
+                icon: Icon(
+                    _apiKeyObscured ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.grey[400],
+                    size: 20),
+                onPressed: () =>
+                    setState(() => _apiKeyObscured = !_apiKeyObscured),
               ),
             ),
           ),
@@ -995,15 +1180,19 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 backgroundColor: teal,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
               child: _isSavingApiKey
                   ? const SizedBox(
-                      height: 18, width: 18,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
                   : Text(localizations.save_and_verify,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ),
         ],
@@ -1023,7 +1212,10 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+            BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 2)),
           ],
         ),
         child: Row(
@@ -1034,7 +1226,8 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 color: const Color(0xFF4F46E5).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.feedback_outlined, color: Color(0xFF4F46E5), size: 20),
+              child: const Icon(Icons.feedback_outlined,
+                  color: Color(0xFF4F46E5), size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1042,7 +1235,10 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(localizations.send_feedback,
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.grey[800])),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Colors.grey[800])),
                   const SizedBox(height: 2),
                   Text(localizations.send_feedback_subtitle,
                       style: TextStyle(fontSize: 12, color: Colors.grey[500])),
@@ -1069,12 +1265,15 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
             children: [
               Text(localizations.advanced_section_label,
                   style: TextStyle(
-                      fontSize: 12.5, fontWeight: FontWeight.w600,
-                      color: Colors.grey[400], letterSpacing: 0.4)),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[400],
+                      letterSpacing: 0.4)),
               const SizedBox(width: 2),
               Icon(
                 _showAdvanced ? Icons.expand_less : Icons.expand_more,
-                size: 16, color: Colors.grey[400],
+                size: 16,
+                color: Colors.grey[400],
               ),
             ],
           ),
@@ -1087,23 +1286,31 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2)),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.text_merge_sensitivity_title,
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                         color: Colors.grey[800])),
                 const SizedBox(height: 4),
                 Text(
                   localizations.text_merge_sensitivity_description,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500], height: 1.4),
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey[500], height: 1.4),
                 ),
                 Slider(
                   value: provider.mergeAggressiveness,
-                  min: 0.0, max: 3.0, divisions: 30,
+                  min: 0.0,
+                  max: 3.0,
+                  divisions: 30,
                   label: '${provider.mergeAggressiveness.toStringAsFixed(1)}×',
                   activeColor: Colors.blueGrey,
                   onChanged: provider.setMergeAggressiveness,
@@ -1111,11 +1318,17 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(localizations.merge_precise, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+                    Text(localizations.merge_precise,
+                        style:
+                            TextStyle(fontSize: 11, color: Colors.grey[400])),
                     Text('${provider.mergeAggressiveness.toStringAsFixed(1)}×',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             color: Colors.blueGrey[600])),
-                    Text(localizations.merge_aggressive, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+                    Text(localizations.merge_aggressive,
+                        style:
+                            TextStyle(fontSize: 11, color: Colors.grey[400])),
                   ],
                 ),
               ],
@@ -1132,7 +1345,9 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         padding: const EdgeInsets.only(left: 2),
         child: Text(text,
             style: TextStyle(
-                fontSize: 11.5, fontWeight: FontWeight.w700,
-                color: Colors.grey[500], letterSpacing: 0.8)),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                color: Colors.grey[500],
+                letterSpacing: 0.8)),
       );
 }

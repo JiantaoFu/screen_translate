@@ -17,7 +17,7 @@ class AndroidScreenCaptureService {
           'intentFlags': result['intentFlags'],
           'intentDataString': result['intentDataString'],
         };
-        
+
         // Start the screen capture with the permission result
         return await _channel.invokeMethod('startScreenCapture', intentData);
       }

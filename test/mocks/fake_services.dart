@@ -24,7 +24,8 @@ class FakeTranslationService extends Fake implements TranslationService {
   }
 }
 
-class FakeOnnxTranslationService extends Fake implements OnnxTranslationService {
+class FakeOnnxTranslationService extends Fake
+    implements OnnxTranslationService {
   int callCount = 0;
   bool shouldThrowNotReady = false;
   bool shouldThrowUnsupported = false;
@@ -33,6 +34,9 @@ class FakeOnnxTranslationService extends Fake implements OnnxTranslationService 
 
   @override
   OnnxCrashGuard get crashGuard => guard;
+
+  @override
+  void Function(String reason)? onSkipped;
 
   @override
   Future<String> translateText({

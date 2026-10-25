@@ -20,11 +20,13 @@ void main() {
   });
 
   test('a Dart exception clears the marker (not a native crash)', () async {
-    await expectLater(relaunch().guard(() async => throw StateError('x')), throwsStateError);
+    await expectLater(
+        relaunch().guard(() async => throw StateError('x')), throwsStateError);
     expect(await relaunch().strikes(), 0);
   });
 
-  test('marker left set: first relaunch uses CPU only, second disables ONNX', () async {
+  test('marker left set: first relaunch uses CPU only, second disables ONNX',
+      () async {
     SharedPreferences.setMockInitialValues({OnnxCrashGuard.kInFlight: true});
     final first = relaunch();
     expect(await first.cpuOnly(), isTrue);
@@ -49,9 +51,10 @@ void main() {
     expect(p.getBool(OnnxCrashGuard.kInFlight), isFalse);
   });
 
-  test('disabled service throws OnnxUnavailableException without loading', () async {
+  test('disabled service throws OnnxUnavailableException without loading',
+      () async {
     SharedPreferences.setMockInitialValues({OnnxCrashGuard.kStrikes: 2});
-    final s = OnnxTranslationService(isLowMemory: () async => false);
+    final s = OnnxTranslationService(lowMemoryReason: () async => null);
     await expectLater(
       s.translateText(text: 'hi', sourceLanguage: 'en', targetLanguage: 'zh'),
       throwsA(isA<OnnxUnavailableException>()),
@@ -59,7 +62,32 @@ void main() {
   });
 
   test('providers drop XNNPACK on the CPU-only path', () {
-    expect(OnnxTranslationService.providersFor(xnnpack: true), [OrtProvider.XNNPACK, OrtProvider.CPU]);
-    expect(OnnxTranslationService.providersFor(xnnpack: false), [OrtProvider.CPU]);
+    expect(OnnxTranslationService.providersFor(xnnpack: true),
+        [OrtProvider.XNNPACK, OrtProvider.CPU]);
+    expect(
+        OnnxTranslationService.providersFor(xnnpack: false), [OrtProvider.CPU]);
+  });
+
+  test('a finished run resets the crash count; CPU-only stays sticky',
+      () async {
+    SharedPreferences.setMockInitialValues({OnnxCrashGuard.kInFlight: true});
+    final g = relaunch();
+    expect(await g.strikes(), 1);
+    await g.guard(() async => 'ok');
+    expect(await relaunch().strikes(), 0);
+    expect(await relaunch().cpuOnly(), isTrue);
+  });
+
+  test('two unfinished runs separated by a success do not disable ONNX',
+      () async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(OnnxCrashGuard.kInFlight, true); // crash 1
+    final a = relaunch();
+    await a.guard(() async => 'ok'); // success resets
+    await prefs.setBool(OnnxCrashGuard.kInFlight, true); // crash 2
+    final b = relaunch();
+    expect(await b.strikes(), 1);
+    expect(await b.disabled(), isFalse);
+    expect(await b.cpuOnly(), isTrue);
   });
 }

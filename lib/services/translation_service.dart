@@ -38,7 +38,8 @@ class TranslationService {
     _translationCompleters[taskKey] = completer;
 
     try {
-      print('Translation: Starting translation from $sourceLanguage to $targetLanguage');
+      print(
+          'Translation: Starting translation from $sourceLanguage to $targetLanguage');
       print('Translation: Original text: $text');
 
       final sourceLang = _getTranslateLanguage(sourceLanguage);
@@ -49,18 +50,20 @@ class TranslationService {
       final targetCode = _getLanguageCode(targetLang);
       final modelService = ModelDownloadService();
       final overlayService = OverlayService();
-      
+
       // Check and download source language model
       if (!await modelService.isModelDownloaded(sourceCode)) {
         print('Translation: Downloading language model for $sourceCode');
-        overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
+        overlayService.showToast(
+            deviceAppLocalizations().downloading_language_model_toast);
         await modelService.downloadModelWithFallback(sourceCode);
       }
-      
+
       // Check and download target language model
       if (!await modelService.isModelDownloaded(targetCode)) {
         print('Translation: Downloading language model for $targetCode');
-        overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
+        overlayService.showToast(
+            deviceAppLocalizations().downloading_language_model_toast);
         await modelService.downloadModelWithFallback(targetCode);
       }
       print('Translation: Both language models are available.');
@@ -77,7 +80,8 @@ class TranslationService {
       }
 
       // Start the translation
-      final translationFuture = _translator!.translateText(text).then((translatedText) {
+      final translationFuture =
+          _translator!.translateText(text).then((translatedText) {
         print('Translation: Translated text: $translatedText');
         // isCompleted guard: cancelTranslation()/cancelAllTranslations() may
         // have already completed this same completer (with the original
@@ -109,12 +113,14 @@ class TranslationService {
   }
 
   // Generate a unique key for translation tasks
-  String _generateTaskKey(String text, String sourceLanguage, String targetLanguage) {
+  String _generateTaskKey(
+      String text, String sourceLanguage, String targetLanguage) {
     return '$text|$sourceLanguage|$targetLanguage|${DateTime.now().millisecondsSinceEpoch}';
   }
 
   // Method to cancel a specific translation task
-  Future<void> cancelTranslation(String text, String sourceLanguage, String targetLanguage) async {
+  Future<void> cancelTranslation(
+      String text, String sourceLanguage, String targetLanguage) async {
     final taskKey = _translations.keys.firstWhere(
       (key) => key.startsWith('$text|$sourceLanguage|$targetLanguage'),
       orElse: () => '',

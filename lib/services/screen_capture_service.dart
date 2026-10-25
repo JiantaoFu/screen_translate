@@ -2,14 +2,16 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class ScreenCaptureService {
-  static const platform = MethodChannel('com.lomoware.screen_translate/screen_capture');
+  static const platform =
+      MethodChannel('com.lomoware.screen_translate/screen_capture');
   bool _isCapturing = false;
   Timer? _debounceTimer;
   static const _debounceTime = Duration(milliseconds: 500);
 
   Future<bool> requestScreenCapture() async {
     try {
-      final Map<String, dynamic> result = await platform.invokeMethod('requestScreenCapture');
+      final Map<String, dynamic> result =
+          await platform.invokeMethod('requestScreenCapture');
       return result != null;
     } on PlatformException catch (e) {
       print('Error requesting screen capture: ${e.message}');
@@ -19,7 +21,7 @@ class ScreenCaptureService {
 
   Future<bool> startScreenCapture(Map<String, dynamic> data) async {
     if (_isCapturing) return true;
-    
+
     try {
       await platform.invokeMethod('startScreenCapture', {
         'resultCode': data['resultCode'],
@@ -35,7 +37,7 @@ class ScreenCaptureService {
 
   Future<void> stopScreenCapture() async {
     if (!_isCapturing) return;
-    
+
     try {
       _debounceTimer?.cancel();
       await platform.invokeMethod('stopScreenCapture');
@@ -66,10 +68,10 @@ class ScreenCaptureService {
       while (_isCapturing) {
         if (!isProcessing) {
           isProcessing = true;
-          
+
           // Cancel previous timer
           debounceTimer?.cancel();
-          
+
           // Start new timer
           debounceTimer = Timer(_debounceTime, () async {
             try {
@@ -84,7 +86,7 @@ class ScreenCaptureService {
             }
           });
         }
-        
+
         // Small delay to prevent tight loop
         await Future.delayed(const Duration(milliseconds: 100));
       }
@@ -96,7 +98,7 @@ class ScreenCaptureService {
   // For single captures (if needed)
   Future<Uint8List?> captureScreen() async {
     if (!_isCapturing) return null;
-    
+
     try {
       final result = await platform.invokeMethod('captureScreen');
       return result as Uint8List?;

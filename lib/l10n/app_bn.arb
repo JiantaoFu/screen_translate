@@ -92,6 +92,7 @@
   "mode_quick_title": "দ্রুত",
   "mode_quick_subtitle": "তাৎক্ষণিক · সবসময় উপলব্ধ · সেটআপের প্রয়োজন নেই",
   "mode_ai_enhanced_title": "এআই উন্নত",
+  "onnx_disabled_notice": "এই ডিভাইসে AI Enhanced অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে, তাই এর পরিবর্তে দ্রুত অনুবাদ ব্যবহার করা হচ্ছে।",
   "mode_ai_enhanced_subtitle": "উন্নত মান · অফলাইনে কাজ করে · একটি ভাষা প্যাক ডাউনলোড করুন",
   "mode_cloud_ai_title": "ক্লাউড এআই",
   "mode_cloud_ai_subtitle": "সেরা মান · ইন্টারনেট প্রয়োজন · এপিআই কী প্রয়োজন",

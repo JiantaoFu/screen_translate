@@ -293,6 +293,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get mode_ai_enhanced_title => 'AI-förbättrad';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced stoppade oväntat på den här enheten, så snabböversättning används i stället.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Bättre kvalitet · Fungerar offline · Ladda ner ett språkpaket';
 

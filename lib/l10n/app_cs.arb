@@ -92,6 +92,7 @@
   "mode_quick_title": "Rychlý",
   "mode_quick_subtitle": "Okamžité · Vždy dostupné · Není potřeba nastavení",
   "mode_ai_enhanced_title": "Vylepšeno AI",
+  "onnx_disabled_notice": "AI Enhanced se na tomto zařízení neočekávaně zastavil, proto se místo něj používá rychlý překlad.",
   "mode_ai_enhanced_subtitle": "Lepší kvalita · Funguje offline · Stáhněte jazykový balíček",
   "mode_cloud_ai_title": "Cloud AI",
   "mode_cloud_ai_subtitle": "Nejlepší kvalita · Vyžaduje internet · Vyžaduje API klíč",

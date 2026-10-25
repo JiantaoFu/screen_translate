@@ -291,6 +291,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mode_ai_enhanced_title => 'ปรับปรุงด้วย AI';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced หยุดทำงานโดยไม่คาดคิดบนอุปกรณ์นี้ จึงใช้การแปลแบบด่วนแทน';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'คุณภาพดีขึ้น · ทำงานแบบออฟไลน์ได้ · ดาวน์โหลดแพ็กภาษา';
 

@@ -293,6 +293,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Nâng cao bằng AI';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced đã dừng đột ngột trên thiết bị này, nên bản dịch Nhanh được dùng thay thế.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Chất lượng tốt hơn · Hoạt động ngoại tuyến · Tải xuống gói ngôn ngữ';
 

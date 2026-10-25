@@ -716,6 +716,12 @@ abstract class AppLocalizations {
   /// **'AI Enhanced'**
   String get mode_ai_enhanced_title;
 
+  /// No description provided for @onnx_disabled_notice.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Enhanced stopped unexpectedly on this device, so Quick translation is used instead.'**
+  String get onnx_disabled_notice;
+
   /// No description provided for @mode_ai_enhanced_subtitle.
   ///
   /// In en, this message translates to:

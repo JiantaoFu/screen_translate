@@ -293,6 +293,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Ditingkatkan AI';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced berhenti tiba-tiba di perangkat ini, jadi terjemahan Cepat digunakan sebagai gantinya.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Kualitas lebih baik · Berfungsi offline · Unduh paket bahasa';
 

@@ -294,6 +294,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get mode_ai_enhanced_title => 'AI-fejlesztett';
 
   @override
+  String get onnx_disabled_notice =>
+      'Az AI Enhanced váratlanul leállt ezen az eszközön, ezért helyette a gyors fordítás működik.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Jobb minőség · Offline is működik · Nyelvi csomag letöltése';
 

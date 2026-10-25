@@ -291,6 +291,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mode_ai_enhanced_title => 'محسّن بالذكاء الاصطناعي';
 
   @override
+  String get onnx_disabled_notice =>
+      'توقف AI Enhanced بشكل غير متوقع على هذا الجهاز، لذا يُستخدم الترجمة السريعة بدلاً منه.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'جودة أفضل · يعمل بلا إنترنت · قم بتنزيل حزمة لغة';
 

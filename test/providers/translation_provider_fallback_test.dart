@@ -1,4 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:screen_translate/services/onnx_translation_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 
@@ -57,6 +59,35 @@ void main() {
       expect(result, 'ML Kit translated: Hello');
       expect(mockOnnx.callCount, 1);
       expect(mockMlKit.callCount, 1);
+    });
+
+    test('Falls back to ML Kit when ONNX throws anything else (PlatformException)', () async {
+      provider.setTranslationMode(TranslationMode.onnx);
+      mockOnnx.throwError = PlatformException(code: 'INFERENCE_ERROR', message: 'boom');
+
+      final result = await provider.translateText('Hello');
+
+      expect(result, 'ML Kit translated: Hello');
+      expect(provider.sessionOnnxFailures, 1);
+    });
+
+    test('Stops calling ONNX for the session after repeated failures', () async {
+      provider.setTranslationMode(TranslationMode.onnx);
+      mockOnnx.throwError = StateError('ort');
+
+      for (var i = 0; i < TranslationProvider.kMaxOnnxFailuresPerSession + 2; i++) {
+        expect(await provider.translateText('Hi'), 'ML Kit translated: Hi');
+      }
+      expect(mockOnnx.callCount, TranslationProvider.kMaxOnnxFailuresPerSession);
+    });
+
+    test('Falls back to ML Kit when ONNX is unavailable on the device', () async {
+      provider.setTranslationMode(TranslationMode.onnx);
+      mockOnnx.throwError = const OnnxUnavailableException('low memory');
+
+      expect(await provider.translateText('Hello'), 'ML Kit translated: Hello');
+      expect(provider.onnxUnavailable, isTrue);
+      expect(provider.sessionOnnxFailures, 0);
     });
   });
 }

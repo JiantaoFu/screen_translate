@@ -92,6 +92,7 @@
   "mode_quick_title": "Γρήγορο",
   "mode_quick_subtitle": "Άμεσο · Πάντα διαθέσιμο · Δεν απαιτείται ρύθμιση",
   "mode_ai_enhanced_title": "Βελτιωμένο με AI",
+  "onnx_disabled_notice": "Το AI Enhanced σταμάτησε απροσδόκητα σε αυτή τη συσκευή, οπότε χρησιμοποιείται η γρήγορη μετάφραση.",
   "mode_ai_enhanced_subtitle": "Καλύτερη ποιότητα · Λειτουργεί εκτός σύνδεσης · Κατεβάστε ένα γλωσσικό πακέτο",
   "mode_cloud_ai_title": "AI στο Cloud",
   "mode_cloud_ai_subtitle": "Καλύτερη ποιότητα · Απαιτεί σύνδεση στο διαδίκτυο · Απαιτείται κλειδί API",

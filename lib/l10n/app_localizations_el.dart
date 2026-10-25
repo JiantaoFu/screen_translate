@@ -294,6 +294,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Βελτιωμένο με AI';
 
   @override
+  String get onnx_disabled_notice =>
+      'Το AI Enhanced σταμάτησε απροσδόκητα σε αυτή τη συσκευή, οπότε χρησιμοποιείται η γρήγορη μετάφραση.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Καλύτερη ποιότητα · Λειτουργεί εκτός σύνδεσης · Κατεβάστε ένα γλωσσικό πακέτο';
 

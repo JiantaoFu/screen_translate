@@ -294,6 +294,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Улучшено ИИ';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced неожиданно остановился на этом устройстве, поэтому вместо него используется быстрый перевод.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Лучшее качество · Работает офлайн · Скачайте языковой пакет';
 

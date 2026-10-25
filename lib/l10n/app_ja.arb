@@ -92,6 +92,7 @@
   "mode_quick_title": "クイック",
   "mode_quick_subtitle": "即時 · 常に利用可能 · 設定不要",
   "mode_ai_enhanced_title": "AI強化",
+  "onnx_disabled_notice": "このデバイスでAI Enhancedが予期せず停止したため、代わりにクイック翻訳を使用します。",
   "mode_ai_enhanced_subtitle": "より高品質 · オフラインで動作 · 言語パックをダウンロード",
   "mode_cloud_ai_title": "クラウドAI",
   "mode_cloud_ai_subtitle": "最高品質 · インターネット接続が必要 · APIキーが必要",

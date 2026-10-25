@@ -277,6 +277,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowOnnxDisabledNote());
+  }
+
+  // One-time note when AI Enhanced was turned off on this device after it
+  // crashed natively twice (see OnnxCrashGuard).
+  Future<void> _maybeShowOnnxDisabledNote() async {
+    if (!mounted) return;
+    final provider = Provider.of<TranslationProvider>(context, listen: false);
+    if (provider.translationMode != TranslationMode.onnx) return;
+    try {
+      if (!await provider.takeOnnxDisabledNotice() || !mounted) return;
+    } catch (_) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.onnx_disabled_notice),
+      duration: const Duration(seconds: 8),
+    ));
   }
 
   @override

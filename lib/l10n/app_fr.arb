@@ -92,6 +92,7 @@
   "mode_quick_title": "Rapide",
   "mode_quick_subtitle": "Instantané · Toujours disponible · Aucune configuration requise",
   "mode_ai_enhanced_title": "Amélioré par IA",
+  "onnx_disabled_notice": "AI Enhanced s'est arrêté de façon inattendue sur cet appareil ; la traduction rapide est utilisée à la place.",
   "mode_ai_enhanced_subtitle": "Meilleure qualité · Fonctionne hors ligne · Téléchargez un pack de langue",
   "mode_cloud_ai_title": "IA Cloud",
   "mode_cloud_ai_subtitle": "Meilleure qualité · Nécessite internet · Clé API requise",

@@ -294,6 +294,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get mode_ai_enhanced_title => 'بهبودیافته با هوش مصنوعی';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced در این دستگاه به‌طور غیرمنتظره متوقف شد، بنابراین به‌جای آن از ترجمه سریع استفاده می‌شود.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'کیفیت بهتر · به‌صورت آفلاین کار می‌کند · یک بسته زبان دانلود کنید';
 

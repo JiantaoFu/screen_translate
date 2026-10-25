@@ -92,6 +92,7 @@
   "mode_quick_title": "מהיר",
   "mode_quick_subtitle": "מיידי · זמין תמיד · אין צורך בהגדרה",
   "mode_ai_enhanced_title": "משופר בבינה מלאכותית",
+  "onnx_disabled_notice": "AI Enhanced נעצר באופן בלתי צפוי במכשיר זה, ולכן נעשה שימוש בתרגום מהיר במקומו.",
   "mode_ai_enhanced_subtitle": "איכות טובה יותר · עובד ללא חיבור לאינטרנט · הורד חבילת שפה",
   "mode_cloud_ai_title": "בינה מלאכותית בענן",
   "mode_cloud_ai_subtitle": "האיכות הטובה ביותר · דורש אינטרנט · נדרש מפתח API",

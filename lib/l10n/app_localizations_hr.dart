@@ -293,6 +293,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Poboljšano AI-jem';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced neočekivano se zaustavio na ovom uređaju pa se umjesto njega koristi brzi prijevod.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Bolja kvaliteta · Radi bez interneta · Preuzmite jezični paket';
 

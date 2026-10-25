@@ -92,6 +92,7 @@
   "mode_quick_title": "빠름",
   "mode_quick_subtitle": "즉시 · 항상 사용 가능 · 설정 불필요",
   "mode_ai_enhanced_title": "AI 강화",
+  "onnx_disabled_notice": "이 기기에서 AI Enhanced가 예기치 않게 중지되어 대신 빠른 번역을 사용합니다.",
   "mode_ai_enhanced_subtitle": "더 나은 품질 · 오프라인에서 작동 · 언어 팩 다운로드",
   "mode_cloud_ai_title": "클라우드 AI",
   "mode_cloud_ai_subtitle": "최고 품질 · 인터넷 필요 · API 키 필요",

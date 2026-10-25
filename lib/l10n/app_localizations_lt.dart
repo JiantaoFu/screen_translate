@@ -293,6 +293,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Patobulintas DI';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced netikėtai sustojo šiame įrenginyje, todėl vietoj jo naudojamas greitasis vertimas.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Geresnė kokybė · Veikia neprisijungus · Atsisiųskite kalbos paketą';
 

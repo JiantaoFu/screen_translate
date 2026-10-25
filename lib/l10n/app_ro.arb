@@ -92,6 +92,7 @@
   "mode_quick_title": "Rapid",
   "mode_quick_subtitle": "Instantaneu · Întotdeauna disponibil · Nu necesită configurare",
   "mode_ai_enhanced_title": "Îmbunătățit cu AI",
+  "onnx_disabled_notice": "AI Enhanced s-a oprit neașteptat pe acest dispozitiv, așa că se folosește traducerea rapidă.",
   "mode_ai_enhanced_subtitle": "Calitate mai bună · Funcționează offline · Descarcă un pachet lingvistic",
   "mode_cloud_ai_title": "AI în cloud",
   "mode_cloud_ai_subtitle": "Cea mai bună calitate · Necesită internet · Necesită cheie API",

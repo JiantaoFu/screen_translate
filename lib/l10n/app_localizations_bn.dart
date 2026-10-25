@@ -292,6 +292,10 @@ class AppLocalizationsBn extends AppLocalizations {
   String get mode_ai_enhanced_title => 'এআই উন্নত';
 
   @override
+  String get onnx_disabled_notice =>
+      'এই ডিভাইসে AI Enhanced অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে, তাই এর পরিবর্তে দ্রুত অনুবাদ ব্যবহার করা হচ্ছে।';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'উন্নত মান · অফলাইনে কাজ করে · একটি ভাষা প্যাক ডাউনলোড করুন';
 

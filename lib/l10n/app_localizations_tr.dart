@@ -293,6 +293,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Yapay Zeka ile Geliştirilmiş';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced bu cihazda beklenmedik şekilde durdu, bu yüzden bunun yerine Hızlı çeviri kullanılıyor.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Daha iyi kalite · Çevrimdışı çalışır · Bir dil paketi indirin';
 

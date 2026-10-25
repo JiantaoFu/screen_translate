@@ -92,6 +92,7 @@
   "mode_quick_title": "Quick",
   "mode_quick_subtitle": "Instant · Always available · No setup needed",
   "mode_ai_enhanced_title": "AI Enhanced",
+  "onnx_disabled_notice": "AI Enhanced stopped unexpectedly on this device, so Quick translation is used instead.",
   "mode_ai_enhanced_subtitle": "Better quality · Works offline · Download a language pack",
   "mode_cloud_ai_title": "Cloud AI",
   "mode_cloud_ai_subtitle": "Best quality · Requires internet · API key needed",

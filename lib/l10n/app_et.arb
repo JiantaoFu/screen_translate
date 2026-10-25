@@ -92,6 +92,7 @@
   "mode_quick_title": "Kiire",
   "mode_quick_subtitle": "Kohene · Alati saadaval · Seadistamist pole vaja",
   "mode_ai_enhanced_title": "AI-täiustatud",
+  "onnx_disabled_notice": "AI Enhanced peatus selles seadmes ootamatult, seega kasutatakse selle asemel kiirtõlget.",
   "mode_ai_enhanced_subtitle": "Parem kvaliteet · Töötab võrguühenduseta · Laadi alla keelepakett",
   "mode_cloud_ai_title": "Pilve AI",
   "mode_cloud_ai_subtitle": "Parim kvaliteet · Vajab internetti · Vajab API-võtit",

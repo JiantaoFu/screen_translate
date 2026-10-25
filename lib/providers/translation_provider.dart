@@ -515,6 +515,7 @@ class TranslationProvider with ChangeNotifier {
         _sessionProducedTranslations = false;
         _sessionOcrFrames = 0;
         _sessionOcrTextFrames = 0;
+        _sessionOnnxFailures = 0;
         activation.liveStarted();
 
         FirebaseAnalyticsService().trackTranslation(
@@ -1164,6 +1165,36 @@ class TranslationProvider with ChangeNotifier {
     return out.toString();
   }
 
+  /// ONNX ("AI Enhanced") failures tolerated per live session before the
+  /// rest of the session uses ML Kit.
+  static const kMaxOnnxFailuresPerSession = 3;
+  int _sessionOnnxFailures = 0;
+  bool _onnxUnavailable = false;
+
+  /// True after ONNX was skipped (repeated native crashes or low memory) and
+  /// ML Kit was used instead.
+  bool get onnxUnavailable => _onnxUnavailable;
+
+  /// True once, the first time ONNX gets disabled on this device after
+  /// native crashes; the UI shows a one-time note.
+  Future<bool> takeOnnxDisabledNotice() => _onnxTranslationService.crashGuard.takeDisabledNotice();
+
+  @visibleForTesting
+  int get sessionOnnxFailures => _sessionOnnxFailures;
+
+  void _reportOnnxError(Object e, StackTrace st) {
+    try {
+      FirebaseAnalyticsService().trackError(
+          errorType: 'onnx_translate', errorMessage: e.toString(), stackTrace: st);
+    } catch (_) {}
+  }
+
+  Future<String> _mlKitTranslate(String text) => _translationService.translateText(
+        text: text,
+        sourceLanguage: _sourceLanguage,
+        targetLanguage: _targetLanguage,
+      );
+
   Future<String> translateText(String text) async {
     text = sourceTextForTranslation(text, _sourceLanguage);
     switch (_translationMode) {
@@ -1175,6 +1206,9 @@ class TranslationProvider with ChangeNotifier {
         );
 
       case TranslationMode.onnx:
+        if (_sessionOnnxFailures >= kMaxOnnxFailuresPerSession) {
+          return _mlKitTranslate(text);
+        }
         try {
           return await _onnxTranslationService.translateText(
             text: text,
@@ -1184,18 +1218,22 @@ class TranslationProvider with ChangeNotifier {
         } on OnnxModelNotReadyException catch (e) {
           // Model not downloaded yet — fall back to Google ML Kit silently.
           debugPrint('OnnxTranslation: ${e.langPairKey} not ready, falling back to ML Kit');
-          return await _translationService.translateText(
-            text: text,
-            sourceLanguage: _sourceLanguage,
-            targetLanguage: _targetLanguage,
-          );
+          return _mlKitTranslate(text);
         } on UnsupportedError catch (_) {
           // Language pair not supported by ONNX — fall back to ML Kit.
-          return await _translationService.translateText(
-            text: text,
-            sourceLanguage: _sourceLanguage,
-            targetLanguage: _targetLanguage,
-          );
+          return _mlKitTranslate(text);
+        } on OnnxUnavailableException catch (e) {
+          debugPrint('OnnxTranslation: unavailable (${e.reason}), using ML Kit');
+          _onnxUnavailable = true;
+          notifyListeners();
+          return _mlKitTranslate(text);
+        } catch (e, st) {
+          // Anything else from ORT/the plugin: record it and keep translating
+          // with ML Kit. After a few failures stop trying for this session.
+          _sessionOnnxFailures++;
+          debugPrint('OnnxTranslation failed ($_sessionOnnxFailures): $e');
+          _reportOnnxError(e, st);
+          return _mlKitTranslate(text);
         }
 
       case TranslationMode.llm:

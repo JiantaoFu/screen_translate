@@ -282,10 +282,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   // One-time note when AI Enhanced was turned off on this device after it
   // crashed natively twice (see OnnxCrashGuard).
+  //
+  // Not gated on the current translation mode: the mode is restored from
+  // prefs by TranslationProvider._initPreferences(), which is still in
+  // flight at the first post-frame callback, so reading it here only ever
+  // saw the default and the note never appeared. takeOnnxDisabledNotice()
+  // is specific enough on its own — it is true only on a device where ONNX
+  // ran and was disabled, and only once.
   Future<void> _maybeShowOnnxDisabledNote() async {
     if (!mounted) return;
     final provider = Provider.of<TranslationProvider>(context, listen: false);
-    if (provider.translationMode != TranslationMode.onnx) return;
     try {
       if (!await provider.takeOnnxDisabledNotice() || !mounted) return;
     } catch (_) {

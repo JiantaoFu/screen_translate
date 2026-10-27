@@ -138,5 +138,27 @@ void main() {
       expect(provider.sessionOnnxFailures, 0);
       expect(provider.debugOnnxSkips, ['low_memory']);
     });
+
+    // HomeScreen asks for this note in its first post-frame callback, which
+    // runs before TranslationProvider._initPreferences() has restored the
+    // saved translation mode from prefs. The note must therefore not be
+    // gated on the mode; takeOnnxDisabledNotice() is authoritative on its
+    // own, and is true only on a device where ONNX ran and was disabled.
+    test('The disabled note is available before the saved mode is restored', () async {
+      SharedPreferences.setMockInitialValues({OnnxCrashGuard.kStrikes: 2});
+      final fresh = TranslationProvider(
+        null,
+        FakeOCRService(),
+        FakeTranslationService(),
+        FakeOverlayService(),
+        llmTranslationService: FakeLLMTranslationService(),
+        onnxTranslationService: FakeOnnxTranslationService(),
+      );
+
+      expect(fresh.translationMode, isNot(TranslationMode.onnx),
+          reason: 'the saved mode has not been restored yet');
+      expect(await fresh.takeOnnxDisabledNotice(), isTrue);
+      expect(await fresh.takeOnnxDisabledNotice(), isFalse, reason: 'shown once');
+    });
   });
 }

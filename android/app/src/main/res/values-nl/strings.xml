@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Scrolldetectie van Screen Translate</string>
-    <string name="accessibility_service_description">Hiermee kan Screen Translate scrollen in andere apps detecteren voor naadloze vertaling. Deze service merkt wanneer inhoud verandert, zodat vertalingen nauwkeurig worden bijgewerkt.</string>
-    <string name="accessibility_permission_title">Toegankelijkheidsservice vereist</string>
-    <string name="accessibility_permission_message">Screen Translate heeft de toegankelijkheidsservice nodig om scrollen te detecteren en inhoud in verschillende apps te vertalen.</string>
-    <string name="accessibility_permission_benefits">Voordelen:\n• Naadloze vertaling tijdens het scrollen\n• Werkt in meerdere apps\n• Nauwkeurigere vertalingen</string>
-    <string name="accessibility_permission_how_to">Zo zet je het aan:\n1. Tik op ‘Aanzetten’\n2. Zoek ‘Scrolldetectie van Screen Translate’ in de toegankelijkheidsinstellingen\n3. Zet de service aan</string>
-    <string name="btn_enable_accessibility">Aanzetten</string>
-    <string name="btn_cancel">Annuleren</string>
+    <string name="accessibility_service_description">Screen Translate kan de toegankelijkheidsservice van Android gebruiken om te merken wanneer je scrolt of naar een andere app gaat, zodat het automatisch opnieuw vertaalt als het scherm verandert en de vertaaloverlay verbergt of bijwerkt als je van app wisselt. De toegankelijkheidsservice gebruikt alleen de naam van de app op de voorgrond; hij leest geen tekst op het scherm, voert geen tikken of gebaren uit en verzamelt of verstuurt geen persoonsgegevens. Hij werkt pas nadat je hem zelf hebt aangezet. Optioneel: zonder de service kun je nog steeds handmatig vertalen; zet hem altijd uit via Instellingen &gt; Toegankelijkheid.</string>
+    <string name="accessibility_permission_title">Toegankelijkheidsservice (optioneel)</string>
+    <string name="accessibility_permission_message">Screen Translate kan de toegankelijkheidsservice van Android gebruiken om te merken wanneer je scrolt of naar een andere app gaat, zodat het automatisch opnieuw vertaalt als het scherm verandert en de vertaaloverlay verbergt of bijwerkt als je van app wisselt.</string>
+    <string name="accessibility_permission_benefits">De toegankelijkheidsservice gebruikt alleen de naam van de app op de voorgrond; hij leest geen tekst op het scherm, voert geen tikken of gebaren uit en verzamelt of verstuurt geen persoonsgegevens. Hij werkt pas nadat je hem zelf hebt aangezet.\n\nOptioneel: zonder de service kun je nog steeds handmatig vertalen; zet hem altijd uit via Instellingen &gt; Toegankelijkheid.</string>
+    <string name="accessibility_permission_how_to">Zo zet je hem aan:\n1. Tik op ‘Akkoord’\n2. Zoek ‘Scrolldetectie van Screen Translate’ in de toegankelijkheidsinstellingen\n3. Zet de service aan</string>
+    <string name="btn_enable_accessibility">Akkoord</string>
+    <string name="btn_cancel">Nee, bedankt</string>
     <string name="tap_outside_to_close">Tik buiten het venster om te sluiten</string>
     <string name="mode_auto_translate">Automatisch vertalen</string>
     <string name="mode_original_text">Originele tekst</string>

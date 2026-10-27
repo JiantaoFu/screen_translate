@@ -109,15 +109,29 @@ enum ProSyncOutcome {
 /// - [init] restores purchases, so a reinstall or a new phone gets Pro back
 ///   without a tap; the paywall also has a Restore button.
 /// - [init] also asks Play which purchases are owned ([syncWithStore]) and
-///   revokes local Pro when Play answers successfully without `pro_unlock`
-///   (refunded + revoked in Play Console). Offline, billing unavailable or
-///   any error keeps the local state, so a paying user is never locked out
-///   by a flaky connection.
+///   revokes local Pro once Play has answered successfully without
+///   `pro_unlock` [emptyQueriesBeforeRevoke] times in a row (refunded +
+///   revoked in Play Console). Offline, billing unavailable, any error, or a
+///   single empty answer keeps the local state, so a paying user is never
+///   locked out by a flaky connection or a signed-out Play Store.
 /// - The price shown is Play's localized [ProductDetails.price], never a
 ///   hard-coded string.
 class ProEntitlement extends ChangeNotifier {
   static const productId = 'pro_unlock';
   static const prefsKey = 'lite_pro_unlocked';
+  static const emptyQueriesKey = 'lite_pro_empty_queries';
+
+  /// Successful owned-purchase queries in a row that must come back without
+  /// `pro_unlock` before local Pro is revoked.
+  ///
+  /// One is not enough. queryPurchasesAsync answers OK with an empty list
+  /// while the user is signed out of the Play Store, after Play's data has
+  /// been cleared, and before it has re-synced on a fresh install — states
+  /// where isAvailable() still returns true. Revoking on the first such
+  /// answer takes Pro away from someone who paid, and restorePurchases()
+  /// won't bring it back until Play is itself healthy again. A real refund
+  /// keeps answering empty, so it still lands on the next launch.
+  static const emptyQueriesBeforeRevoke = 2;
 
   final SharedPreferences _prefs;
   final StoreGateway _store;
@@ -184,9 +198,9 @@ class ProEntitlement extends ChangeNotifier {
 
   /// Reconciles local Pro with what Play says is owned (run at app start).
   ///
-  /// Revokes only when the query succeeded and no `pro_unlock` is in the
-  /// purchased state; grants (and acknowledges) when Play has it but local
-  /// doesn't; otherwise keeps the current state.
+  /// Grants (and acknowledges) when Play has `pro_unlock` but local doesn't.
+  /// Revokes only after [emptyQueriesBeforeRevoke] successful queries in a
+  /// row came back without it; otherwise keeps the current state.
   Future<ProSyncOutcome> syncWithStore() async {
     final grantsBefore = _grants;
     OwnedPurchasesResult res;
@@ -201,7 +215,12 @@ class ProEntitlement extends ChangeNotifier {
         p.productID == productId &&
         (p.status == PurchaseStatus.purchased || p.status == PurchaseStatus.restored));
     if (owned.isNotEmpty) {
-      if (_isPro) return ProSyncOutcome.unchanged;
+      if (_isPro) {
+        if ((_prefs.getInt(emptyQueriesKey) ?? 0) != 0) {
+          await _prefs.setInt(emptyQueriesKey, 0);
+        }
+        return ProSyncOutcome.unchanged;
+      }
       await _grant();
       for (final p in owned) {
         if (p.pendingCompletePurchase) await _complete(p); // acknowledge
@@ -211,8 +230,12 @@ class ProEntitlement extends ChangeNotifier {
     }
     // A purchase that landed on the stream while we were querying wins.
     if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
+    final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
+    await _prefs.setInt(emptyQueriesKey, empties);
+    if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
     _isPro = false;
     await _prefs.setBool(prefsKey, false);
+    await _prefs.setInt(emptyQueriesKey, 0);
     notifyListeners();
     onRevoked?.call();
     return ProSyncOutcome.revoked;
@@ -307,6 +330,8 @@ class ProEntitlement extends ChangeNotifier {
     _grants++;
     _isPro = true;
     await _prefs.setBool(prefsKey, true);
+    // Play has the purchase, so any earlier empty answers were transient.
+    await _prefs.setInt(emptyQueriesKey, 0);
   }
 
   @override

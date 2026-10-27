@@ -335,10 +335,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   /// Whether a new translation may start; shows the paywall when not.
-  bool _liteAllows(String kind) {
-    final gate = _liteGate ?? LiteGate.instance;
+  ///
+  /// Awaits the gate rather than treating a missing one as "allow": in lite
+  /// the gate is built just after runApp, and a share-into-the-app on a cold
+  /// start arrives inside that window, which let an exhausted user translate
+  /// for free. Paid returns null immediately and is unaffected.
+  Future<bool> _liteAllows(String kind) async {
+    final gate = _liteGate ?? await LiteGate.waitForInstance();
     if (gate == null || gate.mayStartTranslation(kind: kind)) return true;
-    _openPaywall(gate, 'limit_hit');
+    if (mounted) _openPaywall(gate, 'limit_hit');
     return false;
   }
 
@@ -398,8 +403,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _navigateToImageTranslation(File file) {
-    if (!_liteAllows('image')) return;
+  Future<void> _navigateToImageTranslation(File file) async {
+    if (!await _liteAllows('image')) return;
+    if (!mounted) return;
     // Provide translation provider so ImageTranslationScreen can use it
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     Navigator.push(
@@ -568,7 +574,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         await showFirstFailureFeedback(context);
                                       }
                                     } else {
-                                      if (!_liteAllows('live')) return;
+                                      if (!await _liteAllows('live')) return;
                                       if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {
                                         return;
                                       }
@@ -597,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   // A second tap while the gallery is still
                                   // opening throws PlatformException(already_active).
                                   if (_isPickingImage) return;
-                                  if (!_liteAllows('image')) return;
+                                  if (!await _liteAllows('image')) return;
                                   _isPickingImage = true;
                                   try {
                                     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {

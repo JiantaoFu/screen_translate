@@ -32,6 +32,12 @@ class QuotaUse {
 /// The limit only blocks the next *attempt* once it is used up; a session in
 /// progress is never cut off, and nothing is blocked at app launch before
 /// the user has translated anything that day.
+///
+/// Known limit: the count and the day both live in SharedPreferences and the
+/// day comes from the device's own clock, so moving the clock forward or
+/// clearing the app's data resets the allowance. That is accepted — there is
+/// no server to check against, and the Pro unlock is a one-time purchase
+/// rather than something worth defending with a backend.
 class DailyTranslationQuota {
   static const dayKey = 'lite_quota_day';
   static const countKey = 'lite_quota_count';

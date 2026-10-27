@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:screen_translate/app_flavor.dart';
 import 'package:screen_translate/lite/daily_translation_quota.dart';
 import 'package:screen_translate/lite/lite_gate.dart';
 import 'package:screen_translate/lite/pro_entitlement.dart';
@@ -159,8 +160,58 @@ void main() {
     expect(g.isPro, isTrue);
     store.ownedResult = const OwnedPurchasesResult.ok([]);
     await entitlement.init();
+    // One empty answer from Play is not proof of a refund.
+    expect(g.isPro, isTrue);
+    expect(names(), isEmpty);
+
+    expect(await entitlement.syncWithStore(), ProSyncOutcome.revoked);
     expect(g.isPro, isFalse);
     expect(names(), [LiteGate.evProRevoked]);
     expect(events.single.value, {'product_id': ProEntitlement.productId});
+  });
+
+  // initForApp() builds the gate just after runApp, behind a
+  // SharedPreferences read. A share-into-the-app on a cold start arrives
+  // inside that window, and a caller that read the missing gate as "allow"
+  // let an exhausted user translate for free. Callers await the gate here.
+  group('waitForInstance', () {
+    tearDown(() {
+      LiteGate.current.value = null;
+      AppFlavorConfig.debugSet(AppFlavor.paid);
+    });
+
+    test('paid has no gate and does not wait for one', () async {
+      AppFlavorConfig.debugSet(AppFlavor.paid);
+      expect(await LiteGate.waitForInstance(), isNull);
+    });
+
+    test('lite waits for the gate that is still being built', () async {
+      AppFlavorConfig.debugSet(AppFlavor.lite);
+      final pending = LiteGate.waitForInstance();
+      var settled = false;
+      pending.then((_) => settled = true);
+
+      await pumpEventQueue();
+      expect(settled, isFalse, reason: 'no gate yet, so nothing is decided');
+
+      final built = make();
+      LiteGate.current.value = built;
+      expect(await pending, same(built));
+    });
+
+    test('lite returns the gate immediately once it exists', () async {
+      AppFlavorConfig.debugSet(AppFlavor.lite);
+      final built = make();
+      LiteGate.current.value = built;
+      expect(await LiteGate.waitForInstance(), same(built));
+    });
+
+    test('a gate that never arrives falls back instead of hanging', () async {
+      AppFlavorConfig.debugSet(AppFlavor.lite);
+      expect(
+        await LiteGate.waitForInstance(timeout: const Duration(milliseconds: 20)),
+        isNull,
+      );
+    });
   });
 }

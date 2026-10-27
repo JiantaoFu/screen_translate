@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +66,32 @@ class LiteGate extends ChangeNotifier {
     );
     current.value = gate;
     await entitlement.init();
+  }
+
+  /// Waits for the lite gate to be built, and returns [instance].
+  ///
+  /// [initForApp] runs just after runApp and needs a SharedPreferences read
+  /// before the gate exists. A share-into-the-app on a cold start resolves
+  /// inside that window, so anything gating a translation attempt waits here
+  /// instead of reading a missing gate as "allow" and letting the attempt
+  /// through for free. Returns null straight away in the paid app, and falls
+  /// back to whatever exists if the gate never arrives, so a broken init
+  /// can't make the app unusable.
+  static Future<LiteGate?> waitForInstance({
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    if (!AppFlavorConfig.isLite || current.value != null) return current.value;
+    final built = Completer<LiteGate?>();
+    void onChange() {
+      if (current.value != null && !built.isCompleted) built.complete(current.value);
+    }
+
+    current.addListener(onChange);
+    try {
+      return await built.future.timeout(timeout, onTimeout: () => current.value);
+    } finally {
+      current.removeListener(onChange);
+    }
   }
 
   bool get isPro => entitlement.isPro;

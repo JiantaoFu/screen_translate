@@ -129,13 +129,21 @@ void main() {
   group('refund revocation (owned purchases query at app start)', () {
     setUp(() async => prefs.setBool(ProEntitlement.prefsKey, true));
 
-    test('query ok and pro_unlock missing -> revoke, persist, callback', () async {
+    test('one empty answer keeps Pro; the next launch revokes it', () async {
+      // A signed-out or freshly-cleared Play Store answers OK with nothing
+      // owned, so a single empty answer must not cost a paying user Pro.
       store.ownedResult = const OwnedPurchasesResult.ok([]);
-      final e = make();
-      expect(e.isPro, isTrue);
-      await e.init();
+      final first = make();
+      expect(first.isPro, isTrue);
+      await first.init();
       expect(store.ownedQueries, 1);
-      expect(e.isPro, isFalse);
+      expect(first.isPro, isTrue);
+      expect(prefs.getBool(ProEntitlement.prefsKey), isTrue);
+      expect(revokedCallbacks, 0);
+
+      final second = make();
+      await second.init();
+      expect(second.isPro, isFalse);
       expect(prefs.getBool(ProEntitlement.prefsKey), isFalse);
       expect(revokedCallbacks, 1);
     });
@@ -146,8 +154,57 @@ void main() {
         purchase(PurchaseStatus.purchased, productId: 'something_else'),
         purchase(PurchaseStatus.pending, pendingComplete: false),
       ]);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(e.isPro, isTrue);
       expect(await e.syncWithStore(), ProSyncOutcome.revoked);
       expect(e.isPro, isFalse);
+    });
+
+    test('Play agreeing in between clears the streak', () async {
+      final e = make();
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+
+      store.ownedResult =
+          OwnedPurchasesResult.ok([purchase(PurchaseStatus.purchased, pendingComplete: false)]);
+      expect(await e.syncWithStore(), ProSyncOutcome.unchanged);
+
+      // Back to empty: this is the first of a new streak, not the second.
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(e.isPro, isTrue);
+      expect(revokedCallbacks, 0);
+    });
+
+    test('a failed query does not count toward the streak', () async {
+      final e = make();
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+
+      store.ownedResult = const OwnedPurchasesResult.error();
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(e.isPro, isTrue);
+
+      // The error answered nothing, so the next empty one is only the second.
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      expect(await e.syncWithStore(), ProSyncOutcome.revoked);
+      expect(revokedCallbacks, 1);
+    });
+
+    test('a re-purchase after a revoke starts the streak over', () async {
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      final e = make();
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(await e.syncWithStore(), ProSyncOutcome.revoked);
+
+      store.ownedResult =
+          OwnedPurchasesResult.ok([purchase(PurchaseStatus.purchased, pendingComplete: false)]);
+      expect(await e.syncWithStore(), ProSyncOutcome.granted);
+      expect(e.isPro, isTrue);
+
+      store.ownedResult = const OwnedPurchasesResult.ok([]);
+      expect(await e.syncWithStore(), ProSyncOutcome.kept);
+      expect(e.isPro, isTrue);
     });
 
     test('query ok and pro_unlock present -> keep', () async {

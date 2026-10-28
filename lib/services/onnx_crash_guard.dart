@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Native ONNX Runtime crashes (SIGILL in libonnxruntime.so, OOM kills) can't
@@ -8,7 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 ///   1 unfinished run  -> run ONNX on plain CPU (no XNNPACK), sticky
 ///   2 consecutive     -> stop using ONNX on this device; ML Kit is used
-/// A run that finishes (success or a normal Dart error) resets the count.
+/// A run that produces a translation resets the count. A run that ends in a
+/// normal Dart error does not: it clears the marker (the process plainly did
+/// not die) but leaves an earlier native crash on the record, so one bad
+/// inference followed by a thrown error can't launder a real strike away.
 class OnnxCrashGuard {
   static const kInFlight = 'onnx_guard_in_flight';
   static const kStrikes = 'onnx_guard_strikes';
@@ -65,7 +70,13 @@ class OnnxCrashGuard {
       return r;
     } finally {
       _inFlight = false;
-      await p.setBool(kInFlight, false);
+      // Not awaited. Setting the marker has to land before inference starts,
+      // or a crash would go unrecorded — clearing it does not, and nothing
+      // downstream reads it. Awaiting it put a second platform round-trip in
+      // front of every translated block in the live streaming loop, where
+      // blocks are translated one at a time. The next guard() call's set is
+      // queued behind this clear on the same channel, so the order holds.
+      unawaited(p.setBool(kInFlight, false).catchError((_) => false));
     }
   }
 

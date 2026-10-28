@@ -1268,6 +1268,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
             } catch (e: Exception) {
                 // Ignore exceptions during cleanup
             }
+
+            // ScreenTranslate: drop the context we took in onAttachedToEngine
+            // so a detached plugin doesn't keep answering lowMemoryReason.
+            appContext = null
         }
     }
 }

@@ -139,6 +139,23 @@ void main() {
       expect(provider.debugOnnxSkips, ['low_memory']);
     });
 
+    test('Unavailable ONNX notifies listeners once, not per block', () async {
+      provider.setTranslationMode(TranslationMode.onnx);
+      mockOnnx.throwError = const OnnxUnavailableException('low_memory');
+      // _initPreferences() notifies when the saved settings land; wait for
+      // that so the count below is only about the ONNX transition.
+      await pumpEventQueue();
+      var notifications = 0;
+      provider.addListener(() => notifications++);
+
+      for (var i = 0; i < 5; i++) {
+        expect(await provider.translateText('Hi'), 'ML Kit translated: Hi');
+      }
+
+      expect(provider.onnxUnavailable, isTrue);
+      expect(notifications, 1, reason: 'only the transition is new state');
+    });
+
     // HomeScreen asks for this note in its first post-frame callback, which
     // runs before TranslationProvider._initPreferences() has restored the
     // saved translation mode from prefs. The note must therefore not be

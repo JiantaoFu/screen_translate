@@ -1262,8 +1262,13 @@ class TranslationProvider with ChangeNotifier {
         } on OnnxUnavailableException catch (e) {
           debugPrint('OnnxTranslation: unavailable (${e.reason}), using ML Kit');
           _logOnnxSkipped(e.reason);
-          _onnxUnavailable = true;
-          notifyListeners();
+          // Only on the change. This throws for every block of every OCR
+          // tick once ONNX is unavailable, so notifying unconditionally
+          // rebuilt every listener a few times a second for no new state.
+          if (!_onnxUnavailable) {
+            _onnxUnavailable = true;
+            notifyListeners();
+          }
           return _mlKitTranslate(text);
         } catch (e, st) {
           // Anything else from ORT/the plugin: record it and keep translating

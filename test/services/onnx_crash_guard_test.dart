@@ -19,6 +19,27 @@ void main() {
     expect(await relaunch().cpuOnly(), isFalse);
   });
 
+  // The clear is deliberately not awaited, so that it does not put a second
+  // platform round-trip in front of every translated block. The contract is
+  // that it still lands.
+  test('the marker is cleared after a run, without being awaited', () async {
+    final g = relaunch();
+    await g.guard(() async => 'ok');
+    await pumpEventQueue();
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool(OnnxCrashGuard.kInFlight), isFalse);
+  });
+
+  test('a long run of translations never accumulates a strike', () async {
+    final g = relaunch();
+    for (var i = 0; i < 40; i++) {
+      expect(await g.guard(() async => i), i);
+    }
+    await pumpEventQueue();
+    expect(await relaunch().strikes(), 0);
+    expect(await relaunch().cpuOnly(), isFalse);
+  });
+
   test('a Dart exception clears the marker (not a native crash)', () async {
     await expectLater(relaunch().guard(() async => throw StateError('x')), throwsStateError);
     expect(await relaunch().strikes(), 0);

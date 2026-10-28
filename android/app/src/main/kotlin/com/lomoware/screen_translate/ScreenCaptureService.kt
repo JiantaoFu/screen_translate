@@ -364,6 +364,23 @@ class FrameStabilizer(
         scheduleStable(frame, lastSamples, System.currentTimeMillis(), onStable)
     }
 
+    /**
+     * Forget a frame that is still waiting for the screen to settle, so it
+     * is never delivered. For the user's "Hide all": a page change queues a
+     * delivery a moment before they press, and without this that frame
+     * arrives afterwards and the page they just hid is translated and drawn
+     * straight back. The baseline is left alone, so the next real content
+     * change still delivers and Hide all stays non-sticky.
+     */
+    @Synchronized
+    fun dropPendingFrame() {
+        if (disposed) return
+        stabilizationTimer?.cancel()
+        stabilizationTimer = null
+        stabilizationPending = false
+        lastFrame = null
+    }
+
     private fun scheduleStable(frame: ByteArray, samples: IntArray?, currentTime: Long, onStable: (ByteArray) -> Unit) {
         stabilizationTimer?.cancel()
         lastFrame = frame
@@ -412,6 +429,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     private val MAX_QUEUE_SIZE = 1
     private val MAX_FRAME_AGE = 2000L
     private val imageQueue = ConcurrentLinkedDeque<CapturedFrame>() // Pair of bytes and timestamp
+
+    // Capture time of the user's last "Hide all". Frames taken before it are
+    // never queued: the press has to win over everything already in flight,
+    // including a delivery the stabilizer had posted to the main thread
+    // before dropPendingFrame() could cancel it.
+    private var dropFramesCapturedBefore = 0L
     private val handlerThread = HandlerThread("ImageReaderThread").apply { start() }
     private val imageReaderHandler = Handler(handlerThread.looper)
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -877,6 +900,12 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         }
         val currentTime = System.currentTimeMillis()
         frameStabilizer.onNewFrame(bytes, currentTime) { stableFrame ->
+            // Taken before the user hid everything: dropPendingFrame() may
+            // have arrived after this delivery was already posted.
+            if (currentTime < dropFramesCapturedBefore) {
+                Log.d(TAG, "Dropping a frame captured before Hide all")
+                return@onNewFrame
+            }
             // Our buttons, and the status bar while it's shown (its clock and
             // the screen-sharing timer aren't content and tick constantly).
             val hidden = OverlayRegions.controlRects().toMutableList()
@@ -1018,6 +1047,18 @@ class ScreenCaptureService(private val context: Context, private val activity: A
     // even if nothing on it changes afterwards.
     fun requestFreshFrame() {
         if (::frameStabilizer.isInitialized) frameStabilizer.requestFreshFrame()
+    }
+
+    // Called by Dart on the user's "Hide all". Drops every frame captured
+    // before now — the one still settling, the one already posted for
+    // delivery, and anything sitting in the queue — so the page they just
+    // hid is not translated and drawn straight back. The next real content
+    // change produces a new frame as usual.
+    fun dropPendingFrame() {
+        dropFramesCapturedBefore = System.currentTimeMillis()
+        if (::frameStabilizer.isInitialized) frameStabilizer.dropPendingFrame()
+        imageQueue.clear()
+        Log.d(TAG, "Hide all: dropped the pending and queued frames")
     }
 
     private fun createFrameStabilizer(): FrameStabilizer {

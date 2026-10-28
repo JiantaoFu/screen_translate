@@ -24,6 +24,7 @@ class MainActivity: FlutterActivity() {
     private val OVERLAY_CHANNEL = "com.lomoware.screen_translate/overlay"
     private val MODEL_DOWNLOAD_CHANNEL = "com.lomoware.screen_translate/model_download"
     private val FEEDBACK_CHANNEL = "com.lomoware.screen_translate/feedback"
+    private val ACCESSIBILITY_CHANNEL = "com.lomoware.screen_translate/accessibility"
 
     companion object {
         // Null until the Flutter engine is attached. Services can be started
@@ -103,6 +104,10 @@ class MainActivity: FlutterActivity() {
                     screenCaptureService?.requestFreshFrame()
                     result.success(null)
                 }
+                "dropPendingFrame" -> {
+                    screenCaptureService?.dropPendingFrame()
+                    result.success(null)
+                }
                 "getTranslationMode" -> {
                     val translationMode = OverlayService.getInstance()?.getCurrentTranslationMode() ?: "auto"
                     result.success(translationMode)
@@ -175,6 +180,24 @@ class MainActivity: FlutterActivity() {
                             Log.w(TAG, "No email app for feedback", e)
                             result.success(false)
                         }
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        // Accessibility explainer outcome, picked up by Dart for analytics.
+        MethodChannel(binaryMessenger, ACCESSIBILITY_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "takeAccessibilityFunnel" -> {
+                    try {
+                        val store = AccessibilityFunnelStore.forContext(this)
+                        result.success(store.take {
+                            AccessibilityPermissionDialog.isServiceEnabled(applicationContext)
+                        })
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error reading accessibility funnel", e)
+                        result.success(null)
                     }
                 }
                 else -> result.notImplemented()

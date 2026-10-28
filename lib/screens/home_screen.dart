@@ -8,6 +8,7 @@ import 'package:screen_translate/l10n/app_localizations.dart';
 import 'package:screen_translate/services/model_download_service.dart';
 import 'package:screen_translate/widgets/download_error_dialog.dart';
 import 'package:screen_translate/widgets/first_failure_dialog.dart';
+import 'package:screen_translate/widgets/no_text_source_prompt.dart';
 import 'package:screen_translate/services/review_prompt_service.dart';
 import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
@@ -15,6 +16,7 @@ import '../services/overlay_service.dart';
 import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../services/firebase_analytics_service.dart';
+import '../services/accessibility_funnel_reporter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -371,6 +373,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _trackTranslationAndPromptReview(context);
       }
     }
+    // Back from the accessibility explainer or Settings.
+    if (state == AppLifecycleState.resumed && Platform.isAndroid) {
+      AccessibilityFunnelReporter.instance.report();
+    }
     if (state == AppLifecycleState.paused) {
       _onnxInterruptedByBackground.addAll(_onnxDownloadProgress.keys);
     } else if (state == AppLifecycleState.resumed && _onnxInterruptedByBackground.isNotEmpty) {
@@ -429,6 +435,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   /// No silent returns from Start: say what is missing and how to fix it.
+  /// Downloads whatever the current pair needs, then starts live translation.
+  /// The gate lives here, not at the call sites. There are two of them —
+  /// the Start button and the retry after "no text found" offers a different
+  /// source language — and a check at one of them silently leaves the other
+  /// ungated. Same lesson as the cold-start share intent.
+  Future<void> _startLiveTranslation(BuildContext context, TranslationProvider provider) async {
+    if (!await _liteAllows('live')) return;
+    if (!context.mounted) return;
+    if (!await _confirmQuickPacksBeforeTranslate(context, provider)) return;
+    if (!context.mounted) return;
+    if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
+    final outcome = await provider.startTranslation();
+    if (!context.mounted) return;
+    _explainStartOutcome(context, outcome);
+  }
+
   void _explainStartOutcome(BuildContext context, StartOutcome outcome) {
     final l = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.maybeOf(context);
@@ -569,22 +591,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       } else if (worked) {
                                         await _trackTranslationAndPromptReview(context);
                                       } else if (context.mounted) {
+                                        // OCR found no text at all: most likely
+                                        // the wrong source language. Offer the
+                                        // common ones and retry right away.
+                                        if (await shouldOfferSourceLanguages(
+                                                sessionFoundNoText: provider.sessionFoundNoText) &&
+                                            context.mounted) {
+                                          final picked = await showNoTextSourcePrompt(context,
+                                              currentSource: provider.sourceLanguage,
+                                              targetLanguage: provider.targetLanguage);
+                                          if (picked != null && context.mounted) {
+                                            provider.setSourceLanguage(picked);
+                                            await _startLiveTranslation(context, provider);
+                                            return;
+                                          }
+                                        }
                                         // First session that showed nothing:
                                         // ask once what went wrong.
-                                        await showFirstFailureFeedback(context);
+                                        if (context.mounted) await showFirstFailureFeedback(context);
                                       }
                                     } else {
-                                      if (!await _liteAllows('live')) return;
-                                      if (!await _confirmQuickPacksBeforeTranslate(context, provider)) {
-                                        return;
-                                      }
-                                      if (!context.mounted) return;
-                                      if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
-                                        return;
-                                      }
-                                      final outcome = await provider.startTranslation();
-                                      if (!context.mounted) return;
-                                      _explainStartOutcome(context, outcome);
+                                      await _startLiveTranslation(context, provider);
                                     }
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(

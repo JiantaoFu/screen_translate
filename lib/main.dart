@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import 'services/translation_service.dart';
 import 'services/overlay_service.dart';
 import 'services/firebase_analytics_service.dart';
 import 'services/activation_tracker.dart';
+import 'services/accessibility_funnel_reporter.dart';
 import 'services/firebase_remote_config_service.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -97,6 +99,7 @@ Future<void> main() async {
       await analytics.init().timeout(const Duration(seconds: 5));
       await analytics.trackAppOpen();
       await ActivationTracker.instance.recordAppOpen();
+      if (Platform.isAndroid) await AccessibilityFunnelReporter.instance.report();
 
       print('Background Services: All services initialized successfully.');
     } catch (e) {

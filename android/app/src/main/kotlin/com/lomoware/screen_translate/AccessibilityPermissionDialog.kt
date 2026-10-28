@@ -13,6 +13,34 @@ class AccessibilityPermissionDialog(private val context: Context) {
         private const val TAG = "AccessibilityPermissionDialog"
         private const val PREFS_NAME = "AccessibilityPrefs"
         private const val PREF_ACCESSIBILITY_PROMPTED = "accessibility_prompted"
+
+        /**
+         * Whether our accessibility service is enabled in system settings.
+         *
+         * The single answer to that question: everything that shows, closes
+         * or reports on the explainer asks this, so the prompt's trigger and
+         * the `enabled` it reports to analytics can never disagree. Note
+         * this is the system setting, not whether the service object has
+         * been bound yet — ScrollDetectionAccessibilityService.instance lags
+         * behind it by however long the system takes to create the service.
+         */
+        fun isServiceEnabled(context: Context): Boolean {
+            return try {
+                val accessibilityManager =
+                    context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+                val enabledServices = accessibilityManager
+                    .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+                val isEnabled = enabledServices.any { serviceInfo ->
+                    serviceInfo.resolveInfo.serviceInfo.packageName == context.packageName &&
+                        serviceInfo.resolveInfo.serviceInfo.name.contains("ScrollDetectionAccessibilityService")
+                }
+                Log.d(TAG, "Accessibility service enabled: $isEnabled")
+                isEnabled
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking accessibility service", e)
+                false
+            }
+        }
     }
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -25,7 +53,7 @@ class AccessibilityPermissionDialog(private val context: Context) {
             // enabled" as "denied" (as this used to) made the dialog pop up
             // on every cold start even after the user dismissed it.
             val shouldShowDialog = forceShow ||
-                                   (!isAccessibilityServiceEnabled() && !isAccessibilityPrompted())
+                                   (!isServiceEnabled(context) && !isAccessibilityPrompted())
 
             if (!shouldShowDialog) {
                 Log.d(TAG, "Dialog should not be shown")
@@ -45,31 +73,9 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
             // Mark that we've prompted the user
             markAccessibilityPrompted()
+            AccessibilityFunnelStore.forContext(context).markPromptShown()
         } catch (e: Exception) {
             Log.e(TAG, "Error showing accessibility dialog", e)
-        }
-    }
-
-    // Check if Accessibility Service is enabled
-    fun isAccessibilityServiceEnabled(): Boolean {
-        return try {
-            // Check if the service is running and permission is granted
-            val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-            
-            // Get all accessibility services
-            val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-            
-            // Check if our specific service is in the list of enabled services
-            val isEnabled = enabledServices.any { serviceInfo ->
-                serviceInfo.resolveInfo.serviceInfo.packageName == context.packageName && 
-                serviceInfo.resolveInfo.serviceInfo.name.contains("ScrollDetectionAccessibilityService")
-            }
-            
-            Log.d(TAG, "Accessibility service enabled: $isEnabled")
-            isEnabled
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking accessibility service", e)
-            false
         }
     }
 

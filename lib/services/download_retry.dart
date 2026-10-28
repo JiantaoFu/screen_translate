@@ -47,12 +47,19 @@ Future<T> withRetries<T>(
 /// [stallTimeout]. There used to be a fixed 3-minute cap per file, and on a
 /// slow connection the 182 MB ja→en decoder could never finish in time;
 /// each retry also deleted the partial file and started from zero.
+///
+/// Flushing the file and renaming it into place get [finalizeTimeout], not
+/// [stallTimeout]. They are local disk work, not network, so slow storage
+/// is not a stalled download — charging them to the stall budget made a
+/// slow close or rename fail an attempt that had already received every
+/// byte, and then retry the whole file.
 Future<void> resumableDownload({
   required http.Client client,
   required String url,
   required File target,
   void Function(int received, int? total)? onBytes,
   Duration stallTimeout = const Duration(seconds: 30),
+  Duration finalizeTimeout = const Duration(seconds: 30),
   int maxAttempts = 6,
   Duration retryDelay = const Duration(seconds: 2),
 }) async {
@@ -96,12 +103,12 @@ Future<void> resumableDownload({
           if (total != null && received >= total) break;
         }
       } finally {
-        await sink.close().timeout(stallTimeout);
+        await sink.close().timeout(finalizeTimeout);
       }
       if (total != null && received < total) {
         throw Exception('Download: connection closed at $received of $total bytes');
       }
-      await tmp.rename(target.path).timeout(stallTimeout);
+      await tmp.rename(target.path).timeout(finalizeTimeout);
       return;
     } on _NonRetryable catch (e) {
       throw e.error;

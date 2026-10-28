@@ -20,6 +20,10 @@ class CustomModelManager {
   /// many minutes.
   final Duration stallTimeout;
 
+  /// Flushing and renaming the finished file is local disk work, so it gets
+  /// its own budget — slow storage is not a stalled download.
+  final Duration finalizeTimeout;
+
   /// Stalls tolerated per call before giving up; each one resumes from the
   /// bytes already on disk.
   final int maxAttempts;
@@ -29,6 +33,7 @@ class CustomModelManager {
     http.Client Function()? clientFactory,
     Future<Directory> Function()? cacheDir,
     this.stallTimeout = const Duration(seconds: 30),
+    this.finalizeTimeout = const Duration(seconds: 30),
     this.maxAttempts = 4,
     this.retryDelay = const Duration(seconds: 2),
   })  : _clientFactory = clientFactory ?? http.Client.new,
@@ -66,6 +71,7 @@ class CustomModelManager {
         url: '$baseUrl/$langCode.zip',
         target: zip,
         stallTimeout: stallTimeout,
+        finalizeTimeout: finalizeTimeout,
         maxAttempts: maxAttempts,
         retryDelay: retryDelay,
         onBytes: (received, total) {

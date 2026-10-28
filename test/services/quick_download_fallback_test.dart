@@ -157,7 +157,8 @@ void main() {
 
     /// Serves [body] with Range support. Requests up to [stallUntil] send
     /// half of what they promise and then stall.
-    MockClient server(List<String?> ranges, {int stallUntil = 0, Duration chunkDelay = Duration.zero}) {
+    MockClient server(List<String?> ranges,
+        {int stallUntil = 0, Duration chunkDelay = Duration.zero, int chunkSize = 100}) {
       var n = 0;
       return MockClient.streaming((request, _) async {
         n++;
@@ -170,9 +171,9 @@ void main() {
           controller.add(rest.sublist(0, rest.length ~/ 2));
         } else {
           () async {
-            for (var i = 0; i < rest.length; i += 100) {
+            for (var i = 0; i < rest.length; i += chunkSize) {
               await Future<void>.delayed(chunkDelay);
-              controller.add(rest.sublist(i, (i + 100).clamp(0, rest.length)));
+              controller.add(rest.sublist(i, (i + chunkSize).clamp(0, rest.length)));
             }
             await controller.close();
           }();
@@ -186,7 +187,14 @@ void main() {
     CustomModelManager manager(MockClient client, {int maxAttempts = 4}) => CustomModelManager(
           clientFactory: () => client,
           cacheDir: () async => dir,
-          stallTimeout: const Duration(milliseconds: 400), // 100 ms flaked: a slow close/rename looked like a stall
+          // Only the gap between chunks is measured against this, and the
+          // tests below keep their gaps 50x under it. Flushing and renaming
+          // the finished file — real disk work, and what actually flaked
+          // here when this budget was 100 ms and then 400 ms — is charged to
+          // finalizeTimeout instead, which is set far above any plausible
+          // scheduling hiccup on a loaded machine.
+          stallTimeout: const Duration(milliseconds: 500),
+          finalizeTimeout: const Duration(seconds: 10),
           maxAttempts: maxAttempts,
           retryDelay: Duration.zero,
         );
@@ -215,9 +223,16 @@ void main() {
     });
 
     test('slow but steady is never cut off: only a stall fails', () async {
-      // 10 chunks 60 ms apart = ~600 ms total, 6x the 100 ms stall timeout.
+      // 100 chunks 10 ms apart: ~1 s in total, twice the 500 ms stall
+      // timeout, so this still proves there is no total-duration cap — but
+      // every individual gap is 50x under the timeout, so the result does
+      // not depend on how loaded the machine is. The previous shape (10
+      // chunks 60 ms apart against a 400 ms timeout) left only 6.7x, and
+      // flaked in a full-suite run.
       final ranges = <String?>[];
-      final zip = await manager(server(ranges, chunkDelay: const Duration(milliseconds: 60)), maxAttempts: 1)
+      final zip = await manager(
+              server(ranges, chunkDelay: const Duration(milliseconds: 10), chunkSize: 10),
+              maxAttempts: 1)
           .downloadZip('tr');
       expect(zip.readAsBytesSync(), body);
       expect(ranges, [null]);

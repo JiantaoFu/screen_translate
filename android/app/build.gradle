@@ -25,18 +25,22 @@ if (flutterVersionCode == null) {
     flutterVersionCode = '1'
 }
 
-// Each flavor's own versionCode, written by tools/build.py; falls back to
-// the shared flutter.versionCode when the key isn't there.
-// A closure, not a method: a method in a Gradle script can't see the
-// script's `def` locals (localProperties, flutterVersionCode).
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+// Each flavor's own version, written by tools/build.py; falls back to the
+// shared flutter.version* when the key isn't there, so a tree synced by an
+// older build.py still builds.
+// Closures, not methods: a method in a Gradle script can't see the script's
+// `def` locals (localProperties, flutterVersionCode, flutterVersionName).
 def flavorVersionCode = { flavor ->
     (localProperties.getProperty("flutter.versionCode.${flavor}")
         ?: flutterVersionCode).toInteger()
 }
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+def flavorVersionName = { flavor ->
+    localProperties.getProperty("flutter.versionName.${flavor}") ?: flutterVersionName
 }
 
 android {
@@ -94,12 +98,14 @@ android {
             applicationId "com.lomoware.screen_translate"
             manifestPlaceholders = [appLabel: "Screen Translate"]
             versionCode flavorVersionCode('paid')
+            versionName flavorVersionName('paid')
         }
         lite {
             dimension "edition"
             applicationId "com.lomoware.screen_translate.lite"
             manifestPlaceholders = [appLabel: "Screen Translator Lite"]
             versionCode flavorVersionCode('lite')
+            versionName flavorVersionName('lite')
             // Native debug symbols in BUNDLE-METADATA made up ~57 MB
             // (compressed) of the ~146 MB lite AAB: whole copies of the
             // prebuilt .so files (onnxruntime, translate_jni, flutter,

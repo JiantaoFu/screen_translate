@@ -133,58 +133,61 @@ def run(cmd, cwd=ROOT, env=None, capture=False):
 def read_version(flavor=DEFAULT_FLAVOR):
     """(versionName, versionCode) for one flavor, both from pubspec.yaml.
 
-    The name is shared — one codebase, one marketing version — but the build
-    number is per flavor, so releasing one app does not consume the other's
-    versionCode. `version:` carries the paid app's, because that is the line
-    Flutter itself reads; the rest live under flavor_version_codes.
+    Each flavor carries its own name and build number: the flavors are
+    separate Play listings, so neither should have to move because the other
+    released. `version:` is the paid app's, because that is the line Flutter
+    itself reads; the rest live under flavor_versions.
     """
     text = PUBSPEC.read_text(encoding="utf-8")
-    m = re.search(r"^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", text, re.M)
-    if not m:
-        raise BuildError('pubspec.yaml has no "version: x.y.z+n" line')
-    name = m.group(1)
     if flavor == DEFAULT_FLAVOR:
-        return name, int(m.group(2))
+        m = re.search(r"^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", text, re.M)
+        if not m:
+            raise BuildError('pubspec.yaml has no "version: x.y.z+n" line')
+        return m.group(1), int(m.group(2))
     if flavor not in FLAVORS:
         raise BuildError(f"unknown flavor {flavor} (one of {', '.join(FLAVORS)})")
-    code = flavor_version_codes(text).get(flavor)
-    if code is None:
-        raise BuildError(f'pubspec.yaml has no "{flavor}:" build number under '
-                         "flavor_version_codes")
-    return name, code
+    version = flavor_versions(text).get(flavor)
+    if version is None:
+        raise BuildError(f'pubspec.yaml has no "{flavor}: x.y.z+n" line under '
+                         "flavor_versions")
+    return version
 
 
-def flavor_version_codes(text):
-    """The flavor_version_codes block as {flavor: code}.
+def flavor_versions(text):
+    """The flavor_versions block as {flavor: (name, code)}.
 
     Parsed rather than loaded with a YAML library: build.py has no
-    third-party dependencies, and this block is two lines of "name: int".
+    third-party dependencies, and the block is one "name: x.y.z+n" per line.
+    The lookahead stops at the next top-level key, so `environment:` below it
+    is not swallowed.
     """
-    block = re.search(r"^flavor_version_codes:\s*$(.*?)(?=^\S|\Z)", text,
-                      re.M | re.S)
+    block = re.search(r"^flavor_versions:\s*$(.*?)(?=^\S|\Z)", text, re.M | re.S)
     if not block:
         return {}
-    return {k: int(v) for k, v in
-            re.findall(r"^\s+(\w+):\s*(\d+)\s*$", block.group(1), re.M)}
+    return {f: (name, int(code)) for f, name, code in re.findall(
+        r"^\s+(\w+):\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", block.group(1), re.M)}
 
 
 def write_local_versions(name, code):
     """The Gradle build reads the version from android/local.properties,
     which only `flutter build` would otherwise refresh from pubspec.yaml.
 
-    flutter.versionCode is the flavor being built, for the Flutter tooling
-    and for defaultConfig. Every flavor's own number is written too, under
-    flutter.versionCode.<flavor>, so a flavor's build gets its own number
-    even when Gradle is invoked for a different one than was last synced.
+    flutter.versionName/versionCode are the flavor being built, for the
+    Flutter tooling and for defaultConfig. Every flavor's own pair is written
+    too, as flutter.version{Name,Code}.<flavor>, so a flavor's build gets its
+    own version even when Gradle is invoked for a different one than was last
+    synced.
     """
     path = ANDROID / "local.properties"
     lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
     wanted = {"flutter.versionName": name, "flutter.versionCode": str(code)}
     for f in FLAVORS:
         try:
-            wanted[f"flutter.versionCode.{f}"] = str(read_version(f)[1])
+            f_name, f_code = read_version(f)
         except BuildError:
-            pass   # flavor has no number yet; its block falls back below
+            continue   # no version for that flavor; its block falls back
+        wanted[f"flutter.versionName.{f}"] = f_name
+        wanted[f"flutter.versionCode.{f}"] = str(f_code)
     out, seen = [], set()
     for line in lines:
         key = line.split("=", 1)[0].strip()

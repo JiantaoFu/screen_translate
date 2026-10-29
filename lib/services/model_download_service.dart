@@ -610,6 +610,7 @@ class ModelDownloadService {
     required File target,
     void Function(int received, int? total)? onBytes,
     Duration stallTimeout = const Duration(seconds: 30),
+    Duration finalizeTimeout = const Duration(seconds: 30),
     int maxAttempts = 6,
     Duration retryDelay = const Duration(seconds: 2),
   }) =>
@@ -619,6 +620,7 @@ class ModelDownloadService {
         target: target,
         onBytes: onBytes,
         stallTimeout: stallTimeout,
+        finalizeTimeout: finalizeTimeout,
         maxAttempts: maxAttempts,
         retryDelay: retryDelay,
       );

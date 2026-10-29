@@ -42,15 +42,24 @@ void main() {
   setUp(() => dir = Directory.systemTemp.createTempSync('dl_test_'));
   tearDown(() => dir.deleteSync(recursive: true));
 
-  Future<void> download(http.Client client, File target, {int maxAttempts = 6}) =>
+  Future<void> download(
+    http.Client client,
+    File target, {
+    int maxAttempts = 6,
+    Duration stallTimeout = const Duration(milliseconds: 400),
+    Duration finalizeTimeout = const Duration(seconds: 10),
+  }) =>
       ModelDownloadService.downloadFileResumable(
         client: client,
         url: 'https://example.com/model.onnx',
         target: target,
-        // Short enough to keep the test fast, long enough that a slow file
-        // close or rename on a loaded Windows machine is not taken for a stall
-        // (100 ms once failed the final rename and retried from scratch).
-        stallTimeout: const Duration(milliseconds: 400),
+        // Only the gap between chunks is measured against this. Closing and
+        // renaming the finished file is local disk work and gets
+        // finalizeTimeout, well above any scheduling hiccup on a loaded
+        // machine — charging it to the stall budget is what once failed the
+        // final rename at 100 ms and retried the whole file from scratch.
+        stallTimeout: stallTimeout,
+        finalizeTimeout: finalizeTimeout,
         retryDelay: Duration.zero,
         maxAttempts: maxAttempts,
       );
@@ -87,6 +96,45 @@ void main() {
     await expectLater(download(_server(failAfter: 99), target, maxAttempts: 3), throwsA(anything));
     expect(target.existsSync(), isFalse);
     expect(File('${target.path}.tmp').existsSync(), isTrue);
+  });
+
+  // Flushing and renaming the finished file used to be charged to
+  // stallTimeout, so slow storage could fail an attempt that had already
+  // received every byte and then retry the whole file. An unmeetable
+  // finalizeTimeout is the only way to assert that separation without being
+  // able to make real disk I/O slow: a download that stalls nowhere and
+  // arrives in full must still fail here, and only because of finalizing.
+  test('finalizing the file is charged to finalizeTimeout, not stallTimeout', () async {
+    // Its own directory, cleaned up best-effort: Future.timeout abandons the
+    // close without cancelling it, so the .tmp handle stays open and Windows
+    // refuses to delete the directory. That is a real (if remote) wart —
+    // a finalize timeout leaks the sink — but it needs more than a timeout
+    // to fix, and the default budget is 30 s.
+    final own = Directory.systemTemp.createTempSync('dl_finalize_');
+    final target = File('${own.path}/model.onnx');
+    try {
+      await expectLater(
+        download(_server(),
+            target,
+            maxAttempts: 1,
+            stallTimeout: const Duration(seconds: 10),
+            finalizeTimeout: Duration.zero),
+        throwsA(isA<TimeoutException>()),
+      );
+    } finally {
+      try {
+        own.deleteSync(recursive: true);
+      } on FileSystemException {
+        // the abandoned sink still holds the .tmp; systemTemp gets it later
+      }
+    }
+  });
+
+  test('a generous finalizeTimeout lets the same download through', () async {
+    final target = File('${dir.path}/model.onnx');
+    await download(_server(), target, maxAttempts: 1, stallTimeout: const Duration(seconds: 10));
+    expect(target.readAsBytesSync(), _body);
+    expect(File('${target.path}.tmp').existsSync(), isFalse);
   });
 
   test('a 404 is not retried', () async {

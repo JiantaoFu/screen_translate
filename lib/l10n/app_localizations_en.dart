@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get app_title => 'Screen Translate';
 
   @override
+  String get app_title_lite => 'Screen Translator Lite';
+
+  @override
   String get source_language => 'From';
 
   @override
@@ -491,4 +494,47 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Screen capture wasn\'t allowed, so nothing can be translated. Tap Start again and allow screen capture.';
+
+  @override
+  String get paywall_title => 'You\'ve used today\'s free translations';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite includes $limit free translations a day. Unlock Pro once for unlimited translations.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Unlimited translations, every day';
+
+  @override
+  String get paywall_benefit_once => 'One-time purchase, no subscription';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Unlock Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Unlock Pro';
+
+  @override
+  String get paywall_restore => 'Restore purchase';
+
+  @override
+  String get paywall_not_now => 'Not now';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play isn\'t available right now. Please try again later.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro unlocked: unlimited translations!';
+
+  @override
+  String get paywall_reset_hint => 'Free translations reset at midnight.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Free translations left today: $count';
+  }
 }

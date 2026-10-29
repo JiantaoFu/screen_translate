@@ -1,6 +1,7 @@
 {
   "@@locale": "nl",
   "app_title": "Schermvertaling",
+  "app_title_lite": "Schermvertaling Lite",
   "source_language": "Van",
   "target_language": "Naar",
   "stop_translation": "Vertaling stoppen",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "De vertaling was onjuist",
   "first_failure_slow": "Het was te langzaam",
   "overlay_permission_not_granted": "Vertalingen kunnen nog niet verschijnen: zet 'Weergeven over andere apps' aan voor Screen Translate en kom terug.",
-  "screen_capture_not_granted": "Schermopname is niet toegestaan, dus er kan niets vertaald worden. Tik opnieuw op Start en sta schermopname toe."
+  "screen_capture_not_granted": "Schermopname is niet toegestaan, dus er kan niets vertaald worden. Tik opnieuw op Start en sta schermopname toe.",
+  "paywall_title": "Je hebt de gratis vertalingen van vandaag gebruikt",
+  "paywall_body": "Screen Translator Lite bevat {limit} gratis vertalingen per dag. Ontgrendel Pro eenmalig voor onbeperkt vertalen.",
+  "paywall_benefit_unlimited": "Onbeperkt vertalen, elke dag",
+  "paywall_benefit_once": "Eenmalige aankoop, geen abonnement",
+  "paywall_unlock_button": "Pro ontgrendelen · {price}",
+  "paywall_unlock_button_no_price": "Pro ontgrendelen",
+  "paywall_restore": "Aankoop herstellen",
+  "paywall_not_now": "Niet nu",
+  "paywall_store_unavailable": "Google Play is nu niet beschikbaar. Probeer het later opnieuw.",
+  "paywall_pro_unlocked": "Pro ontgrendeld: onbeperkt vertalen!",
+  "paywall_reset_hint": "Gratis vertalingen worden om middernacht gereset.",
+  "lite_remaining_today": "Resterende gratis vertalingen vandaag: {count}"
 }

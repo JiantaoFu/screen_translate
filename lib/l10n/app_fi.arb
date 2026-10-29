@@ -1,6 +1,7 @@
 {
   "@@locale": "fi",
   "app_title": "Näytön kääntäminen",
+  "app_title_lite": "Näytön kääntäminen Lite",
   "source_language": "Lähtökieli",
   "target_language": "Kohdekieli",
   "stop_translation": "Lopeta kääntäminen",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Käännös oli väärä",
   "first_failure_slow": "Se oli liian hidas",
   "overlay_permission_not_granted": "Käännöksiä ei voi vielä näyttää: ota Screen Translatelle käyttöön ”Näytä muiden sovellusten päällä” ja palaa takaisin.",
-  "screen_capture_not_granted": "Näytön tallennusta ei sallittu, joten mitään ei voi kääntää. Napauta Aloita uudelleen ja salli näytön tallennus."
+  "screen_capture_not_granted": "Näytön tallennusta ei sallittu, joten mitään ei voi kääntää. Napauta Aloita uudelleen ja salli näytön tallennus.",
+  "paywall_title": "Olet käyttänyt tämän päivän ilmaiset käännökset",
+  "paywall_body": "Screen Translator Lite sisältää {limit} ilmaista käännöstä päivässä. Avaa Pro kerran, niin voit kääntää rajattomasti.",
+  "paywall_benefit_unlimited": "Rajattomasti käännöksiä joka päivä",
+  "paywall_benefit_once": "Kertaosto, ei tilausta",
+  "paywall_unlock_button": "Avaa Pro · {price}",
+  "paywall_unlock_button_no_price": "Avaa Pro",
+  "paywall_restore": "Palauta osto",
+  "paywall_not_now": "Ei nyt",
+  "paywall_store_unavailable": "Google Play ei ole juuri nyt käytettävissä. Yritä myöhemmin uudelleen.",
+  "paywall_pro_unlocked": "Pro avattu: rajattomasti käännöksiä!",
+  "paywall_reset_hint": "Ilmaiset käännökset nollautuvat keskiyöllä.",
+  "lite_remaining_today": "Ilmaisia käännöksiä jäljellä tänään: {count}"
 }

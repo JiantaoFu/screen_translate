@@ -1,6 +1,7 @@
 {
   "@@locale": "ja",
   "app_title": "画面翻訳",
+  "app_title_lite": "画面翻訳 Lite",
   "source_language": "翻訳元",
   "target_language": "翻訳先",
   "stop_translation": "翻訳を停止",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "翻訳が間違っていた",
   "first_failure_slow": "動作が遅すぎた",
   "overlay_permission_not_granted": "翻訳を表示できません。Screen Translate の「他のアプリの上に重ねて表示」をオンにしてから戻ってください。",
-  "screen_capture_not_granted": "画面の録画が許可されなかったため翻訳できません。もう一度開始をタップして、画面の録画を許可してください。"
+  "screen_capture_not_granted": "画面の録画が許可されなかったため翻訳できません。もう一度開始をタップして、画面の録画を許可してください。",
+  "paywall_title": "本日の無料翻訳を使い切りました",
+  "paywall_body": "Screen Translator Lite は1日{limit}回まで無料で翻訳できます。Pro を一度購入すれば翻訳し放題です。",
+  "paywall_benefit_unlimited": "毎日、翻訳し放題",
+  "paywall_benefit_once": "買い切り、サブスクなし",
+  "paywall_unlock_button": "Pro を解除 · {price}",
+  "paywall_unlock_button_no_price": "Pro を解除",
+  "paywall_restore": "購入を復元",
+  "paywall_not_now": "あとで",
+  "paywall_store_unavailable": "現在 Google Play を利用できません。しばらくしてからもう一度お試しください。",
+  "paywall_pro_unlocked": "Pro を解除しました：翻訳し放題です！",
+  "paywall_reset_hint": "無料回数は午前0時にリセットされます。",
+  "lite_remaining_today": "本日の残り無料翻訳：{count}回"
 }

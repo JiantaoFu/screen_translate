@@ -1,6 +1,7 @@
 {
   "@@locale": "bg",
   "app_title": "Превод на екрана",
+  "app_title_lite": "Превод на екрана Lite",
   "source_language": "От",
   "target_language": "На",
   "stop_translation": "Спри превода",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Преводът беше грешен",
   "first_failure_slow": "Беше твърде бавно",
   "overlay_permission_not_granted": "Преводите още не могат да се покажат: включете „Показване върху други приложения“ за Screen Translate и се върнете.",
-  "screen_capture_not_granted": "Заснемането на екрана не беше разрешено, затова нищо не може да се преведе. Докоснете Старт отново и разрешете заснемането."
+  "screen_capture_not_granted": "Заснемането на екрана не беше разрешено, затова нищо не може да се преведе. Докоснете Старт отново и разрешете заснемането.",
+  "paywall_title": "Използвахте безплатните преводи за днес",
+  "paywall_body": "Screen Translator Lite включва {limit} безплатни превода на ден. Отключете Pro еднократно за неограничени преводи.",
+  "paywall_benefit_unlimited": "Неограничени преводи всеки ден",
+  "paywall_benefit_once": "Еднократна покупка, без абонамент",
+  "paywall_unlock_button": "Отключи Pro · {price}",
+  "paywall_unlock_button_no_price": "Отключи Pro",
+  "paywall_restore": "Възстанови покупката",
+  "paywall_not_now": "Не сега",
+  "paywall_store_unavailable": "Google Play не е достъпен в момента. Опитайте по-късно.",
+  "paywall_pro_unlocked": "Pro е отключен: неограничени преводи!",
+  "paywall_reset_hint": "Безплатните преводи се нулират в полунощ.",
+  "lite_remaining_today": "Оставащи безплатни преводи днес: {count}"
 }

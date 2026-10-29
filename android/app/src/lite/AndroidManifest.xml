@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lite edition ships with no accessibility service and no screen that
+     asks the user to enable one. Translation refreshes on tap only. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <service
+            android:name=".ScrollDetectionAccessibilityService"
+            tools:node="remove" />
+        <activity
+            android:name=".AccessibilityPermissionActivity"
+            tools:node="remove" />
+    </application>
+</manifest>

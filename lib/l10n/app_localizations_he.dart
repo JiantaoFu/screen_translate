@@ -12,6 +12,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get app_title => 'תרגום מסך';
 
   @override
+  String get app_title_lite => 'תרגום מסך Lite';
+
+  @override
   String get source_language => 'מ-';
 
   @override
@@ -489,4 +492,47 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'הקלטת המסך לא אושרה, ולכן אי אפשר לתרגם. הקישו שוב על התחל ואשרו הקלטת מסך.';
+
+  @override
+  String get paywall_title => 'השתמשת בתרגומים החינמיים של היום';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite כולל $limit תרגומים חינם ביום. פתחו את Pro פעם אחת לתרגומים ללא הגבלה.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'תרגומים ללא הגבלה, כל יום';
+
+  @override
+  String get paywall_benefit_once => 'רכישה חד־פעמית, ללא מנוי';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'פתיחת Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'פתיחת Pro';
+
+  @override
+  String get paywall_restore => 'שחזור רכישה';
+
+  @override
+  String get paywall_not_now => 'לא עכשיו';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play אינו זמין כרגע. נסו שוב מאוחר יותר.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro נפתח: תרגומים ללא הגבלה!';
+
+  @override
+  String get paywall_reset_hint => 'התרגומים החינמיים מתאפסים בחצות.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'תרגומים חינמיים שנותרו היום: $count';
+  }
 }

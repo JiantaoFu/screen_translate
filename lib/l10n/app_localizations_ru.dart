@@ -12,6 +12,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get app_title => 'Перевод экрана';
 
   @override
+  String get app_title_lite => 'Перевод экрана Lite';
+
+  @override
   String get source_language => 'С';
 
   @override
@@ -496,4 +499,48 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Запись экрана не разрешена, поэтому переводить нечего. Нажмите «Старт» снова и разрешите запись экрана.';
+
+  @override
+  String get paywall_title => 'Вы использовали бесплатные переводы на сегодня';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite даёт $limit бесплатных переводов в день. Разблокируйте Pro один раз — и переводите без ограничений.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Безлимитные переводы каждый день';
+
+  @override
+  String get paywall_benefit_once => 'Разовая покупка, без подписки';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Разблокировать Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Разблокировать Pro';
+
+  @override
+  String get paywall_restore => 'Восстановить покупку';
+
+  @override
+  String get paywall_not_now => 'Не сейчас';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play сейчас недоступен. Попробуйте позже.';
+
+  @override
+  String get paywall_pro_unlocked =>
+      'Pro разблокирован: переводы без ограничений!';
+
+  @override
+  String get paywall_reset_hint => 'Бесплатные переводы обновляются в полночь.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Осталось бесплатных переводов сегодня: $count';
+  }
 }

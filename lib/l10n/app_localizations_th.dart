@@ -12,6 +12,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get app_title => 'แปลหน้าจอ';
 
   @override
+  String get app_title_lite => 'แปลหน้าจอ Lite';
+
+  @override
   String get source_language => 'จาก';
 
   @override
@@ -490,4 +493,47 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'ไม่ได้อนุญาตการบันทึกหน้าจอ จึงแปลไม่ได้ แตะเริ่มอีกครั้งและอนุญาตการบันทึกหน้าจอ';
+
+  @override
+  String get paywall_title => 'คุณใช้การแปลฟรีของวันนี้หมดแล้ว';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite แปลฟรีได้วันละ $limit ครั้ง ปลดล็อก Pro ครั้งเดียวเพื่อแปลได้ไม่จำกัด';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'แปลได้ไม่จำกัดทุกวัน';
+
+  @override
+  String get paywall_benefit_once => 'ซื้อครั้งเดียว ไม่ต้องสมัครสมาชิก';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'ปลดล็อก Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'ปลดล็อก Pro';
+
+  @override
+  String get paywall_restore => 'กู้คืนการซื้อ';
+
+  @override
+  String get paywall_not_now => 'ไว้ทีหลัง';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play ไม่พร้อมใช้งานในขณะนี้ โปรดลองอีกครั้งภายหลัง';
+
+  @override
+  String get paywall_pro_unlocked => 'ปลดล็อก Pro แล้ว: แปลได้ไม่จำกัด!';
+
+  @override
+  String get paywall_reset_hint => 'การแปลฟรีจะรีเซ็ตตอนเที่ยงคืน';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'การแปลฟรีที่เหลือวันนี้: $count';
+  }
 }

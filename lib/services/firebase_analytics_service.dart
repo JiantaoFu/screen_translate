@@ -4,16 +4,18 @@ import 'package:logging/logging.dart';
 
 class FirebaseAnalyticsService {
   static final FirebaseAnalyticsService _instance = FirebaseAnalyticsService._internal();
-  late FirebaseAnalytics _analytics;
+  // Resolved on use, not in the constructor: the lite flavor can run without
+  // Firebase (no google-services.json yet), and then every call below must
+  // fail inside its own try/catch instead of throwing from
+  // FirebaseAnalyticsService() at the call site.
+  FirebaseAnalytics get _analytics => FirebaseAnalytics.instance;
   final Logger _logger = Logger('FirebaseAnalyticsService');
 
   factory FirebaseAnalyticsService() {
     return _instance;
   }
 
-  FirebaseAnalyticsService._internal() {
-    _analytics = FirebaseAnalytics.instance;
-  }
+  FirebaseAnalyticsService._internal();
 
   /// Initialize Firebase Analytics
   Future<void> init() async {

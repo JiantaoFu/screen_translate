@@ -12,6 +12,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get app_title => 'Schermvertaling';
 
   @override
+  String get app_title_lite => 'Schermvertaling Lite';
+
+  @override
   String get source_language => 'Van';
 
   @override
@@ -493,4 +496,49 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Schermopname is niet toegestaan, dus er kan niets vertaald worden. Tik opnieuw op Start en sta schermopname toe.';
+
+  @override
+  String get paywall_title =>
+      'Je hebt de gratis vertalingen van vandaag gebruikt';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite bevat $limit gratis vertalingen per dag. Ontgrendel Pro eenmalig voor onbeperkt vertalen.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Onbeperkt vertalen, elke dag';
+
+  @override
+  String get paywall_benefit_once => 'Eenmalige aankoop, geen abonnement';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro ontgrendelen · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro ontgrendelen';
+
+  @override
+  String get paywall_restore => 'Aankoop herstellen';
+
+  @override
+  String get paywall_not_now => 'Niet nu';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play is nu niet beschikbaar. Probeer het later opnieuw.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro ontgrendeld: onbeperkt vertalen!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Gratis vertalingen worden om middernacht gereset.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Resterende gratis vertalingen vandaag: $count';
+  }
 }

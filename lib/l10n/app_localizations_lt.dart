@@ -12,6 +12,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get app_title => 'Ekrano vertimas';
 
   @override
+  String get app_title_lite => 'Ekrano vertimas Lite';
+
+  @override
   String get source_language => 'Iš';
 
   @override
@@ -495,4 +498,47 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Ekrano įrašymas neleistas, todėl nieko negalima išversti. Dar kartą bakstelėkite Pradėti ir leiskite įrašymą.';
+
+  @override
+  String get paywall_title => 'Išnaudojote šiandienos nemokamus vertimus';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite suteikia $limit nemokamų vertimų per dieną. Vieną kartą atrakinkite Pro ir verskite neribotai.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Neriboti vertimai kasdien';
+
+  @override
+  String get paywall_benefit_once => 'Vienkartinis pirkimas, be prenumeratos';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Atrakinti Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Atrakinti Pro';
+
+  @override
+  String get paywall_restore => 'Atkurti pirkinį';
+
+  @override
+  String get paywall_not_now => 'Ne dabar';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play šiuo metu nepasiekiama. Bandykite vėliau.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro atrakinta: neriboti vertimai!';
+
+  @override
+  String get paywall_reset_hint => 'Nemokami vertimai atnaujinami vidurnaktį.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Šiandien liko nemokamų vertimų: $count';
+  }
 }

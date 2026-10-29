@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate slinkimo aptikimas</string>
-    <string name="accessibility_service_description">Leidžia Screen Translate aptikti slinkimą kitose programose, kad vertimas būtų sklandus. Paslauga atpažįsta, kada pasikeičia turinys, kad vertimai būtų tiksliai atnaujinti.</string>
-    <string name="accessibility_permission_title">Reikalinga pritaikymo neįgaliesiems paslauga</string>
-    <string name="accessibility_permission_message">Screen Translate reikia pritaikymo neįgaliesiems paslaugos, kad galėtų aptikti slinkimą ir versti turinį įvairiose programose.</string>
-    <string name="accessibility_permission_benefits">Privalumai:\n• Sklandus vertimas slenkant\n• Veikia daugelyje programų\n• Tikslesni vertimai</string>
-    <string name="accessibility_permission_how_to">Kaip įjungti:\n1. Palieskite „Įjungti“\n2. Pritaikymo neįgaliesiems nustatymuose raskite „Screen Translate slinkimo aptikimas“\n3. Įjunkite paslaugą</string>
-    <string name="btn_enable_accessibility">Įjungti</string>
-    <string name="btn_cancel">Atšaukti</string>
+    <string name="accessibility_service_description">Screen Translate gali naudoti „Android“ pritaikymo neįgaliesiems paslaugą, kad pastebėtų, kai slenkate ar perjungiate kitą programą, todėl pasikeitus ekranui automatiškai išverčia iš naujo, o pakeitus programą paslepia arba atnaujina vertimo sluoksnį. Paslauga naudoja tik priekyje esančios programos pavadinimą; ji neskaito ekrano teksto, neatlieka palietimų ar gestų ir nerenka bei neperduoda jūsų asmens duomenų. Ji veikia tik jums patiems ją įjungus. Neprivaloma: ir be jos galite versti rankiniu būdu; bet kada išjunkite skiltyje Nustatymai &gt; Pritaikymas neįgaliesiems.</string>
+    <string name="accessibility_permission_title">Pritaikymo neįgaliesiems paslauga (neprivaloma)</string>
+    <string name="accessibility_permission_message">Screen Translate gali naudoti „Android“ pritaikymo neįgaliesiems paslaugą, kad pastebėtų, kai slenkate ar perjungiate kitą programą, todėl pasikeitus ekranui automatiškai išverčia iš naujo, o pakeitus programą paslepia arba atnaujina vertimo sluoksnį.</string>
+    <string name="accessibility_permission_benefits">Paslauga naudoja tik priekyje esančios programos pavadinimą; ji neskaito ekrano teksto, neatlieka palietimų ar gestų ir nerenka bei neperduoda jūsų asmens duomenų. Ji veikia tik jums patiems ją įjungus.\n\nNeprivaloma: ir be jos galite versti rankiniu būdu; bet kada išjunkite skiltyje Nustatymai &gt; Pritaikymas neįgaliesiems.</string>
+    <string name="accessibility_permission_how_to">Kaip įjungti:\n1. Palieskite „Sutinku“\n2. Pritaikymo neįgaliesiems nustatymuose raskite „Screen Translate slinkimo aptikimas“\n3. Įjunkite paslaugą</string>
+    <string name="btn_enable_accessibility">Sutinku</string>
+    <string name="btn_cancel">Ne, ačiū</string>
     <string name="tap_outside_to_close">Palieskite už lango ribų, kad uždarytumėte</string>
     <string name="mode_auto_translate">Automatinis vertimas</string>
     <string name="mode_original_text">Originalus tekstas</string>

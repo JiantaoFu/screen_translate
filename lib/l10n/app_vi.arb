@@ -1,6 +1,7 @@
 {
   "@@locale": "vi",
   "app_title": "Dịch màn hình",
+  "app_title_lite": "Dịch màn hình Lite",
   "source_language": "Từ",
   "target_language": "Sang",
   "stop_translation": "Dừng dịch",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Bản dịch bị sai",
   "first_failure_slow": "Quá chậm",
   "overlay_permission_not_granted": "Chưa thể hiện bản dịch: hãy bật \"Hiển thị trên ứng dụng khác\" cho Screen Translate rồi quay lại.",
-  "screen_capture_not_granted": "Chưa cho phép ghi màn hình nên không thể dịch. Nhấn Bắt đầu lần nữa và cho phép ghi màn hình."
+  "screen_capture_not_granted": "Chưa cho phép ghi màn hình nên không thể dịch. Nhấn Bắt đầu lần nữa và cho phép ghi màn hình.",
+  "paywall_title": "Bạn đã dùng hết lượt dịch miễn phí hôm nay",
+  "paywall_body": "Screen Translator Lite có {limit} lượt dịch miễn phí mỗi ngày. Mở khóa Pro một lần để dịch không giới hạn.",
+  "paywall_benefit_unlimited": "Dịch không giới hạn mỗi ngày",
+  "paywall_benefit_once": "Mua một lần, không đăng ký",
+  "paywall_unlock_button": "Mở khóa Pro · {price}",
+  "paywall_unlock_button_no_price": "Mở khóa Pro",
+  "paywall_restore": "Khôi phục giao dịch mua",
+  "paywall_not_now": "Để sau",
+  "paywall_store_unavailable": "Google Play hiện không khả dụng. Vui lòng thử lại sau.",
+  "paywall_pro_unlocked": "Đã mở khóa Pro: dịch không giới hạn!",
+  "paywall_reset_hint": "Lượt dịch miễn phí được đặt lại lúc nửa đêm.",
+  "lite_remaining_today": "Lượt dịch miễn phí còn lại hôm nay: {count}"
 }

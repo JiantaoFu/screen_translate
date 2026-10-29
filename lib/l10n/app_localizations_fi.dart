@@ -12,6 +12,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get app_title => 'Näytön kääntäminen';
 
   @override
+  String get app_title_lite => 'Näytön kääntäminen Lite';
+
+  @override
   String get source_language => 'Lähtökieli';
 
   @override
@@ -495,4 +498,48 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Näytön tallennusta ei sallittu, joten mitään ei voi kääntää. Napauta Aloita uudelleen ja salli näytön tallennus.';
+
+  @override
+  String get paywall_title => 'Olet käyttänyt tämän päivän ilmaiset käännökset';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite sisältää $limit ilmaista käännöstä päivässä. Avaa Pro kerran, niin voit kääntää rajattomasti.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Rajattomasti käännöksiä joka päivä';
+
+  @override
+  String get paywall_benefit_once => 'Kertaosto, ei tilausta';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Avaa Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Avaa Pro';
+
+  @override
+  String get paywall_restore => 'Palauta osto';
+
+  @override
+  String get paywall_not_now => 'Ei nyt';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play ei ole juuri nyt käytettävissä. Yritä myöhemmin uudelleen.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro avattu: rajattomasti käännöksiä!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Ilmaiset käännökset nollautuvat keskiyöllä.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Ilmaisia käännöksiä jäljellä tänään: $count';
+  }
 }

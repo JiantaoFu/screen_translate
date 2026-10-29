@@ -1,6 +1,7 @@
 {
   "@@locale": "sl",
   "app_title": "Prevajanje zaslona",
+  "app_title_lite": "Prevajanje zaslona Lite",
   "source_language": "Iz",
   "target_language": "V",
   "stop_translation": "Ustavi prevajanje",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Prevod je bil napačen",
   "first_failure_slow": "Bilo je prepočasno",
   "overlay_permission_not_granted": "Prevodi se še ne morejo prikazati: za Screen Translate vklopite »Prikaz prek drugih aplikacij« in se vrnite.",
-  "screen_capture_not_granted": "Snemanje zaslona ni bilo dovoljeno, zato ni mogoče ničesar prevesti. Znova tapnite Začni in dovolite snemanje."
+  "screen_capture_not_granted": "Snemanje zaslona ni bilo dovoljeno, zato ni mogoče ničesar prevesti. Znova tapnite Začni in dovolite snemanje.",
+  "paywall_title": "Porabili ste današnje brezplačne prevode",
+  "paywall_body": "Screen Translator Lite vključuje {limit} brezplačnih prevodov na dan. Pro odklenite enkrat za neomejene prevode.",
+  "paywall_benefit_unlimited": "Neomejeni prevodi vsak dan",
+  "paywall_benefit_once": "Enkraten nakup, brez naročnine",
+  "paywall_unlock_button": "Odkleni Pro · {price}",
+  "paywall_unlock_button_no_price": "Odkleni Pro",
+  "paywall_restore": "Obnovi nakup",
+  "paywall_not_now": "Ne zdaj",
+  "paywall_store_unavailable": "Google Play trenutno ni na voljo. Poskusite znova pozneje.",
+  "paywall_pro_unlocked": "Pro odklenjen: neomejeni prevodi!",
+  "paywall_reset_hint": "Brezplačni prevodi se ponastavijo ob polnoči.",
+  "lite_remaining_today": "Preostali brezplačni prevodi danes: {count}"
 }

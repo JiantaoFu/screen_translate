@@ -12,6 +12,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get app_title => 'Képernyőfordítás';
 
   @override
+  String get app_title_lite => 'Képernyőfordítás Lite';
+
+  @override
   String get source_language => 'Erről';
 
   @override
@@ -497,4 +500,48 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'A képernyőrögzítés nem lett engedélyezve, így nem lehet fordítani. Koppintson újra az Indításra, és engedélyezze a rögzítést.';
+
+  @override
+  String get paywall_title => 'Elhasználtad a mai ingyenes fordításokat';
+
+  @override
+  String paywall_body(int limit) {
+    return 'A Screen Translator Lite naponta $limit ingyenes fordítást tartalmaz. Oldd fel egyszer a Pro verziót a korlátlan fordításhoz.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Korlátlan fordítás minden nap';
+
+  @override
+  String get paywall_benefit_once => 'Egyszeri vásárlás, előfizetés nélkül';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro feloldása · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro feloldása';
+
+  @override
+  String get paywall_restore => 'Vásárlás visszaállítása';
+
+  @override
+  String get paywall_not_now => 'Most nem';
+
+  @override
+  String get paywall_store_unavailable =>
+      'A Google Play most nem érhető el. Próbáld újra később.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro feloldva: korlátlan fordítás!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Az ingyenes fordítások éjfélkor nullázódnak.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Ma hátralévő ingyenes fordítások: $count';
+  }
 }

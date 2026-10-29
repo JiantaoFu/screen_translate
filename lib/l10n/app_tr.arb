@@ -1,6 +1,7 @@
 {
   "@@locale": "tr",
   "app_title": "Ekran çevirisi",
+  "app_title_lite": "Ekran çevirisi Lite",
   "source_language": "Kaynak",
   "target_language": "Hedef",
   "stop_translation": "Çeviriyi durdur",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Çeviri yanlıştı",
   "first_failure_slow": "Çok yavaştı",
   "overlay_permission_not_granted": "Çeviriler henüz görünemiyor: Screen Translate için \"Diğer uygulamaların üzerinde göster\"i açıp geri dönün.",
-  "screen_capture_not_granted": "Ekran kaydına izin verilmedi, bu yüzden çeviri yapılamıyor. Başlat'a tekrar dokunun ve ekran kaydına izin verin."
+  "screen_capture_not_granted": "Ekran kaydına izin verilmedi, bu yüzden çeviri yapılamıyor. Başlat'a tekrar dokunun ve ekran kaydına izin verin.",
+  "paywall_title": "Bugünkü ücretsiz çevirileri kullandınız",
+  "paywall_body": "Screen Translator Lite günde {limit} ücretsiz çeviri içerir. Sınırsız çeviri için Pro'yu bir kez açın.",
+  "paywall_benefit_unlimited": "Her gün sınırsız çeviri",
+  "paywall_benefit_once": "Tek seferlik satın alma, abonelik yok",
+  "paywall_unlock_button": "Pro'yu aç · {price}",
+  "paywall_unlock_button_no_price": "Pro'yu aç",
+  "paywall_restore": "Satın alımı geri yükle",
+  "paywall_not_now": "Şimdi değil",
+  "paywall_store_unavailable": "Google Play şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
+  "paywall_pro_unlocked": "Pro açıldı: sınırsız çeviri!",
+  "paywall_reset_hint": "Ücretsiz çeviriler gece yarısı sıfırlanır.",
+  "lite_remaining_today": "Bugün kalan ücretsiz çeviri: {count}"
 }

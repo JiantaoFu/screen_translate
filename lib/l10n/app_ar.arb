@@ -1,6 +1,7 @@
 {
   "@@locale": "ar",
   "app_title": "ترجمة الشاشة",
+  "app_title_lite": "ترجمة الشاشة Lite",
   "source_language": "من",
   "target_language": "إلى",
   "stop_translation": "إيقاف الترجمة",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "كانت الترجمة خاطئة",
   "first_failure_slow": "كان بطيئًا جدًا",
   "overlay_permission_not_granted": "لا يمكن عرض الترجمات بعد: فعّل \"العرض فوق التطبيقات الأخرى\" لـ Screen Translate ثم ارجع.",
-  "screen_capture_not_granted": "لم يُسمح بالتقاط الشاشة، لذا لا يمكن الترجمة. اضغط على بدء مرة أخرى واسمح بالتقاط الشاشة."
+  "screen_capture_not_granted": "لم يُسمح بالتقاط الشاشة، لذا لا يمكن الترجمة. اضغط على بدء مرة أخرى واسمح بالتقاط الشاشة.",
+  "paywall_title": "لقد استخدمت ترجمات اليوم المجانية",
+  "paywall_body": "يتضمن Screen Translator Lite عدد {limit} ترجمات مجانية يوميًا. افتح Pro مرة واحدة لترجمات غير محدودة.",
+  "paywall_benefit_unlimited": "ترجمات غير محدودة كل يوم",
+  "paywall_benefit_once": "شراء لمرة واحدة، بلا اشتراك",
+  "paywall_unlock_button": "فتح Pro · {price}",
+  "paywall_unlock_button_no_price": "فتح Pro",
+  "paywall_restore": "استعادة الشراء",
+  "paywall_not_now": "ليس الآن",
+  "paywall_store_unavailable": "Google Play غير متاح الآن. يُرجى المحاولة لاحقًا.",
+  "paywall_pro_unlocked": "تم فتح Pro: ترجمات غير محدودة!",
+  "paywall_reset_hint": "تتجدد الترجمات المجانية عند منتصف الليل.",
+  "lite_remaining_today": "الترجمات المجانية المتبقية اليوم: {count}"
 }

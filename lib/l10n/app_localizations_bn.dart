@@ -12,6 +12,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get app_title => 'স্ক্রিন অনুবাদ';
 
   @override
+  String get app_title_lite => 'স্ক্রিন অনুবাদ Lite';
+
+  @override
   String get source_language => 'থেকে';
 
   @override
@@ -495,4 +498,48 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'স্ক্রিন ক্যাপচারের অনুমতি দেওয়া হয়নি, তাই অনুবাদ করা যাচ্ছে না। আবার শুরু চাপুন এবং স্ক্রিন ক্যাপচারের অনুমতি দিন।';
+
+  @override
+  String get paywall_title =>
+      'আপনি আজকের বিনামূল্যের অনুবাদ ব্যবহার করে ফেলেছেন';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite-এ প্রতিদিন $limitটি বিনামূল্যের অনুবাদ রয়েছে। সীমাহীন অনুবাদের জন্য একবার Pro আনলক করুন।';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'প্রতিদিন সীমাহীন অনুবাদ';
+
+  @override
+  String get paywall_benefit_once => 'একবারের কেনা, কোনো সাবস্ক্রিপশন নেই';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro আনলক করুন · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro আনলক করুন';
+
+  @override
+  String get paywall_restore => 'কেনাকাটা পুনরুদ্ধার করুন';
+
+  @override
+  String get paywall_not_now => 'এখন নয়';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play এখন উপলব্ধ নেই। পরে আবার চেষ্টা করুন।';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro আনলক হয়েছে: সীমাহীন অনুবাদ!';
+
+  @override
+  String get paywall_reset_hint => 'বিনামূল্যের অনুবাদ মধ্যরাতে রিসেট হয়।';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'আজ বাকি বিনামূল্যের অনুবাদ: $count';
+  }
 }

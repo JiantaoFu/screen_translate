@@ -12,6 +12,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get app_title => 'Traducere ecran';
 
   @override
+  String get app_title_lite => 'Traducere ecran Lite';
+
+  @override
   String get source_language => 'Din';
 
   @override
@@ -496,4 +499,48 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Captura de ecran nu a fost permisă, deci nu se poate traduce nimic. Atingeți din nou Pornire și permiteți captura.';
+
+  @override
+  String get paywall_title => 'Ai folosit traducerile gratuite de azi';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite include $limit traduceri gratuite pe zi. Deblochează Pro o singură dată pentru traduceri nelimitate.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Traduceri nelimitate, în fiecare zi';
+
+  @override
+  String get paywall_benefit_once => 'Achiziție unică, fără abonament';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Deblochează Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Deblochează Pro';
+
+  @override
+  String get paywall_restore => 'Restabilește achiziția';
+
+  @override
+  String get paywall_not_now => 'Nu acum';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play nu este disponibil acum. Încearcă din nou mai târziu.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro deblocat: traduceri nelimitate!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Traducerile gratuite se resetează la miezul nopții.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Traduceri gratuite rămase azi: $count';
+  }
 }

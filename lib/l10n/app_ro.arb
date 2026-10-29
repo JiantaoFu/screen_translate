@@ -1,6 +1,7 @@
 {
   "@@locale": "ro",
   "app_title": "Traducere ecran",
+  "app_title_lite": "Traducere ecran Lite",
   "source_language": "Din",
   "target_language": "În",
   "stop_translation": "Oprește traducerea",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Traducerea a fost greșită",
   "first_failure_slow": "A fost prea lent",
   "overlay_permission_not_granted": "Traducerile nu pot apărea încă: activați „Afișare peste alte aplicații” pentru Screen Translate, apoi reveniți.",
-  "screen_capture_not_granted": "Captura de ecran nu a fost permisă, deci nu se poate traduce nimic. Atingeți din nou Pornire și permiteți captura."
+  "screen_capture_not_granted": "Captura de ecran nu a fost permisă, deci nu se poate traduce nimic. Atingeți din nou Pornire și permiteți captura.",
+  "paywall_title": "Ai folosit traducerile gratuite de azi",
+  "paywall_body": "Screen Translator Lite include {limit} traduceri gratuite pe zi. Deblochează Pro o singură dată pentru traduceri nelimitate.",
+  "paywall_benefit_unlimited": "Traduceri nelimitate, în fiecare zi",
+  "paywall_benefit_once": "Achiziție unică, fără abonament",
+  "paywall_unlock_button": "Deblochează Pro · {price}",
+  "paywall_unlock_button_no_price": "Deblochează Pro",
+  "paywall_restore": "Restabilește achiziția",
+  "paywall_not_now": "Nu acum",
+  "paywall_store_unavailable": "Google Play nu este disponibil acum. Încearcă din nou mai târziu.",
+  "paywall_pro_unlocked": "Pro deblocat: traduceri nelimitate!",
+  "paywall_reset_hint": "Traducerile gratuite se resetează la miezul nopții.",
+  "lite_remaining_today": "Traduceri gratuite rămase azi: {count}"
 }

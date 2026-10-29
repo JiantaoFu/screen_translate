@@ -1,6 +1,7 @@
 {
   "@@locale": "it",
   "app_title": "Traduzione schermo",
+  "app_title_lite": "Traduzione schermo Lite",
   "source_language": "Da",
   "target_language": "A",
   "stop_translation": "Ferma traduzione",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "La traduzione era sbagliata",
   "first_failure_slow": "Era troppo lento",
   "overlay_permission_not_granted": "Le traduzioni non possono ancora apparire: attiva \"Mostra sopra altre app\" per Screen Translate e torna qui.",
-  "screen_capture_not_granted": "L'acquisizione dello schermo non è stata consentita, quindi non si può tradurre. Tocca di nuovo Avvia e consenti l'acquisizione."
+  "screen_capture_not_granted": "L'acquisizione dello schermo non è stata consentita, quindi non si può tradurre. Tocca di nuovo Avvia e consenti l'acquisizione.",
+  "paywall_title": "Hai usato le traduzioni gratuite di oggi",
+  "paywall_body": "Screen Translator Lite include {limit} traduzioni gratuite al giorno. Sblocca Pro una volta sola per traduzioni illimitate.",
+  "paywall_benefit_unlimited": "Traduzioni illimitate, ogni giorno",
+  "paywall_benefit_once": "Acquisto unico, nessun abbonamento",
+  "paywall_unlock_button": "Sblocca Pro · {price}",
+  "paywall_unlock_button_no_price": "Sblocca Pro",
+  "paywall_restore": "Ripristina acquisto",
+  "paywall_not_now": "Non ora",
+  "paywall_store_unavailable": "Google Play non è disponibile al momento. Riprova più tardi.",
+  "paywall_pro_unlocked": "Pro sbloccato: traduzioni illimitate!",
+  "paywall_reset_hint": "Le traduzioni gratuite si azzerano a mezzanotte.",
+  "lite_remaining_today": "Traduzioni gratuite rimaste oggi: {count}"
 }

@@ -1,6 +1,7 @@
 {
   "@@locale": "lt",
   "app_title": "Ekrano vertimas",
+  "app_title_lite": "Ekrano vertimas Lite",
   "source_language": "Iš",
   "target_language": "Į",
   "stop_translation": "Sustabdyti vertimą",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Vertimas buvo neteisingas",
   "first_failure_slow": "Buvo per lėta",
   "overlay_permission_not_granted": "Vertimai dar negali būti rodomi: įjunkite „Rodyti virš kitų programų“ programai Screen Translate ir grįžkite.",
-  "screen_capture_not_granted": "Ekrano įrašymas neleistas, todėl nieko negalima išversti. Dar kartą bakstelėkite Pradėti ir leiskite įrašymą."
+  "screen_capture_not_granted": "Ekrano įrašymas neleistas, todėl nieko negalima išversti. Dar kartą bakstelėkite Pradėti ir leiskite įrašymą.",
+  "paywall_title": "Išnaudojote šiandienos nemokamus vertimus",
+  "paywall_body": "Screen Translator Lite suteikia {limit} nemokamų vertimų per dieną. Vieną kartą atrakinkite Pro ir verskite neribotai.",
+  "paywall_benefit_unlimited": "Neriboti vertimai kasdien",
+  "paywall_benefit_once": "Vienkartinis pirkimas, be prenumeratos",
+  "paywall_unlock_button": "Atrakinti Pro · {price}",
+  "paywall_unlock_button_no_price": "Atrakinti Pro",
+  "paywall_restore": "Atkurti pirkinį",
+  "paywall_not_now": "Ne dabar",
+  "paywall_store_unavailable": "Google Play šiuo metu nepasiekiama. Bandykite vėliau.",
+  "paywall_pro_unlocked": "Pro atrakinta: neriboti vertimai!",
+  "paywall_reset_hint": "Nemokami vertimai atnaujinami vidurnaktį.",
+  "lite_remaining_today": "Šiandien liko nemokamų vertimų: {count}"
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate görgetésérzékelés</string>
-    <string name="accessibility_service_description">Lehetővé teszi, hogy a Screen Translate érzékelje a görgetést más alkalmazásokban a folyamatos fordításhoz. A szolgáltatás felismeri, ha a tartalom megváltozik, így a fordítás pontosan frissül.</string>
-    <string name="accessibility_permission_title">Kisegítő szolgáltatás szükséges</string>
-    <string name="accessibility_permission_message">A Screen Translate-nek kisegítő szolgáltatásra van szüksége a görgetés érzékeléséhez és a különböző alkalmazások tartalmának fordításához.</string>
-    <string name="accessibility_permission_benefits">Előnyök:\n• Folyamatos fordítás görgetés közben\n• Több alkalmazásban is működik\n• Pontosabb fordítás</string>
-    <string name="accessibility_permission_how_to">Bekapcsolás:\n1. Koppintson a(z) „Bekapcsolás” gombra\n2. Keresse meg a(z) „Screen Translate görgetésérzékelés” elemet a kisegítő lehetőségek beállításaiban\n3. Kapcsolja be a szolgáltatást</string>
-    <string name="btn_enable_accessibility">Bekapcsolás</string>
-    <string name="btn_cancel">Mégse</string>
+    <string name="accessibility_service_description">A Screen Translate az Android kisegítő szolgáltatásával észlelheti, ha görget vagy másik alkalmazásra vált, így a képernyő változásakor automatikusan újrafordít, alkalmazásváltáskor pedig elrejti vagy frissíti a fordítási réteget. A kisegítő szolgáltatás csak az előtérben lévő alkalmazás nevét használja; nem olvassa a képernyőn lévő szöveget, nem végez koppintást vagy kézmozdulatot, és nem gyűjti vagy továbbítja személyes adatait. Csak azután fut, hogy Ön maga bekapcsolta. Nem kötelező: nélküle is fordíthat kézzel; bármikor kikapcsolhatja a Beállítások &gt; Kisegítő lehetőségek menüben.</string>
+    <string name="accessibility_permission_title">Kisegítő szolgáltatás (nem kötelező)</string>
+    <string name="accessibility_permission_message">A Screen Translate az Android kisegítő szolgáltatásával észlelheti, ha görget vagy másik alkalmazásra vált, így a képernyő változásakor automatikusan újrafordít, alkalmazásváltáskor pedig elrejti vagy frissíti a fordítási réteget.</string>
+    <string name="accessibility_permission_benefits">A kisegítő szolgáltatás csak az előtérben lévő alkalmazás nevét használja; nem olvassa a képernyőn lévő szöveget, nem végez koppintást vagy kézmozdulatot, és nem gyűjti vagy továbbítja személyes adatait. Csak azután fut, hogy Ön maga bekapcsolta.\n\nNem kötelező: nélküle is fordíthat kézzel; bármikor kikapcsolhatja a Beállítások &gt; Kisegítő lehetőségek menüben.</string>
+    <string name="accessibility_permission_how_to">Bekapcsolás:\n1. Koppintson a(z) „Elfogadom” gombra\n2. Keresse meg a(z) „Screen Translate görgetésérzékelés” elemet a kisegítő beállításokban\n3. Kapcsolja be a szolgáltatást</string>
+    <string name="btn_enable_accessibility">Elfogadom</string>
+    <string name="btn_cancel">Nem, köszönöm</string>
     <string name="tap_outside_to_close">A bezáráshoz koppintson az ablakon kívülre</string>
     <string name="mode_auto_translate">Automatikus fordítás</string>
     <string name="mode_original_text">Eredeti szöveg</string>

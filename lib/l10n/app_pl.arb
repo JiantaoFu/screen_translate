@@ -1,6 +1,7 @@
 {
   "@@locale": "pl",
   "app_title": "Tłumaczenie ekranu",
+  "app_title_lite": "Tłumaczenie ekranu Lite",
   "source_language": "Z",
   "target_language": "Na",
   "stop_translation": "Zatrzymaj tłumaczenie",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Tłumaczenie było błędne",
   "first_failure_slow": "Działało zbyt wolno",
   "overlay_permission_not_granted": "Tłumaczenia nie mogą się jeszcze pojawić: włącz „Wyświetlanie nad innymi aplikacjami” dla Screen Translate i wróć.",
-  "screen_capture_not_granted": "Nie zezwolono na nagrywanie ekranu, więc nie można nic przetłumaczyć. Dotknij ponownie Start i zezwól na nagrywanie."
+  "screen_capture_not_granted": "Nie zezwolono na nagrywanie ekranu, więc nie można nic przetłumaczyć. Dotknij ponownie Start i zezwól na nagrywanie.",
+  "paywall_title": "Wykorzystałeś dzisiejsze darmowe tłumaczenia",
+  "paywall_body": "Screen Translator Lite zawiera {limit} darmowych tłumaczeń dziennie. Odblokuj Pro jednorazowo, aby tłumaczyć bez limitu.",
+  "paywall_benefit_unlimited": "Nielimitowane tłumaczenia każdego dnia",
+  "paywall_benefit_once": "Jednorazowy zakup, bez subskrypcji",
+  "paywall_unlock_button": "Odblokuj Pro · {price}",
+  "paywall_unlock_button_no_price": "Odblokuj Pro",
+  "paywall_restore": "Przywróć zakup",
+  "paywall_not_now": "Nie teraz",
+  "paywall_store_unavailable": "Google Play jest teraz niedostępny. Spróbuj ponownie później.",
+  "paywall_pro_unlocked": "Pro odblokowane: nielimitowane tłumaczenia!",
+  "paywall_reset_hint": "Darmowe tłumaczenia odnawiają się o północy.",
+  "lite_remaining_today": "Pozostałe darmowe tłumaczenia dziś: {count}"
 }

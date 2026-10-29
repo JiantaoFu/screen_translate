@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Zaznavanje drsenja Screen Translate</string>
-    <string name="accessibility_service_description">Aplikaciji Screen Translate omogoča zaznavanje drsenja v drugih aplikacijah za tekoč prevod. Storitev zazna, kdaj se vsebina spremeni, da se prevodi natančno posodobijo.</string>
-    <string name="accessibility_permission_title">Potrebna je storitev dostopnosti</string>
-    <string name="accessibility_permission_message">Screen Translate potrebuje storitev dostopnosti za zaznavanje drsenja in prevajanje vsebine v različnih aplikacijah.</string>
-    <string name="accessibility_permission_benefits">Prednosti:\n• Tekoč prevod med drsenjem\n• Deluje v več aplikacijah\n• Natančnejši prevodi</string>
-    <string name="accessibility_permission_how_to">Kako vklopiti:\n1. Dotaknite se »Vklopi«\n2. V nastavitvah dostopnosti poiščite »Zaznavanje drsenja Screen Translate«\n3. Vklopite storitev</string>
-    <string name="btn_enable_accessibility">Vklopi</string>
-    <string name="btn_cancel">Prekliči</string>
+    <string name="accessibility_service_description">Screen Translate lahko uporablja storitev za dostopnost sistema Android, da zazna, kdaj se pomikate ali preklopite v drugo aplikacijo, tako da samodejno znova prevede vsebino, ko se zaslon spremeni, in skrije ali posodobi prekrivni prevod, ko zamenjate aplikacijo. Storitev uporablja samo ime aplikacije v ospredju; ne bere besedila na zaslonu, ne izvaja dotikov ali potez ter ne zbira ali pošilja vaših osebnih podatkov. Deluje šele, ko jo sami vklopite. Izbirno: tudi brez nje lahko prevajate ročno; kadar koli jo izklopite v Nastavitve &gt; Dostopnost.</string>
+    <string name="accessibility_permission_title">Storitev za dostopnost (izbirno)</string>
+    <string name="accessibility_permission_message">Screen Translate lahko uporablja storitev za dostopnost sistema Android, da zazna, kdaj se pomikate ali preklopite v drugo aplikacijo, tako da samodejno znova prevede vsebino, ko se zaslon spremeni, in skrije ali posodobi prekrivni prevod, ko zamenjate aplikacijo.</string>
+    <string name="accessibility_permission_benefits">Storitev uporablja samo ime aplikacije v ospredju; ne bere besedila na zaslonu, ne izvaja dotikov ali potez ter ne zbira ali pošilja vaših osebnih podatkov. Deluje šele, ko jo sami vklopite.\n\nIzbirno: tudi brez nje lahko prevajate ročno; kadar koli jo izklopite v Nastavitve &gt; Dostopnost.</string>
+    <string name="accessibility_permission_how_to">Kako jo vklopite:\n1. Tapnite »Strinjam se«\n2. V nastavitvah dostopnosti poiščite »Zaznavanje drsenja Screen Translate«\n3. Vklopite storitev</string>
+    <string name="btn_enable_accessibility">Strinjam se</string>
+    <string name="btn_cancel">Ne, hvala</string>
     <string name="tap_outside_to_close">Za zapiranje se dotaknite zunaj okna</string>
     <string name="mode_auto_translate">Samodejni prevod</string>
     <string name="mode_original_text">Izvirno besedilo</string>

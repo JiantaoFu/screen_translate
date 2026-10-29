@@ -1,6 +1,7 @@
 {
   "@@locale": "et",
   "app_title": "Ekraani tõlkimine",
+  "app_title_lite": "Ekraani tõlkimine Lite",
   "source_language": "Lähtekeel",
   "target_language": "Sihtkeel",
   "stop_translation": "Peata tõlkimine",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "Tõlge oli vale",
   "first_failure_slow": "See oli liiga aeglane",
   "overlay_permission_not_granted": "Tõlkeid ei saa veel kuvada: lülitage Screen Translate'i jaoks sisse „Kuva teiste rakenduste peal“ ja tulge tagasi.",
-  "screen_capture_not_granted": "Ekraanisalvestust ei lubatud, seega ei saa midagi tõlkida. Puudutage uuesti Alusta ja lubage ekraanisalvestus."
+  "screen_capture_not_granted": "Ekraanisalvestust ei lubatud, seega ei saa midagi tõlkida. Puudutage uuesti Alusta ja lubage ekraanisalvestus.",
+  "paywall_title": "Oled tänased tasuta tõlked ära kasutanud",
+  "paywall_body": "Screen Translator Lite sisaldab {limit} tasuta tõlget päevas. Ava Pro ühe korra ja tõlgi piiramatult.",
+  "paywall_benefit_unlimited": "Piiramatud tõlked iga päev",
+  "paywall_benefit_once": "Ühekordne ost, tellimust pole",
+  "paywall_unlock_button": "Ava Pro · {price}",
+  "paywall_unlock_button_no_price": "Ava Pro",
+  "paywall_restore": "Taasta ost",
+  "paywall_not_now": "Mitte praegu",
+  "paywall_store_unavailable": "Google Play pole praegu saadaval. Proovi hiljem uuesti.",
+  "paywall_pro_unlocked": "Pro avatud: piiramatud tõlked!",
+  "paywall_reset_hint": "Tasuta tõlked lähtestatakse keskööl.",
+  "lite_remaining_today": "Täna jäänud tasuta tõlkeid: {count}"
 }

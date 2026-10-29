@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- The paid app sells nothing: drop the permission in_app_purchase merges in. -->
+    <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
+</manifest>

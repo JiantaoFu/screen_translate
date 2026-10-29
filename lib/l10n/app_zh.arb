@@ -1,6 +1,7 @@
 {
   "@@locale": "zh",
   "app_title": "屏幕翻译",
+  "app_title_lite": "屏幕翻译 Lite",
   "source_language": "源语言",
   "target_language": "目标语言",
   "stop_translation": "停止翻译",
@@ -149,5 +150,17 @@
   "first_failure_wrong": "翻译不对",
   "first_failure_slow": "太慢了",
   "overlay_permission_not_granted": "还无法显示翻译：请为 Screen Translate 开启“显示在其他应用上层”（悬浮窗）权限，然后返回应用。",
-  "screen_capture_not_granted": "未允许录屏，无法翻译。请再次点击开始并允许屏幕录制。"
+  "screen_capture_not_granted": "未允许录屏，无法翻译。请再次点击开始并允许屏幕录制。",
+  "paywall_title": "今天的免费翻译次数已用完",
+  "paywall_body": "Screen Translator Lite 每天可免费翻译 {limit} 次。一次性解锁 Pro，即可无限翻译。",
+  "paywall_benefit_unlimited": "每天无限次翻译",
+  "paywall_benefit_once": "一次性购买，无需订阅",
+  "paywall_unlock_button": "解锁 Pro · {price}",
+  "paywall_unlock_button_no_price": "解锁 Pro",
+  "paywall_restore": "恢复购买",
+  "paywall_not_now": "以后再说",
+  "paywall_store_unavailable": "Google Play 暂时不可用，请稍后再试。",
+  "paywall_pro_unlocked": "已解锁 Pro：无限翻译！",
+  "paywall_reset_hint": "免费次数将在午夜重置。",
+  "lite_remaining_today": "今日剩余免费翻译：{count} 次"
 }

@@ -12,6 +12,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get app_title => 'Preklad obrazovky';
 
   @override
+  String get app_title_lite => 'Preklad obrazovky Lite';
+
+  @override
   String get source_language => 'Z';
 
   @override
@@ -492,4 +495,47 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Záznam obrazovky nebol povolený, takže nemožno nič preložiť. Klepnite znova na Spustiť a záznam povoľte.';
+
+  @override
+  String get paywall_title => 'Dnešné bezplatné preklady ste vyčerpali';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite obsahuje $limit bezplatných prekladov denne. Odomknite Pro raz a prekladajte bez obmedzení.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Neobmedzené preklady každý deň';
+
+  @override
+  String get paywall_benefit_once => 'Jednorazový nákup, bez predplatného';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Odomknúť Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Odomknúť Pro';
+
+  @override
+  String get paywall_restore => 'Obnoviť nákup';
+
+  @override
+  String get paywall_not_now => 'Teraz nie';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play teraz nie je dostupný. Skúste to neskôr.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro odomknuté: neobmedzené preklady!';
+
+  @override
+  String get paywall_reset_hint => 'Bezplatné preklady sa obnovia o polnoci.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Zostávajúce bezplatné preklady dnes: $count';
+  }
 }

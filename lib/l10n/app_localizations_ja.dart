@@ -12,6 +12,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get app_title => '画面翻訳';
 
   @override
+  String get app_title_lite => '画面翻訳 Lite';
+
+  @override
   String get source_language => '翻訳元';
 
   @override
@@ -485,4 +488,47 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       '画面の録画が許可されなかったため翻訳できません。もう一度開始をタップして、画面の録画を許可してください。';
+
+  @override
+  String get paywall_title => '本日の無料翻訳を使い切りました';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite は1日$limit回まで無料で翻訳できます。Pro を一度購入すれば翻訳し放題です。';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => '毎日、翻訳し放題';
+
+  @override
+  String get paywall_benefit_once => '買い切り、サブスクなし';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Pro を解除 · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Pro を解除';
+
+  @override
+  String get paywall_restore => '購入を復元';
+
+  @override
+  String get paywall_not_now => 'あとで';
+
+  @override
+  String get paywall_store_unavailable =>
+      '現在 Google Play を利用できません。しばらくしてからもう一度お試しください。';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro を解除しました：翻訳し放題です！';
+
+  @override
+  String get paywall_reset_hint => '無料回数は午前0時にリセットされます。';
+
+  @override
+  String lite_remaining_today(int count) {
+    return '本日の残り無料翻訳：$count回';
+  }
 }

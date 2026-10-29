@@ -298,6 +298,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mode_ai_enhanced_title => 'KI-Verbessert';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced wurde auf diesem Gerät unerwartet beendet, daher wird stattdessen die schnelle Übersetzung verwendet. Sie können es in den Einstellungen wieder einschalten.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Bessere Qualität · Funktioniert offline · Sprachpaket herunterladen';
 

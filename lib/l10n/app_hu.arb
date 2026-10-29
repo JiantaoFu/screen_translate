@@ -93,6 +93,7 @@
   "mode_quick_title": "Gyors",
   "mode_quick_subtitle": "Azonnali · Mindig elérhető · Nincs szükség beállításra",
   "mode_ai_enhanced_title": "AI-fejlesztett",
+  "onnx_disabled_notice": "Az AI Enhanced váratlanul leállt ezen az eszközön, ezért helyette a gyors fordítás működik. A Beállításokban újra bekapcsolhatja.",
   "mode_ai_enhanced_subtitle": "Jobb minőség · Offline is működik · Nyelvi csomag letöltése",
   "mode_cloud_ai_title": "Felhő AI",
   "mode_cloud_ai_subtitle": "Legjobb minőség · Internet szükséges · API-kulcs szükséges",

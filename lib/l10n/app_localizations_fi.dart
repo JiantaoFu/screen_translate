@@ -296,6 +296,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Tekoälyllä parannettu';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced pysähtyi odottamatta tällä laitteella, joten sen sijaan käytetään pikakäännöstä. Voit ottaa sen uudelleen käyttöön asetuksista.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Parempi laatu · Toimii offline · Lataa kielipaketti';
 

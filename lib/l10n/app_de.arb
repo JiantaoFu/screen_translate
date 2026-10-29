@@ -93,6 +93,7 @@
   "mode_quick_title": "Schnell",
   "mode_quick_subtitle": "Sofort · Immer verfügbar · Keine Einrichtung nötig",
   "mode_ai_enhanced_title": "KI-Verbessert",
+  "onnx_disabled_notice": "AI Enhanced wurde auf diesem Gerät unerwartet beendet, daher wird stattdessen die schnelle Übersetzung verwendet. Sie können es in den Einstellungen wieder einschalten.",
   "mode_ai_enhanced_subtitle": "Bessere Qualität · Funktioniert offline · Sprachpaket herunterladen",
   "mode_cloud_ai_title": "Cloud-KI",
   "mode_cloud_ai_subtitle": "Beste Qualität · Internet erforderlich · API-Schlüssel erforderlich",

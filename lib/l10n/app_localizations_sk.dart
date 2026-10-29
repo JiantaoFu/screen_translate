@@ -296,6 +296,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get mode_ai_enhanced_title => 'Vylepšené AI';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced sa na tomto zariadení neočakávane zastavil, preto sa namiesto neho používa rýchly preklad. Znova ho môžete zapnúť v Nastaveniach.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Lepšia kvalita · Funguje offline · Stiahnite si jazykový balík';
 

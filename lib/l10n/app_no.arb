@@ -93,6 +93,7 @@
   "mode_quick_title": "Rask",
   "mode_quick_subtitle": "Umiddelbar · Alltid tilgjengelig · Ingen oppsett nødvendig",
   "mode_ai_enhanced_title": "AI-forbedret",
+  "onnx_disabled_notice": "AI Enhanced stoppet uventet på denne enheten, så rask oversettelse brukes i stedet. Du kan slå det på igjen i Innstillinger.",
   "mode_ai_enhanced_subtitle": "Bedre kvalitet · Fungerer offline · Last ned en språkpakke",
   "mode_cloud_ai_title": "Sky-AI",
   "mode_cloud_ai_subtitle": "Best kvalitet · Krever internett · API-nøkkel kreves",

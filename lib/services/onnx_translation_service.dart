@@ -5,10 +5,12 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_onnxruntime/flutter_onnxruntime.dart';
 import 'package:dart_sentencepiece_tokenizer/dart_sentencepiece_tokenizer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'onnx_crash_guard.dart';
 
 // ─── Language pair metadata ──────────────────────────────────────────────────
 
@@ -450,6 +452,29 @@ class _ModelLRUCache {
 
 class OnnxTranslationService {
   final _modelCache = _ModelLRUCache(2);
+  final OnnxCrashGuard crashGuard;
+  final Future<String?> Function() _lowMemoryReason;
+
+  /// Called with an `onnx_skipped` reason whenever ONNX is skipped or
+  /// downgraded (the provider logs it to Analytics/Crashlytics).
+  void Function(String reason)? onSkipped;
+
+  OnnxTranslationService({OnnxCrashGuard? crashGuard, Future<String?> Function()? lowMemoryReason})
+      : crashGuard = crashGuard ?? OnnxCrashGuard(),
+        _lowMemoryReason = lowMemoryReason ?? _platformLowMemoryReason;
+
+  static const _memChannel = MethodChannel('flutter_onnxruntime');
+
+  /// Loading a pack needs a few hundred MB; on a low-RAM device or when the
+  /// system is already short on memory the process can be OOM-killed.
+  static Future<String?> _platformLowMemoryReason() async {
+    if (!Platform.isAndroid) return null;
+    try {
+      return await _memChannel.invokeMethod<String>('lowMemoryReason');
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<Directory> _modelDir(String langPairKey) async {
     final appSupport = await getApplicationSupportDirectory();
@@ -486,6 +511,31 @@ class OnnxTranslationService {
     return (pair?.useFp16 ?? false) ? 'extended' : null;
   }
 
+  @visibleForTesting
+  static List<OrtProvider> providersFor({required bool xnnpack}) =>
+      xnnpack ? [OrtProvider.XNNPACK, OrtProvider.CPU] : [OrtProvider.CPU];
+
+  Future<List<OrtSession>> _createSessions(
+      OnnxRuntime ort, Directory dir, String langPairKey, {required bool xnnpack}) async {
+    final sessionOptions = OrtSessionOptions(
+      providers: providersFor(xnnpack: xnnpack),
+      graphOptimizationLevel: graphOptimizationLevelFor(langPairKey),
+    );
+    final created = <OrtSession>[];
+    try {
+      // createSession(path) is the correct API for file-system paths
+      for (final f in ['encoder_model.onnx', 'decoder_model.onnx', 'decoder_with_past_model.onnx']) {
+        created.add(await ort.createSession(p.join(dir.path, f), options: sessionOptions));
+      }
+      return created;
+    } catch (_) {
+      for (final s in created) {
+        try { await s.close(); } catch (_) {}
+      }
+      rethrow;
+    }
+  }
+
   Future<_OnnxModelBundle> _loadModel(String langPairKey) async {
     final cached = _modelCache.get(langPairKey);
     if (cached != null) return cached;
@@ -502,24 +552,20 @@ class OnnxTranslationService {
     // fully support. Listing CPU after it is just the required fallback
     // for any op XNNPACK itself doesn't implement — ORT handles that
     // per-node automatically.
-    final sessionOptions = OrtSessionOptions(
-      providers: [OrtProvider.XNNPACK, OrtProvider.CPU],
-      graphOptimizationLevel: graphOptimizationLevelFor(langPairKey),
-    );
-
-    // createSession(path) is the correct API for file-system paths
-    final encoder = await ort.createSession(
-      p.join(dir.path, 'encoder_model.onnx'),
-      options: sessionOptions,
-    );
-    final decoder = await ort.createSession(
-      p.join(dir.path, 'decoder_model.onnx'),
-      options: sessionOptions,
-    );
-    final decoderWithPast = await ort.createSession(
-      p.join(dir.path, 'decoder_with_past_model.onnx'),
-      options: sessionOptions,
-    );
+    // After a native crash inside ONNX (see OnnxCrashGuard) XNNPACK is
+    // dropped: SIGILLs in libonnxruntime.so point at CPU-specific kernels.
+    final useXnnpack = !await crashGuard.cpuOnly();
+    if (!useXnnpack) onSkipped?.call('crash_marker_cpu');
+    List<OrtSession> sessions;
+    try {
+      sessions = await _createSessions(ort, dir, langPairKey, xnnpack: useXnnpack);
+    } catch (e) {
+      if (!useXnnpack) rethrow;
+      debugPrint('OnnxTranslation: XNNPACK load failed ($e), retrying on CPU');
+      onSkipped?.call('xnnpack_load_failed_cpu');
+      sessions = await _createSessions(ort, dir, langPairKey, xnnpack: false);
+    }
+    final [encoder, decoder, decoderWithPast] = sessions;
 
     // source.spm is used only for *segmentation* into pieces (strings); the
     // resulting pieces are then mapped through vocab.json below to get the
@@ -573,6 +619,13 @@ class OnnxTranslationService {
     required String sourceLanguage,
     required String targetLanguage,
   }) async {
+    if (await crashGuard.disabled()) {
+      throw const OnnxUnavailableException('crash_marker_disabled');
+    }
+    return crashGuard.guard(() => _translate(text, sourceLanguage, targetLanguage));
+  }
+
+  Future<String> _translate(String text, String sourceLanguage, String targetLanguage) async {
     final pair = findOnnxPair(sourceLanguage, targetLanguage);
     if (pair == null) {
       final pivot = findOnnxPivotPair(sourceLanguage, targetLanguage);
@@ -580,19 +633,17 @@ class OnnxTranslationService {
         throw UnsupportedError(
             'OnnxTranslation: No model for $sourceLanguage → $targetLanguage');
       }
-      final intermediate = await translateText(
-        text: text,
-        sourceLanguage: pivot.firstHop.sourceBcp,
-        targetLanguage: pivot.firstHop.targetBcp,
-      );
-      return translateText(
-        text: intermediate,
-        sourceLanguage: pivot.secondHop.sourceBcp,
-        targetLanguage: pivot.secondHop.targetBcp,
-      );
+      final intermediate = await _translate(
+          text, pivot.firstHop.sourceBcp, pivot.firstHop.targetBcp);
+      return _translate(
+          intermediate, pivot.secondHop.sourceBcp, pivot.secondHop.targetBcp);
     }
     if (!await isModelReady(pair.key)) {
       throw OnnxModelNotReadyException(pair.key);
+    }
+    if (_modelCache.get(pair.key) == null) {
+      final reason = await _lowMemoryReason();
+      if (reason != null) throw OnnxUnavailableException(reason);
     }
     final bundle = await _loadModel(pair.key);
     // Look up the language-prefix token ID for this model pair (may be null).
@@ -887,4 +938,14 @@ class OnnxModelNotReadyException implements Exception {
   @override
   String toString() =>
       'OnnxModelNotReadyException: Model "$langPairKey" is not downloaded yet.';
+}
+
+/// ONNX is skipped on this device (repeated native crashes or low memory);
+/// callers fall back to ML Kit.
+class OnnxUnavailableException implements Exception {
+  final String reason;
+  const OnnxUnavailableException(this.reason);
+
+  @override
+  String toString() => 'OnnxUnavailableException: $reason';
 }

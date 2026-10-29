@@ -1,3 +1,4 @@
+import 'package:screen_translate/services/onnx_crash_guard.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:screen_translate/services/llm_translation_service.dart';
 import 'package:screen_translate/services/ocr_service.dart';
@@ -27,6 +28,14 @@ class FakeOnnxTranslationService extends Fake implements OnnxTranslationService 
   int callCount = 0;
   bool shouldThrowNotReady = false;
   bool shouldThrowUnsupported = false;
+  Object? throwError;
+  final OnnxCrashGuard guard = OnnxCrashGuard();
+
+  @override
+  OnnxCrashGuard get crashGuard => guard;
+
+  @override
+  void Function(String reason)? onSkipped;
 
   @override
   Future<String> translateText({
@@ -41,6 +50,7 @@ class FakeOnnxTranslationService extends Fake implements OnnxTranslationService 
     if (shouldThrowUnsupported) {
       throw UnsupportedError('Not supported');
     }
+    if (throwError != null) throw throwError!;
     return 'ONNX translated: $text';
   }
 

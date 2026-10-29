@@ -296,6 +296,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get mode_ai_enhanced_title => 'AI-täiustatud';
 
   @override
+  String get onnx_disabled_notice =>
+      'AI Enhanced peatus selles seadmes ootamatult, seega kasutatakse selle asemel kiirtõlget. Saate selle seadetes uuesti sisse lülitada.';
+
+  @override
   String get mode_ai_enhanced_subtitle =>
       'Parem kvaliteet · Töötab võrguühenduseta · Laadi alla keelepakett';
 

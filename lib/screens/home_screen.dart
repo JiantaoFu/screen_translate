@@ -282,6 +282,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
     _attachLiteGate();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowOnnxDisabledNote());
+  }
+
+  // One-time note when AI Enhanced was turned off on this device after it
+  // crashed natively twice (see OnnxCrashGuard).
+  //
+  // Not gated on the current translation mode: the mode is restored from
+  // prefs by TranslationProvider._initPreferences(), which is still in
+  // flight at the first post-frame callback, so reading it here only ever
+  // saw the default and the note never appeared. takeOnnxDisabledNotice()
+  // is specific enough on its own — it is true only on a device where ONNX
+  // ran and was disabled, and only once.
+  Future<void> _maybeShowOnnxDisabledNote() async {
+    if (!mounted) return;
+    final provider = Provider.of<TranslationProvider>(context, listen: false);
+    try {
+      if (!await provider.takeOnnxDisabledNotice() || !mounted) return;
+    } catch (_) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.onnx_disabled_notice),
+      duration: const Duration(seconds: 8),
+    ));
   }
 
   // ---- Lite flavor (no-ops in the paid app: LiteGate.instance is null) ----

@@ -290,6 +290,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mode_ai_enhanced_title => 'AI增强';
 
   @override
+  String get onnx_disabled_notice => 'AI 增强在此设备上意外停止，已改用快速翻译。您可以在设置中重新开启。';
+
+  @override
   String get mode_ai_enhanced_subtitle => '更高质量 · 离线可用 · 下载语言包';
 
   @override

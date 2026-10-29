@@ -137,6 +137,7 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
      */
     private lateinit var channel: MethodChannel
     private lateinit var ortEnvironment: OrtEnvironment
+    private var appContext: android.content.Context? = null
     private val sessions = ConcurrentHashMap<String, OrtSession>()
 
     // Store OrtValues (tensors) by ID
@@ -185,6 +186,15 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    private fun lowMemoryReason(): String? {
+        val am = appContext?.getSystemService(android.content.Context.ACTIVITY_SERVICE)
+            as? android.app.ActivityManager ?: return null
+        if (am.isLowRamDevice) return "low_ram_device"
+        val info = android.app.ActivityManager.MemoryInfo()
+        am.getMemoryInfo(info)
+        return if (info.lowMemory) "low_memory" else null
+    }
+
     override fun onAttachedToEngine(
         @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding,
     ) {
@@ -196,6 +206,7 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                 io.flutter.plugin.common.StandardMethodCodec.INSTANCE,
                 taskQueue,
             )
+        appContext = flutterPluginBinding.applicationContext
         channel.setMethodCallHandler(this)
         ortEnvironment = OrtEnvironment.getEnvironment()
     }
@@ -206,6 +217,11 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
     ): Unit =
         synchronized(lock) {
             when (call.method) {
+                "lowMemoryReason" -> {
+                    // ScreenTranslate: skip loading a model pack only when
+                    // Android itself reports a low-RAM device or low memory.
+                    result.success(lowMemoryReason())
+                }
                 "getPlatformVersion" -> {
                     result.success("Android ${android.os.Build.VERSION.RELEASE}")
                 }
@@ -332,7 +348,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         )
                     } catch (e: OrtException) {
                         result.error("ORT_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -479,7 +498,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         }
                     } catch (e: OrtException) {
                         result.error("INFERENCE_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -499,7 +521,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         result.success(null)
                     } catch (e: OrtException) {
                         result.error("ORT_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -537,7 +562,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         result.success(metadataMap)
                     } catch (e: OrtException) {
                         result.error("ORT_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -586,7 +614,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         result.success(nodeInfoList)
                     } catch (e: OrtException) {
                         result.error("ORT_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -635,7 +666,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         result.success(nodeInfoList)
                     } catch (e: OrtException) {
                         result.error("ORT_ERROR", e.message, e.stackTraceToString())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("PLUGIN_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -799,7 +833,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                             )
 
                         result.success(tensorInfo)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("TENSOR_CREATION_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -1063,7 +1100,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                             )
 
                         result.success(tensorInfo)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("CONVERSION_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -1154,7 +1194,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                             )
 
                         result.success(resultMap)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("DATA_EXTRACTION_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -1178,7 +1221,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
                         }
 
                         result.success(null)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Throwable, not Exception: an OutOfMemoryError while
+                        // loading/running a model must become a Dart error,
+                        // not take the process down.
                         result.error("RELEASE_ERROR", e.message, e.stackTraceToString())
                     }
                 }
@@ -1222,6 +1268,10 @@ class FlutterOnnxruntimePlugin : FlutterPlugin, MethodCallHandler {
             } catch (e: Exception) {
                 // Ignore exceptions during cleanup
             }
+
+            // ScreenTranslate: drop the context we took in onAttachedToEngine
+            // so a detached plugin doesn't keep answering lowMemoryReason.
+            appContext = null
         }
     }
 }

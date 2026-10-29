@@ -93,6 +93,7 @@
   "mode_quick_title": "Snabb",
   "mode_quick_subtitle": "Direkt · Alltid tillgänglig · Ingen konfiguration behövs",
   "mode_ai_enhanced_title": "AI-förbättrad",
+  "onnx_disabled_notice": "AI Enhanced stoppade oväntat på den här enheten, så snabböversättning används i stället. Du kan slå på det igen i Inställningar.",
   "mode_ai_enhanced_subtitle": "Bättre kvalitet · Fungerar offline · Ladda ner ett språkpaket",
   "mode_cloud_ai_title": "Moln-AI",
   "mode_cloud_ai_subtitle": "Bästa kvalitet · Kräver internet · API-nyckel krävs",

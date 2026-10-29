@@ -292,6 +292,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mode_ai_enhanced_title => 'AI 강화';
 
   @override
+  String get onnx_disabled_notice =>
+      '이 기기에서 AI Enhanced가 예기치 않게 중지되어 대신 빠른 번역을 사용합니다. 설정에서 다시 켤 수 있습니다.';
+
+  @override
   String get mode_ai_enhanced_subtitle => '더 나은 품질 · 오프라인에서 작동 · 언어 팩 다운로드';
 
   @override

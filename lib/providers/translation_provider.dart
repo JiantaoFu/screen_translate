@@ -315,6 +315,7 @@ class TranslationProvider with ChangeNotifier {
   })  : _onSessionSucceeded = onSessionSucceeded ?? _recordReviewSuccess,
         _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
         _onnxTranslationService = onnxTranslationService ?? OnnxTranslationService() {
+    _onnxTranslationService.onSkipped = _logOnnxSkipped;
     if (Platform.isAndroid) {
       _androidScreenCaptureService = AndroidScreenCaptureService();
       initTranslationServiceChannel();
@@ -447,8 +448,11 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setTranslationMode(TranslationMode mode) {
+  /// [userInitiated]: picked by the user in Settings. Picking AI Enhanced
+  /// there re-enables it if it was auto-disabled after native crashes.
+  void setTranslationMode(TranslationMode mode, {bool userInitiated = false}) {
     _translationMode = mode;
+    if (userInitiated && mode == TranslationMode.onnx) _reEnableOnnx();
     SharedPreferences.getInstance().then((p) => p.setString(_prefTranslationMode, mode.name));
     notifyListeners();
   }
@@ -523,6 +527,8 @@ class TranslationProvider with ChangeNotifier {
         _sessionProducedTranslations = false;
         _sessionOcrFrames = 0;
         _sessionOcrTextFrames = 0;
+        _sessionOnnxFailures = 0;
+        _loggedOnnxSkips.clear();
         activation.liveStarted();
 
         FirebaseAnalyticsService().trackTranslation(
@@ -1172,6 +1178,68 @@ class TranslationProvider with ChangeNotifier {
     return out.toString();
   }
 
+  /// ONNX ("AI Enhanced") failures tolerated per live session before the
+  /// rest of the session uses ML Kit.
+  static const kMaxOnnxFailuresPerSession = 3;
+  int _sessionOnnxFailures = 0;
+  bool _onnxUnavailable = false;
+
+  /// True after ONNX was skipped (repeated native crashes or low memory) and
+  /// ML Kit was used instead.
+  bool get onnxUnavailable => _onnxUnavailable;
+
+  /// True once, the first time ONNX gets disabled on this device after
+  /// native crashes; the UI shows a one-time note.
+  Future<bool> takeOnnxDisabledNotice() => _onnxTranslationService.crashGuard.takeDisabledNotice();
+
+  @visibleForTesting
+  int get sessionOnnxFailures => _sessionOnnxFailures;
+
+  /// Reasons already logged this live session. A skip happens per OCR block
+  /// (every ~500 ms), so each reason is logged once per session, not per
+  /// block. error_fallback is capped at kMaxOnnxFailuresPerSession, so each
+  /// one is logged.
+  final Set<String> _loggedOnnxSkips = {};
+
+  @visibleForTesting
+  final List<String> debugOnnxSkips = [];
+
+  @visibleForTesting
+  Future<void>? debugReEnable;
+
+  void _reEnableOnnx() {
+    _onnxUnavailable = false;
+    _sessionOnnxFailures = 0;
+    _loggedOnnxSkips.clear();
+    debugReEnable = _onnxTranslationService.crashGuard.reEnable().then((wasDisabled) {
+      if (!wasDisabled) return;
+      debugOnnxSkips.add('reenabled');
+      try {
+        FirebaseAnalyticsService().logEvent('onnx_reenabled', {'source': 'settings'});
+      } catch (_) {}
+    }).catchError((_) {});
+  }
+
+  /// `onnx_skipped` Analytics event + Crashlytics non-fatal.
+  void _logOnnxSkipped(String reason, [Object? error, StackTrace? st]) {
+    if (!_loggedOnnxSkips.add(reason) && reason != 'error_fallback') return;
+    debugOnnxSkips.add(reason);
+    try {
+      final analytics = FirebaseAnalyticsService();
+      analytics.logEvent('onnx_skipped', {'reason': reason});
+      analytics.trackError(
+          errorType: 'onnx_skipped_$reason',
+          errorMessage: error?.toString() ?? 'ONNX skipped: $reason',
+          stackTrace: st ?? StackTrace.current);
+    } catch (_) {}
+  }
+
+  Future<String> _mlKitTranslate(String text) => _translationService.translateText(
+        text: text,
+        sourceLanguage: _sourceLanguage,
+        targetLanguage: _targetLanguage,
+      );
+
   Future<String> translateText(String text) async {
     text = sourceTextForTranslation(text, _sourceLanguage);
     switch (_translationMode) {
@@ -1183,6 +1251,9 @@ class TranslationProvider with ChangeNotifier {
         );
 
       case TranslationMode.onnx:
+        if (_sessionOnnxFailures >= kMaxOnnxFailuresPerSession) {
+          return _mlKitTranslate(text);
+        }
         try {
           return await _onnxTranslationService.translateText(
             text: text,
@@ -1192,18 +1263,28 @@ class TranslationProvider with ChangeNotifier {
         } on OnnxModelNotReadyException catch (e) {
           // Model not downloaded yet — fall back to Google ML Kit silently.
           debugPrint('OnnxTranslation: ${e.langPairKey} not ready, falling back to ML Kit');
-          return await _translationService.translateText(
-            text: text,
-            sourceLanguage: _sourceLanguage,
-            targetLanguage: _targetLanguage,
-          );
+          return _mlKitTranslate(text);
         } on UnsupportedError catch (_) {
           // Language pair not supported by ONNX — fall back to ML Kit.
-          return await _translationService.translateText(
-            text: text,
-            sourceLanguage: _sourceLanguage,
-            targetLanguage: _targetLanguage,
-          );
+          return _mlKitTranslate(text);
+        } on OnnxUnavailableException catch (e) {
+          debugPrint('OnnxTranslation: unavailable (${e.reason}), using ML Kit');
+          _logOnnxSkipped(e.reason);
+          // Only on the change. This throws for every block of every OCR
+          // tick once ONNX is unavailable, so notifying unconditionally
+          // rebuilt every listener a few times a second for no new state.
+          if (!_onnxUnavailable) {
+            _onnxUnavailable = true;
+            notifyListeners();
+          }
+          return _mlKitTranslate(text);
+        } catch (e, st) {
+          // Anything else from ORT/the plugin: record it and keep translating
+          // with ML Kit. After a few failures stop trying for this session.
+          _sessionOnnxFailures++;
+          debugPrint('OnnxTranslation failed ($_sessionOnnxFailures): $e');
+          _logOnnxSkipped('error_fallback', e, st);
+          return _mlKitTranslate(text);
         }
 
       case TranslationMode.llm:

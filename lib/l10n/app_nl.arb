@@ -93,6 +93,7 @@
   "mode_quick_title": "Snel",
   "mode_quick_subtitle": "Direct · Altijd beschikbaar · Geen installatie nodig",
   "mode_ai_enhanced_title": "AI-verbeterd",
+  "onnx_disabled_notice": "AI Enhanced is onverwacht gestopt op dit apparaat, daarom wordt in plaats daarvan snelle vertaling gebruikt. Je kunt het weer inschakelen in Instellingen.",
   "mode_ai_enhanced_subtitle": "Betere kwaliteit · Werkt offline · Download een taalpakket",
   "mode_cloud_ai_title": "Cloud-AI",
   "mode_cloud_ai_subtitle": "Beste kwaliteit · Internet vereist · API-sleutel vereist",

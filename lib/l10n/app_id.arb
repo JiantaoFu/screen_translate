@@ -93,6 +93,7 @@
   "mode_quick_title": "Cepat",
   "mode_quick_subtitle": "Instan · Selalu tersedia · Tidak perlu pengaturan",
   "mode_ai_enhanced_title": "Ditingkatkan AI",
+  "onnx_disabled_notice": "AI Enhanced berhenti tiba-tiba di perangkat ini, jadi terjemahan Cepat digunakan sebagai gantinya. Anda dapat mengaktifkannya kembali di Setelan.",
   "mode_ai_enhanced_subtitle": "Kualitas lebih baik · Berfungsi offline · Unduh paket bahasa",
   "mode_cloud_ai_title": "AI Cloud",
   "mode_cloud_ai_subtitle": "Kualitas terbaik · Membutuhkan internet · Perlu kunci API",

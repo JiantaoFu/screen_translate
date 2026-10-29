@@ -93,6 +93,7 @@
   "mode_quick_title": "ด่วน",
   "mode_quick_subtitle": "ทันที · พร้อมใช้งานเสมอ · ไม่ต้องตั้งค่า",
   "mode_ai_enhanced_title": "ปรับปรุงด้วย AI",
+  "onnx_disabled_notice": "AI Enhanced หยุดทำงานโดยไม่คาดคิดบนอุปกรณ์นี้ จึงใช้การแปลแบบด่วนแทนคุณสามารถเปิดใช้อีกครั้งได้ในการตั้งค่า",
   "mode_ai_enhanced_subtitle": "คุณภาพดีขึ้น · ทำงานแบบออฟไลน์ได้ · ดาวน์โหลดแพ็กภาษา",
   "mode_cloud_ai_title": "AI บนคลาวด์",
   "mode_cloud_ai_subtitle": "คุณภาพดีที่สุด · ต้องใช้อินเทอร์เน็ต · ต้องใช้คีย์ API",

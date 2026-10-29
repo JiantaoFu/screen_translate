@@ -93,6 +93,7 @@
   "mode_quick_title": "Greitas",
   "mode_quick_subtitle": "Momentinis · Visada pasiekiamas · Nereikia jokio nustatymo",
   "mode_ai_enhanced_title": "Patobulintas DI",
+  "onnx_disabled_notice": "AI Enhanced netikėtai sustojo šiame įrenginyje, todėl vietoj jo naudojamas greitasis vertimas. Galite vėl jį įjungti nustatymuose.",
   "mode_ai_enhanced_subtitle": "Geresnė kokybė · Veikia neprisijungus · Atsisiųskite kalbos paketą",
   "mode_cloud_ai_title": "Debesijos DI",
   "mode_cloud_ai_subtitle": "Geriausia kokybė · Reikalingas internetas · Reikalingas API raktas",

@@ -8,7 +8,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && (pwd -W 2>/dev/null || pwd)
 SERIAL="${ANDROID_SERIAL:-emulator-5554}"
 A="adb -s $SERIAL"
 PKG=${PKG:-com.lomoware.screen_translate}   # lite: PKG=com.lomoware.screen_translate.lite
-APK="$ROOT/build/app/outputs/apk/debug/app-debug.apk"   # python tools/build.py emulator
+# python tools/build.py emulator writes the flavored path below; the
+# unflavored apk/debug/app-debug.apk from before the paid/lite flavors is
+# deliberately NOT accepted as a fallback, so a stale copy of it can't be
+# installed in place of the build you meant to test.
+# Override with FLAVOR=lite, or APK=<path> for an APK from anywhere.
+FLAVOR=${FLAVOR:-paid}
+APK="${APK:-$ROOT/build/app/outputs/apk/$FLAVOR/debug/app-$FLAVOR-debug.apk}"
 OUT="${OUT:-$ROOT/build/emulator-regression}"
 mkdir -p "$OUT"
 PY=$(command -v python3 || command -v python)

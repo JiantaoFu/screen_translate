@@ -24,8 +24,10 @@ Screenshots and logs go to `build/emulator-regression/`.
    ```
    python tools/build.py emulator
    ```
-   The output is `build/app/outputs/apk/debug/app-debug.apk`, which has only
-   the x86_64 ABI, so it fits on the emulator.
+   The output is `build/app/outputs/apk/paid/debug/app-paid-debug.apk`, which
+   has only the x86_64 ABI, so it fits on the emulator. The scripts pick that
+   up automatically; use `FLAVOR=lite` for the lite build, or `APK=<path>` for
+   an APK from anywhere.
 3. Run `tools/emulator/run_all.sh`. The scripts target `emulator-5554`, or
    `$ANDROID_SERIAL` if set, so a connected phone is never touched.
 

@@ -1,4 +1,5 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseRemoteConfigService {
@@ -106,8 +107,20 @@ class FirebaseRemoteConfigService {
   /// Check if OCR debug boxes should be drawn
   bool isDebugOCRBoxesEnabled() => getBool('debug_ocr_boxes');
 
-  /// Get minimum text length for OCR results
-  int getOCRMinTextLength() => getInt('ocr_min_text_length');
+  /// Get minimum text length for OCR results.
+  ///
+  /// Falls back to 1 instead of trusting getInt's 0. Remote Config is the
+  /// last startup step, and until [init] has run setDefaults an
+  /// unregistered key reads as 0 — which would switch the minimum off
+  /// entirely and let single-character OCR noise through. 0 is not a
+  /// meaningful minimum, so it is read as "not configured yet".
+  int getOCRMinTextLength() => minTextLengthFrom(getInt('ocr_min_text_length'));
+
+  static const defaultOCRMinTextLength = 1;
+
+  @visibleForTesting
+  static int minTextLengthFrom(int raw) =>
+      raw >= 1 ? raw : defaultOCRMinTextLength;
 
   /// Check if analytics is enabled
   bool isAnalyticsEnabled() => getBool('enable_analytics');

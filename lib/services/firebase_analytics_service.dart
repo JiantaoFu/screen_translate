@@ -1,14 +1,19 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAnalyticsService {
   static final FirebaseAnalyticsService _instance = FirebaseAnalyticsService._internal();
-  // Resolved on use, not in the constructor: the lite flavor can run without
-  // Firebase (no google-services.json yet), and then every call below must
-  // fail inside its own try/catch instead of throwing from
-  // FirebaseAnalyticsService() at the call site.
-  FirebaseAnalytics get _analytics => FirebaseAnalytics.instance;
+  // Resolved on first use, not in the constructor, for two reasons.
+  // FirebaseAnalytics.instance throws until Firebase.initializeApp has run,
+  // so this singleton's field initializer would otherwise make the whole
+  // service unconstructable before startup finishes (and in tests). And the
+  // lite flavor can run without Firebase at all (no google-services.json),
+  // so every call below must fail inside its own try/catch instead of
+  // throwing from FirebaseAnalyticsService() at the call site.
+  FirebaseAnalytics? _injected;
+  FirebaseAnalytics get _analytics => _injected ??= FirebaseAnalytics.instance;
   final Logger _logger = Logger('FirebaseAnalyticsService');
 
   factory FirebaseAnalyticsService() {
@@ -17,45 +22,61 @@ class FirebaseAnalyticsService {
 
   FirebaseAnalyticsService._internal();
 
-  /// Initialize Firebase Analytics
+  /// Lets a test drive the service without a live Firebase app.
+  @visibleForTesting
+  // ignore: use_setters_to_change_properties
+  void debugUseAnalytics(FirebaseAnalytics analytics) => _injected = analytics;
+
+  /// Initialize Firebase Analytics.
+  ///
+  /// Lets failures propagate. This runs as a startup step (see
+  /// startup_tasks.dart), and a step that swallows its own error reports
+  /// "ok" for a launch where analytics never came up — which is exactly the
+  /// blind spot that made every funnel denominator untrustworthy.
   Future<void> init() async {
-    try {
-      // Enable analytics collection
-      await _analytics.setAnalyticsCollectionEnabled(true);
-      _logger.info('Firebase Analytics initialized');
-    } catch (e) {
-      _logger.severe('Failed to initialize Firebase Analytics: $e');
-    }
+    // Enable analytics collection
+    await _analytics.setAnalyticsCollectionEnabled(true);
+    _logger.info('Firebase Analytics initialized');
   }
 
-  /// Log a custom event
+  /// Log a custom event, letting failures propagate.
+  ///
+  /// For callers that need to know whether the event actually went out —
+  /// the startup steps, which otherwise log "ok" for a dropped event.
+  Future<void> logEventOrThrow(
+    String eventName, [
+    Map<String, Object>? parameters,
+  ]) async {
+    // Firebase has restrictions on event names and parameter names
+    final sanitizedName = _sanitizeEventName(eventName);
+    final sanitizedParams = _sanitizeParameters(parameters);
+
+    await _analytics.logEvent(
+      name: sanitizedName,
+      parameters: sanitizedParams,
+    );
+    _logger.info('Event logged: $sanitizedName with params: $sanitizedParams');
+  }
+
+  /// Log a custom event. Never throws: analytics must not break a feature.
   Future<void> logEvent(
     String eventName, [
     Map<String, Object>? parameters,
   ]) async {
     try {
-      // Firebase has restrictions on event names and parameter names
-      final sanitizedName = _sanitizeEventName(eventName);
-      final sanitizedParams = _sanitizeParameters(parameters);
-
-      await _analytics.logEvent(
-        name: sanitizedName,
-        parameters: sanitizedParams,
-      );
-      _logger.info('Event logged: $sanitizedName with params: $sanitizedParams');
+      await logEventOrThrow(eventName, parameters);
     } catch (e) {
       _logger.severe('Error logging event: $e');
     }
   }
 
-  /// Track app open event
-  Future<void> trackAppOpen() async {
-    try {
-      await logEvent('app_opened');
-    } catch (e) {
-      _logger.severe('Error tracking app open: $e');
-    }
-  }
+  /// Track app open event.
+  ///
+  /// Propagates failures: `app_opened` is the denominator of every funnel,
+  /// including the 2 h activation north star, so its startup step has to be
+  /// able to say it failed rather than logging "ok" for a launch that was
+  /// never counted.
+  Future<void> trackAppOpen() => logEventOrThrow('app_opened');
 
   /// Track screen view
   Future<void> trackScreenView(String screenName) async {

@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Narrow on purpose: this service only receives scroll and app-switch
+     events, and never reads screen text. No accessibilityFlags at all —
+     flagRequestFilterKeyEvents was declared here with no onKeyEvent
+     override anywhere in the service, i.e. the app asked to be able to
+     intercept keystrokes and never used it. -->
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/accessibility_service_description"
     android:packageNames="*"
     android:accessibilityEventTypes="typeViewScrolled|typeWindowStateChanged"
     android:accessibilityFeedbackType="feedbackVisual"
-    android:notificationTimeout="100"
-    android:settingsActivity=".ScrollDetectionAccessibilityActivity" />
+    android:notificationTimeout="100" />

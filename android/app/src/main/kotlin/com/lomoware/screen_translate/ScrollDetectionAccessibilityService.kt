@@ -22,6 +22,28 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
             private set
 
         private const val TAG = "ScrollDetectionService"
+
+        /**
+         * The capabilities this service asks for at runtime. Must stay in
+         * step with res/xml/accessibility_service_config.xml, and must stay
+         * this narrow: the Play listing states the service only receives
+         * scroll and app-switch events and never reads screen text.
+         */
+        internal fun scrollDetectionServiceInfo(): AccessibilityServiceInfo =
+            AccessibilityServiceInfo().apply {
+                eventTypes = AccessibilityEvent.TYPE_VIEW_SCROLLED or
+                    AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+                feedbackType = AccessibilityServiceInfo.FEEDBACK_VISUAL
+                notificationTimeout = 100
+                // 0, not AccessibilityServiceInfo.DEFAULT: DEFAULT is the flag
+                // with value 1 that marks this as the *default* service for
+                // its feedback type, which Android then invokes "only if no
+                // package specific one exists" — that would stop scroll
+                // detection firing in apps another accessibility service has
+                // claimed. We want no flags at all: no key filtering, no
+                // window-content retrieval.
+                flags = 0
+            }
     }
 
     // Track scroll state for different packages
@@ -160,14 +182,7 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Accessibility service connected")
         
         // Configure service capabilities
-        val info = AccessibilityServiceInfo().apply {
-            this.eventTypes = AccessibilityEvent.TYPE_VIEW_SCROLLED or AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-            this.feedbackType = AccessibilityServiceInfo.FEEDBACK_VISUAL
-            this.notificationTimeout = 100
-            this.flags = AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS
-        }
-        
-        serviceInfo = info
+        serviceInfo = scrollDetectionServiceInfo()
         
         Log.d(TAG, "Accessibility service configured with scroll detection")
     }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate otkrivanje pomicanja</string>
-    <string name="accessibility_service_description">Omogućuje aplikaciji Screen Translate otkrivanje pomicanja u drugim aplikacijama za neprekidan prijevod. Usluga prepoznaje kada se sadržaj promijeni kako bi se prijevodi točno ažurirali.</string>
-    <string name="accessibility_permission_title">Potrebna je usluga pristupačnosti</string>
-    <string name="accessibility_permission_message">Screen Translate treba uslugu pristupačnosti za otkrivanje pomicanja i prevođenje sadržaja u različitim aplikacijama.</string>
-    <string name="accessibility_permission_benefits">Prednosti:\n• Neprekidan prijevod tijekom pomicanja\n• Radi u više aplikacija\n• Točniji prijevodi</string>
-    <string name="accessibility_permission_how_to">Kako uključiti:\n1. Dodirnite „Uključi”\n2. U postavkama pristupačnosti pronađite „Screen Translate otkrivanje pomicanja”\n3. Uključite uslugu</string>
-    <string name="btn_enable_accessibility">Uključi</string>
-    <string name="btn_cancel">Odustani</string>
+    <string name="accessibility_service_description">Screen Translate može koristiti Androidovu uslugu pristupačnosti kako bi primijetio kada se pomičete ili prelazite u drugu aplikaciju, pa automatski ponovno prevodi kada se zaslon promijeni te skriva ili ažurira sloj prijevoda kada promijenite aplikaciju. Usluga pristupačnosti koristi samo naziv aplikacije u prednjem planu; ne čita tekst na zaslonu, ne izvodi dodire ni pokrete te ne prikuplja niti prenosi vaše osobne podatke. Radi tek nakon što je sami uključite. Neobavezno: i bez nje možete prevoditi ručno; isključite je bilo kada u Postavke &gt; Pristupačnost.</string>
+    <string name="accessibility_permission_title">Usluga pristupačnosti (neobavezno)</string>
+    <string name="accessibility_permission_message">Screen Translate može koristiti Androidovu uslugu pristupačnosti kako bi primijetio kada se pomičete ili prelazite u drugu aplikaciju, pa automatski ponovno prevodi kada se zaslon promijeni te skriva ili ažurira sloj prijevoda kada promijenite aplikaciju.</string>
+    <string name="accessibility_permission_benefits">Usluga pristupačnosti koristi samo naziv aplikacije u prednjem planu; ne čita tekst na zaslonu, ne izvodi dodire ni pokrete te ne prikuplja niti prenosi vaše osobne podatke. Radi tek nakon što je sami uključite.\n\nNeobavezno: i bez nje možete prevoditi ručno; isključite je bilo kada u Postavke &gt; Pristupačnost.</string>
+    <string name="accessibility_permission_how_to">Kako je uključiti:\n1. Dodirnite „Slažem se”\n2. Pronađite „Screen Translate otkrivanje pomicanja” u postavkama pristupačnosti\n3. Uključite uslugu</string>
+    <string name="btn_enable_accessibility">Slažem se</string>
+    <string name="btn_cancel">Ne, hvala</string>
     <string name="tap_outside_to_close">Dodirnite izvan prozora za zatvaranje</string>
     <string name="mode_auto_translate">Automatski prijevod</string>
     <string name="mode_original_text">Izvorni tekst</string>

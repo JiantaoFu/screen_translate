@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate Scroll Detection</string>
-    <string name="accessibility_service_description">Enables Screen Translate to detect scrolling in other apps for seamless translation. This service helps identify when content changes so translations can be updated accurately.</string>
-    <string name="accessibility_permission_title">Accessibility Service Required</string>
-    <string name="accessibility_permission_message">Screen Translate needs Accessibility Service to detect scrolling and translate content across different apps.</string>
-    <string name="accessibility_permission_benefits">Benefits:\n• Seamless translation while scrolling\n• Works across multiple applications\n• Improves translation accuracy</string>
-    <string name="accessibility_permission_how_to">How to enable:\n1. Tap “Enable”\n2. Find “Screen Translate Scroll Detection” in Accessibility settings\n3. Turn the service on</string>
-    <string name="btn_enable_accessibility">Enable</string>
-    <string name="btn_cancel">Cancel</string>
+    <string name="accessibility_service_description">Screen Translate can use Android\'s Accessibility Service to notice when you scroll or switch to another app, so it can re-translate automatically when the screen changes and hide or update the translation overlay when you change apps. The Accessibility Service only uses the name of the app in front; it does not read on-screen text or perform taps or gestures, and does not collect or transmit your personal data. It runs only after you turn it on yourself. Optional: without it you can still translate manually; turn it off anytime in Settings &gt; Accessibility.</string>
+    <string name="accessibility_permission_title">Accessibility Service (Optional)</string>
+    <string name="accessibility_permission_message">Screen Translate can use Android\'s Accessibility Service to notice when you scroll or switch to another app, so it can re-translate automatically when the screen changes and hide or update the translation overlay when you change apps.</string>
+    <string name="accessibility_permission_benefits">The Accessibility Service only uses the name of the app in front; it does not read on-screen text or perform taps or gestures, and does not collect or transmit your personal data. It runs only after you turn it on yourself.\n\nOptional: without it you can still translate manually; turn it off anytime in Settings &gt; Accessibility.</string>
+    <string name="accessibility_permission_how_to">To turn it on:\n1. Tap “Agree”\n2. Find “Screen Translate Scroll Detection” in Accessibility settings\n3. Turn the service on</string>
+    <string name="btn_enable_accessibility">Agree</string>
+    <string name="btn_cancel">No thanks</string>
     <string name="tap_outside_to_close">Tap outside to close</string>
     <string name="mode_auto_translate">Auto translate</string>
     <string name="mode_original_text">Original text</string>

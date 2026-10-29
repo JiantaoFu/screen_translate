@@ -1227,6 +1227,8 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
     // Automatically check and prompt for Accessibility Service
     fun checkAccessibilityServiceOnFirstLaunch() {
+        // Lite has no accessibility service: never prompt for it.
+        if (BuildConfig.FLAVOR == "lite") return
         try {
             // Use application context to avoid potential context-related issues
             val appContext = context.applicationContext

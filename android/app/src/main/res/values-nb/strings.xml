@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate rulleregistrering</string>
-    <string name="accessibility_service_description">Lar Screen Translate oppdage rulling i andre apper for sømløs oversettelse. Tjenesten oppdager når innholdet endres, slik at oversettelsene oppdateres nøyaktig.</string>
-    <string name="accessibility_permission_title">Tilgjengelighetstjeneste kreves</string>
-    <string name="accessibility_permission_message">Screen Translate trenger tilgjengelighetstjenesten for å oppdage rulling og oversette innhold i ulike apper.</string>
-    <string name="accessibility_permission_benefits">Fordeler:\n• Sømløs oversettelse mens du ruller\n• Fungerer i flere apper\n• Mer nøyaktige oversettelser</string>
-    <string name="accessibility_permission_how_to">Slik slår du den på:\n1. Trykk på «Slå på»\n2. Finn «Screen Translate rulleregistrering» i tilgjengelighetsinnstillingene\n3. Slå på tjenesten</string>
-    <string name="btn_enable_accessibility">Slå på</string>
-    <string name="btn_cancel">Avbryt</string>
+    <string name="accessibility_service_description">Screen Translate kan bruke Androids tilgjengelighetstjeneste til å merke når du blar eller bytter til en annen app, slik at den oversetter på nytt automatisk når skjermen endres, og skjuler eller oppdaterer oversettelseslaget når du bytter app. Tjenesten bruker bare navnet på appen i forgrunnen; den leser ikke tekst på skjermen, utfører ikke trykk eller bevegelser og samler ikke inn eller overfører personopplysningene dine. Den kjører bare etter at du selv har slått den på. Valgfri: uten den kan du fortsatt oversette manuelt; slå den av når som helst i Innstillinger &gt; Tilgjengelighet.</string>
+    <string name="accessibility_permission_title">Tilgjengelighetstjeneste (valgfri)</string>
+    <string name="accessibility_permission_message">Screen Translate kan bruke Androids tilgjengelighetstjeneste til å merke når du blar eller bytter til en annen app, slik at den oversetter på nytt automatisk når skjermen endres, og skjuler eller oppdaterer oversettelseslaget når du bytter app.</string>
+    <string name="accessibility_permission_benefits">Tjenesten bruker bare navnet på appen i forgrunnen; den leser ikke tekst på skjermen, utfører ikke trykk eller bevegelser og samler ikke inn eller overfører personopplysningene dine. Den kjører bare etter at du selv har slått den på.\n\nValgfri: uten den kan du fortsatt oversette manuelt; slå den av når som helst i Innstillinger &gt; Tilgjengelighet.</string>
+    <string name="accessibility_permission_how_to">Slik slår du den på:\n1. Trykk på «Godta»\n2. Finn «Screen Translate rulleregistrering» i tilgjengelighetsinnstillingene\n3. Slå på tjenesten</string>
+    <string name="btn_enable_accessibility">Godta</string>
+    <string name="btn_cancel">Nei takk</string>
     <string name="tap_outside_to_close">Trykk utenfor for å lukke</string>
     <string name="mode_auto_translate">Automatisk oversettelse</string>
     <string name="mode_original_text">Originaltekst</string>

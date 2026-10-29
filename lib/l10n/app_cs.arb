@@ -1,6 +1,7 @@
 {
   "@@locale": "cs",
   "app_title": "Překlad obrazovky",
+  "app_title_lite": "Překlad obrazovky Lite",
   "source_language": "Z",
   "target_language": "Do",
   "stop_translation": "Zastavit překlad",
@@ -148,5 +149,17 @@
   "first_failure_wrong": "Překlad byl chybný",
   "first_failure_slow": "Bylo to příliš pomalé",
   "overlay_permission_not_granted": "Překlady se zatím nemohou zobrazit: zapněte pro Screen Translate „Zobrazení přes jiné aplikace“ a vraťte se.",
-  "screen_capture_not_granted": "Záznam obrazovky nebyl povolen, takže nelze nic přeložit. Klepněte znovu na Spustit a záznam povolte."
+  "screen_capture_not_granted": "Záznam obrazovky nebyl povolen, takže nelze nic přeložit. Klepněte znovu na Spustit a záznam povolte.",
+  "paywall_title": "Dnešní bezplatné překlady jste vyčerpali",
+  "paywall_body": "Screen Translator Lite obsahuje {limit} bezplatných překladů denně. Odemkněte Pro jednou a překládejte bez omezení.",
+  "paywall_benefit_unlimited": "Neomezené překlady každý den",
+  "paywall_benefit_once": "Jednorázový nákup, bez předplatného",
+  "paywall_unlock_button": "Odemknout Pro · {price}",
+  "paywall_unlock_button_no_price": "Odemknout Pro",
+  "paywall_restore": "Obnovit nákup",
+  "paywall_not_now": "Teď ne",
+  "paywall_store_unavailable": "Google Play teď není dostupný. Zkuste to později.",
+  "paywall_pro_unlocked": "Pro odemčeno: neomezené překlady!",
+  "paywall_reset_hint": "Bezplatné překlady se obnoví o půlnoci.",
+  "lite_remaining_today": "Zbývající bezplatné překlady dnes: {count}"
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate: отслеживание прокрутки</string>
-    <string name="accessibility_service_description">Позволяет Screen Translate отслеживать прокрутку в других приложениях для непрерывного перевода. Сервис определяет, когда меняется содержимое, чтобы точно обновлять перевод.</string>
-    <string name="accessibility_permission_title">Нужна служба специальных возможностей</string>
-    <string name="accessibility_permission_message">Screen Translate использует службу специальных возможностей, чтобы отслеживать прокрутку и переводить содержимое разных приложений.</string>
-    <string name="accessibility_permission_benefits">Преимущества:\n• Непрерывный перевод при прокрутке\n• Работает во многих приложениях\n• Более точный перевод</string>
-    <string name="accessibility_permission_how_to">Как включить:\n1. Нажмите «Включить»\n2. Найдите «Screen Translate: отслеживание прокрутки» в настройках специальных возможностей\n3. Включите службу</string>
-    <string name="btn_enable_accessibility">Включить</string>
-    <string name="btn_cancel">Отмена</string>
+    <string name="accessibility_service_description">Screen Translate может использовать службу специальных возможностей Android, чтобы замечать прокрутку или переход в другое приложение: так перевод автоматически обновляется при изменении экрана, а слой перевода скрывается или обновляется при смене приложения. Служба использует только название приложения на переднем плане; она не читает текст на экране, не выполняет нажатия или жесты и не собирает и не передаёт ваши личные данные. Она работает только после того, как вы сами её включите. Необязательно: без неё можно переводить вручную; отключить можно в любой момент в Настройки &gt; Спец. возможности.</string>
+    <string name="accessibility_permission_title">Спец. возможности (необязательно)</string>
+    <string name="accessibility_permission_message">Screen Translate может использовать службу специальных возможностей Android, чтобы замечать прокрутку или переход в другое приложение: так перевод автоматически обновляется при изменении экрана, а слой перевода скрывается или обновляется при смене приложения.</string>
+    <string name="accessibility_permission_benefits">Служба использует только название приложения на переднем плане; она не читает текст на экране, не выполняет нажатия или жесты и не собирает и не передаёт ваши личные данные. Она работает только после того, как вы сами её включите.\n\nНеобязательно: без неё можно переводить вручную; отключить можно в любой момент в Настройки &gt; Спец. возможности.</string>
+    <string name="accessibility_permission_how_to">Как включить:\n1. Нажмите «Согласен»\n2. Найдите «Screen Translate: отслеживание прокрутки» в настройках спец. возможностей\n3. Включите службу</string>
+    <string name="btn_enable_accessibility">Согласен</string>
+    <string name="btn_cancel">Нет, спасибо</string>
     <string name="tap_outside_to_close">Нажмите за пределами окна, чтобы закрыть</string>
     <string name="mode_auto_translate">Автоперевод</string>
     <string name="mode_original_text">Исходный текст</string>

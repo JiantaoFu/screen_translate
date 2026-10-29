@@ -1,6 +1,7 @@
 {
   "@@locale": "he",
   "app_title": "תרגום מסך",
+  "app_title_lite": "תרגום מסך Lite",
   "source_language": "מ-",
   "target_language": "ל-",
   "stop_translation": "עצור תרגום",
@@ -148,5 +149,17 @@
   "first_failure_wrong": "התרגום היה שגוי",
   "first_failure_slow": "זה היה איטי מדי",
   "overlay_permission_not_granted": "עדיין לא ניתן להציג תרגומים: הפעילו את \"הצגה מעל אפליקציות אחרות\" עבור Screen Translate וחזרו.",
-  "screen_capture_not_granted": "הקלטת המסך לא אושרה, ולכן אי אפשר לתרגם. הקישו שוב על התחל ואשרו הקלטת מסך."
+  "screen_capture_not_granted": "הקלטת המסך לא אושרה, ולכן אי אפשר לתרגם. הקישו שוב על התחל ואשרו הקלטת מסך.",
+  "paywall_title": "השתמשת בתרגומים החינמיים של היום",
+  "paywall_body": "Screen Translator Lite כולל {limit} תרגומים חינם ביום. פתחו את Pro פעם אחת לתרגומים ללא הגבלה.",
+  "paywall_benefit_unlimited": "תרגומים ללא הגבלה, כל יום",
+  "paywall_benefit_once": "רכישה חד־פעמית, ללא מנוי",
+  "paywall_unlock_button": "פתיחת Pro · {price}",
+  "paywall_unlock_button_no_price": "פתיחת Pro",
+  "paywall_restore": "שחזור רכישה",
+  "paywall_not_now": "לא עכשיו",
+  "paywall_store_unavailable": "Google Play אינו זמין כרגע. נסו שוב מאוחר יותר.",
+  "paywall_pro_unlocked": "Pro נפתח: תרגומים ללא הגבלה!",
+  "paywall_reset_hint": "התרגומים החינמיים מתאפסים בחצות.",
+  "lite_remaining_today": "תרגומים חינמיים שנותרו היום: {count}"
 }

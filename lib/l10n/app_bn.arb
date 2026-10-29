@@ -1,6 +1,7 @@
 {
   "@@locale": "bn",
   "app_title": "স্ক্রিন অনুবাদ",
+  "app_title_lite": "স্ক্রিন অনুবাদ Lite",
   "source_language": "থেকে",
   "target_language": "তে",
   "stop_translation": "অনুবাদ বন্ধ করুন",
@@ -148,5 +149,17 @@
   "first_failure_wrong": "অনুবাদ ভুল ছিল",
   "first_failure_slow": "খুব ধীর ছিল",
   "overlay_permission_not_granted": "এখনও অনুবাদ দেখানো যাচ্ছে না: Screen Translate-এর জন্য \"অন্য অ্যাপের উপরে দেখান\" চালু করে ফিরে আসুন।",
-  "screen_capture_not_granted": "স্ক্রিন ক্যাপচারের অনুমতি দেওয়া হয়নি, তাই অনুবাদ করা যাচ্ছে না। আবার শুরু চাপুন এবং স্ক্রিন ক্যাপচারের অনুমতি দিন।"
+  "screen_capture_not_granted": "স্ক্রিন ক্যাপচারের অনুমতি দেওয়া হয়নি, তাই অনুবাদ করা যাচ্ছে না। আবার শুরু চাপুন এবং স্ক্রিন ক্যাপচারের অনুমতি দিন।",
+  "paywall_title": "আপনি আজকের বিনামূল্যের অনুবাদ ব্যবহার করে ফেলেছেন",
+  "paywall_body": "Screen Translator Lite-এ প্রতিদিন {limit}টি বিনামূল্যের অনুবাদ রয়েছে। সীমাহীন অনুবাদের জন্য একবার Pro আনলক করুন।",
+  "paywall_benefit_unlimited": "প্রতিদিন সীমাহীন অনুবাদ",
+  "paywall_benefit_once": "একবারের কেনা, কোনো সাবস্ক্রিপশন নেই",
+  "paywall_unlock_button": "Pro আনলক করুন · {price}",
+  "paywall_unlock_button_no_price": "Pro আনলক করুন",
+  "paywall_restore": "কেনাকাটা পুনরুদ্ধার করুন",
+  "paywall_not_now": "এখন নয়",
+  "paywall_store_unavailable": "Google Play এখন উপলব্ধ নেই। পরে আবার চেষ্টা করুন।",
+  "paywall_pro_unlocked": "Pro আনলক হয়েছে: সীমাহীন অনুবাদ!",
+  "paywall_reset_hint": "বিনামূল্যের অনুবাদ মধ্যরাতে রিসেট হয়।",
+  "lite_remaining_today": "আজ বাকি বিনামূল্যের অনুবাদ: {count}"
 }

@@ -15,6 +15,7 @@ import '../services/llm_translation_service.dart';
 import '../services/onnx_translation_service.dart';
 import '../models/ocr_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../lite/lite_gate.dart';
 import '../services/review_prompt_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/activation_tracker.dart';
@@ -60,6 +61,9 @@ class TranslationProvider with ChangeNotifier {
   // Whether the current/last live session rendered at least one translated
   // box — used to only ask for a store review after the app actually worked.
   bool _sessionProducedTranslations = false;
+  // OCR passes this live session, and how many of them found any text.
+  int _sessionOcrFrames = 0;
+  int _sessionOcrTextFrames = 0;
   // Defaults follow the device language (see _defaultLanguagePair) and are
   // then overridden by the user's saved choice in _initPreferences.
   late String _sourceLanguage = _defaultLanguagePair().$1;
@@ -321,6 +325,13 @@ class TranslationProvider with ChangeNotifier {
   final Future<void> Function() _onSessionSucceeded;
 
   static Future<void> _recordReviewSuccess() async {
+    // Lite flavor: one live session that drew a translation is one of the
+    // day's free translations (no-op in the paid app).
+    try {
+      await LiteGate.instance?.recordTranslationSuccess(kind: 'live');
+    } catch (e) {
+      print('Lite quota not updated: $e');
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       await ReviewPromptService(prefs).recordSuccessfulTranslation();
@@ -332,6 +343,18 @@ class TranslationProvider with ChangeNotifier {
   bool get isTranslating => _isTranslating;
   String get lastTranslatedText => _lastTranslatedText;
   bool get sessionProducedTranslations => _sessionProducedTranslations;
+
+  /// True when this live session ran OCR at least once and never found any
+  /// text in the source language — usually a wrong source language/script.
+  bool get sessionFoundNoText => _sessionOcrFrames > 0 && _sessionOcrTextFrames == 0;
+
+  @visibleForTesting
+  void debugRecordOcrFrame(int blocks) => _recordSessionOcrFrame(blocks);
+
+  void _recordSessionOcrFrame(int blocks) {
+    _sessionOcrFrames++;
+    if (blocks > 0) _sessionOcrTextFrames++;
+  }
   String get sourceLanguage => _sourceLanguage;
   String get targetLanguage => _targetLanguage;
   TranslationMode get translationMode => _translationMode;
@@ -382,9 +405,9 @@ class TranslationProvider with ChangeNotifier {
 
   // Buyers come from dozens of locales (TH, VN, KR, ID, BR, MX, ...); a
   // hardcoded en->zh default meant most of them got Chinese output on their
-  // first try. Translate *into* the device language, and *from* English —
-  // or from Japanese for English-locale users, since manga/games are the
-  // main use case.
+  // first try. Translate *into* the device language, and *from* Japanese,
+  // since manga/games are the main use case. Japanese-locale users get
+  // English as the source so the pair is never ja->ja.
   static (String, String) _defaultLanguagePair() =>
       defaultLanguagePairFor(PlatformDispatcher.instance.locale.languageCode);
 
@@ -393,7 +416,7 @@ class TranslationProvider with ChangeNotifier {
     final raw = languageCode.toLowerCase();
     final device = _legacyLanguageCodes[raw] ?? raw;
     final target = supportedLanguages.containsKey(device) ? device : 'en';
-    final source = target == 'en' ? 'ja' : 'en';
+    final source = target == 'ja' ? 'en' : 'ja';
     return (source, target);
   }
 
@@ -498,6 +521,8 @@ class TranslationProvider with ChangeNotifier {
 
         _isTranslating = true;
         _sessionProducedTranslations = false;
+        _sessionOcrFrames = 0;
+        _sessionOcrTextFrames = 0;
         activation.liveStarted();
 
         FirebaseAnalyticsService().trackTranslation(
@@ -650,6 +675,7 @@ class TranslationProvider with ChangeNotifier {
               // Counted before our own boxes are removed, so a screen whose
               // text is all already translated is not mistaken for an empty one.
               ActivationTracker.instance.ocrFrame(translatableOcr.length);
+              _recordSessionOcrFrame(translatableOcr.length);
               final ocrResults = withoutOwnOverlayText(
                 translatableOcr,
                 _isManualTranslationRequested

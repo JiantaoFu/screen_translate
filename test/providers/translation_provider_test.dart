@@ -42,12 +42,14 @@ void main() {
     });
 
     test('default pair targets the device language', () {
-      expect(TranslationProvider.defaultLanguagePairFor('pt'), ('en', 'pt'));
-      expect(TranslationProvider.defaultLanguagePairFor('th'), ('en', 'th'));
-      expect(TranslationProvider.defaultLanguagePairFor('zh'), ('en', 'zh'));
+      expect(TranslationProvider.defaultLanguagePairFor('pt'), ('ja', 'pt'));
+      expect(TranslationProvider.defaultLanguagePairFor('th'), ('ja', 'th'));
+      expect(TranslationProvider.defaultLanguagePairFor('zh'), ('ja', 'zh'));
       expect(TranslationProvider.defaultLanguagePairFor('en'), ('ja', 'en'));
       // Legacy Android codes are mapped; unsupported ones fall back to English.
-      expect(TranslationProvider.defaultLanguagePairFor('in'), ('en', 'id'));
+      expect(TranslationProvider.defaultLanguagePairFor('in'), ('ja', 'id'));
+      // Japanese devices keep English as the source (no ja->ja).
+      expect(TranslationProvider.defaultLanguagePairFor('ja'), ('en', 'ja'));
       expect(TranslationProvider.defaultLanguagePairFor('xx'), ('ja', 'en'));
     });
 

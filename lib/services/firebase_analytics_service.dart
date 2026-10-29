@@ -5,11 +5,13 @@ import 'package:logging/logging.dart';
 
 class FirebaseAnalyticsService {
   static final FirebaseAnalyticsService _instance = FirebaseAnalyticsService._internal();
-
-  // Resolved on first use, not in the constructor: FirebaseAnalytics.instance
-  // throws until Firebase.initializeApp has run, and this singleton's field
-  // initializer would otherwise make the whole service unconstructable
-  // before startup finishes (and in tests).
+  // Resolved on first use, not in the constructor, for two reasons.
+  // FirebaseAnalytics.instance throws until Firebase.initializeApp has run,
+  // so this singleton's field initializer would otherwise make the whole
+  // service unconstructable before startup finishes (and in tests). And the
+  // lite flavor can run without Firebase at all (no google-services.json),
+  // so every call below must fail inside its own try/catch instead of
+  // throwing from FirebaseAnalyticsService() at the call site.
   FirebaseAnalytics? _injected;
   FirebaseAnalytics get _analytics => _injected ??= FirebaseAnalytics.instance;
   final Logger _logger = Logger('FirebaseAnalyticsService');

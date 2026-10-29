@@ -4,15 +4,31 @@ import 'package:logging/logging.dart';
 
 class FirebaseRemoteConfigService {
   static final FirebaseRemoteConfigService _instance = FirebaseRemoteConfigService._internal();
-  late FirebaseRemoteConfig _remoteConfig;
+  // Resolved on use (see FirebaseAnalyticsService): lite may run without Firebase.
+  FirebaseRemoteConfig get _remoteConfig => FirebaseRemoteConfig.instance;
   final Logger _logger = Logger('FirebaseRemoteConfigService');
 
   factory FirebaseRemoteConfigService() {
     return _instance;
   }
 
-  FirebaseRemoteConfigService._internal() {
-    _remoteConfig = FirebaseRemoteConfig.instance;
+  FirebaseRemoteConfigService._internal();
+
+  /// Lite flavor: successful translations per local day before the paywall.
+  static const liteDailyFreeTranslationsKey = 'lite_daily_free_translations';
+  static const liteDailyFreeTranslationsDefault = 5;
+
+  /// [liteDailyFreeTranslationsKey], or the default when Firebase isn't
+  /// available or the value is unusable (missing, < 1).
+  int getLiteDailyFreeTranslations() {
+    try {
+      final v = _remoteConfig.getValue(liteDailyFreeTranslationsKey);
+      if (v.source == ValueSource.valueStatic) return liteDailyFreeTranslationsDefault;
+      final n = v.asInt();
+      return n >= 1 ? n : liteDailyFreeTranslationsDefault;
+    } catch (_) {
+      return liteDailyFreeTranslationsDefault;
+    }
   }
 
   /// Initialize Remote Config with default values
@@ -25,6 +41,7 @@ class FirebaseRemoteConfigService {
         'enable_analytics': true,
         'translation_timeout_seconds': 30,
         'max_concurrent_translations': 3,
+        liteDailyFreeTranslationsKey: liteDailyFreeTranslationsDefault,
       });
 
       // Set cache duration - how long to use cached values before fetching fresh

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Détection du défilement Screen Translate</string>
-    <string name="accessibility_service_description">Permet à Screen Translate de détecter le défilement dans les autres applis pour une traduction fluide. Ce service repère les changements de contenu afin de mettre à jour les traductions avec précision.</string>
-    <string name="accessibility_permission_title">Service d\'accessibilité requis</string>
-    <string name="accessibility_permission_message">Screen Translate a besoin du service d\'accessibilité pour détecter le défilement et traduire le contenu des différentes applis.</string>
-    <string name="accessibility_permission_benefits">Avantages :\n• Traduction fluide pendant le défilement\n• Fonctionne dans de nombreuses applis\n• Traductions plus précises</string>
-    <string name="accessibility_permission_how_to">Pour l\'activer :\n1. Appuyez sur « Activer »\n2. Trouvez « Détection du défilement Screen Translate » dans les paramètres d\'accessibilité\n3. Activez le service</string>
-    <string name="btn_enable_accessibility">Activer</string>
-    <string name="btn_cancel">Annuler</string>
+    <string name="accessibility_service_description">Screen Translate peut utiliser le service d\'accessibilité d\'Android pour détecter quand vous faites défiler l\'écran ou passez à une autre application, afin de retraduire automatiquement quand l\'écran change et de masquer ou mettre à jour la superposition de traduction quand vous changez d\'application. Le service d\'accessibilité n\'utilise que le nom de l\'application au premier plan ; il ne lit pas le texte à l\'écran, n\'effectue ni appui ni geste et ne collecte ni ne transmet vos données personnelles. Il ne fonctionne qu\'après que vous l\'avez activé vous-même. Facultatif : sans lui, vous pouvez toujours traduire manuellement ; désactivez-le à tout moment dans Paramètres &gt; Accessibilité.</string>
+    <string name="accessibility_permission_title">Service d\'accessibilité (facultatif)</string>
+    <string name="accessibility_permission_message">Screen Translate peut utiliser le service d\'accessibilité d\'Android pour détecter quand vous faites défiler l\'écran ou passez à une autre application, afin de retraduire automatiquement quand l\'écran change et de masquer ou mettre à jour la superposition de traduction quand vous changez d\'application.</string>
+    <string name="accessibility_permission_benefits">Le service d\'accessibilité n\'utilise que le nom de l\'application au premier plan ; il ne lit pas le texte à l\'écran, n\'effectue ni appui ni geste et ne collecte ni ne transmet vos données personnelles. Il ne fonctionne qu\'après que vous l\'avez activé vous-même.\n\nFacultatif : sans lui, vous pouvez toujours traduire manuellement ; désactivez-le à tout moment dans Paramètres &gt; Accessibilité.</string>
+    <string name="accessibility_permission_how_to">Pour l\'activer :\n1. Appuyez sur « Accepter »\n2. Trouvez « Détection du défilement Screen Translate » dans les paramètres d\'accessibilité\n3. Activez le service</string>
+    <string name="btn_enable_accessibility">Accepter</string>
+    <string name="btn_cancel">Non merci</string>
     <string name="tap_outside_to_close">Appuyez à l\'extérieur pour fermer</string>
     <string name="mode_auto_translate">Traduction automatique</string>
     <string name="mode_original_text">Texte original</string>

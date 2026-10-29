@@ -16,7 +16,7 @@ import sys
 import tempfile
 from xml.sax.saxutils import escape
 
-PKG = 'com.lomoware.screen_translate'
+PKG = os.environ.get('PKG', 'com.lomoware.screen_translate')  # lite: PKG=...lite
 PREFS = 'shared_prefs/FlutterSharedPreferences.xml'
 EMPTY = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map>\n</map>\n"
 

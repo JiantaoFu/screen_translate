@@ -1,6 +1,10 @@
 {
   "@@locale": "en",
   "app_title": "Screen Translate",
+  "app_title_lite": "Screen Translator Lite",
+  "@app_title_lite": {
+    "description": "Home screen title in the Lite edition: the app name plus \"Lite\" (keep \"Lite\" in Latin letters)"
+  },
   "source_language": "From",
   "target_language": "To",
   "stop_translation": "Stop Translation",
@@ -206,5 +210,41 @@
   "first_failure_wrong": "The translation was wrong",
   "first_failure_slow": "It was too slow",
   "overlay_permission_not_granted": "Translations can't appear yet: turn on \"Display over other apps\" for Screen Translate, then come back.",
-  "screen_capture_not_granted": "Screen capture wasn't allowed, so nothing can be translated. Tap Start again and allow screen capture."
+  "screen_capture_not_granted": "Screen capture wasn't allowed, so nothing can be translated. Tap Start again and allow screen capture.",
+  "paywall_title": "You've used today's free translations",
+  "paywall_body": "Screen Translator Lite includes {limit} free translations a day. Unlock Pro once for unlimited translations.",
+  "@paywall_body": {
+    "description": "Lite paywall body; limit = free translations per day",
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "paywall_benefit_unlimited": "Unlimited translations, every day",
+  "paywall_benefit_once": "One-time purchase, no subscription",
+  "paywall_unlock_button": "Unlock Pro · {price}",
+  "@paywall_unlock_button": {
+    "description": "Lite paywall buy button; price is Google Play's localized price",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "paywall_unlock_button_no_price": "Unlock Pro",
+  "paywall_restore": "Restore purchase",
+  "paywall_not_now": "Not now",
+  "paywall_store_unavailable": "Google Play isn't available right now. Please try again later.",
+  "paywall_pro_unlocked": "Pro unlocked: unlimited translations!",
+  "paywall_reset_hint": "Free translations reset at midnight.",
+  "lite_remaining_today": "Free translations left today: {count}",
+  "@lite_remaining_today": {
+    "description": "Lite home screen: free translations left today",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

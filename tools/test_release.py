@@ -6,6 +6,7 @@
 import contextlib
 import io
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -276,7 +277,10 @@ class GitCleanTest(unittest.TestCase):
 class MainTest(unittest.TestCase):
     """main()'s orchestration with the build, git and Play stubbed out."""
 
-    ORIGINAL = b"name: x\r\nversion: 1.2.1+11\r\n"
+    # Both flavors' build numbers, because a release reads the one
+    # belonging to --flavor.
+    ORIGINAL = (b"name: x\r\nversion: 1.2.1+11\r\n"
+                b"flavor_versions:\r\n  lite: 1.1.0+11\r\n")
 
     def setUp(self):
         root = Path(tempfile.mkdtemp())
@@ -294,7 +298,16 @@ class MainTest(unittest.TestCase):
             cmd = [str(c) for c in cmd]
             self.calls.append(cmd)
             if len(cmd) > 1 and cmd[1].endswith("bump_version.py"):
-                self.pubspec.write_bytes(b"name: x\r\nversion: 1.2.2+12\r\n")
+                # Mirror the real script: the x.y.z name is shared, but only
+                # the --flavor's build number moves.
+                if "lite" in cmd:
+                    self.pubspec.write_bytes(
+                        b"name: x\r\nversion: 1.2.2+11\r\n"
+                        b"flavor_versions:\r\n  lite: 1.1.1+12\r\n")
+                else:
+                    self.pubspec.write_bytes(
+                        b"name: x\r\nversion: 1.2.2+12\r\n"
+                        b"flavor_versions:\r\n  lite: 1.1.0+11\r\n")
             return ""
 
         def fake_gradle(tasks, java_home):
@@ -401,8 +414,11 @@ class MainTest(unittest.TestCase):
         self.assertEqual((code, err), (0, ""))
         self.assertIn(["lite firebase"], self.calls)
         self.assertIn(["versions", "com.lomoware.screen_translate.lite"], self.calls)
-        self.assertIn(["build", "aab", "1.2.2", "12", "lite"], self.calls)
-        self.assertIn(["git", "tag", "-a", "v1.2.2+12-lite", "-m", "1.2.2 (12) on internal"], self.calls)
+        # lite's own version, not the paid app's: the fixture's paid line is
+        # 1.2.1+11 and a lite release must leave it alone.
+        self.assertIn(["build", "aab", "1.1.1", "12", "lite"], self.calls)
+        self.assertIn(["git", "tag", "-a", "v1.1.1+12-lite", "-m", "1.1.1 (12) on internal"], self.calls)
+        self.assertNotIn(["build", "aab", "1.2.2", "12", "lite"], self.calls)
 
     def test_default_release_checks_paid_package(self):
         self.main(*self.publish_args("--bump", "patch"))
@@ -526,6 +542,94 @@ class FlavorPathTest(unittest.TestCase):
     def test_flavored_task(self):
         self.assertEqual(build.flavored_task("bundleRelease", "lite"), "bundleLiteRelease")
 
+
+class FlavorVersionTest(unittest.TestCase):
+    """Each flavor owns its whole version: name and build number."""
+
+    PUBSPEC = """name: screen_translate
+version: 1.2.7+21
+
+# comment about the scheme
+flavor_versions:
+  lite: 1.1.0+4
+
+environment:
+  sdk: '>=3.1.3 <4.0.0'
+"""
+
+    def setUp(self):
+        self.dir = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.pubspec = self.dir / "pubspec.yaml"
+        self.pubspec.write_text(self.PUBSPEC, encoding="utf-8")
+        patch = mock.patch.object(build, "PUBSPEC", self.pubspec)
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def test_each_flavor_reads_its_own_name_and_build_number(self):
+        self.assertEqual(build.read_version(), ("1.2.7", 21))
+        self.assertEqual(build.read_version("paid"), ("1.2.7", 21))
+        self.assertEqual(build.read_version("lite"), ("1.1.0", 4))
+
+    def test_unknown_flavor_is_refused(self):
+        with self.assertRaisesRegex(build.BuildError, "unknown flavor"):
+            build.read_version("deluxe")
+
+    def test_missing_flavor_version_names_the_block(self):
+        self.pubspec.write_text("""version: 1.2.7+21
+""", encoding="utf-8")
+        with self.assertRaisesRegex(build.BuildError, "flavor_versions"):
+            build.read_version("lite")
+
+    def test_the_block_stops_at_the_next_top_level_key(self):
+        # environment: must not be swallowed into the block.
+        self.assertEqual(build.flavor_versions(self.PUBSPEC),
+                         {"lite": ("1.1.0", 4)})
+
+    def test_local_properties_gets_every_flavors_name_and_code(self):
+        android = self.dir / "android"
+        android.mkdir()
+        with mock.patch.object(build, "ANDROID", android):
+            build.write_local_versions("1.1.0", 4)
+        text = (android / "local.properties").read_text(encoding="utf-8")
+        props = dict(line.split("=", 1) for line in text.splitlines() if "=" in line)
+        # the flavor being built, plus a pair per flavor so a Gradle run for
+        # the other flavor still gets its own version
+        self.assertEqual(props["flutter.versionName"], "1.1.0")
+        self.assertEqual(props["flutter.versionCode"], "4")
+        self.assertEqual(props["flutter.versionName.paid"], "1.2.7")
+        self.assertEqual(props["flutter.versionCode.paid"], "21")
+        self.assertEqual(props["flutter.versionName.lite"], "1.1.0")
+        self.assertEqual(props["flutter.versionCode.lite"], "4")
+
+    def bump(self, *args):
+        done = subprocess.run(
+            [sys.executable, "-I", str(build.ROOT / "scripts" / "bump_version.py"), *args],
+            cwd=self.dir, capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        return self.pubspec.read_text(encoding="utf-8")
+
+    def test_paid_bump_leaves_lites_version_alone(self):
+        out = self.bump("patch")
+        self.assertIn("version: 1.2.8+22", out)
+        self.assertIn("lite: 1.1.0+4", out)
+
+    def test_lite_bump_leaves_the_paid_version_alone(self):
+        out = self.bump("patch", "--flavor", "lite")
+        self.assertIn("version: 1.2.7+21", out)
+        self.assertIn("lite: 1.1.1+5", out)
+
+    def test_lite_build_bump_moves_only_its_build_number(self):
+        out = self.bump("build", "--flavor", "lite")
+        self.assertIn("version: 1.2.7+21", out)
+        self.assertIn("lite: 1.1.0+5", out)
+
+    def test_unknown_bump_type_is_refused(self):
+        done = subprocess.run(
+            [sys.executable, "-I", str(build.ROOT / "scripts" / "bump_version.py"),
+             "sideways"], cwd=self.dir, capture_output=True, text=True)
+        self.assertEqual(done.returncode, 1)
+        self.assertIn("Unknown bump type", done.stdout)
 
 class LiteFirebaseTest(unittest.TestCase):
     def write(self, data):

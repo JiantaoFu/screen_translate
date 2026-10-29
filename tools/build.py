@@ -130,20 +130,64 @@ def run(cmd, cwd=ROOT, env=None, capture=False):
 # Version
 
 
-def read_version():
-    m = re.search(r"^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$",
-                  PUBSPEC.read_text(encoding="utf-8"), re.M)
-    if not m:
-        raise BuildError('pubspec.yaml has no "version: x.y.z+n" line')
-    return m.group(1), int(m.group(2))
+def read_version(flavor=DEFAULT_FLAVOR):
+    """(versionName, versionCode) for one flavor, both from pubspec.yaml.
+
+    Each flavor carries its own name and build number: the flavors are
+    separate Play listings, so neither should have to move because the other
+    released. `version:` is the paid app's, because that is the line Flutter
+    itself reads; the rest live under flavor_versions.
+    """
+    text = PUBSPEC.read_text(encoding="utf-8")
+    if flavor == DEFAULT_FLAVOR:
+        m = re.search(r"^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", text, re.M)
+        if not m:
+            raise BuildError('pubspec.yaml has no "version: x.y.z+n" line')
+        return m.group(1), int(m.group(2))
+    if flavor not in FLAVORS:
+        raise BuildError(f"unknown flavor {flavor} (one of {', '.join(FLAVORS)})")
+    version = flavor_versions(text).get(flavor)
+    if version is None:
+        raise BuildError(f'pubspec.yaml has no "{flavor}: x.y.z+n" line under '
+                         "flavor_versions")
+    return version
+
+
+def flavor_versions(text):
+    """The flavor_versions block as {flavor: (name, code)}.
+
+    Parsed rather than loaded with a YAML library: build.py has no
+    third-party dependencies, and the block is one "name: x.y.z+n" per line.
+    The lookahead stops at the next top-level key, so `environment:` below it
+    is not swallowed.
+    """
+    block = re.search(r"^flavor_versions:\s*$(.*?)(?=^\S|\Z)", text, re.M | re.S)
+    if not block:
+        return {}
+    return {f: (name, int(code)) for f, name, code in re.findall(
+        r"^\s+(\w+):\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", block.group(1), re.M)}
 
 
 def write_local_versions(name, code):
     """The Gradle build reads the version from android/local.properties,
-    which only `flutter build` would otherwise refresh from pubspec.yaml."""
+    which only `flutter build` would otherwise refresh from pubspec.yaml.
+
+    flutter.versionName/versionCode are the flavor being built, for the
+    Flutter tooling and for defaultConfig. Every flavor's own pair is written
+    too, as flutter.version{Name,Code}.<flavor>, so a flavor's build gets its
+    own version even when Gradle is invoked for a different one than was last
+    synced.
+    """
     path = ANDROID / "local.properties"
     lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
     wanted = {"flutter.versionName": name, "flutter.versionCode": str(code)}
+    for f in FLAVORS:
+        try:
+            f_name, f_code = read_version(f)
+        except BuildError:
+            continue   # no version for that flavor; its block falls back
+        wanted[f"flutter.versionName.{f}"] = f_name
+        wanted[f"flutter.versionCode.{f}"] = str(f_code)
     out, seen = [], set()
     for line in lines:
         key = line.split("=", 1)[0].strip()
@@ -360,7 +404,7 @@ def main():
     java_home = None
     try:
         java_home = find_java_home(args.java_home)
-        name, code = read_version()
+        name, code = read_version(args.flavor)
         print(f"==> Building {args.target} ({args.flavor}) {name} ({code}) with {java_home}")
         out = build(args.target, java_home, name, code, args.flavor)
         if args.install:

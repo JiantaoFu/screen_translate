@@ -323,11 +323,14 @@ def main():
             svc = play_service(args.credentials)
 
         if args.bump:
-            step(f"Bumping version ({args.bump})")
-            run([sys.executable, ROOT / "scripts" / "bump_version.py", args.bump])
+            step(f"Bumping version ({args.bump}, {args.flavor})")
+            # --flavor: the build number is per app, so bumping for a lite
+            # release must not raise the paid app's (and the reverse).
+            run([sys.executable, ROOT / "scripts" / "bump_version.py", args.bump,
+                 "--flavor", args.flavor])
             bumped = True
-        name, code = read_version()
-        print(f"  version {name} ({code})")
+        name, code = read_version(args.flavor)
+        print(f"  version {name} ({code}) for {args.flavor}")
         if svc:
             with play_api("Reading versions from Google Play"):
                 on_play = highest_version_code(svc, package)

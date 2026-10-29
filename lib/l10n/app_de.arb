@@ -1,6 +1,7 @@
 {
   "@@locale": "de",
   "app_title": "Bildschirmübersetzung",
+  "app_title_lite": "Bildschirmübersetzung Lite",
   "source_language": "Von",
   "target_language": "Nach",
   "stop_translation": "Übersetzung stoppen",
@@ -148,5 +149,17 @@
   "first_failure_wrong": "Die Übersetzung war falsch",
   "first_failure_slow": "Es war zu langsam",
   "overlay_permission_not_granted": "Übersetzungen können noch nicht erscheinen: Aktiviere „Über anderen Apps einblenden“ für Screen Translate und kehre zurück.",
-  "screen_capture_not_granted": "Die Bildschirmaufnahme wurde nicht erlaubt, daher kann nichts übersetzt werden. Tippe erneut auf Start und erlaube die Aufnahme."
+  "screen_capture_not_granted": "Die Bildschirmaufnahme wurde nicht erlaubt, daher kann nichts übersetzt werden. Tippe erneut auf Start und erlaube die Aufnahme.",
+  "paywall_title": "Du hast die kostenlosen Übersetzungen für heute aufgebraucht",
+  "paywall_body": "Screen Translator Lite enthält {limit} kostenlose Übersetzungen pro Tag. Schalte Pro einmalig frei für unbegrenzte Übersetzungen.",
+  "paywall_benefit_unlimited": "Unbegrenzte Übersetzungen, jeden Tag",
+  "paywall_benefit_once": "Einmalkauf, kein Abo",
+  "paywall_unlock_button": "Pro freischalten · {price}",
+  "paywall_unlock_button_no_price": "Pro freischalten",
+  "paywall_restore": "Kauf wiederherstellen",
+  "paywall_not_now": "Nicht jetzt",
+  "paywall_store_unavailable": "Google Play ist gerade nicht verfügbar. Bitte versuche es später erneut.",
+  "paywall_pro_unlocked": "Pro freigeschaltet: unbegrenzte Übersetzungen!",
+  "paywall_reset_hint": "Die kostenlosen Übersetzungen werden um Mitternacht zurückgesetzt.",
+  "lite_remaining_today": "Heute verbleibende kostenlose Übersetzungen: {count}"
 }

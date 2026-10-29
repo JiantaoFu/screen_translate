@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate स्क्रॉल पहचान</string>
-    <string name="accessibility_service_description">Screen Translate को दूसरे ऐप्स में स्क्रॉल पहचानने देता है, ताकि अनुवाद बिना रुकावट हो। यह सेवा पहचानती है कि सामग्री कब बदली, ताकि अनुवाद सही तरह से अपडेट हो सके।</string>
-    <string name="accessibility_permission_title">सुलभता सेवा ज़रूरी है</string>
-    <string name="accessibility_permission_message">स्क्रॉल पहचानने और अलग-अलग ऐप्स की सामग्री का अनुवाद करने के लिए Screen Translate को सुलभता सेवा की ज़रूरत है।</string>
-    <string name="accessibility_permission_benefits">फ़ायदे:\n• स्क्रॉल करते समय बिना रुकावट अनुवाद\n• कई ऐप्स में काम करता है\n• अनुवाद ज़्यादा सटीक</string>
-    <string name="accessibility_permission_how_to">चालू करने का तरीका:\n1. “चालू करें” पर टैप करें\n2. सुलभता सेटिंग में “Screen Translate स्क्रॉल पहचान” ढूंढें\n3. सेवा चालू करें</string>
-    <string name="btn_enable_accessibility">चालू करें</string>
-    <string name="btn_cancel">रद्द करें</string>
+    <string name="accessibility_service_description">Screen Translate, Android की सुलभता सेवा का उपयोग करके पता लगा सकता है कि आप कब स्क्रॉल करते हैं या किसी दूसरे ऐप पर जाते हैं, ताकि स्क्रीन बदलने पर अपने आप फिर से अनुवाद करे और ऐप बदलने पर अनुवाद ओवरले छिपाए या अपडेट करे। सुलभता सेवा केवल सामने वाले ऐप के नाम का उपयोग करती है; यह स्क्रीन का टेक्स्ट नहीं पढ़ती, टैप या जेस्चर नहीं करती, और आपका निजी डेटा न इकट्ठा करती है न भेजती है। यह तभी चलती है जब आप इसे खुद चालू करते हैं। वैकल्पिक: इसके बिना भी आप मैन्युअल रूप से अनुवाद कर सकते हैं; इसे कभी भी सेटिंग &gt; सुलभता में बंद करें।</string>
+    <string name="accessibility_permission_title">सुलभता सेवा (वैकल्पिक)</string>
+    <string name="accessibility_permission_message">Screen Translate, Android की सुलभता सेवा का उपयोग करके पता लगा सकता है कि आप कब स्क्रॉल करते हैं या किसी दूसरे ऐप पर जाते हैं, ताकि स्क्रीन बदलने पर अपने आप फिर से अनुवाद करे और ऐप बदलने पर अनुवाद ओवरले छिपाए या अपडेट करे।</string>
+    <string name="accessibility_permission_benefits">सुलभता सेवा केवल सामने वाले ऐप के नाम का उपयोग करती है; यह स्क्रीन का टेक्स्ट नहीं पढ़ती, टैप या जेस्चर नहीं करती, और आपका निजी डेटा न इकट्ठा करती है न भेजती है। यह तभी चलती है जब आप इसे खुद चालू करते हैं।\n\nवैकल्पिक: इसके बिना भी आप मैन्युअल रूप से अनुवाद कर सकते हैं; इसे कभी भी सेटिंग &gt; सुलभता में बंद करें।</string>
+    <string name="accessibility_permission_how_to">चालू करने का तरीका:\n1. “सहमत हूं” पर टैप करें\n2. सुलभता सेटिंग में “Screen Translate स्क्रॉल पहचान” ढूंढें\n3. सेवा चालू करें</string>
+    <string name="btn_enable_accessibility">सहमत हूं</string>
+    <string name="btn_cancel">नहीं, धन्यवाद</string>
     <string name="tap_outside_to_close">बंद करने के लिए बाहर टैप करें</string>
     <string name="mode_auto_translate">अपने-आप अनुवाद</string>
     <string name="mode_original_text">मूल टेक्स्ट</string>

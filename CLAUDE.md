@@ -49,6 +49,15 @@ Every build, for any purpose, goes through `tools/build.py`. Don't run
 | Install on the user's phone (only when asked) | `python tools/build.py apk --install <serial>` (release-signed, arm64) |
 | Emulator / `tools/emulator/` | `python tools/build.py emulator [--install emulator-5554]` (debug, x86_64) |
 | Google Play bundle | `python tools/build.py aab`, or `tools/release.py` to publish |
+| Lite app (any of the above) | add `--flavor lite` (default `paid` = the existing app) |
+
+Two Gradle product flavors share all code: `paid` (`com.lomoware.screen_translate`,
+unchanged, no billing) and `lite` (`com.lomoware.screen_translate.lite`,
+"Screen Translator Lite": daily free limit + one-time `pro_unlock` purchase,
+code in `lib/lite/`). Lite needs `android/app/src/lite/google-services.json`
+for release builds (see `android/app/src/lite/README.md`). Gradle task names
+are flavored (`assemblePaidDebug`); `:app:testDebugUnitTest` still runs the
+unit tests of both flavors.
 
 What the script does:
 - syncs the version from `pubspec.yaml` into `android/local.properties`,

@@ -25,6 +25,10 @@ import 'dart:async';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:screen_translate/screens/image_translation_screen.dart';
+import '../lite/lite_gate.dart';
+import '../lite/paywall_screen.dart';
+import '../lite/lite_home_pro_row.dart';
+import '../app_flavor.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -277,7 +281,76 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initSharingIntent();
+    _attachLiteGate();
   }
+
+  // ---- Lite flavor (no-ops in the paid app: LiteGate.instance is null) ----
+
+  LiteGate? _liteGate;
+  bool _paywallOpen = false;
+
+  /// LiteGate is created right after runApp (lite only); attach when ready.
+  void _attachLiteGate() {
+    final gate = LiteGate.instance;
+    if (gate == null) {
+      LiteGate.current.addListener(_onLiteGateCreated);
+      return;
+    }
+    LiteGate.current.removeListener(_onLiteGateCreated);
+    if (identical(gate, _liteGate)) return;
+    _liteGate = gate;
+    gate.addListener(_onLiteGateChanged);
+    if (mounted) setState(() {});
+  }
+
+  void _onLiteGateCreated() {
+    if (mounted && LiteGate.instance != null) _attachLiteGate();
+  }
+
+  void _onLiteGateChanged() {
+    if (!mounted) return;
+    setState(() {}); // remaining-today line
+    // The success that used the last free translation: show the paywall now
+    // if we are in front (e.g. Stop tapped in the app), else on return.
+    if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+      _maybeShowPendingPaywall();
+    }
+  }
+
+  /// Shows the paywall once after the last free translation was used.
+  bool _maybeShowPendingPaywall() {
+    final gate = _liteGate;
+    if (gate == null || _paywallOpen || !mounted) return false;
+    if (!gate.takePendingPaywall()) return false;
+    _openPaywall(gate, 'limit_reached');
+    return true;
+  }
+
+  Future<void> _openPaywall(LiteGate gate, String trigger) async {
+    if (_paywallOpen) return;
+    _paywallOpen = true;
+    try {
+      await PaywallScreen.show(context, gate, trigger: trigger);
+    } finally {
+      _paywallOpen = false;
+    }
+  }
+
+  /// Whether a new translation may start; shows the paywall when not.
+  ///
+  /// Awaits the gate rather than treating a missing one as "allow": in lite
+  /// the gate is built just after runApp, and a share-into-the-app on a cold
+  /// start arrives inside that window, which let an exhausted user translate
+  /// for free. Paid returns null immediately and is unaffected.
+  Future<bool> _liteAllows(String kind) async {
+    final gate = _liteGate ?? await LiteGate.waitForInstance();
+    if (gate == null || gate.mayStartTranslation(kind: kind)) return true;
+    if (mounted) _openPaywall(gate, 'limit_hit');
+    return false;
+  }
+
+  Widget _buildLiteRemaining(BuildContext context) =>
+      LiteHomeProRow(gate: _liteGate, onOpenPaywall: _openPaywall);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -287,7 +360,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // while Start is in progress and for a few seconds after it.
     if (state == AppLifecycleState.resumed && mounted) {
       final provider = context.read<TranslationProvider>();
-      if (TranslationProvider.mayPromptReviewOnResume(
+      // Lite: the paywall due after the last free translation takes this
+      // resume instead of the review prompt.
+      if (_maybeShowPendingPaywall()) {
+        // nothing else on this resume
+      } else if (TranslationProvider.mayPromptReviewOnResume(
         isTranslating: provider.isTranslating,
         isStarting: provider.isStarting,
         startEndedAt: provider.startEndedAt,
@@ -332,7 +409,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _navigateToImageTranslation(File file) {
+  Future<void> _navigateToImageTranslation(File file) async {
+    if (!await _liteAllows('image')) return;
+    if (!mounted) return;
     // Provide translation provider so ImageTranslationScreen can use it
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     Navigator.push(
@@ -349,13 +428,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    LiteGate.current.removeListener(_onLiteGateCreated);
+    _liteGate?.removeListener(_onLiteGateChanged);
     _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 
   /// No silent returns from Start: say what is missing and how to fix it.
   /// Downloads whatever the current pair needs, then starts live translation.
+  /// The gate lives here, not at the call sites. There are two of them —
+  /// the Start button and the retry after "no text found" offers a different
+  /// source language — and a check at one of them silently leaves the other
+  /// ungated. Same lesson as the cold-start share intent.
   Future<void> _startLiveTranslation(BuildContext context, TranslationProvider provider) async {
+    if (!await _liteAllows('live')) return;
+    if (!context.mounted) return;
     if (!await _confirmQuickPacksBeforeTranslate(context, provider)) return;
     if (!context.mounted) return;
     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
@@ -499,7 +586,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       // showed translations — asking a user
                                       // whose capture just failed to rate the
                                       // app invites a 1-star review.
-                                      if (worked) {
+                                      if (worked && _maybeShowPendingPaywall()) {
+                                        // Lite: paywall instead of review.
+                                      } else if (worked) {
                                         await _trackTranslationAndPromptReview(context);
                                       } else if (context.mounted) {
                                         // OCR found no text at all: most likely
@@ -541,6 +630,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   // A second tap while the gallery is still
                                   // opening throws PlatformException(already_active).
                                   if (_isPickingImage) return;
+                                  if (!await _liteAllows('image')) return;
                                   _isPickingImage = true;
                                   try {
                                     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) {
@@ -559,7 +649,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 },
                                 context: context,
                               ),
-                            ]
+                            ],
+                            _buildLiteRemaining(context),
                           ],
                         );
                       },
@@ -1186,12 +1277,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            AppLocalizations.of(context)!.app_title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          // Flexible: the Lite titles are longer ("Bildschirmübersetzung Lite").
+          Flexible(
+            child: Text(
+              AppFlavorConfig.isLite
+                  ? AppLocalizations.of(context)!.app_title_lite
+                  : AppLocalizations.of(context)!.app_title,
+              key: const Key('home_title'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Icon(Icons.translate, color: Colors.white, size: 30),

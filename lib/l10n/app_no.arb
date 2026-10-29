@@ -1,6 +1,7 @@
 {
   "@@locale": "no",
   "app_title": "Skjermoversettelse",
+  "app_title_lite": "Skjermoversettelse Lite",
   "source_language": "Fra",
   "target_language": "Til",
   "stop_translation": "Stopp oversettelse",
@@ -148,5 +149,17 @@
   "first_failure_wrong": "Oversettelsen var feil",
   "first_failure_slow": "Det var for tregt",
   "overlay_permission_not_granted": "Oversettelser kan ikke vises ennå: slå på «Vis over andre apper» for Screen Translate, og kom tilbake.",
-  "screen_capture_not_granted": "Skjermopptak ble ikke tillatt, så ingenting kan oversettes. Trykk på Start igjen og tillat skjermopptak."
+  "screen_capture_not_granted": "Skjermopptak ble ikke tillatt, så ingenting kan oversettes. Trykk på Start igjen og tillat skjermopptak.",
+  "paywall_title": "Du har brukt dagens gratis oversettelser",
+  "paywall_body": "Screen Translator Lite inkluderer {limit} gratis oversettelser per dag. Lås opp Pro én gang for ubegrensede oversettelser.",
+  "paywall_benefit_unlimited": "Ubegrensede oversettelser hver dag",
+  "paywall_benefit_once": "Engangskjøp, ikke abonnement",
+  "paywall_unlock_button": "Lås opp Pro · {price}",
+  "paywall_unlock_button_no_price": "Lås opp Pro",
+  "paywall_restore": "Gjenopprett kjøp",
+  "paywall_not_now": "Ikke nå",
+  "paywall_store_unavailable": "Google Play er ikke tilgjengelig akkurat nå. Prøv igjen senere.",
+  "paywall_pro_unlocked": "Pro låst opp: ubegrensede oversettelser!",
+  "paywall_reset_hint": "Gratis oversettelser nullstilles ved midnatt.",
+  "lite_remaining_today": "Gratis oversettelser igjen i dag: {count}"
 }

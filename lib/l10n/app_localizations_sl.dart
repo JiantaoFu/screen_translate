@@ -12,6 +12,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get app_title => 'Prevajanje zaslona';
 
   @override
+  String get app_title_lite => 'Prevajanje zaslona Lite';
+
+  @override
   String get source_language => 'Iz';
 
   @override
@@ -492,4 +495,48 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Snemanje zaslona ni bilo dovoljeno, zato ni mogoče ničesar prevesti. Znova tapnite Začni in dovolite snemanje.';
+
+  @override
+  String get paywall_title => 'Porabili ste današnje brezplačne prevode';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite vključuje $limit brezplačnih prevodov na dan. Pro odklenite enkrat za neomejene prevode.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Neomejeni prevodi vsak dan';
+
+  @override
+  String get paywall_benefit_once => 'Enkraten nakup, brez naročnine';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Odkleni Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Odkleni Pro';
+
+  @override
+  String get paywall_restore => 'Obnovi nakup';
+
+  @override
+  String get paywall_not_now => 'Ne zdaj';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play trenutno ni na voljo. Poskusite znova pozneje.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro odklenjen: neomejeni prevodi!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Brezplačni prevodi se ponastavijo ob polnoči.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Preostali brezplačni prevodi danes: $count';
+  }
 }

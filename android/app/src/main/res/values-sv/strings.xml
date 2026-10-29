@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accessibility_service_label">Screen Translate rullningsavkänning</string>
-    <string name="accessibility_service_description">Låter Screen Translate känna av rullning i andra appar för sömlös översättning. Tjänsten märker när innehållet ändras så att översättningarna uppdateras korrekt.</string>
-    <string name="accessibility_permission_title">Tillgänglighetstjänst krävs</string>
-    <string name="accessibility_permission_message">Screen Translate behöver tillgänglighetstjänsten för att känna av rullning och översätta innehåll i olika appar.</string>
-    <string name="accessibility_permission_benefits">Fördelar:\n• Sömlös översättning när du rullar\n• Fungerar i flera appar\n• Mer exakta översättningar</string>
-    <string name="accessibility_permission_how_to">Så aktiverar du den:\n1. Tryck på ”Aktivera”\n2. Hitta ”Screen Translate rullningsavkänning” i tillgänglighetsinställningarna\n3. Slå på tjänsten</string>
-    <string name="btn_enable_accessibility">Aktivera</string>
-    <string name="btn_cancel">Avbryt</string>
+    <string name="accessibility_service_description">Screen Translate kan använda Androids tillgänglighetstjänst för att märka när du scrollar eller byter till en annan app, så att den översätter igen automatiskt när skärmen ändras och döljer eller uppdaterar översättningslagret när du byter app. Tillgänglighetstjänsten använder bara namnet på appen i förgrunden; den läser inte text på skärmen, utför inga tryck eller gester och samlar inte in eller överför dina personuppgifter. Den körs först när du själv har aktiverat den. Valfri: utan den kan du fortfarande översätta manuellt; stäng av den när som helst under Inställningar &gt; Tillgänglighet.</string>
+    <string name="accessibility_permission_title">Tillgänglighetstjänst (valfri)</string>
+    <string name="accessibility_permission_message">Screen Translate kan använda Androids tillgänglighetstjänst för att märka när du scrollar eller byter till en annan app, så att den översätter igen automatiskt när skärmen ändras och döljer eller uppdaterar översättningslagret när du byter app.</string>
+    <string name="accessibility_permission_benefits">Tillgänglighetstjänsten använder bara namnet på appen i förgrunden; den läser inte text på skärmen, utför inga tryck eller gester och samlar inte in eller överför dina personuppgifter. Den körs först när du själv har aktiverat den.\n\nValfri: utan den kan du fortfarande översätta manuellt; stäng av den när som helst under Inställningar &gt; Tillgänglighet.</string>
+    <string name="accessibility_permission_how_to">Så aktiverar du den:\n1. Tryck på ”Godkänn”\n2. Hitta ”Screen Translate rullningsavkänning” i tillgänglighetsinställningarna\n3. Aktivera tjänsten</string>
+    <string name="btn_enable_accessibility">Godkänn</string>
+    <string name="btn_cancel">Nej tack</string>
     <string name="tap_outside_to_close">Tryck utanför för att stänga</string>
     <string name="mode_auto_translate">Automatisk översättning</string>
     <string name="mode_original_text">Originaltext</string>

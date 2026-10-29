@@ -12,6 +12,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get app_title => 'Terjemahan layar';
 
   @override
+  String get app_title_lite => 'Terjemahan layar Lite';
+
+  @override
   String get source_language => 'Dari';
 
   @override
@@ -491,4 +494,48 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get screen_capture_not_granted =>
       'Perekaman layar tidak diizinkan, jadi tidak ada yang bisa diterjemahkan. Ketuk Mulai lagi dan izinkan perekaman layar.';
+
+  @override
+  String get paywall_title => 'Anda telah memakai terjemahan gratis hari ini';
+
+  @override
+  String paywall_body(int limit) {
+    return 'Screen Translator Lite menyertakan $limit terjemahan gratis per hari. Buka Pro sekali untuk terjemahan tanpa batas.';
+  }
+
+  @override
+  String get paywall_benefit_unlimited => 'Terjemahan tanpa batas setiap hari';
+
+  @override
+  String get paywall_benefit_once => 'Sekali beli, tanpa langganan';
+
+  @override
+  String paywall_unlock_button(String price) {
+    return 'Buka Pro · $price';
+  }
+
+  @override
+  String get paywall_unlock_button_no_price => 'Buka Pro';
+
+  @override
+  String get paywall_restore => 'Pulihkan pembelian';
+
+  @override
+  String get paywall_not_now => 'Nanti saja';
+
+  @override
+  String get paywall_store_unavailable =>
+      'Google Play sedang tidak tersedia. Coba lagi nanti.';
+
+  @override
+  String get paywall_pro_unlocked => 'Pro terbuka: terjemahan tanpa batas!';
+
+  @override
+  String get paywall_reset_hint =>
+      'Terjemahan gratis diatur ulang tengah malam.';
+
+  @override
+  String lite_remaining_today(int count) {
+    return 'Sisa terjemahan gratis hari ini: $count';
+  }
 }

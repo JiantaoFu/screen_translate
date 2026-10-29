@@ -6,6 +6,12 @@
     python tools/build.py apk --install SERIAL  # ...and install it over the current app (keeps data)
     python tools/build.py emulator              # debug x86_64 APK for tools/emulator/
     python tools/build.py emulator --install emulator-5554
+    python tools/build.py aab --flavor lite     # any target, for the Lite app
+
+Flavors (android/app/build.gradle): `paid` (default, com.lomoware.screen_translate,
+what every command above builds when --flavor is left out) and `lite`
+(com.lomoware.screen_translate.lite, daily free limit + Pro unlock). The
+flavor is also passed to Dart as --dart-define APP_FLAVOR=<flavor>.
 
 Every build syncs the version from pubspec.yaml, regenerates localizations,
 runs Gradle on JDK 17-23 (Android Studio's bundled JBR 25 can't run this
@@ -21,6 +27,8 @@ tools/release.py builds through this module.
 """
 
 import argparse
+import base64
+import json
 import os
 import re
 import shutil
@@ -32,19 +40,68 @@ ROOT = Path(__file__).resolve().parent.parent
 ANDROID = ROOT / "android"
 PUBSPEC = ROOT / "pubspec.yaml"
 PACKAGE = "com.lomoware.screen_translate"
+# Gradle product flavor -> applicationId. "paid" is the default everywhere.
+FLAVORS = {"paid": PACKAGE, "lite": PACKAGE + ".lite"}
+DEFAULT_FLAVOR = "paid"
 OUTPUTS = ROOT / "build" / "app" / "outputs"
-AAB = OUTPUTS / "bundle" / "release" / "app-release.aab"
-MAPPING = OUTPUTS / "mapping" / "release" / "mapping.txt"
-RELEASE_APK = OUTPUTS / "apk" / "release" / "app-release.apk"
-DEBUG_APK = OUTPUTS / "apk" / "debug" / "app-debug.apk"
+LITE_GOOGLE_SERVICES = ANDROID / "app" / "src" / "lite" / "google-services.json"
 IS_WINDOWS = os.name == "nt"
 
-# target: (gradle task, flutter target-platform, ABI, output, release-signed)
+
+def output_path(target, flavor=DEFAULT_FLAVOR):
+    """Where Gradle writes `target` for `flavor` (AGP's flavored layout)."""
+    kind = {"aab": "bundle", "apk": "release", "emulator": "debug"}[target]
+    if kind == "bundle":
+        return OUTPUTS / "bundle" / f"{flavor}Release" / f"app-{flavor}-release.aab"
+    return OUTPUTS / "apk" / flavor / kind / f"app-{flavor}-{kind}.apk"
+
+
+def mapping_path(flavor=DEFAULT_FLAVOR):
+    return OUTPUTS / "mapping" / f"{flavor}Release" / "mapping.txt"
+
+
+AAB = output_path("aab")
+MAPPING = mapping_path()
+RELEASE_APK = output_path("apk")
+DEBUG_APK = output_path("emulator")
+
+# target: (gradle task, flutter target-platform, ABI, release-signed). The
+# task gets the flavor inserted: assembleRelease -> assemblePaidRelease.
 TARGETS = {
-    "aab": ("bundleRelease", None, None, AAB, True),
-    "apk": ("assembleRelease", "android-arm64", "arm64-v8a", RELEASE_APK, True),
-    "emulator": ("assembleDebug", "android-x64", "x86_64", DEBUG_APK, False),
+    "aab": ("bundleRelease", None, None, True),
+    "apk": ("assembleRelease", "android-arm64", "arm64-v8a", True),
+    "emulator": ("assembleDebug", "android-x64", "x86_64", False),
 }
+
+
+def flavored_task(task, flavor):
+    m = re.fullmatch(r"(assemble|bundle)(Debug|Release)", task)
+    if not m:
+        raise BuildError(f"unknown Gradle task {task}")
+    return f"{m.group(1)}{flavor.capitalize()}{m.group(2)}"
+
+
+def dart_defines(flavor):
+    """Flutter's Gradle plugin takes dart-defines as comma-separated base64."""
+    return base64.b64encode(f"APP_FLAVOR={flavor}".encode()).decode()
+
+
+def check_lite_firebase(path=None):
+    """Lite release builds need the lite app's own Firebase config; without
+    it build.gradle skips google-services and the app ships without Firebase."""
+    path = path or LITE_GOOGLE_SERVICES
+    if not path.exists():
+        raise BuildError(f"{path} is missing: download it from the Firebase console "
+                         "(android/app/src/lite/README.md) before a lite release build")
+    try:
+        clients = json.loads(path.read_text(encoding="utf-8")).get("client", [])
+    except ValueError as e:
+        raise BuildError(f"{path} is not valid JSON: {e}")
+    names = {c.get("client_info", {}).get("android_client_info", {}).get("package_name")
+             for c in clients}
+    if FLAVORS["lite"] not in names:
+        raise BuildError(f"{path} has no Android app {FLAVORS['lite']} (found: "
+                         f"{', '.join(sorted(filter(None, names))) or 'none'})")
 
 
 class BuildError(Exception):
@@ -192,11 +249,16 @@ def check_signature(java_home, path=AAB):
     print(f"  signed by {owner.group(1)}\n  SHA-256 {sha.group(1) if sha else '?'}")
 
 
-def check_apk(path, name, code, release):
-    """APK version must match pubspec.yaml; release APKs must not be debug-signed."""
+def check_apk(path, name, code, release, package=PACKAGE):
+    """APK version must match pubspec.yaml, its package the flavor's, and
+    release APKs must not be debug-signed."""
     tools = build_tools()
     aapt2 = tools / ("aapt2.exe" if IS_WINDOWS else "aapt2")
     badging = run([aapt2, "dump", "badging", path], capture=True)
+    pkg = re.search(r"package: name='([^']+)'", badging)
+    if not pkg or pkg.group(1) != package:
+        raise BuildError(f"{path.name} is package {pkg.group(1) if pkg else '?'}, "
+                         f"expected {package}")
     m = re.search(r"versionCode='(\d+)' versionName='([^']*)'", badging)
     if not m or (int(m.group(1)), m.group(2)) != (code, name):
         raise BuildError(f"{path.name} has version {m.groups() if m else '?'}, "
@@ -223,16 +285,21 @@ def prepare(name, code):
     write_local_versions(name, code)
 
 
-def build(target, java_home, name, code):
-    """Builds and checks one target; returns the output path."""
-    task, platform, abi, out, release = TARGETS[target]
+def build(target, java_home, name, code, flavor=DEFAULT_FLAVOR):
+    """Builds and checks one target of one flavor; returns the output path."""
+    if flavor not in FLAVORS:
+        raise BuildError(f"unknown flavor {flavor} (one of {', '.join(FLAVORS)})")
+    task, platform, abi, release = TARGETS[target]
+    out = output_path(target, flavor)
     if release:
         check_keystore()
+        if flavor == "lite":
+            check_lite_firebase()
     prepare(name, code)
     # When nothing changed Gradle skips repackaging and leaves the old file
     # in place; removing it guarantees the output is from this build.
     out.unlink(missing_ok=True)
-    args = [task]
+    args = [flavored_task(task, flavor), f"-Pdart-defines={dart_defines(flavor)}"]
     if platform:
         # disable-abi-filtering stops the Flutter plugin from replacing our
         # abiFilters with all ABIs (FlutterPlugin.configureAbiWithoutSplits).
@@ -245,7 +312,7 @@ def build(target, java_home, name, code):
     if target == "aab":
         check_signature(java_home, out)
     else:
-        check_apk(out, name, code, release)
+        check_apk(out, name, code, release, FLAVORS[flavor])
     return out
 
 
@@ -257,7 +324,7 @@ INSTALL_HINTS = {
 }
 
 
-def install(apk, serial):
+def install(apk, serial, package=PACKAGE):
     """Installs over the current app, keeping its data. adb refuses, and
     changes nothing, if the installed app is newer or signed differently."""
     print(f"  installing on {serial}")
@@ -271,7 +338,7 @@ def install(apk, serial):
         if code in out:
             raise BuildError(f"{serial} refused the install: {why}. Uninstalling the app "
                              f"first would fix it, but that clears its data "
-                             f"(adb -s {serial} uninstall {PACKAGE})")
+                             f"(adb -s {serial} uninstall {package})")
     raise BuildError(f"adb install on {serial} failed:\n{out.strip()}")
 
 
@@ -280,6 +347,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("target", choices=TARGETS)
+    p.add_argument("--flavor", choices=FLAVORS, default=DEFAULT_FLAVOR,
+                   help="paid (default, com.lomoware.screen_translate) or lite "
+                        "(com.lomoware.screen_translate.lite)")
     p.add_argument("--install", metavar="SERIAL",
                    help="adb serial to install the APK on (adb devices)")
     p.add_argument("--java-home", help="JDK 17-23 (default: $RELEASE_JAVA_HOME, $JAVA_HOME)")
@@ -291,10 +361,10 @@ def main():
     try:
         java_home = find_java_home(args.java_home)
         name, code = read_version()
-        print(f"==> Building {args.target} {name} ({code}) with {java_home}")
-        out = build(args.target, java_home, name, code)
+        print(f"==> Building {args.target} ({args.flavor}) {name} ({code}) with {java_home}")
+        out = build(args.target, java_home, name, code, args.flavor)
         if args.install:
-            install(out, args.install)
+            install(out, args.install, FLAVORS[args.flavor])
     except BuildError as e:
         print(f"\nBuild failed: {e}", file=sys.stderr)
         return 1

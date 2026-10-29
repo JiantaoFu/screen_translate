@@ -3,6 +3,24 @@ description: Screen Translate - A real-time screen translation app
 publish_to: 'none'
 version: 1.2.7+21
 
+# The x.y.z name above is shared by both flavors — one codebase, one
+# marketing version. The build number is not: it is per app, because the two
+# flavors are separate Play listings and releasing one must not consume the
+# other's numbers. While the lite flavor was being built the single shared
+# number went 17 -> 21, which made the paid app skip 18, 19 and 20 for
+# nothing.
+#
+# `version:` carries the paid app's build number, because that is the line
+# Flutter itself reads. Every other flavor's lives here. tools/build.py
+# syncs the right one into android/local.properties per flavor, and
+# `release.py --flavor lite --bump build` raises only lite's.
+#
+# lite starts level with paid rather than at 1: it has never been published,
+# and if anything did reach Play, release.py refuses a versionCode that is
+# not higher than what is already there.
+flavor_version_codes:
+  lite: 21
+
 environment:
   sdk: '>=3.1.3 <4.0.0'
 

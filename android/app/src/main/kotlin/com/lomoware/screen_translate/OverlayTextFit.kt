@@ -11,6 +11,10 @@ package com.lomoware.screen_translate
  * words whole; autosize can still go smaller to fit the height.
  */
 object OverlayTextFit {
+    /** Keep padding proportional for small OCR labels; never consume a line. */
+    fun padding(extent: Float, preferred: Int): Int =
+        (extent.coerceAtLeast(0f) * 0.05f).toInt().coerceIn(0, preferred)
+
     /**
      * Largest text size (same unit as [refSize]) at which every
      * space-separated word of [text] fits in [availableWidth], or null when

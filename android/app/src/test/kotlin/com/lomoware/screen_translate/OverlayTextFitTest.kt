@@ -5,6 +5,14 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class OverlayTextFitTest {
+    @Test
+    fun smallLabelsReserveSpaceForGlyphs() {
+        assertEquals(0, OverlayTextFit.padding(5f, 6))
+        assertEquals(2, OverlayTextFit.padding(40f, 12))
+        assertEquals(12, OverlayTextFit.padding(600f, 12))
+        assertEquals(0, OverlayTextFit.padding(-1f, 12))
+    }
+
     // Monospace stand-in for Paint.measureText: 10px per character at size 100.
     private val measure: (String) -> Float = { it.length * 10f }
 

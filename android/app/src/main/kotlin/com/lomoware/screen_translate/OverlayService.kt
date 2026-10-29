@@ -854,21 +854,16 @@ class OverlayService : Service() {
                 // edges — the box itself stays sized to the original text's
                 // bounds, so autosize just shrinks the font slightly more to
                 // make room for this.
-                setPadding(4.dpToPx(), 2.dpToPx(), 4.dpToPx(), 2.dpToPx())
+                val horizontalPadding = OverlayTextFit.padding(transformedWidth, 4.dpToPx())
+                val verticalPadding = OverlayTextFit.padding(transformedHeight, 2.dpToPx())
+                setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+                includeFontPadding = false
                 setSingleLine(false)
 
-                // Cap vertical growth so pathologically long translations
-                // can't push the box far past its original bounds — but do
-                // NOT set ellipsize here: Android's TextView autosizing
-                // (setAutoSizeTextTypeUniformWithConfiguration below) is
-                // documented to conflict with ellipsize, and combining them
-                // was found to break autosizing outright, leaving text
-                // rendered past the box's right/bottom edge where
-                // clipChildren then silently discarded it instead of
-                // shrinking to fit. maxLines alone is compatible with
-                // autosize — the sizing algorithm treats it as an available
-                // space constraint.
-                maxLines = 15
+                // The fixed window bounds constrain autosize. Allow the
+                // complete translation to wrap, rather than truncating at
+                // an arbitrary line limit. Ellipsize conflicts with autosize.
+                maxLines = Int.MAX_VALUE
 
                 val spPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 1f, resources.displayMetrics)
                 val refPaint = android.text.TextPaint(paint).apply { textSize = 100 * spPx }
@@ -881,8 +876,11 @@ class OverlayService : Service() {
                     100f,
                 ) { refPaint.measureText(it) }
                 val maxSp = (wordCapSp?.toInt() ?: 100).coerceIn(7, 100)
+                // A 6sp floor can be taller than an entire map label.
+                // Use physical pixels so system font scaling cannot force
+                // even the smallest candidate outside the fixed window.
                 setAutoSizeTextTypeUniformWithConfiguration(
-                    6, maxSp, 1, TypedValue.COMPLEX_UNIT_SP
+                    1, (maxSp * spPx).toInt().coerceAtLeast(2), 1, TypedValue.COMPLEX_UNIT_PX
                 )
                 gravity = Gravity.CENTER
             }

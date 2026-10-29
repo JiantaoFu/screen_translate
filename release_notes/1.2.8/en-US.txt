@@ -1,0 +1,3 @@
+• Improved text fitting in small translation boxes to reduce clipped text
+• Reduced overlap between nearby translations, including map labels
+• More consistent translation box placement in live and image translation

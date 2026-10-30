@@ -60,8 +60,8 @@ are flavored (`assemblePaidDebug`); `:app:testDebugUnitTest` still runs the
 unit tests of both flavors.
 
 What the script does:
-- syncs the version from `pubspec.yaml` into `android/local.properties`,
-  which is where Gradle reads it;
+- syncs the flavor's version from `pubspec.yaml` into
+  `android/local.properties`, which is where Gradle reads it;
 - builds with JDK 17. `flutter build` fails here because it runs on Android
   Studio's JBR 25;
 - keeps each APK to a single ABI through `-Pabi`, instead of Flutter's
@@ -73,6 +73,29 @@ What the script does:
 
 If a build needs something the script doesn't do, extend `tools/build.py`
 (and `tools/test_release.py`) instead of working around it.
+
+### Versions are per flavor
+
+Each flavor has its own `x.y.z+n`, so releasing one app never moves the
+other's version. `version:` in `pubspec.yaml` is the paid app's (the line
+Flutter itself reads); the rest live under `flavor_versions:`:
+
+```yaml
+version: 1.2.8+22        # paid
+flavor_versions:
+  lite: 1.2.7+21
+```
+
+`build.py` writes each flavor's pair into `android/local.properties` as
+`flutter.version{Name,Code}.<flavor>`, and every `productFlavor` in
+`build.gradle` reads its own. Bump with
+`release.py --flavor lite --bump patch` (or `scripts/bump_version.py patch
+--flavor lite`), which edits exactly one version line.
+
+Don't go back to one shared number, and don't give a flavor an offset
+(`+1000` etc.) — that is the split-per-abi mistake above. Sharing one line
+already cost us: the lite work moved the number 17 -> 21, so the paid app
+skipped 18, 19 and 20 for nothing.
 
 ## Releasing
 

@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play ist gerade nicht verfügbar. Bitte versuche es später erneut.",
   "paywall_pro_unlocked": "Pro freigeschaltet: unbegrenzte Übersetzungen!",
   "paywall_reset_hint": "Die kostenlosen Übersetzungen werden um Mitternacht zurückgesetzt.",
-  "lite_remaining_today": "Heute verbleibende kostenlose Übersetzungen: {count}"
+  "lite_remaining_today": "Heute verbleibende kostenlose Übersetzungen: {count}",
+  "screen_capture_permission_required": "Bildschirmaufnahme erlauben",
+  "screen_capture_permission_required_content": "Um zu übersetzen, was Sie sehen, muss die App Ihren Bildschirm lesen. Android fragt gleich und warnt vor allem, was auf dem Bildschirm zu sehen ist — diese App liest jedoch nur Text, und zwar auf Ihrem Gerät. Nichts wird hochgeladen, aufgezeichnet oder gespeichert, und Sie können jederzeit aufhören."
 }

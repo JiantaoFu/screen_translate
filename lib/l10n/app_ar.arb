@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play غير متاح الآن. يُرجى المحاولة لاحقًا.",
   "paywall_pro_unlocked": "تم فتح Pro: ترجمات غير محدودة!",
   "paywall_reset_hint": "تتجدد الترجمات المجانية عند منتصف الليل.",
-  "lite_remaining_today": "الترجمات المجانية المتبقية اليوم: {count}"
+  "lite_remaining_today": "الترجمات المجانية المتبقية اليوم: {count}",
+  "screen_capture_permission_required": "السماح بالتقاط الشاشة",
+  "screen_capture_permission_required_content": "لترجمة ما تراه، يحتاج التطبيق إلى قراءة شاشتك. سيسألك Android بعد ذلك ويحذّر بشأن كل ما يظهر على الشاشة — لكن هذا التطبيق يقرأ النص فقط، وعلى جهازك. لا يتم رفع أي شيء أو تسجيله أو حفظه، ويمكنك الإيقاف في أي وقت."
 }

@@ -35,6 +35,21 @@ void main() {
     expect(only('capture_permission_result'), {'granted': 'no'});
   });
 
+  test('the consent prompt is reported apart from the system permission', () {
+    tracker.startRequested(sourceLanguage: 'ja', targetLanguage: 'en', mode: 'onDevice');
+    tracker.captureConsentPrompt(false);
+
+    // Backing out of our own explanation must not look like a denied
+    // MediaProjection dialog, or the two refusals cannot be told apart.
+    expect(events.map((e) => e.$1), ['live_start_requested', 'capture_consent_prompt']);
+    expect(only('capture_consent_prompt'), {'outcome': 'cancel'});
+  });
+
+  test('continuing past the consent prompt is its own outcome', () {
+    tracker.captureConsentPrompt(true);
+    expect(only('capture_consent_prompt'), {'outcome': 'continue'});
+  });
+
   test('first_translation_shown fires once per install with seconds since install', () async {
     await tracker.recordAppOpen();
     now = now.add(const Duration(minutes: 3));

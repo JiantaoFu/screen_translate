@@ -541,4 +541,11 @@ class AppLocalizationsLt extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Šiandien liko nemokamų vertimų: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Leisti fiksuoti ekraną';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Kad išverstų tai, ką matote, programa turi skaityti jūsų ekraną. „Android“ netrukus paprašys leidimo ir įspės dėl visko, kas rodoma ekrane, tačiau ši programa skaito tik tekstą ir tik jūsų įrenginyje. Niekas neįkeliama, neįrašoma ir neišsaugoma, o sustabdyti galite bet kada.';
 }

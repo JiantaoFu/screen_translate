@@ -542,4 +542,11 @@ class AppLocalizationsId extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Sisa terjemahan gratis hari ini: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Izinkan perekaman layar';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Untuk menerjemahkan apa yang Anda lihat, aplikasi harus membaca layar Anda. Android akan menanyakannya sebentar lagi dan memperingatkan tentang semua yang tampil di layar — tetapi aplikasi ini hanya membaca teks, dan di perangkat Anda. Tidak ada yang diunggah, direkam, atau disimpan, dan Anda dapat berhenti kapan saja.';
 }

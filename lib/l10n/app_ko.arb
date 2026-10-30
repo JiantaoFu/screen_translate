@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "지금은 Google Play를 사용할 수 없습니다. 잠시 후 다시 시도하세요.",
   "paywall_pro_unlocked": "Pro 잠금 해제됨: 무제한 번역!",
   "paywall_reset_hint": "무료 번역은 자정에 초기화됩니다.",
-  "lite_remaining_today": "오늘 남은 무료 번역: {count}회"
+  "lite_remaining_today": "오늘 남은 무료 번역: {count}회",
+  "screen_capture_permission_required": "화면 캡처 허용",
+  "screen_capture_permission_required_content": "보이는 내용을 번역하려면 앱이 화면을 읽어야 합니다. 곧 Android가 권한을 요청하며 화면의 모든 내용에 대해 경고하지만, 이 앱은 글자만 읽고 처리는 모두 기기 안에서 이루어집니다. 업로드·녹화·저장은 하지 않으며 언제든지 중지할 수 있습니다."
 }

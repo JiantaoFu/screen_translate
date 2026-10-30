@@ -542,4 +542,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Bugün kalan ücretsiz çeviri: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Ekran yakalamaya izin ver';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Gördüklerinizi çevirebilmek için uygulamanın ekranınızı okuması gerekir. Android birazdan izin isteyecek ve ekrandaki her şey hakkında uyaracak; ancak bu uygulama yalnızca metni okur ve bunu cihazınızda yapar. Hiçbir şey yüklenmez, kaydedilmez veya saklanmaz ve istediğiniz an durdurabilirsiniz.';
 }

@@ -543,4 +543,12 @@ class AppLocalizationsRo extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Traduceri gratuite rămase azi: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'Permite capturarea ecranului';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Pentru a traduce ceea ce vezi, aplicația trebuie să îți citească ecranul. Android va cere permisiunea imediat și avertizează cu privire la tot ce apare pe ecran — însă această aplicație citește doar text, direct pe dispozitivul tău. Nimic nu este încărcat, înregistrat sau salvat și poți opri oricând.';
 }

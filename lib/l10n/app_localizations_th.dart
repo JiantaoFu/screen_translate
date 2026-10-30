@@ -536,4 +536,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'การแปลฟรีที่เหลือวันนี้: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'อนุญาตให้จับภาพหน้าจอ';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'เพื่อแปลสิ่งที่คุณเห็น แอปต้องอ่านหน้าจอของคุณ Android จะขออนุญาตในขั้นต่อไปและเตือนถึงทุกอย่างที่แสดงบนหน้าจอ แต่แอปนี้อ่านเฉพาะข้อความ และทำงานบนเครื่องของคุณเท่านั้น ไม่มีการอัปโหลด บันทึก หรือจัดเก็บใด ๆ และคุณหยุดได้ทุกเมื่อ';
 }

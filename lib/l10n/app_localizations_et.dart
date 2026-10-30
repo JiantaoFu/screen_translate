@@ -539,4 +539,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Täna jäänud tasuta tõlkeid: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Luba ekraani jäädvustamine';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Selleks et tõlkida seda, mida näed, peab rakendus su ekraani lugema. Android küsib kohe ja hoiatab kõige ekraanil oleva eest — see rakendus loeb aga ainult teksti ja seda sinu seadmes. Midagi ei laadita üles, ei salvestata ega jäädvustata ning võid igal ajal lõpetada.';
 }

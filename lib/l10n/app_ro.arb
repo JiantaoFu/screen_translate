@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play nu este disponibil acum. Încearcă din nou mai târziu.",
   "paywall_pro_unlocked": "Pro deblocat: traduceri nelimitate!",
   "paywall_reset_hint": "Traducerile gratuite se resetează la miezul nopții.",
-  "lite_remaining_today": "Traduceri gratuite rămase azi: {count}"
+  "lite_remaining_today": "Traduceri gratuite rămase azi: {count}",
+  "screen_capture_permission_required": "Permite capturarea ecranului",
+  "screen_capture_permission_required_content": "Pentru a traduce ceea ce vezi, aplicația trebuie să îți citească ecranul. Android va cere permisiunea imediat și avertizează cu privire la tot ce apare pe ecran — însă această aplicație citește doar text, direct pe dispozitivul tău. Nimic nu este încărcat, înregistrat sau salvat și poți opri oricând."
 }

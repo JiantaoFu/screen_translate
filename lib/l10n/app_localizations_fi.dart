@@ -542,4 +542,11 @@ class AppLocalizationsFi extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Ilmaisia käännöksiä jäljellä tänään: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Salli näytön kaappaus';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Jotta sovellus voi kääntää näkemäsi, sen on luettava näyttöäsi. Android kysyy seuraavaksi ja varoittaa kaikesta näytöllä näkyvästä — tämä sovellus lukee kuitenkin vain tekstiä, ja laitteellasi. Mitään ei lähetetä, tallenneta eikä nauhoiteta, ja voit lopettaa milloin tahansa.';
 }

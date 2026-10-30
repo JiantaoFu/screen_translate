@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play 暂时不可用，请稍后再试。",
   "paywall_pro_unlocked": "已解锁 Pro：无限翻译！",
   "paywall_reset_hint": "免费次数将在午夜重置。",
-  "lite_remaining_today": "今日剩余免费翻译：{count} 次"
+  "lite_remaining_today": "今日剩余免费翻译：{count} 次",
+  "screen_capture_permission_required": "允许读取屏幕",
+  "screen_capture_permission_required_content": "要翻译你看到的内容，应用需要读取你的屏幕。接下来 Android 会请求授权，并对屏幕上的所有内容发出警告——但本应用只读取文字，且全部在你的设备上完成。不会上传、不会录制、不会保存，你随时可以停止。"
 }

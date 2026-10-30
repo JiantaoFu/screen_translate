@@ -543,4 +543,11 @@ class AppLocalizationsSv extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Gratis översättningar kvar i dag: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Tillåt skärminspelning';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'För att kunna översätta det du ser måste appen läsa din skärm. Android frågar om en stund och varnar för allt som visas på skärmen — men den här appen läser bara text, och det sker på din enhet. Ingenting laddas upp, spelas in eller sparas, och du kan sluta när du vill.';
 }

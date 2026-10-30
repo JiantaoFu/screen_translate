@@ -552,4 +552,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Heute verbleibende kostenlose Übersetzungen: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'Bildschirmaufnahme erlauben';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Um zu übersetzen, was Sie sehen, muss die App Ihren Bildschirm lesen. Android fragt gleich und warnt vor allem, was auf dem Bildschirm zu sehen ist — diese App liest jedoch nur Text, und zwar auf Ihrem Gerät. Nichts wird hochgeladen, aufgezeichnet oder gespeichert, und Sie können jederzeit aufhören.';
 }

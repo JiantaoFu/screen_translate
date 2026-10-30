@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play sedang tidak tersedia. Coba lagi nanti.",
   "paywall_pro_unlocked": "Pro terbuka: terjemahan tanpa batas!",
   "paywall_reset_hint": "Terjemahan gratis diatur ulang tengah malam.",
-  "lite_remaining_today": "Sisa terjemahan gratis hari ini: {count}"
+  "lite_remaining_today": "Sisa terjemahan gratis hari ini: {count}",
+  "screen_capture_permission_required": "Izinkan perekaman layar",
+  "screen_capture_permission_required_content": "Untuk menerjemahkan apa yang Anda lihat, aplikasi harus membaca layar Anda. Android akan menanyakannya sebentar lagi dan memperingatkan tentang semua yang tampil di layar — tetapi aplikasi ini hanya membaca teks, dan di perangkat Anda. Tidak ada yang diunggah, direkam, atau disimpan, dan Anda dapat berhenti kapan saja."
 }

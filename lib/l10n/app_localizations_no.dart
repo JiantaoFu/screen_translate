@@ -540,4 +540,11 @@ class AppLocalizationsNo extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Gratis oversettelser igjen i dag: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Tillat skjermopptak';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'For å oversette det du ser, må appen lese skjermen din. Android spør om litt og advarer om alt som vises på skjermen — men denne appen leser bare tekst, og den gjør det på enheten din. Ingenting lastes opp, tas opp eller lagres, og du kan stoppe når som helst.';
 }

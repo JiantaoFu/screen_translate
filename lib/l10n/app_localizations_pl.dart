@@ -545,4 +545,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Pozostałe darmowe tłumaczenia dziś: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'Zezwól na przechwytywanie ekranu';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Aby przetłumaczyć to, co widzisz, aplikacja musi odczytywać ekran. Android zapyta za chwilę i ostrzeże przed wszystkim, co jest na ekranie — ta aplikacja odczytuje jednak tylko tekst i robi to na Twoim urządzeniu. Nic nie jest wysyłane, nagrywane ani zapisywane, a przerwać możesz w dowolnej chwili.';
 }

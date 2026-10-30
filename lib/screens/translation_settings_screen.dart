@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
+import '../services/firebase_analytics_service.dart';
 import '../services/llm_translation_service.dart';
 import '../services/model_download_service.dart';
 import '../widgets/download_error_dialog.dart';
@@ -153,6 +154,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
   @override
   void initState() {
     super.initState();
+    FirebaseAnalyticsService().trackScreenView('translation_settings');
     WidgetsBinding.instance.addObserver(this);
     _refreshPackStatus();
     _refreshQuickStatus();

@@ -99,6 +99,14 @@ class ActivationTracker {
   void overlayPermissionResult(bool granted) =>
       _emit('overlay_permission_result', {'granted': _yesNo(granted)});
 
+  /// Our own "why we need the screen" dialog, shown before Android's consent
+  /// prompt. Separate from [capturePermissionResult] on purpose: backing out
+  /// here and refusing the system dialog are different refusals, and only
+  /// keeping them apart shows whether the explanation helps or just adds a
+  /// tap.
+  void captureConsentPrompt(bool proceed) => _emit(
+      'capture_consent_prompt', {'outcome': proceed ? 'continue' : 'cancel'});
+
   void capturePermissionResult(bool granted) =>
       _emit('capture_permission_result', {'granted': _yesNo(granted)});
 

@@ -523,4 +523,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String lite_remaining_today(int count) {
     return '今日剩余免费翻译：$count 次';
   }
+
+  @override
+  String get screen_capture_permission_required => '允许读取屏幕';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      '要翻译你看到的内容，应用需要读取你的屏幕。接下来 Android 会请求授权，并对屏幕上的所有内容发出警告——但本应用只读取文字，且全部在你的设备上完成。不会上传、不会录制、不会保存，你随时可以停止。';
 }

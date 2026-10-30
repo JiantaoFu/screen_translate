@@ -531,4 +531,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String lite_remaining_today(int count) {
     return '本日の残り無料翻訳：$count回';
   }
+
+  @override
+  String get screen_capture_permission_required => '画面の読み取りを許可';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      '画面に映っているものを翻訳するために、アプリは画面を読み取る必要があります。このあと Android が許可を求め、画面上のすべてについて警告しますが、このアプリが読み取るのは文字だけで、処理はすべて端末内で行われます。送信も録画も保存もされず、いつでも停止できます。';
 }

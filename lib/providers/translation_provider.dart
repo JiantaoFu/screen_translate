@@ -20,6 +20,7 @@ import '../lite/lite_gate.dart';
 import '../services/review_prompt_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/activation_tracker.dart';
+import '../widgets/screen_capture_consent.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -52,7 +53,7 @@ enum TranslationMode {
 
 /// Result of [TranslationProvider.startTranslation], so the UI can explain
 /// why nothing started instead of returning silently.
-enum StartOutcome { started, alreadyRunning, overlayDenied, captureDenied, failed }
+enum StartOutcome { started, alreadyRunning, overlayDenied, captureCancelled, captureDenied, failed }
 
 class TranslationProvider with ChangeNotifier {
   bool _isTranslating = false;
@@ -436,6 +437,16 @@ class TranslationProvider with ChangeNotifier {
           print('Overlay permission not granted after returning from settings');
           return StartOutcome.overlayDenied;
         }
+        // Say what the capture is for before Android's consent dialog says
+        // what it could be used for. See ScreenCaptureConsent.
+        if (await ScreenCaptureConsent.shouldExplain()) {
+          final ctx = _context;
+          final proceed = ctx != null && ctx.mounted && await ScreenCaptureConsent.explain(ctx);
+          // Backing out here is not a denied system dialog, and conflating
+          // the two would hide which of the two prompts people refuse.
+          activation.captureConsentPrompt(proceed);
+          if (!proceed) return StartOutcome.captureCancelled;
+        }
         // Request MediaProjection consent BEFORE showing the floating
         // control overlay. If the user backs out of (or denies) that
         // system dialog, requestScreenCapture() returns false here and we
@@ -448,6 +459,7 @@ class TranslationProvider with ChangeNotifier {
           print('Screen capture permission denied or cancelled, not starting translation');
           return StartOutcome.captureDenied;
         }
+        await ScreenCaptureConsent.markGranted();
 
         _isTranslating = true;
         _sessionProducedTranslations = false;

@@ -544,4 +544,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Ma hátralévő ingyenes fordítások: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'Képernyőrögzítés engedélyezése';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Ahhoz, hogy lefordítsa, amit lát, az alkalmazásnak olvasnia kell a képernyőt. Az Android mindjárt rákérdez, és mindenre figyelmeztet, ami a képernyőn van — ez az alkalmazás azonban csak szöveget olvas, a saját készülékén. Semmi nem kerül feltöltésre, rögzítésre vagy mentésre, és bármikor leállíthatja.';
 }

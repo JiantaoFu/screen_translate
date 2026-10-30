@@ -531,4 +531,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String lite_remaining_today(int count) {
     return '오늘 남은 무료 번역: $count회';
   }
+
+  @override
+  String get screen_capture_permission_required => '화면 캡처 허용';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      '보이는 내용을 번역하려면 앱이 화면을 읽어야 합니다. 곧 Android가 권한을 요청하며 화면의 모든 내용에 대해 경고하지만, 이 앱은 글자만 읽고 처리는 모두 기기 안에서 이루어집니다. 업로드·녹화·저장은 하지 않으며 언제든지 중지할 수 있습니다.';
 }

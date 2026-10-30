@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play er ikke tilgængelig lige nu. Prøv igen senere.",
   "paywall_pro_unlocked": "Pro låst op: ubegrænsede oversættelser!",
   "paywall_reset_hint": "Gratis oversættelser nulstilles ved midnat.",
-  "lite_remaining_today": "Gratis oversættelser tilbage i dag: {count}"
+  "lite_remaining_today": "Gratis oversættelser tilbage i dag: {count}",
+  "screen_capture_permission_required": "Tillad skærmoptagelse",
+  "screen_capture_permission_required_content": "For at oversætte det, du ser, skal appen læse din skærm. Android spørger om lidt og advarer om alt på skærmen — men denne app læser kun tekst, og kun på din enhed. Intet uploades, optages eller gemmes, og du kan stoppe når som helst."
 }

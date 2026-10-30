@@ -541,4 +541,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'आज बचे मुफ़्त अनुवाद: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'स्क्रीन कैप्चर की अनुमति दें';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'आप जो देख रहे हैं उसका अनुवाद करने के लिए ऐप को आपकी स्क्रीन पढ़नी होती है। Android अभी अनुमति माँगेगा और स्क्रीन की हर चीज़ के बारे में चेतावनी देगा — लेकिन यह ऐप केवल टेक्स्ट पढ़ता है, वह भी आपके डिवाइस पर। कुछ भी अपलोड, रिकॉर्ड या सेव नहीं होता, और आप कभी भी रोक सकते हैं।';
 }

@@ -1141,6 +1141,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free translations left today: {count}'**
   String lite_remaining_today(int count);
+
+  /// Title of the dialog shown just before Android's screen-capture consent prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Allow screen capture'**
+  String get screen_capture_permission_required;
+
+  /// Why the app needs screen capture, answering the system prompt's warning
+  ///
+  /// In en, this message translates to:
+  /// **'To translate what you see, the app has to read your screen. Android will ask next and warns about everything on screen — this app only reads text, on your device. Nothing is uploaded, recorded or saved, and you can stop any time.'**
+  String get screen_capture_permission_required_content;
 }
 
 class _AppLocalizationsDelegate

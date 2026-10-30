@@ -541,4 +541,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Resterende gratis vertalingen vandaag: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Schermopname toestaan';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Om te vertalen wat u ziet, moet de app uw scherm lezen. Android vraagt dit zo meteen en waarschuwt voor alles wat op het scherm staat — maar deze app leest alleen tekst, en dat gebeurt op uw apparaat. Er wordt niets geüpload, opgenomen of bewaard, en u kunt altijd stoppen.';
 }

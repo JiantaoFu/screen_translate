@@ -541,4 +541,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Lượt dịch miễn phí còn lại hôm nay: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Cho phép chụp màn hình';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Để dịch những gì bạn thấy, ứng dụng cần đọc màn hình của bạn. Android sẽ hỏi ngay sau đây và cảnh báo về mọi thứ hiển thị trên màn hình — nhưng ứng dụng này chỉ đọc chữ, và xử lý ngay trên máy của bạn. Không có gì được tải lên, ghi lại hay lưu trữ, và bạn có thể dừng bất cứ lúc nào.';
 }

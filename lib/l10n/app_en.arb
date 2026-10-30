@@ -247,5 +247,13 @@
         "type": "int"
       }
     }
+  },
+  "screen_capture_permission_required": "Allow screen capture",
+  "screen_capture_permission_required_content": "To translate what you see, the app has to read your screen. Android will ask next and warns about everything on screen — this app only reads text, on your device. Nothing is uploaded, recorded or saved, and you can stop any time.",
+  "@screen_capture_permission_required": {
+    "description": "Title of the dialog shown just before Android's screen-capture consent prompt"
+  },
+  "@screen_capture_permission_required_content": {
+    "description": "Why the app needs screen capture, answering the system prompt's warning"
   }
 }

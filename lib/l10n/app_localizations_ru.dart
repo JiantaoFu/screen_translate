@@ -543,4 +543,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Осталось бесплатных переводов сегодня: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Разрешить захват экрана';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Чтобы перевести то, что вы видите, приложению нужно читать экран. Сейчас Android запросит разрешение и предупредит обо всём, что отображается на экране, — но это приложение читает только текст и делает это на вашем устройстве. Ничего не отправляется, не записывается и не сохраняется, и вы можете остановить в любой момент.';
 }

@@ -535,4 +535,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'תרגומים חינמיים שנותרו היום: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'אישור לכידת מסך';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'כדי לתרגם את מה שמוצג, האפליקציה צריכה לקרוא את המסך שלך. מערכת Android תבקש זאת מיד ותזהיר לגבי כל מה שמופיע במסך — אך אפליקציה זו קוראת רק טקסט, ובמכשיר שלך בלבד. שום דבר לא מועלה, מוקלט או נשמר, ואפשר לעצור בכל רגע.';
 }

@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play is nu niet beschikbaar. Probeer het later opnieuw.",
   "paywall_pro_unlocked": "Pro ontgrendeld: onbeperkt vertalen!",
   "paywall_reset_hint": "Gratis vertalingen worden om middernacht gereset.",
-  "lite_remaining_today": "Resterende gratis vertalingen vandaag: {count}"
+  "lite_remaining_today": "Resterende gratis vertalingen vandaag: {count}",
+  "screen_capture_permission_required": "Schermopname toestaan",
+  "screen_capture_permission_required_content": "Om te vertalen wat u ziet, moet de app uw scherm lezen. Android vraagt dit zo meteen en waarschuwt voor alles wat op het scherm staat — maar deze app leest alleen tekst, en dat gebeurt op uw apparaat. Er wordt niets geüpload, opgenomen of bewaard, en u kunt altijd stoppen."
 }

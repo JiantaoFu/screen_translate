@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play šiuo metu nepasiekiama. Bandykite vėliau.",
   "paywall_pro_unlocked": "Pro atrakinta: neriboti vertimai!",
   "paywall_reset_hint": "Nemokami vertimai atnaujinami vidurnaktį.",
-  "lite_remaining_today": "Šiandien liko nemokamų vertimų: {count}"
+  "lite_remaining_today": "Šiandien liko nemokamų vertimų: {count}",
+  "screen_capture_permission_required": "Leisti fiksuoti ekraną",
+  "screen_capture_permission_required_content": "Kad išverstų tai, ką matote, programa turi skaityti jūsų ekraną. „Android“ netrukus paprašys leidimo ir įspės dėl visko, kas rodoma ekrane, tačiau ši programa skaito tik tekstą ir tik jūsų įrenginyje. Niekas neįkeliama, neįrašoma ir neišsaugoma, o sustabdyti galite bet kada."
 }

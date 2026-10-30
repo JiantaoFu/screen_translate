@@ -22,6 +22,12 @@ $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c
 $A shell input tap 540 1508; sleep 3    # Translate Screen
+# On a fresh install Start now explains why the app needs the screen
+# before Android's consent dialog. Optional: a reused install (or one
+# that already granted once) goes straight to the system dialog. Tapped
+# by text, because this one is our own layout and would drift.
+$PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Grant Permission' --optional --timeout 6
+sleep 2
 $A shell input tap 540 1128; sleep 1.5  # capture-mode dropdown
 $A shell input tap 360 1318; sleep 1.5  # "Share entire screen"
 $A shell input tap 894 1610; sleep 4    # Next

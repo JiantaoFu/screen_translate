@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "現在 Google Play を利用できません。しばらくしてからもう一度お試しください。",
   "paywall_pro_unlocked": "Pro を解除しました：翻訳し放題です！",
   "paywall_reset_hint": "無料回数は午前0時にリセットされます。",
-  "lite_remaining_today": "本日の残り無料翻訳：{count}回"
+  "lite_remaining_today": "本日の残り無料翻訳：{count}回",
+  "screen_capture_permission_required": "画面の読み取りを許可",
+  "screen_capture_permission_required_content": "画面に映っているものを翻訳するために、アプリは画面を読み取る必要があります。このあと Android が許可を求め、画面上のすべてについて警告しますが、このアプリが読み取るのは文字だけで、処理はすべて端末内で行われます。送信も録画も保存もされず、いつでも停止できます。"
 }

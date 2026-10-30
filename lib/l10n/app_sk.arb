@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play teraz nie je dostupný. Skúste to neskôr.",
   "paywall_pro_unlocked": "Pro odomknuté: neobmedzené preklady!",
   "paywall_reset_hint": "Bezplatné preklady sa obnovia o polnoci.",
-  "lite_remaining_today": "Zostávajúce bezplatné preklady dnes: {count}"
+  "lite_remaining_today": "Zostávajúce bezplatné preklady dnes: {count}",
+  "screen_capture_permission_required": "Povoliť snímanie obrazovky",
+  "screen_capture_permission_required_content": "Aby aplikácia preložila to, čo vidíte, musí čítať vašu obrazovku. Android sa o chvíľu spýta a upozorní na všetko, čo je na obrazovke — táto aplikácia však číta iba text, a to priamo vo vašom zariadení. Nič sa neodosiela, nenahráva ani neukladá a kedykoľvek môžete skončiť."
 }

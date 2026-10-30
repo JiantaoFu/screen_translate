@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play jest teraz niedostępny. Spróbuj ponownie później.",
   "paywall_pro_unlocked": "Pro odblokowane: nielimitowane tłumaczenia!",
   "paywall_reset_hint": "Darmowe tłumaczenia odnawiają się o północy.",
-  "lite_remaining_today": "Pozostałe darmowe tłumaczenia dziś: {count}"
+  "lite_remaining_today": "Pozostałe darmowe tłumaczenia dziś: {count}",
+  "screen_capture_permission_required": "Zezwól na przechwytywanie ekranu",
+  "screen_capture_permission_required_content": "Aby przetłumaczyć to, co widzisz, aplikacja musi odczytywać ekran. Android zapyta za chwilę i ostrzeże przed wszystkim, co jest na ekranie — ta aplikacja odczytuje jednak tylko tekst i robi to na Twoim urządzeniu. Nic nie jest wysyłane, nagrywane ani zapisywane, a przerwać możesz w dowolnej chwili."
 }

@@ -36,6 +36,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseAnalyticsService().trackScreenView('image_translation');
     _processImage();
   }
 

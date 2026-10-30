@@ -29,6 +29,7 @@ import '../lite/lite_gate.dart';
 import '../lite/paywall_screen.dart';
 import '../lite/lite_home_pro_row.dart';
 import '../app_flavor.dart';
+import '../widgets/screen_capture_consent.dart';
 
 class ModelStatusDropdown extends StatefulWidget {
   final String? value;
@@ -280,6 +281,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Screen names were never set, so every screen reached GA as
+    // "(not set)" and the funnel could not say where the users who never
+    // press Start actually stop.
+    FirebaseAnalyticsService().trackScreenView('home');
     _initSharingIntent();
     _attachLiteGate();
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowOnnxDisabledNote());
@@ -472,6 +477,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
     final outcome = await provider.startTranslation();
     if (!context.mounted) return;
+    // A denied screen-capture consent is the one failure worth a second go
+    // in place: the user has already granted the overlay and is one tap from
+    // a working translation. Retry once, then explain and stop — a loop here
+    // would be indistinguishable from the app refusing to take no.
+    if (outcome == StartOutcome.captureDenied) {
+      final retry = await ScreenCaptureConsent.offerRetry(context);
+      if (!context.mounted) return;
+      // Either way the dialog has already said what went wrong, so no
+      // snackbar saying it again.
+      if (retry) {
+        final retried = await provider.startTranslation();
+        if (!context.mounted) return;
+        _explainStartOutcome(context, retried);
+      }
+      return;
+    }
     _explainStartOutcome(context, outcome);
   }
 

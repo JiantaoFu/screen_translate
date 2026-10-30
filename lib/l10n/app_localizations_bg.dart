@@ -541,4 +541,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Оставащи безплатни преводи днес: $count';
   }
+
+  @override
+  String get screen_capture_permission_required =>
+      'Разрешаване на заснемане на екрана';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'За да превежда това, което виждате, приложението трябва да чете екрана ви. Android ще попита след малко и предупреждава за всичко на екрана — това приложение чете само текст и само на вашето устройство. Нищо не се качва, записва или запазва и можете да спрете по всяко време.';
 }

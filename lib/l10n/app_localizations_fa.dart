@@ -540,4 +540,11 @@ class AppLocalizationsFa extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'ترجمه‌های رایگان باقی‌مانده امروز: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'اجازه ضبط صفحه';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'برای ترجمهٔ آنچه می‌بینید، برنامه باید صفحهٔ شما را بخواند. اندروید در ادامه اجازه می‌خواهد و دربارهٔ همه‌چیزِ روی صفحه هشدار می‌دهد — اما این برنامه فقط متن را می‌خواند، آن هم روی دستگاه خودتان. چیزی بارگذاری، ضبط یا ذخیره نمی‌شود و هر زمان می‌توانید متوقف کنید.';
 }

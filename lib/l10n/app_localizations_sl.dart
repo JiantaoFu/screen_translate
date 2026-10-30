@@ -543,4 +543,11 @@ class AppLocalizationsSl extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Preostali brezplačni prevodi danes: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Dovoli zajem zaslona';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Da bi aplikacija prevedla to, kar vidite, mora brati vaš zaslon. Android bo takoj vprašal za dovoljenje in opozoril na vse, kar je na zaslonu — ta aplikacija pa bere samo besedilo, in sicer v vaši napravi. Nič se ne naloži, posname ali shrani, ustavite pa lahko kadar koli.';
 }

@@ -538,4 +538,11 @@ class AppLocalizationsSk extends AppLocalizations {
   String lite_remaining_today(int count) {
     return 'Zostávajúce bezplatné preklady dnes: $count';
   }
+
+  @override
+  String get screen_capture_permission_required => 'Povoliť snímanie obrazovky';
+
+  @override
+  String get screen_capture_permission_required_content =>
+      'Aby aplikácia preložila to, čo vidíte, musí čítať vašu obrazovku. Android sa o chvíľu spýta a upozorní na všetko, čo je na obrazovke — táto aplikácia však číta iba text, a to priamo vo vašom zariadení. Nič sa neodosiela, nenahráva ani neukladá a kedykoľvek môžete skončiť.';
 }

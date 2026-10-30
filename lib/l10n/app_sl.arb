@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play trenutno ni na voljo. Poskusite znova pozneje.",
   "paywall_pro_unlocked": "Pro odklenjen: neomejeni prevodi!",
   "paywall_reset_hint": "Brezplačni prevodi se ponastavijo ob polnoči.",
-  "lite_remaining_today": "Preostali brezplačni prevodi danes: {count}"
+  "lite_remaining_today": "Preostali brezplačni prevodi danes: {count}",
+  "screen_capture_permission_required": "Dovoli zajem zaslona",
+  "screen_capture_permission_required_content": "Da bi aplikacija prevedla to, kar vidite, mora brati vaš zaslon. Android bo takoj vprašal za dovoljenje in opozoril na vse, kar je na zaslonu — ta aplikacija pa bere samo besedilo, in sicer v vaši napravi. Nič se ne naloži, posname ali shrani, ustavite pa lahko kadar koli."
 }

@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play אינו זמין כרגע. נסו שוב מאוחר יותר.",
   "paywall_pro_unlocked": "Pro נפתח: תרגומים ללא הגבלה!",
   "paywall_reset_hint": "התרגומים החינמיים מתאפסים בחצות.",
-  "lite_remaining_today": "תרגומים חינמיים שנותרו היום: {count}"
+  "lite_remaining_today": "תרגומים חינמיים שנותרו היום: {count}",
+  "screen_capture_permission_required": "אישור לכידת מסך",
+  "screen_capture_permission_required_content": "כדי לתרגם את מה שמוצג, האפליקציה צריכה לקרוא את המסך שלך. מערכת Android תבקש זאת מיד ותזהיר לגבי כל מה שמופיע במסך — אך אפליקציה זו קוראת רק טקסט, ובמכשיר שלך בלבד. שום דבר לא מועלה, מוקלט או נשמר, ואפשר לעצור בכל רגע."
 }

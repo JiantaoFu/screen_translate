@@ -162,5 +162,7 @@
   "paywall_store_unavailable": "Google Play şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
   "paywall_pro_unlocked": "Pro açıldı: sınırsız çeviri!",
   "paywall_reset_hint": "Ücretsiz çeviriler gece yarısı sıfırlanır.",
-  "lite_remaining_today": "Bugün kalan ücretsiz çeviri: {count}"
+  "lite_remaining_today": "Bugün kalan ücretsiz çeviri: {count}",
+  "screen_capture_permission_required": "Ekran yakalamaya izin ver",
+  "screen_capture_permission_required_content": "Gördüklerinizi çevirebilmek için uygulamanın ekranınızı okuması gerekir. Android birazdan izin isteyecek ve ekrandaki her şey hakkında uyaracak; ancak bu uygulama yalnızca metni okur ve bunu cihazınızda yapar. Hiçbir şey yüklenmez, kaydedilmez veya saklanmaz ve istediğiniz an durdurabilirsiniz."
 }

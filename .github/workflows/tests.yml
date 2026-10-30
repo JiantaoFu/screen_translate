@@ -1,10 +1,26 @@
-# Unit tests on every push and pull request. The emulator regression
-# (tools/emulator/run_all.sh) needs a real emulator session and is run locally.
+# Unit tests on every pull request, and on main once a change lands. The
+# emulator regression (tools/emulator/run_all.sh) needs a real emulator
+# session and is run locally.
+#
+# `push` is limited to main on purpose. An unfiltered `push` fires on every
+# branch and tag as well, so a branch with an open PR ran the whole suite
+# twice for the same code, and a release tag ran it a third time on the
+# commit main had already tested. The pull_request run is the one worth
+# keeping: it tests the merge result (main merged into the branch), so it
+# also catches a branch that is green alone and broken once merged, which a
+# push run on the branch tip cannot see.
 name: tests
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+# A second push supersedes the first; nothing is learned from finishing a
+# run against code that has already been replaced.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   flutter:

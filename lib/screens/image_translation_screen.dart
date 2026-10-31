@@ -39,6 +39,19 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
     _processImage();
   }
 
+  /// Without an errorBuilder, a file the engine cannot decode (HEIC/AVIF
+  /// on some devices, a truncated cloud placeholder, a non-image shared
+  /// file) is reported through FlutterError.onError, which Crashlytics
+  /// records as a fatal "Could not decompress image". Show a placeholder.
+  Widget _imageErrorBuilder(
+      BuildContext context, Object error, StackTrace? stackTrace) {
+    return const Padding(
+      key: Key('image_decode_error'),
+      padding: EdgeInsets.all(32),
+      child: Icon(Icons.broken_image_outlined, size: 64),
+    );
+  }
+
   Future<void> _processImage() async {
     setState(() {
       _isProcessing = true;
@@ -141,8 +154,14 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
                     children: [
                       Center(
                         child: widget.imageFile != null
-                            ? Image.file(widget.imageFile!)
-                            : Image.memory(widget.memoryImage!),
+                            ? Image.file(
+                                widget.imageFile!,
+                                errorBuilder: _imageErrorBuilder,
+                              )
+                            : Image.memory(
+                                widget.memoryImage!,
+                                errorBuilder: _imageErrorBuilder,
+                              ),
                       ),
                       // We need to render the translations over the image.
                       // Calculating the exact position requires knowing the image's displayed size versus actual size.

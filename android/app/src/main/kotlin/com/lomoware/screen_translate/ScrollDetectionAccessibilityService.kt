@@ -164,7 +164,7 @@ class ScrollDetectionAccessibilityService : AccessibilityService() {
             this.eventTypes = AccessibilityEvent.TYPE_VIEW_SCROLLED or AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
             this.feedbackType = AccessibilityServiceInfo.FEEDBACK_VISUAL
             this.notificationTimeout = 100
-            this.flags = AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS
+            this.flags = AccessibilityServiceInfo.DEFAULT // no key filtering, no window-content retrieval
         }
         
         serviceInfo = info

@@ -7,9 +7,9 @@
       Play Billing's non-exported proxy activities are only needed for billing
       flows. The paid app never starts one, so remove these unused activities;
       the lite flavor keeps them for its pro_unlock purchase.
-      This is a mitigation for the billing@@8.0.0 NPE reported in Crashlytics
-      faab73ef..., not a confirmed diagnosis: the full stack trace has not
-      been inspected, and ordinary external apps cannot launch these activities.
+      Crashlytics faab73ef... confirms billing@@8.0.0 calls getIntentSender()
+      on a null PendingIntent in ProxyBillingActivity.onCreate. What started
+      the activity is unconfirmed; ordinary external apps cannot launch it.
     -->
     <application>
         <activity android:name="com.android.billingclient.api.ProxyBillingActivity" tools:node="remove" />

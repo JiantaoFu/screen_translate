@@ -26,7 +26,11 @@ $PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLangua
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c
-$A shell input tap 540 1508; sleep 3    # Translate Screen
+$PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Translate Screen' --timeout 10 || {
+  echo "FAIL start: Translate Screen button not found"
+  exit 1
+}
+sleep 3
 # On a fresh install Start now explains why the app needs the screen
 # before Android's consent dialog. Optional: a reused install (or one
 # that already granted once) goes straight to the system dialog. Tapped

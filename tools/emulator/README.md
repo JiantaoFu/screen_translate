@@ -14,6 +14,8 @@ app cannot accidentally produce a passing regression. Test this guard without
 a device using `python tools/emulator/test_start.py`.
 Set `FLAVOR=lite` to select the Lite APK, package and preference storage; native
 component class names keep their shared `com.lomoware.screen_translate` namespace.
+The app's Translate Screen button is located by its accessibility label so the
+paid and Lite home layouts can differ without opening the image picker by mistake.
 
 ## Setup (Windows, Git Bash)
 

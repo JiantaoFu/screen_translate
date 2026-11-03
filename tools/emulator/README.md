@@ -12,6 +12,8 @@ Screenshots and logs go to `build/emulator-regression/`.
 The runner stops if installing the requested APK fails, so an older installed
 app cannot accidentally produce a passing regression. Test this guard without
 a device using `python tools/emulator/test_start.py`.
+Set `FLAVOR=lite` to select the Lite APK, package and preference storage; native
+component class names keep their shared `com.lomoware.screen_translate` namespace.
 
 ## Setup (Windows, Git Bash)
 

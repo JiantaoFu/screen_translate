@@ -14,7 +14,7 @@ if [ "$SKIP_INSTALL" != 1 ]; then
   printf '%s\n' "$install_output" | tail -1
 fi
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
-$A shell settings put secure enabled_accessibility_services $PKG/.ScrollDetectionAccessibilityService
+$A shell settings put secure enabled_accessibility_services "$PKG/com.lomoware.screen_translate.ScrollDetectionAccessibilityService"
 $A shell settings put secure accessibility_enabled 1
 $A shell settings put system accelerometer_rotation 0
 $A shell settings put system user_rotation 0

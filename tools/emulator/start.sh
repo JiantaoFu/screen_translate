@@ -6,10 +6,15 @@
 source "$(dirname "$0")/common.sh"
 if [ "$SKIP_INSTALL" != 1 ]; then
   [ -f "$APK" ] || { echo "FAIL start: $APK missing (see tools/emulator/README.md)"; exit 1; }
-  $A install -r "$APK" 2>&1 | tail -1
+  if ! install_output=$($A install -r "$APK" 2>&1); then
+    printf '%s\n' "$install_output"
+    echo "FAIL start: APK installation failed; refusing to test an older install"
+    exit 1
+  fi
+  printf '%s\n' "$install_output" | tail -1
 fi
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
-$A shell settings put secure enabled_accessibility_services $PKG/.ScrollDetectionAccessibilityService
+$A shell settings put secure enabled_accessibility_services "$PKG/com.lomoware.screen_translate.ScrollDetectionAccessibilityService"
 $A shell settings put secure accessibility_enabled 1
 $A shell settings put system accelerometer_rotation 0
 $A shell settings put system user_rotation 0
@@ -21,7 +26,11 @@ $PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLangua
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c
-$A shell input tap 540 1508; sleep 3    # Translate Screen
+$PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Translate Screen' --timeout 10 || {
+  echo "FAIL start: Translate Screen button not found"
+  exit 1
+}
+sleep 3
 # On a fresh install Start now explains why the app needs the screen
 # before Android's consent dialog. Optional: a reused install (or one
 # that already granted once) goes straight to the system dialog. Tapped

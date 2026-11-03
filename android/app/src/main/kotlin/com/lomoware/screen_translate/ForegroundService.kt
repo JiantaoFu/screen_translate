@@ -1,5 +1,6 @@
 package com.lomoware.screen_translate
 
+import androidx.core.content.ContextCompat
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -33,7 +34,9 @@ class ForegroundService : Service() {
 
         fun startAndAwaitForeground(context: Context, onReady: () -> Unit) {
             onForegroundReady = onReady
-            context.startForegroundService(Intent(context, ForegroundService::class.java))
+            // Context.startForegroundService is API 26+; Lite minSdk is 24, so the
+            // direct call throws NoSuchMethodError on Android 7.x.
+            ContextCompat.startForegroundService(context, Intent(context, ForegroundService::class.java))
         }
     }
 

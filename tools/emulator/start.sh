@@ -6,7 +6,12 @@
 source "$(dirname "$0")/common.sh"
 if [ "$SKIP_INSTALL" != 1 ]; then
   [ -f "$APK" ] || { echo "FAIL start: $APK missing (see tools/emulator/README.md)"; exit 1; }
-  $A install -r "$APK" 2>&1 | tail -1
+  if ! install_output=$($A install -r "$APK" 2>&1); then
+    printf '%s\n' "$install_output"
+    echo "FAIL start: APK installation failed; refusing to test an older install"
+    exit 1
+  fi
+  printf '%s\n' "$install_output" | tail -1
 fi
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell settings put secure enabled_accessibility_services $PKG/.ScrollDetectionAccessibilityService

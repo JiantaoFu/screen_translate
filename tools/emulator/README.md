@@ -9,6 +9,10 @@ release. It takes about 10 minutes. Every check prints `PASS`/`FAIL`, and the
 run ends with `ALL EMULATOR CHECKS PASSED` or a list of the failures.
 Screenshots and logs go to `build/emulator-regression/`.
 
+The runner stops if installing the requested APK fails, so an older installed
+app cannot accidentally produce a passing regression. Test this guard without
+a device using `python tools/emulator/test_start.py`.
+
 ## Setup (Windows, Git Bash)
 
 1. Use the AVD `Medium_Phone_API_36.1` (1080x2400; the taps in `start.sh`

@@ -35,20 +35,6 @@ class AccessibilityPermissionDialog(private val context: Context) {
          * been bound yet — ScrollDetectionAccessibilityService.instance lags
          * behind it by however long the system takes to create the service.
          */
-        /**
-         * Record that the user has now been shown the explainer.
-         *
-         * Called by AccessibilityPermissionActivity.onCreate, not by [show]:
-         * startActivity does not fail loudly when the system refuses a
-         * background launch, so marking it here is the only way the flag
-         * means "the user saw it" rather than "we asked for it". Marking on
-         * the request burned the single showing this prompt ever gets.
-         */
-        fun markPrompted(context: Context) {
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().putBoolean(PREF_ACCESSIBILITY_PROMPTED, true).apply()
-        }
-
         fun isServiceEnabled(context: Context): Boolean {
             return try {
                 val accessibilityManager =
@@ -65,6 +51,24 @@ class AccessibilityPermissionDialog(private val context: Context) {
                 Log.e(TAG, "Error checking accessibility service", e)
                 false
             }
+        }
+
+        /**
+         * Record that the user has now been shown the explainer.
+         *
+         * Called by AccessibilityPermissionActivity.onCreate, not by [show]:
+         * startActivity does not fail loudly when the system refuses a
+         * background launch, so marking it here is the only way the flag
+         * means "the user saw it" rather than "we asked for it". Marking on
+         * the request burned the single showing this prompt ever gets.
+         *
+         * Committed, not applied: AccessibilityFunnelStore records the same
+         * moment synchronously, and a process killed before an async write
+         * reached disk would show the explainer a second time.
+         */
+        fun markPrompted(context: Context) {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().putBoolean(PREF_ACCESSIBILITY_PROMPTED, true).commit()
         }
     }
 

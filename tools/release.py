@@ -298,7 +298,7 @@ def main():
         check_git_clean(args.allow_dirty)
         # build() checks this again; checking here fails before ~10 minutes of
         # tests and building instead of after.
-        check_keystore()
+        check_keystore(args.flavor)
         if args.flavor == "lite":
             check_lite_firebase()
         package = FLAVORS[args.flavor]

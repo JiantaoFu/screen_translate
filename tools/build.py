@@ -242,9 +242,21 @@ def build_tools():
     return versions[-1]
 
 
-def check_keystore():
+# Each listing is enrolled with its own Play upload key, so each flavor has
+# its own keystore. Mirrors the signingConfigs in android/app/build.gradle:
+# prefix into key.properties, default keystore, default alias, password env vars.
+KEYSTORES = {
+    "paid": ("", "../screen-trans-key.keystore", "screen-trans",
+             "KEYSTORE_PASSWORD", "KEY_PASSWORD"),
+    "lite": ("lite.", "../st-upload-keystore.jks", "upload",
+             "LITE_KEYSTORE_PASSWORD", "LITE_KEY_PASSWORD"),
+}
+
+
+def check_keystore(flavor=DEFAULT_FLAVOR):
     """Mirrors android/app/build.gradle, which silently signs with the DEBUG
-    key when the keystore file is missing."""
+    key when the keystore file is missing. Checks the keystore of this flavor:
+    lite signed with the paid key is rejected by Play, not by Gradle."""
     props = ANDROID / "key.properties"
     values = {}
     if props.exists():
@@ -253,12 +265,14 @@ def check_keystore():
                 key, value = line.split("=", 1)
                 # Java properties escaping: "C\:\\keys\\x.jks" is C:\keys\x.jks.
                 values[key.strip()] = re.sub(r"\\(.)", r"\1", value.strip())
+    prefix, default_store, _alias, store_env, key_env = KEYSTORES[flavor]
     # Same default and relative base as android/app/build.gradle.
-    store = (ANDROID / "app" / values.get("storeFile", "../screen-trans-key.keystore")).resolve()
+    store = (ANDROID / "app" / values.get(f"{prefix}storeFile", default_store)).resolve()
     if not store.exists():
         raise BuildError(f"release keystore not found: {store} (the build would fall "
-                         "back to DEBUG signing, which Play rejects)")
-    for key, env in (("storePassword", "KEYSTORE_PASSWORD"), ("keyPassword", "KEY_PASSWORD")):
+                         f"back to DEBUG signing, which Play rejects). The {flavor} app "
+                         f"needs its own upload key, set as {prefix}storeFile")
+    for key, env in ((f"{prefix}storePassword", store_env), (f"{prefix}keyPassword", key_env)):
         if not values.get(key) and not os.environ.get(env):
             raise BuildError(f"{key} is not set in android/key.properties or ${env}")
 
@@ -336,7 +350,7 @@ def build(target, java_home, name, code, flavor=DEFAULT_FLAVOR):
     task, platform, abi, release = TARGETS[target]
     out = output_path(target, flavor)
     if release:
-        check_keystore()
+        check_keystore(flavor)
         if flavor == "lite":
             check_lite_firebase()
     prepare(name, code)

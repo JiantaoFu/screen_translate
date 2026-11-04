@@ -80,6 +80,38 @@ android {
         buildConfig true
     }
 
+    // Each Play listing is enrolled with its OWN upload key, so the flavor
+    // picks the signing config (see productFlavors below). Signing lite with
+    // the paid screen-trans key makes Play reject the bundle outright:
+    // "The Android App Bundle was signed with the wrong key."
+    // Declared before productFlavors because this block has to exist before
+    // a flavor can reference it.
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD') ?: ''
+            keyAlias keystoreProperties['keyAlias'] ?: 'screen-trans'
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD') ?: ''
+        }
+        liteRelease {
+            storeFile file(keystoreProperties['lite.storeFile'] ?: '../st-upload-keystore.jks')
+            storePassword keystoreProperties['lite.storePassword'] ?: System.getenv('LITE_KEYSTORE_PASSWORD') ?: ''
+            keyAlias keystoreProperties['lite.keyAlias'] ?: 'upload'
+            keyPassword keystoreProperties['lite.keyPassword'] ?: System.getenv('LITE_KEY_PASSWORD') ?: ''
+        }
+    }
+
+    // Release signing, or debug signing when that flavor's keystore is absent
+    // so a checkout without the keys still builds. Only `release` consults
+    // this: the debug build type keeps its own signing config, which takes
+    // precedence over the flavor's.
+    def releaseSigning = { String name, String storePath ->
+        file(storePath).exists() ? signingConfigs.getByName(name) : {
+            println "WARNING: Release keystore not found at ${file(storePath).absolutePath}. Falling back to DEBUG signing config for local testing."
+            signingConfigs.debug
+        }()
+    }
+
     // One codebase, two Play listings. tools/build.py --flavor picks one
     // (default paid) and passes the same name to Dart as APP_FLAVOR.
     //  paid: com.lomoware.screen_translate, unchanged; the BILLING permission
@@ -99,6 +131,8 @@ android {
             manifestPlaceholders = [appLabel: "Screen Translate"]
             versionCode flavorVersionCode('paid')
             versionName flavorVersionName('paid')
+            signingConfig releaseSigning('release',
+                keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
         }
         lite {
             dimension "edition"
@@ -106,6 +140,9 @@ android {
             manifestPlaceholders = [appLabel: "Screen Translator Lite"]
             versionCode flavorVersionCode('lite')
             versionName flavorVersionName('lite')
+            // Lite's own Play upload key (alias "upload"), NOT screen-trans.
+            signingConfig releaseSigning('liteRelease',
+                keystoreProperties['lite.storeFile'] ?: '../st-upload-keystore.jks')
             // Native debug symbols in BUNDLE-METADATA made up ~57 MB
             // (compressed) of the ~146 MB lite AAB: whole copies of the
             // prebuilt .so files (onnxruntime, translate_jni, flutter,
@@ -120,24 +157,11 @@ android {
         }
     }
 
-    signingConfigs {
-        release {
-            storeFile file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
-            storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD') ?: ''
-            keyAlias keystoreProperties['keyAlias'] ?: 'screen-trans'
-            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD') ?: ''
-        }
-    }
-
     buildTypes {
         release {
-            def keystoreFile = file(keystoreProperties['storeFile'] ?: '../screen-trans-key.keystore')
-            if (keystoreFile.exists()) {
-                signingConfig signingConfigs.release
-            } else {
-                signingConfig signingConfigs.debug
-                println "WARNING: Release keystore not found at ${keystoreFile.absolutePath}. Falling back to DEBUG signing config for local testing."
-            }
+            // signingConfig comes from the flavor: the two listings have
+            // different upload keys. A signingConfig here would win over the
+            // flavor's and sign both with the same key.
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

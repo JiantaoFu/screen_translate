@@ -177,8 +177,9 @@ class KeystoreTest(unittest.TestCase):
         self.patch.start()
         self.env = mock.patch.dict(os.environ, {}, clear=False)
         self.env.start()
-        os.environ.pop("KEYSTORE_PASSWORD", None)
-        os.environ.pop("KEY_PASSWORD", None)
+        for var in ("KEYSTORE_PASSWORD", "KEY_PASSWORD",
+                    "LITE_KEYSTORE_PASSWORD", "LITE_KEY_PASSWORD"):
+            os.environ.pop(var, None)
 
     def tearDown(self):
         self.env.stop()
@@ -205,6 +206,42 @@ class KeystoreTest(unittest.TestCase):
         (self.tmp / "key.properties").write_text(
             f"# comment\nstoreFile={escaped}\nstorePassword=a\nkeyPassword=b\n")
         build.check_keystore()
+
+    # The two listings are enrolled with different Play upload keys. Lite
+    # signed with the paid key builds fine and is then rejected by Play with
+    # "signed with the wrong key", which is why the paid keystore being
+    # present must not satisfy a lite release.
+    def test_paid_keystore_does_not_satisfy_lite(self):
+        (self.tmp / "screen-trans-key.keystore").write_bytes(b"k")
+        (self.tmp / "key.properties").write_text(
+            "storePassword=a\nkeyPassword=b\n")
+        build.check_keystore("paid")
+        with self.assertRaisesRegex(release.ReleaseError, "st-upload-keystore"):
+            build.check_keystore("lite")
+
+    def test_lite_keystore_and_passwords(self):
+        (self.tmp / "st-upload-keystore.jks").write_bytes(b"k")
+        with self.assertRaisesRegex(release.ReleaseError, "lite.storePassword"):
+            build.check_keystore("lite")
+        os.environ.update(LITE_KEYSTORE_PASSWORD="a", LITE_KEY_PASSWORD="b")
+        build.check_keystore("lite")
+        # The lite passwords must not stand in for the paid ones.
+        (self.tmp / "screen-trans-key.keystore").write_bytes(b"k")
+        with self.assertRaisesRegex(release.ReleaseError, "storePassword"):
+            build.check_keystore("paid")
+
+    def test_lite_prefixed_store_file(self):
+        store = self.tmp / "keys" / "lite.jks"
+        store.parent.mkdir()
+        store.write_bytes(b"k")
+        escaped = str(store).replace("\\", "\\\\").replace(":", "\\:")
+        (self.tmp / "key.properties").write_text(
+            f"storeFile=../nope.keystore\nlite.storeFile={escaped}\n"
+            "lite.storePassword=a\nlite.keyPassword=b\n")
+        build.check_keystore("lite")
+        # ...and the lite entries must not be read for a paid build.
+        with self.assertRaisesRegex(release.ReleaseError, "DEBUG"):
+            build.check_keystore("paid")
 
 
 def http_error(status, message):
@@ -336,7 +373,7 @@ class MainTest(unittest.TestCase):
         self.patches = [mock.patch.object(release, k, v) for k, v in {
             "ROOT": root, "PUBSPEC": self.pubspec, "AAB": self.aab,
             "run": fake_run, "gradle": fake_gradle, "git": fake_git,
-            "check_git_clean": lambda allow: None, "check_keystore": lambda: None,
+            "check_git_clean": lambda allow: None, "check_keystore": lambda flavor=None: None,
             "find_java_home": lambda explicit: Path("jdk"),
             "build": fake_build,
             "stop_gradle": lambda jh: self.calls.append(["gradle", "--stop"]),
@@ -468,7 +505,7 @@ class BuildTest(unittest.TestCase):
             "ROOT": root, "output_path": fake_output_path, "gradle": fake_gradle,
             "check_lite_firebase": lambda: self.checks.append("lite firebase"),
             "prepare": lambda name, code: self.checks.append("prepare"),
-            "check_keystore": lambda: self.checks.append("keystore"),
+            "check_keystore": lambda flavor=None: self.checks.append("keystore"),
             "check_signature": lambda jh, path: self.checks.append("jar signature"),
             "check_apk": lambda path, name, code, release, package: self.checks.append(
                 ("apk", release, package)),

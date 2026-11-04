@@ -5,13 +5,17 @@ import 'activation_tracker.dart';
 /// Shows the native accessibility explainer, and forwards its outcome to
 /// analytics.
 ///
-/// The explainer (AccessibilityPermissionActivity) is shown natively on
-/// first launch, before or without Dart being in front, so native only
-/// records what happened (AccessibilityFunnelStore) and Dart picks it up on
-/// app start and every resume: `accessibility_prompt_shown` once the prompt
-/// was shown, and `accessibility_permission_result` once the user has left
-/// it (and come back from Settings, if they went there). Native clears what
-/// it hands over, so each is sent once.
+/// The explainer is a native activity (AccessibilityPermissionActivity),
+/// and the user can leave it for the system Settings and come back, so Dart
+/// is not in front for its outcome. Native records what happened
+/// (AccessibilityFunnelStore) and Dart picks it up on app start and every
+/// resume: `accessibility_prompt_shown` once the prompt was shown, and
+/// `accessibility_permission_result` once the user has left it (and come
+/// back from Settings, if they went there). Native clears what it hands
+/// over, so each is sent once.
+///
+/// Dart also decides when to show it (see [maybeExplain]); it used to be
+/// shown from ScreenCaptureService.initialize() on first launch.
 class AccessibilityFunnelReporter {
   AccessibilityFunnelReporter({MethodChannel? channel, ActivationTracker? tracker})
       : _channel = channel ?? defaultChannel,

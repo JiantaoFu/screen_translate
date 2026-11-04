@@ -14,6 +14,7 @@ import 'package:screen_translate/l10n/localization_extension.dart';
 import '../providers/translation_provider.dart';
 import '../services/overlay_service.dart';
 import '../services/llm_translation_service.dart';
+import '../services/resume_prompts.dart';
 import '../services/onnx_translation_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/accessibility_funnel_reporter.dart';
@@ -381,23 +382,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildLiteRemaining(BuildContext context) =>
       LiteHomeProRow(gate: _liteGate, onOpenPaywall: _openPaywall);
 
-  /// The one prompt this resume gets, after the lite paywall has passed.
-  ///
-  /// The accessibility explainer goes first because it is shown at most
-  /// once per install and only after a translation has been seen; the
-  /// review prompt gets every later resume, and asks again anyway.
-  Future<void> _explainAccessibilityOrPromptReview(TranslationProvider provider) async {
-    if (Platform.isAndroid && await AccessibilityFunnelReporter.instance.maybeExplain()) return;
-    if (!mounted) return;
-    if (TranslationProvider.mayPromptReviewOnResume(
-      isTranslating: provider.isTranslating,
-      isStarting: provider.isStarting,
-      startEndedAt: provider.startEndedAt,
-      now: DateTime.now(),
-    )) {
-      _trackTranslationAndPromptReview(context);
-    }
-  }
+  /// The one prompt this resume gets. [chooseResumePrompt] owns the order
+  /// and why it is that order; this only wires each step to the screen.
+  Future<void> _promptOnResume(TranslationProvider provider) =>
+      chooseResumePrompt(
+        showPaywallIfPending: _maybeShowPendingPaywall,
+        explainAccessibility: () async =>
+            Platform.isAndroid && await AccessibilityFunnelReporter.instance.maybeExplain(),
+        // The explainer is a native activity, so the screen can be gone by
+        // the time we are back here.
+        reviewIsDue: () =>
+            mounted &&
+            TranslationProvider.mayPromptReviewOnResume(
+              isTranslating: provider.isTranslating,
+              isStarting: provider.isStarting,
+              startEndedAt: provider.startEndedAt,
+              now: DateTime.now(),
+            ),
+        promptReview: () => _trackTranslationAndPromptReview(context),
+      );
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -407,13 +410,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // while Start is in progress and for a few seconds after it.
     if (state == AppLifecycleState.resumed && mounted) {
       final provider = context.read<TranslationProvider>();
-      // Lite: the paywall due after the last free translation takes this
-      // resume instead of the review prompt.
-      if (_maybeShowPendingPaywall()) {
-        // nothing else on this resume
-      } else {
-        _explainAccessibilityOrPromptReview(provider);
-      }
+      _promptOnResume(provider);
     }
     // Back from the accessibility explainer or Settings.
     if (state == AppLifecycleState.resumed && Platform.isAndroid) {

@@ -21,16 +21,37 @@ $PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLangua
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c
-$A shell input tap 540 1508; sleep 3    # Translate Screen
+# Tapped by text: lite adds a free-allowance row and an Unlock Pro button
+# to the home screen, which moves this button. The old fixed tap was tuned
+# to paid and in lite landed on Translate Image, opening the photo picker.
+$PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Translate Screen' --timeout 10 || exit 1
+sleep 3
 # On a fresh install Start now explains why the app needs the screen
 # before Android's consent dialog. Optional: a reused install (or one
 # that already granted once) goes straight to the system dialog. Tapped
 # by text, because this one is our own layout and would drift.
 $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Grant Permission' --optional --timeout 6
 sleep 2
-$A shell input tap 540 1128; sleep 1.5  # capture-mode dropdown
-$A shell input tap 360 1318; sleep 1.5  # "Share entire screen"
-$A shell input tap 894 1610; sleep 4    # Next
+# Pick full-screen capture, by text. The system dialog's height moves with
+# the app name - "Share your screen with Screen Translator Lite?" wraps to
+# two lines where the paid name does not - so the old fixed taps selected
+# the mode correctly for paid only. In lite they left it on "Share one app"
+# pointed at nothing, and capture then ran with a VirtualDisplay nothing
+# ever rendered into: every check failed with "No frame available in queue"
+# and no crash, which looks exactly like a broken pipeline.
+# Android 14+ defaults to "Share one app"; if a device defaults to the whole
+# screen there is no dropdown to open, so that tap decides whether to select.
+if $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share one app' --timeout 6 >/dev/null 2>&1; then
+  sleep 1.5
+  $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share entire screen' --timeout 6 || exit 1
+  sleep 1.5
+fi
+# The confirm button is labelled for what it does next: "Share screen" for
+# the whole screen, "Next" for one app (it leads to the app picker). Same
+# position either way, which is why the old coordinate tap hid the
+# difference.
+$PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share screen' --optional --timeout 8   || $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Next' --timeout 4 || exit 1
+sleep 4
 if $A logcat -d | grep -q 'Service started, reset stopped flag'; then
   app_pid > "$OUT/pid"
   echo "PASS start: live translation running (pid $(cat "$OUT/pid"))"

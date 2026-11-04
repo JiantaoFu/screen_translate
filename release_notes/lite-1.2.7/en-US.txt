@@ -1,0 +1,6 @@
+• Screen capture is now explained before Android asks for permission
+• AI Enhanced translation is more reliable, and falls back automatically when it cannot run
+• More reliable language model downloads
+• Fixed clipped translation text and overlapping translation boxes
+• Fixed a crash when starting translation on Android 7
+• Image translation no longer breaks on a picture it cannot open, such as HEIC

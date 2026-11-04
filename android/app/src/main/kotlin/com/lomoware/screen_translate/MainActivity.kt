@@ -196,7 +196,11 @@ class MainActivity: FlutterActivity() {
                 // Play policy needs it.
                 "showAccessibilityExplainer" -> {
                     try {
-                        result.success(AccessibilityPermissionDialog(applicationContext).show())
+                        // `this`, not applicationContext: Dart calls this while
+                        // MainActivity is resumed, and starting the explainer
+                        // from the visible activity is what keeps the launch
+                        // clear of the background-activity-launch restrictions.
+                        result.success(AccessibilityPermissionDialog(this@MainActivity).show())
                     } catch (e: Exception) {
                         Log.e(TAG, "Error showing accessibility explainer", e)
                         result.success(false)

@@ -30,6 +30,16 @@ class AccessibilityPermissionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accessibility_permission)
 
+        // The explainer is on screen, so this is where "we prompted the user"
+        // becomes true: AccessibilityPermissionDialog.show() cannot tell,
+        // because a refused background launch throws nothing.
+        // Only on first creation -- a rotation must not restart the funnel
+        // result that markPromptShown clears.
+        if (savedInstanceState == null) {
+            AccessibilityPermissionDialog.markPrompted(this)
+            AccessibilityFunnelStore.forContext(this).markPromptShown()
+        }
+
         // Find views
         val tvMessage = findViewById<TextView>(R.id.tvAccessibilityMessage)
         val tvBenefits = findViewById<TextView>(R.id.tvAccessibilityBenefits)

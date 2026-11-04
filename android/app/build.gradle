@@ -80,6 +80,13 @@ android {
         buildConfig true
     }
 
+    // NOTE: do not set testOptions.unitTests.includeAndroidResources here.
+    // Robolectric then reads the real manifest and refuses the whole suite:
+    // "Package targetSdkVersion=36 > maxSdkVersion=33" (robolectric 4.10.3
+    // supports SDK 33 at most). Without it Robolectric uses its legacy asset
+    // manager, which cannot resolve AppCompat resources, so no test can
+    // inflate an AppCompatActivity. Upgrading Robolectric would lift both.
+
     // Each Play listing is enrolled with its OWN upload key, so the flavor
     // picks the signing config (see productFlavors below). Signing lite with
     // the paid screen-trans key makes Play reject the bundle outright:

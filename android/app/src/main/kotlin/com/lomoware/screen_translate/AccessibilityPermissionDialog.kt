@@ -13,6 +13,17 @@ class AccessibilityPermissionDialog(private val context: Context) {
         private const val TAG = "AccessibilityPermissionDialog"
         private const val PREFS_NAME = "AccessibilityPrefs"
         private const val PREF_ACCESSIBILITY_PROMPTED = "accessibility_prompted"
+        private const val PREF_PROMPT_ATTEMPTS = "accessibility_prompt_attempts"
+
+        /**
+         * How many launches to try before giving up on the explainer.
+         *
+         * Only the activity can confirm it was shown, so a launch the system
+         * drops leaves nothing marked and the next resume tries again. Without
+         * a cap, a launch that can never succeed would be retried on every
+         * single resume, and would take the review prompt's turn every time.
+         */
+        private const val MAX_PROMPT_ATTEMPTS = 3
 
         /**
          * Whether our accessibility service is enabled in system settings.
@@ -24,6 +35,20 @@ class AccessibilityPermissionDialog(private val context: Context) {
          * been bound yet — ScrollDetectionAccessibilityService.instance lags
          * behind it by however long the system takes to create the service.
          */
+        /**
+         * Record that the user has now been shown the explainer.
+         *
+         * Called by AccessibilityPermissionActivity.onCreate, not by [show]:
+         * startActivity does not fail loudly when the system refuses a
+         * background launch, so marking it here is the only way the flag
+         * means "the user saw it" rather than "we asked for it". Marking on
+         * the request burned the single showing this prompt ever gets.
+         */
+        fun markPrompted(context: Context) {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().putBoolean(PREF_ACCESSIBILITY_PROMPTED, true).apply()
+        }
+
         fun isServiceEnabled(context: Context): Boolean {
             return try {
                 val accessibilityManager =
@@ -45,7 +70,14 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** True if an explainer was actually launched. */
+    /**
+     * True if an explainer launch was issued.
+     *
+     * "Issued", not "seen": the activity marks itself as shown. The caller
+     * uses this only to decide whether to leave this resume alone, so being
+     * optimistic here costs at most one skipped review prompt, whereas
+     * marking a launch that never happened costs the explainer entirely.
+     */
     fun show(forceShow: Boolean = false): Boolean {
         // Lite has no accessibility service, so it must never explain one.
         // The guard lives here rather than at the call site: it used to sit
@@ -58,8 +90,11 @@ class AccessibilityPermissionDialog(private val context: Context) {
             // accessibility services enabled by default, so treating "none
             // enabled" as "denied" (as this used to) made the dialog pop up
             // on every cold start even after the user dismissed it.
+            val attempts = prefs.getInt(PREF_PROMPT_ATTEMPTS, 0)
             val shouldShowDialog = forceShow ||
-                                   (!isServiceEnabled(context) && !isAccessibilityPrompted())
+                                   (!isServiceEnabled(context) &&
+                                    !isAccessibilityPrompted() &&
+                                    attempts < MAX_PROMPT_ATTEMPTS)
 
             if (!shouldShowDialog) {
                 Log.d(TAG, "Dialog should not be shown")
@@ -74,12 +109,10 @@ class AccessibilityPermissionDialog(private val context: Context) {
                          Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
 
-            // Use context.startActivity to ensure proper context handling
+            // Use context.startActivity to ensure proper context handling.
+            // The activity records that it was shown; see markPrompted.
             context.startActivity(intent)
-
-            // Mark that we've prompted the user
-            markAccessibilityPrompted()
-            AccessibilityFunnelStore.forContext(context).markPromptShown()
+            prefs.edit().putInt(PREF_PROMPT_ATTEMPTS, attempts + 1).apply()
             return true
         } catch (e: Exception) {
             Log.e(TAG, "Error showing accessibility dialog", e)
@@ -92,14 +125,12 @@ class AccessibilityPermissionDialog(private val context: Context) {
         return prefs.getBoolean(PREF_ACCESSIBILITY_PROMPTED, false)
     }
 
-    // Mark that user has been prompted about accessibility
-    private fun markAccessibilityPrompted() {
-        prefs.edit().putBoolean(PREF_ACCESSIBILITY_PROMPTED, true).apply()
-    }
-
     // Method to reset accessibility prompts (for settings)
     fun resetAccessibilityPrompt() {
-        prefs.edit().remove(PREF_ACCESSIBILITY_PROMPTED).apply()
+        prefs.edit()
+            .remove(PREF_ACCESSIBILITY_PROMPTED)
+            .remove(PREF_PROMPT_ATTEMPTS)
+            .apply()
         Log.d(TAG, "Accessibility prompt reset")
     }
 }

@@ -1,2 +1,4 @@
 • Screen capture is now explained before Android asks for permission
 • The optional accessibility service is explained after your first translation instead of at first launch
+• Fixed a crash when starting translation on Android 7
+• Image translation no longer breaks on a picture it cannot open, such as HEIC

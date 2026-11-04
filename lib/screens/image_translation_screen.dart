@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/overlay_layout.dart';
@@ -26,6 +27,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
   bool _isProcessing = true;
   List<OCRResult> _ocrResults = [];
   List<String> _translatedTexts = [];
+  Object? _reportedImageError;
 
   /// Manual nudge per overlay box (by result index), for when the
   /// auto-placed position covers something the user wants to see — the
@@ -38,6 +40,39 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
     super.initState();
     FirebaseAnalyticsService().trackScreenView('image_translation');
     _processImage();
+  }
+
+  /// Without an errorBuilder, a file the engine cannot decode (HEIC/AVIF
+  /// on some devices, a truncated cloud placeholder, a non-image shared
+  /// file) is reported through FlutterError.onError, which Crashlytics
+  /// records as a fatal "Could not decompress image". Show a placeholder.
+  Widget _imageErrorBuilder(
+      BuildContext context, Object error, StackTrace? stackTrace) {
+    // An errorBuilder handles the image stream error, bypassing the global
+    // FlutterError handler. Report it here, once even if the widget rebuilds.
+    if (!identical(_reportedImageError, error)) {
+      _reportedImageError = error;
+      _reportImageError(error, stackTrace);
+    }
+    return const Padding(
+      key: Key('image_decode_error'),
+      padding: EdgeInsets.all(32),
+      child: Icon(Icons.broken_image_outlined, size: 64),
+    );
+  }
+
+  Future<void> _reportImageError(Object error, StackTrace? stackTrace) async {
+    try {
+      await FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'Image translation preview could not be decoded',
+        fatal: false,
+      );
+    } catch (reportingError) {
+      // Lite can run without Firebase; diagnostics must not break recovery.
+      debugPrint('Could not report image decode error: $reportingError');
+    }
   }
 
   Future<void> _processImage() async {
@@ -142,8 +177,14 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
                     children: [
                       Center(
                         child: widget.imageFile != null
-                            ? Image.file(widget.imageFile!)
-                            : Image.memory(widget.memoryImage!),
+                            ? Image.file(
+                                widget.imageFile!,
+                                errorBuilder: _imageErrorBuilder,
+                              )
+                            : Image.memory(
+                                widget.memoryImage!,
+                                errorBuilder: _imageErrorBuilder,
+                              ),
                       ),
                       // We need to render the translations over the image.
                       // Calculating the exact position requires knowing the image's displayed size versus actual size.

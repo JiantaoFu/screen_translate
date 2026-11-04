@@ -66,3 +66,4 @@ jobs:
           python-version: "3.12"
       - run: pip install -r tools/requirements-release.txt
       - run: python tools/test_release.py
+      - run: python tools/emulator/test_start.py

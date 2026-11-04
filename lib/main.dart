@@ -124,7 +124,15 @@ Future<void> _initFirebase() async {
 /// FlutterFire pattern.
 Future<void> _initCrashReporting() async {
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = (details) {
+    // Undecodable images (bad bytes / unsupported format) are recoverable
+    // UI errors, not app crashes; keep them visible as non-fatal.
+    if (details.library == 'image resource service') {
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+      return;
+    }
+    FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+  };
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;

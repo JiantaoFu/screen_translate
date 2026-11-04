@@ -2,4 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- The paid app sells nothing: drop the permission in_app_purchase merges in. -->
     <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
+
+    <!--
+      Play Billing's non-exported proxy activities are only needed for billing
+      flows. The paid app never starts one, so remove these unused activities;
+      the lite flavor keeps them for its pro_unlock purchase.
+      Crashlytics faab73ef... confirms billing@@8.0.0 calls getIntentSender()
+      on a null PendingIntent in ProxyBillingActivity.onCreate. What started
+      the activity is unconfirmed; ordinary external apps cannot launch it.
+    -->
+    <application>
+        <activity android:name="com.android.billingclient.api.ProxyBillingActivity" tools:node="remove" />
+        <activity android:name="com.android.billingclient.api.ProxyBillingActivityV2" tools:node="remove" />
+    </application>
 </manifest>

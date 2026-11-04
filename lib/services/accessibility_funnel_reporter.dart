@@ -2,7 +2,8 @@ import 'package:flutter/services.dart';
 
 import 'activation_tracker.dart';
 
-/// Forwards the native accessibility explainer's outcome to analytics.
+/// Shows the native accessibility explainer, and forwards its outcome to
+/// analytics.
 ///
 /// The explainer (AccessibilityPermissionActivity) is shown natively on
 /// first launch, before or without Dart being in front, so native only
@@ -26,6 +27,24 @@ class AccessibilityFunnelReporter {
   /// Safe to call often: concurrent calls share one native round trip, and
   /// a missing or failing native side is ignored.
   Future<void> report() => _inFlight ??= _report().whenComplete(() => _inFlight = null);
+
+  /// Asks native to explain the accessibility service, if it is time to.
+  ///
+  /// True if a dialog was actually launched, so the caller knows this
+  /// resume is taken. Only once a translation has been shown: the explainer
+  /// used to run from ScreenCaptureService.initialize(), which meant a
+  /// ~250-word disclosure about an optional service was the first thing a
+  /// new buyer saw, before the app had translated a word. Native owns the
+  /// rest of the conditions (once per install, not already enabled, never
+  /// in lite), so there is no second copy of that state here.
+  Future<bool> maybeExplain() async {
+    if (!await _tracker.firstTranslationEverShown()) return false;
+    try {
+      return await _channel.invokeMethod<bool>('showAccessibilityExplainer') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
 
   Future<void> _report() async {
     try {

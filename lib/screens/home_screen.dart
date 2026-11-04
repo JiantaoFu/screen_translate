@@ -381,6 +381,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildLiteRemaining(BuildContext context) =>
       LiteHomeProRow(gate: _liteGate, onOpenPaywall: _openPaywall);
 
+  /// The one prompt this resume gets, after the lite paywall has passed.
+  ///
+  /// The accessibility explainer goes first because it is shown at most
+  /// once per install and only after a translation has been seen; the
+  /// review prompt gets every later resume, and asks again anyway.
+  Future<void> _explainAccessibilityOrPromptReview(TranslationProvider provider) async {
+    if (Platform.isAndroid && await AccessibilityFunnelReporter.instance.maybeExplain()) return;
+    if (!mounted) return;
+    if (TranslationProvider.mayPromptReviewOnResume(
+      isTranslating: provider.isTranslating,
+      isStarting: provider.isStarting,
+      startEndedAt: provider.startEndedAt,
+      now: DateTime.now(),
+    )) {
+      _trackTranslationAndPromptReview(context);
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Sessions are often ended from the floating button or the system stop
@@ -393,13 +411,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // resume instead of the review prompt.
       if (_maybeShowPendingPaywall()) {
         // nothing else on this resume
-      } else if (TranslationProvider.mayPromptReviewOnResume(
-        isTranslating: provider.isTranslating,
-        isStarting: provider.isStarting,
-        startEndedAt: provider.startEndedAt,
-        now: DateTime.now(),
-      )) {
-        _trackTranslationAndPromptReview(context);
+      } else {
+        _explainAccessibilityOrPromptReview(provider);
       }
     }
     // Back from the accessibility explainer or Settings.

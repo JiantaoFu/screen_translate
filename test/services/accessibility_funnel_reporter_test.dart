@@ -9,20 +9,22 @@ void main() {
   const channel = AccessibilityFunnelReporter.defaultChannel;
   late List<(String, Map<String, Object>)> events;
   late AccessibilityFunnelReporter reporter;
+  late List<String> methods;
   late int calls;
   Object? Function()? answer;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     events = [];
+    methods = [];
     calls = 0;
     reporter = AccessibilityFunnelReporter(
       tracker: ActivationTracker(sink: (name, params) => events.add((name, params))),
     );
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-      expect(call.method, 'takeAccessibilityFunnel');
-      calls++;
+      methods.add(call.method);
+      if (call.method == 'takeAccessibilityFunnel') calls++;
       return answer?.call();
     });
   });
@@ -73,6 +75,46 @@ void main() {
     await Future.wait([reporter.report(), reporter.report()]);
     expect(calls, 1);
     expect(events, hasLength(1));
+  });
+
+  group('maybeExplain', () {
+    test('says nothing to native before a translation has been shown', () async {
+      answer = () => true;
+      expect(await reporter.maybeExplain(), isFalse);
+      expect(methods, isEmpty);
+    });
+
+    test('asks native once a translation has been shown', () async {
+      SharedPreferences.setMockInitialValues(
+          {ActivationTracker.prefFirstTranslationLogged: true});
+      answer = () => true;
+      expect(await reporter.maybeExplain(), isTrue);
+      expect(methods, ['showAccessibilityExplainer']);
+    });
+
+    // Native owns "once per install", "already enabled" and the lite guard,
+    // and says so by returning false. The caller must then fall through to
+    // the review prompt rather than spend the resume on nothing.
+    test('reports native declining to show it', () async {
+      SharedPreferences.setMockInitialValues(
+          {ActivationTracker.prefFirstTranslationLogged: true});
+      answer = () => false;
+      expect(await reporter.maybeExplain(), isFalse);
+      expect(methods, ['showAccessibilityExplainer']);
+    });
+
+    test('a missing or failing native side is not shown', () async {
+      SharedPreferences.setMockInitialValues(
+          {ActivationTracker.prefFirstTranslationLogged: true});
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+      expect(await reporter.maybeExplain(), isFalse);
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+              channel, (call) async => throw PlatformException(code: 'x'));
+      expect(await reporter.maybeExplain(), isFalse);
+    });
   });
 
   test('a missing or failing native side is ignored', () async {

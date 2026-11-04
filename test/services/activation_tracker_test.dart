@@ -324,6 +324,16 @@ void main() {
     expect(only('first_translation_failed')['error_type'], 'String');
   });
 
+  test('firstTranslationEverShown survives a restart and a cold tracker', () async {
+    expect(await tracker.firstTranslationEverShown(), isFalse);
+    await tracker.translationShown(2);
+    expect(await tracker.firstTranslationEverShown(), isTrue);
+    // A later launch has the pref but not the in-memory shortcut: the
+    // accessibility explainer's trigger has to see it on that launch too.
+    final nextLaunch = ActivationTracker(sink: (_, __) {}, clock: () => now);
+    expect(await nextLaunch.firstTranslationEverShown(), isTrue);
+  });
+
   test('accessibility events use yes/no and a fixed action list', () {
     tracker.accessibilityPromptShown();
     tracker.accessibilityPermissionResult(enabled: true, action: 'settings_opened');

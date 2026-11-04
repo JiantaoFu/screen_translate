@@ -215,6 +215,20 @@ class ActivationTracker {
     }
   }
 
+  /// Whether a translation has ever been shown on this install.
+  ///
+  /// What makes auto-retranslate worth explaining: before this is true the
+  /// accessibility service is a disclosure about a benefit the user has no
+  /// way to recognise yet.
+  Future<bool> firstTranslationEverShown() async {
+    if (_firstTranslationDone) return true;
+    try {
+      return (await _prefs()).getBool(prefFirstTranslationLogged) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// The answer to that question; [reason] is one of [failureReasons].
   void failureFeedback(String reason) => _emit('first_failure_feedback', {
         'outcome': reason,

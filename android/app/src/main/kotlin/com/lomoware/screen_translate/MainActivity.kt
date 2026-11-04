@@ -189,6 +189,19 @@ class MainActivity: FlutterActivity() {
         // Accessibility explainer outcome, picked up by Dart for analytics.
         MethodChannel(binaryMessenger, ACCESSIBILITY_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
+                // Dart decides when to explain the accessibility service:
+                // after a first translation has been shown, not at startup.
+                // Still a one-time prompt, and still shown before the user
+                // can enable the service, so the disclosure stays where the
+                // Play policy needs it.
+                "showAccessibilityExplainer" -> {
+                    try {
+                        result.success(AccessibilityPermissionDialog(applicationContext).show())
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error showing accessibility explainer", e)
+                        result.success(false)
+                    }
+                }
                 "takeAccessibilityFunnel" -> {
                     try {
                         val store = AccessibilityFunnelStore.forContext(this)

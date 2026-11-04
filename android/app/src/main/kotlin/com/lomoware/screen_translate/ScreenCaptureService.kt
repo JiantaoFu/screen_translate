@@ -478,9 +478,13 @@ class ScreenCaptureService(private val context: Context, private val activity: A
 
         // Register scroll detection receiver during initialization
         registerScrollDetectionReceiver()
-        
-        // Automatically check and prompt for Accessibility Service
-        checkAccessibilityServiceOnFirstLaunch()
+
+        // The accessibility explainer is deliberately NOT shown from here.
+        // It used to be, which meant the first thing a new buyer saw was a
+        // ~250-word disclosure about an optional service, before the home
+        // screen was usable and before a single word had been translated.
+        // Dart asks for it now, once a translation has actually been shown
+        // and auto-retranslate is a benefit the user can recognise.
     }
 
     fun startProjection(resultCode: Int, data: Intent, result: MethodChannel.Result) {
@@ -1225,18 +1229,4 @@ class ScreenCaptureService(private val context: Context, private val activity: A
         unregisterScrollDetectionReceiver()
     }
 
-    // Automatically check and prompt for Accessibility Service
-    fun checkAccessibilityServiceOnFirstLaunch() {
-        // Lite has no accessibility service: never prompt for it.
-        if (BuildConfig.FLAVOR == "lite") return
-        try {
-            // Use application context to avoid potential context-related issues
-            val appContext = context.applicationContext
-            val permissionDialog = AccessibilityPermissionDialog(appContext)
-            Log.d(TAG, "Checking accessibility service on first launch")
-            permissionDialog.show()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking accessibility service", e)
-        }
-    }
 }

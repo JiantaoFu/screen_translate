@@ -45,7 +45,13 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun show(forceShow: Boolean = false) {
+    /** True if an explainer was actually launched. */
+    fun show(forceShow: Boolean = false): Boolean {
+        // Lite has no accessibility service, so it must never explain one.
+        // The guard lives here rather than at the call site: it used to sit
+        // in ScreenCaptureService.checkAccessibilityServiceOnFirstLaunch(),
+        // and the moment a second caller appeared it would have been missed.
+        if (BuildConfig.FLAVOR == "lite") return false
         try {
             // Show once: on first launch, or any time the service isn't
             // enabled and we haven't already asked. Most users have zero
@@ -57,7 +63,7 @@ class AccessibilityPermissionDialog(private val context: Context) {
 
             if (!shouldShowDialog) {
                 Log.d(TAG, "Dialog should not be shown")
-                return
+                return false
             }
 
             // Launch the dedicated accessibility permission activity
@@ -74,8 +80,10 @@ class AccessibilityPermissionDialog(private val context: Context) {
             // Mark that we've prompted the user
             markAccessibilityPrompted()
             AccessibilityFunnelStore.forContext(context).markPromptShown()
+            return true
         } catch (e: Exception) {
             Log.e(TAG, "Error showing accessibility dialog", e)
+            return false
         }
     }
 

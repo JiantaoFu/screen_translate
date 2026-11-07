@@ -543,4 +543,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'لترجمة ما تراه، يحتاج التطبيق إلى قراءة شاشتك. سيسألك Android بعد ذلك ويحذّر بشأن كل ما يظهر على الشاشة — لكن هذا التطبيق يقرأ النص فقط، وعلى جهازك. لا يتم رفع أي شيء أو تسجيله أو حفظه، ويمكنك الإيقاف في أي وقت.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'تعذّر التحقق من مفتاح API. تحقق من الاتصال أو حساب مزوّد الخدمة وحاول مجددًا. لم يتغير مفتاحك المحفوظ.';
+
+  @override
+  String get api_key_storage_error => 'تعذّر حفظ مفتاح API بأمان. حاول مجددًا.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'لم يتعرف محرك الترجمة على حزمة «$pack» التي تم تنزيلها. أعد التنزيل أو أرسل ملاحظات.';
+  }
 }

@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Nemokami vertimai atnaujinami vidurnaktį.",
   "lite_remaining_today": "Šiandien liko nemokamų vertimų: {count}",
   "screen_capture_permission_required": "Leisti fiksuoti ekraną",
-  "screen_capture_permission_required_content": "Kad išverstų tai, ką matote, programa turi skaityti jūsų ekraną. „Android“ netrukus paprašys leidimo ir įspės dėl visko, kas rodoma ekrane, tačiau ši programa skaito tik tekstą ir tik jūsų įrenginyje. Niekas neįkeliama, neįrašoma ir neišsaugoma, o sustabdyti galite bet kada."
+  "screen_capture_permission_required_content": "Kad išverstų tai, ką matote, programa turi skaityti jūsų ekraną. „Android“ netrukus paprašys leidimo ir įspės dėl visko, kas rodoma ekrane, tačiau ši programa skaito tik tekstą ir tik jūsų įrenginyje. Niekas neįkeliama, neįrašoma ir neišsaugoma, o sustabdyti galite bet kada.",
+  "api_key_validation_unavailable": "Nepavyko patikrinti API rakto. Patikrinkite ryšį arba paslaugos teikėjo paskyrą ir bandykite dar kartą. Išsaugotas raktas nepakeistas.",
+  "api_key_storage_error": "Nepavyko saugiai išsaugoti API rakto. Bandykite dar kartą.",
+  "download_model_not_recognized": "Vertimo variklis neatpažino atsisiųsto paketo „{pack}“. Atsisiųskite dar kartą arba siųskite atsiliepimą."
 }

@@ -550,4 +550,17 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'För att kunna översätta det du ser måste appen läsa din skärm. Android frågar om en stund och varnar för allt som visas på skärmen — men den här appen läser bara text, och det sker på din enhet. Ingenting laddas upp, spelas in eller sparas, och du kan sluta när du vill.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Det gick inte att verifiera API-nyckeln. Kontrollera anslutningen eller leverantörskontot och försök igen. Din sparade nyckel har inte ändrats.';
+
+  @override
+  String get api_key_storage_error =>
+      'Det gick inte att spara API-nyckeln säkert. Försök igen.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Översättningsmotorn kände inte igen det hämtade paketet ”$pack”. Hämta det igen eller skicka feedback.';
+  }
 }

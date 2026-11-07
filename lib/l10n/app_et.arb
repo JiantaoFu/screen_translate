@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Tasuta tõlked lähtestatakse keskööl.",
   "lite_remaining_today": "Täna jäänud tasuta tõlkeid: {count}",
   "screen_capture_permission_required": "Luba ekraani jäädvustamine",
-  "screen_capture_permission_required_content": "Selleks et tõlkida seda, mida näed, peab rakendus su ekraani lugema. Android küsib kohe ja hoiatab kõige ekraanil oleva eest — see rakendus loeb aga ainult teksti ja seda sinu seadmes. Midagi ei laadita üles, ei salvestata ega jäädvustata ning võid igal ajal lõpetada."
+  "screen_capture_permission_required_content": "Selleks et tõlkida seda, mida näed, peab rakendus su ekraani lugema. Android küsib kohe ja hoiatab kõige ekraanil oleva eest — see rakendus loeb aga ainult teksti ja seda sinu seadmes. Midagi ei laadita üles, ei salvestata ega jäädvustata ning võid igal ajal lõpetada.",
+  "api_key_validation_unavailable": "API-võtit ei saanud kontrollida. Kontrolli ühendust või teenusepakkuja kontot ja proovi uuesti. Salvestatud võtit ei muudetud.",
+  "api_key_storage_error": "API-võtit ei saanud turvaliselt salvestada. Proovi uuesti.",
+  "download_model_not_recognized": "Tõlkemootor ei tundnud allalaaditud paketti „{pack}“ ära. Laadi see uuesti alla või saada tagasisidet."
 }

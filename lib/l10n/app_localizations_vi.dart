@@ -548,4 +548,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Để dịch những gì bạn thấy, ứng dụng cần đọc màn hình của bạn. Android sẽ hỏi ngay sau đây và cảnh báo về mọi thứ hiển thị trên màn hình — nhưng ứng dụng này chỉ đọc chữ, và xử lý ngay trên máy của bạn. Không có gì được tải lên, ghi lại hay lưu trữ, và bạn có thể dừng bất cứ lúc nào.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Không thể xác minh khóa API. Kiểm tra kết nối hoặc tài khoản nhà cung cấp rồi thử lại. Khóa đã lưu không bị thay đổi.';
+
+  @override
+  String get api_key_storage_error =>
+      'Không thể lưu khóa API an toàn. Vui lòng thử lại.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Công cụ dịch không nhận diện được gói “$pack” đã tải xuống. Hãy tải lại hoặc gửi phản hồi.';
+  }
 }

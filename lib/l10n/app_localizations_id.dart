@@ -549,4 +549,17 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Untuk menerjemahkan apa yang Anda lihat, aplikasi harus membaca layar Anda. Android akan menanyakannya sebentar lagi dan memperingatkan tentang semua yang tampil di layar — tetapi aplikasi ini hanya membaca teks, dan di perangkat Anda. Tidak ada yang diunggah, direkam, atau disimpan, dan Anda dapat berhenti kapan saja.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Kunci API tidak dapat diverifikasi. Periksa koneksi atau akun penyedia lalu coba lagi. Kunci tersimpan tidak diubah.';
+
+  @override
+  String get api_key_storage_error =>
+      'Kunci API tidak dapat disimpan dengan aman. Coba lagi.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Mesin terjemahan tidak mengenali paket “$pack” yang diunduh. Unduh ulang atau kirim masukan.';
+  }
 }

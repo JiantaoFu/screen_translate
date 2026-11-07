@@ -543,4 +543,17 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'เพื่อแปลสิ่งที่คุณเห็น แอปต้องอ่านหน้าจอของคุณ Android จะขออนุญาตในขั้นต่อไปและเตือนถึงทุกอย่างที่แสดงบนหน้าจอ แต่แอปนี้อ่านเฉพาะข้อความ และทำงานบนเครื่องของคุณเท่านั้น ไม่มีการอัปโหลด บันทึก หรือจัดเก็บใด ๆ และคุณหยุดได้ทุกเมื่อ';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'ยืนยันคีย์ API ไม่ได้ โปรดตรวจสอบการเชื่อมต่อหรือบัญชีผู้ให้บริการแล้วลองอีกครั้ง คีย์ที่บันทึกไว้ไม่ได้เปลี่ยนแปลง';
+
+  @override
+  String get api_key_storage_error =>
+      'บันทึกคีย์ API อย่างปลอดภัยไม่ได้ โปรดลองอีกครั้ง';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'ระบบแปลภาษาไม่รู้จักแพ็ก “$pack” ที่ดาวน์โหลด โปรดดาวน์โหลดใหม่หรือส่งความคิดเห็น';
+  }
 }

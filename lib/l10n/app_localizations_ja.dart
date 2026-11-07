@@ -538,4 +538,16 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       '画面に映っているものを翻訳するために、アプリは画面を読み取る必要があります。このあと Android が許可を求め、画面上のすべてについて警告しますが、このアプリが読み取るのは文字だけで、処理はすべて端末内で行われます。送信も録画も保存もされず、いつでも停止できます。';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API キーを確認できませんでした。接続またはプロバイダーのアカウントを確認して再試行してください。保存済みのキーは変更していません。';
+
+  @override
+  String get api_key_storage_error => 'API キーを安全に保存できませんでした。再試行してください。';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return '翻訳エンジンがダウンロード済みの「$pack」パックを認識できませんでした。再ダウンロードするか、フィードバックを送信してください。';
+  }
 }

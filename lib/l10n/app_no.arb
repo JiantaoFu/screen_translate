@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Gratis oversettelser nullstilles ved midnatt.",
   "lite_remaining_today": "Gratis oversettelser igjen i dag: {count}",
   "screen_capture_permission_required": "Tillat skjermopptak",
-  "screen_capture_permission_required_content": "For å oversette det du ser, må appen lese skjermen din. Android spør om litt og advarer om alt som vises på skjermen — men denne appen leser bare tekst, og den gjør det på enheten din. Ingenting lastes opp, tas opp eller lagres, og du kan stoppe når som helst."
+  "screen_capture_permission_required_content": "For å oversette det du ser, må appen lese skjermen din. Android spør om litt og advarer om alt som vises på skjermen — men denne appen leser bare tekst, og den gjør det på enheten din. Ingenting lastes opp, tas opp eller lagres, og du kan stoppe når som helst.",
+  "api_key_validation_unavailable": "Kunne ikke bekrefte API-nøkkelen. Sjekk tilkoblingen eller leverandørkontoen og prøv igjen. Den lagrede nøkkelen er ikke endret.",
+  "api_key_storage_error": "Kunne ikke lagre API-nøkkelen sikkert. Prøv igjen.",
+  "download_model_not_recognized": "Oversettelsesmotoren gjenkjente ikke den nedlastede pakken «{pack}». Last ned på nytt eller send tilbakemelding."
 }

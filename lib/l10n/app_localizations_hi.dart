@@ -549,4 +549,17 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'आप जो देख रहे हैं उसका अनुवाद करने के लिए ऐप को आपकी स्क्रीन पढ़नी होती है। Android अभी अनुमति माँगेगा और स्क्रीन की हर चीज़ के बारे में चेतावनी देगा — लेकिन यह ऐप केवल टेक्स्ट पढ़ता है, वह भी आपके डिवाइस पर। कुछ भी अपलोड, रिकॉर्ड या सेव नहीं होता, और आप कभी भी रोक सकते हैं।';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API कुंजी की पुष्टि नहीं हो सकी। कनेक्शन या प्रदाता खाते की जाँच करके फिर प्रयास करें। आपकी सहेजी गई कुंजी नहीं बदली गई है।';
+
+  @override
+  String get api_key_storage_error =>
+      'API कुंजी सुरक्षित रूप से सहेजी नहीं जा सकी। फिर प्रयास करें।';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'अनुवाद इंजन डाउनलोड किए गए “$pack” पैक को पहचान नहीं सका। फिर से डाउनलोड करें या फ़ीडबैक भेजें।';
+  }
 }

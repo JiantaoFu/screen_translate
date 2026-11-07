@@ -550,4 +550,17 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'আপনি যা দেখছেন তা অনুবাদ করতে অ্যাপটিকে আপনার স্ক্রিন পড়তে হবে। Android এরপর অনুমতি চাইবে এবং স্ক্রিনের সবকিছু সম্পর্কে সতর্ক করবে — কিন্তু এই অ্যাপ শুধু টেক্সট পড়ে, আপনার ডিভাইসেই। কিছুই আপলোড, রেকর্ড বা সংরক্ষণ করা হয় না, এবং আপনি যেকোনো সময় বন্ধ করতে পারেন।';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API কী যাচাই করা যায়নি। সংযোগ বা প্রদানকারীর অ্যাকাউন্ট পরীক্ষা করে আবার চেষ্টা করুন। সংরক্ষিত কী বদলানো হয়নি।';
+
+  @override
+  String get api_key_storage_error =>
+      'API কী নিরাপদে সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'অনুবাদ ইঞ্জিন ডাউনলোড করা “$pack” প্যাকটি চিনতে পারেনি। আবার ডাউনলোড করুন বা মতামত পাঠান।';
+  }
 }

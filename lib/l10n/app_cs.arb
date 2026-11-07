@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Bezplatné překlady se obnoví o půlnoci.",
   "lite_remaining_today": "Zbývající bezplatné překlady dnes: {count}",
   "screen_capture_permission_required": "Povolit snímání obrazovky",
-  "screen_capture_permission_required_content": "Aby aplikace přeložila, co vidíte, musí číst vaši obrazovku. Android se zeptá vzápětí a varuje před vším, co je na obrazovce — tato aplikace však čte jen text, a to přímo ve vašem zařízení. Nic se neodesílá, nenahrává ani neukládá a kdykoli můžete skončit."
+  "screen_capture_permission_required_content": "Aby aplikace přeložila, co vidíte, musí číst vaši obrazovku. Android se zeptá vzápětí a varuje před vším, co je na obrazovce — tato aplikace však čte jen text, a to přímo ve vašem zařízení. Nic se neodesílá, nenahrává ani neukládá a kdykoli můžete skončit.",
+  "api_key_validation_unavailable": "Klíč API nelze ověřit. Zkontrolujte připojení nebo účet poskytovatele a zkuste to znovu. Uložený klíč nebyl změněn.",
+  "api_key_storage_error": "Klíč API nelze bezpečně uložit. Zkuste to znovu.",
+  "download_model_not_recognized": "Překladač nerozpoznal stažený balíček „{pack}“. Stáhněte jej znovu nebo pošlete zpětnou vazbu."
 }

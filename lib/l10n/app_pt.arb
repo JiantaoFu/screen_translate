@@ -164,5 +164,8 @@
   "paywall_reset_hint": "As traduções grátis reiniciam à meia-noite.",
   "lite_remaining_today": "Traduções grátis restantes hoje: {count}",
   "screen_capture_permission_required": "Permitir a captura de ecrã",
-  "screen_capture_permission_required_content": "Para traduzir o que vê, a aplicação precisa de ler o seu ecrã. O Android vai perguntar a seguir e avisa sobre tudo o que aparece no ecrã — mas esta aplicação lê apenas texto, e fá-lo no seu dispositivo. Nada é enviado, gravado ou guardado, e pode parar quando quiser."
+  "screen_capture_permission_required_content": "Para traduzir o que vê, a aplicação precisa de ler o seu ecrã. O Android vai perguntar a seguir e avisa sobre tudo o que aparece no ecrã — mas esta aplicação lê apenas texto, e fá-lo no seu dispositivo. Nada é enviado, gravado ou guardado, e pode parar quando quiser.",
+  "api_key_validation_unavailable": "Não foi possível verificar a chave API. Verifique a conexão ou a conta do provedor e tente novamente. A chave salva não foi alterada.",
+  "api_key_storage_error": "Não foi possível salvar a chave API com segurança. Tente novamente.",
+  "download_model_not_recognized": "O mecanismo de tradução não reconheceu o pacote baixado “{pack}”. Baixe novamente ou envie feedback."
 }

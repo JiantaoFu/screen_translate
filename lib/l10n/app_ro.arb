@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Traducerile gratuite se resetează la miezul nopții.",
   "lite_remaining_today": "Traduceri gratuite rămase azi: {count}",
   "screen_capture_permission_required": "Permite capturarea ecranului",
-  "screen_capture_permission_required_content": "Pentru a traduce ceea ce vezi, aplicația trebuie să îți citească ecranul. Android va cere permisiunea imediat și avertizează cu privire la tot ce apare pe ecran — însă această aplicație citește doar text, direct pe dispozitivul tău. Nimic nu este încărcat, înregistrat sau salvat și poți opri oricând."
+  "screen_capture_permission_required_content": "Pentru a traduce ceea ce vezi, aplicația trebuie să îți citească ecranul. Android va cere permisiunea imediat și avertizează cu privire la tot ce apare pe ecran — însă această aplicație citește doar text, direct pe dispozitivul tău. Nimic nu este încărcat, înregistrat sau salvat și poți opri oricând.",
+  "api_key_validation_unavailable": "Cheia API nu a putut fi verificată. Verifică conexiunea sau contul furnizorului și încearcă din nou. Cheia salvată nu a fost modificată.",
+  "api_key_storage_error": "Cheia API nu a putut fi salvată în siguranță. Încearcă din nou.",
+  "download_model_not_recognized": "Motorul de traducere nu a recunoscut pachetul descărcat „{pack}”. Descarcă-l din nou sau trimite feedback."
 }

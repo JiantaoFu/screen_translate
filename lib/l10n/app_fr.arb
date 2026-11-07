@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Les traductions gratuites sont réinitialisées à minuit.",
   "lite_remaining_today": "Traductions gratuites restantes aujourd'hui : {count}",
   "screen_capture_permission_required": "Autoriser la capture d'écran",
-  "screen_capture_permission_required_content": "Pour traduire ce que vous voyez, l'application doit lire votre écran. Android va vous le demander et vous avertir à propos de tout ce qui s'affiche — mais cette application ne lit que du texte, et sur votre appareil. Rien n'est envoyé, enregistré ni conservé, et vous pouvez arrêter à tout moment."
+  "screen_capture_permission_required_content": "Pour traduire ce que vous voyez, l'application doit lire votre écran. Android va vous le demander et vous avertir à propos de tout ce qui s'affiche — mais cette application ne lit que du texte, et sur votre appareil. Rien n'est envoyé, enregistré ni conservé, et vous pouvez arrêter à tout moment.",
+  "api_key_validation_unavailable": "Impossible de vérifier la clé API. Vérifiez votre connexion ou votre compte fournisseur et réessayez. Votre clé enregistrée n’a pas été modifiée.",
+  "api_key_storage_error": "Impossible d’enregistrer la clé API de façon sécurisée. Réessayez.",
+  "download_model_not_recognized": "Le moteur de traduction n’a pas reconnu le pack téléchargé « {pack} ». Téléchargez-le à nouveau ou envoyez un commentaire."
 }

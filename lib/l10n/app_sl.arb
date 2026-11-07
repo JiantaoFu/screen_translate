@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Brezplačni prevodi se ponastavijo ob polnoči.",
   "lite_remaining_today": "Preostali brezplačni prevodi danes: {count}",
   "screen_capture_permission_required": "Dovoli zajem zaslona",
-  "screen_capture_permission_required_content": "Da bi aplikacija prevedla to, kar vidite, mora brati vaš zaslon. Android bo takoj vprašal za dovoljenje in opozoril na vse, kar je na zaslonu — ta aplikacija pa bere samo besedilo, in sicer v vaši napravi. Nič se ne naloži, posname ali shrani, ustavite pa lahko kadar koli."
+  "screen_capture_permission_required_content": "Da bi aplikacija prevedla to, kar vidite, mora brati vaš zaslon. Android bo takoj vprašal za dovoljenje in opozoril na vse, kar je na zaslonu — ta aplikacija pa bere samo besedilo, in sicer v vaši napravi. Nič se ne naloži, posname ali shrani, ustavite pa lahko kadar koli.",
+  "api_key_validation_unavailable": "Ključa API ni bilo mogoče preveriti. Preverite povezavo ali račun ponudnika in poskusite znova. Shranjeni ključ ni bil spremenjen.",
+  "api_key_storage_error": "Ključa API ni bilo mogoče varno shraniti. Poskusite znova.",
+  "download_model_not_recognized": "Prevajalnik ni prepoznal prenesenega paketa »{pack}«. Prenesite ga znova ali pošljite povratne informacije."
 }

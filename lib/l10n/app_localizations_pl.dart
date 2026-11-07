@@ -553,4 +553,17 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Aby przetłumaczyć to, co widzisz, aplikacja musi odczytywać ekran. Android zapyta za chwilę i ostrzeże przed wszystkim, co jest na ekranie — ta aplikacja odczytuje jednak tylko tekst i robi to na Twoim urządzeniu. Nic nie jest wysyłane, nagrywane ani zapisywane, a przerwać możesz w dowolnej chwili.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Nie można zweryfikować klucza API. Sprawdź połączenie lub konto dostawcy i spróbuj ponownie. Zapisany klucz nie został zmieniony.';
+
+  @override
+  String get api_key_storage_error =>
+      'Nie można bezpiecznie zapisać klucza API. Spróbuj ponownie.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Silnik tłumaczenia nie rozpoznał pobranego pakietu „$pack”. Pobierz ponownie lub wyślij opinię.';
+  }
 }

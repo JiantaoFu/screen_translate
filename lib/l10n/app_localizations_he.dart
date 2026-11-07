@@ -542,4 +542,17 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'כדי לתרגם את מה שמוצג, האפליקציה צריכה לקרוא את המסך שלך. מערכת Android תבקש זאת מיד ותזהיר לגבי כל מה שמופיע במסך — אך אפליקציה זו קוראת רק טקסט, ובמכשיר שלך בלבד. שום דבר לא מועלה, מוקלט או נשמר, ואפשר לעצור בכל רגע.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'לא ניתן לאמת את מפתח ה-API. יש לבדוק את החיבור או את חשבון הספק ולנסות שוב. המפתח השמור לא שונה.';
+
+  @override
+  String get api_key_storage_error =>
+      'לא ניתן לשמור את מפתח ה-API באופן מאובטח. יש לנסות שוב.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'מנוע התרגום לא זיהה את החבילה שהורדה ״$pack״. יש להוריד שוב או לשלוח משוב.';
+  }
 }

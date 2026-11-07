@@ -1153,6 +1153,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To translate what you see, the app has to read your screen. Android will ask next and warns about everything on screen — this app only reads text, on your device. Nothing is uploaded, recorded or saved, and you can stop any time.'**
   String get screen_capture_permission_required_content;
+
+  /// No description provided for @api_key_validation_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not verify the API key. Check your connection or provider account and retry. Your saved key was not changed.'**
+  String get api_key_validation_unavailable;
+
+  /// No description provided for @api_key_storage_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the API key securely. Please try again.'**
+  String get api_key_storage_error;
+
+  /// No description provided for @download_model_not_recognized.
+  ///
+  /// In en, this message translates to:
+  /// **'The downloaded \"{pack}\" pack could not be recognized by the translation engine. Retry the download or send feedback.'**
+  String download_model_not_recognized(Object pack);
 }
 
 class _AppLocalizationsDelegate

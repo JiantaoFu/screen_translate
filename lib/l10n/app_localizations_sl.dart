@@ -550,4 +550,17 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Da bi aplikacija prevedla to, kar vidite, mora brati vaš zaslon. Android bo takoj vprašal za dovoljenje in opozoril na vse, kar je na zaslonu — ta aplikacija pa bere samo besedilo, in sicer v vaši napravi. Nič se ne naloži, posname ali shrani, ustavite pa lahko kadar koli.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Ključa API ni bilo mogoče preveriti. Preverite povezavo ali račun ponudnika in poskusite znova. Shranjeni ključ ni bil spremenjen.';
+
+  @override
+  String get api_key_storage_error =>
+      'Ključa API ni bilo mogoče varno shraniti. Poskusite znova.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Prevajalnik ni prepoznal prenesenega paketa »$pack«. Prenesite ga znova ali pošljite povratne informacije.';
+  }
 }

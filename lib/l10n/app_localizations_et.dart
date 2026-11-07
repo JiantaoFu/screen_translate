@@ -546,4 +546,17 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Selleks et tõlkida seda, mida näed, peab rakendus su ekraani lugema. Android küsib kohe ja hoiatab kõige ekraanil oleva eest — see rakendus loeb aga ainult teksti ja seda sinu seadmes. Midagi ei laadita üles, ei salvestata ega jäädvustata ning võid igal ajal lõpetada.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API-võtit ei saanud kontrollida. Kontrolli ühendust või teenusepakkuja kontot ja proovi uuesti. Salvestatud võtit ei muudetud.';
+
+  @override
+  String get api_key_storage_error =>
+      'API-võtit ei saanud turvaliselt salvestada. Proovi uuesti.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Tõlkemootor ei tundnud allalaaditud paketti „$pack“ ära. Laadi see uuesti alla või saada tagasisidet.';
+  }
 }

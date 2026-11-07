@@ -546,4 +546,17 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Aby aplikace přeložila, co vidíte, musí číst vaši obrazovku. Android se zeptá vzápětí a varuje před vším, co je na obrazovce — tato aplikace však čte jen text, a to přímo ve vašem zařízení. Nic se neodesílá, nenahrává ani neukládá a kdykoli můžete skončit.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Klíč API nelze ověřit. Zkontrolujte připojení nebo účet poskytovatele a zkuste to znovu. Uložený klíč nebyl změněn.';
+
+  @override
+  String get api_key_storage_error =>
+      'Klíč API nelze bezpečně uložit. Zkuste to znovu.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Překladač nerozpoznal stažený balíček „$pack“. Stáhněte jej znovu nebo pošlete zpětnou vazbu.';
+  }
 }

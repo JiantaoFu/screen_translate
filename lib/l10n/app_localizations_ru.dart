@@ -550,4 +550,17 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Чтобы перевести то, что вы видите, приложению нужно читать экран. Сейчас Android запросит разрешение и предупредит обо всём, что отображается на экране, — но это приложение читает только текст и делает это на вашем устройстве. Ничего не отправляется, не записывается и не сохраняется, и вы можете остановить в любой момент.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Не удалось проверить API-ключ. Проверьте подключение или аккаунт провайдера и повторите попытку. Сохранённый ключ не изменён.';
+
+  @override
+  String get api_key_storage_error =>
+      'Не удалось безопасно сохранить API-ключ. Повторите попытку.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Система перевода не распознала загруженный пакет «$pack». Загрузите его снова или отправьте отзыв.';
+  }
 }

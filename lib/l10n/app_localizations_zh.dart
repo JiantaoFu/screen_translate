@@ -530,4 +530,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       '要翻译你看到的内容，应用需要读取你的屏幕。接下来 Android 会请求授权，并对屏幕上的所有内容发出警告——但本应用只读取文字，且全部在你的设备上完成。不会上传、不会录制、不会保存，你随时可以停止。';
+
+  @override
+  String get api_key_validation_unavailable =>
+      '暂时无法验证 API 密钥。请检查网络或服务商账户后重试，原有密钥未更改。';
+
+  @override
+  String get api_key_storage_error => '无法安全保存 API 密钥，请重试。';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return '翻译引擎无法识别已下载的“$pack”语言包。请重试下载或发送反馈。';
+  }
 }

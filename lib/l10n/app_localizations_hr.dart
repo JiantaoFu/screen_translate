@@ -549,4 +549,17 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Da bi prevela ono što vidite, aplikacija mora čitati vaš zaslon. Android će odmah zatražiti dopuštenje i upozorava na sve što je na zaslonu — no ova aplikacija čita samo tekst, i to na vašem uređaju. Ništa se ne šalje, ne snima niti sprema, a možete prekinuti u svakom trenutku.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API ključ nije moguće provjeriti. Provjerite vezu ili račun pružatelja i pokušajte ponovno. Spremljeni ključ nije promijenjen.';
+
+  @override
+  String get api_key_storage_error =>
+      'API ključ nije moguće sigurno spremiti. Pokušajte ponovno.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Prevoditeljski mehanizam nije prepoznao preuzeti paket „$pack“. Preuzmite ga ponovno ili pošaljite povratne informacije.';
+  }
 }

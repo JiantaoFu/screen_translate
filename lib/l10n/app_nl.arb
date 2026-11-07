@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Gratis vertalingen worden om middernacht gereset.",
   "lite_remaining_today": "Resterende gratis vertalingen vandaag: {count}",
   "screen_capture_permission_required": "Schermopname toestaan",
-  "screen_capture_permission_required_content": "Om te vertalen wat u ziet, moet de app uw scherm lezen. Android vraagt dit zo meteen en waarschuwt voor alles wat op het scherm staat — maar deze app leest alleen tekst, en dat gebeurt op uw apparaat. Er wordt niets geüpload, opgenomen of bewaard, en u kunt altijd stoppen."
+  "screen_capture_permission_required_content": "Om te vertalen wat u ziet, moet de app uw scherm lezen. Android vraagt dit zo meteen en waarschuwt voor alles wat op het scherm staat — maar deze app leest alleen tekst, en dat gebeurt op uw apparaat. Er wordt niets geüpload, opgenomen of bewaard, en u kunt altijd stoppen.",
+  "api_key_validation_unavailable": "De API-sleutel kon niet worden gecontroleerd. Controleer je verbinding of provideraccount en probeer opnieuw. Je opgeslagen sleutel is niet gewijzigd.",
+  "api_key_storage_error": "De API-sleutel kon niet veilig worden opgeslagen. Probeer opnieuw.",
+  "download_model_not_recognized": "De vertaalengine herkende het gedownloade pakket “{pack}” niet. Download het opnieuw of stuur feedback."
 }

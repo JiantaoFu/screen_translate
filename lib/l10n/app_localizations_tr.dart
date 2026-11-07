@@ -549,4 +549,17 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Gördüklerinizi çevirebilmek için uygulamanın ekranınızı okuması gerekir. Android birazdan izin isteyecek ve ekrandaki her şey hakkında uyaracak; ancak bu uygulama yalnızca metni okur ve bunu cihazınızda yapar. Hiçbir şey yüklenmez, kaydedilmez veya saklanmaz ve istediğiniz an durdurabilirsiniz.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API anahtarı doğrulanamadı. Bağlantınızı veya sağlayıcı hesabınızı kontrol edip tekrar deneyin. Kayıtlı anahtarınız değiştirilmedi.';
+
+  @override
+  String get api_key_storage_error =>
+      'API anahtarı güvenli şekilde kaydedilemedi. Tekrar deneyin.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Çeviri motoru indirilen “$pack” paketini tanımadı. Yeniden indirin veya geri bildirim gönderin.';
+  }
 }

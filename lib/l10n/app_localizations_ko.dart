@@ -538,4 +538,16 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       '보이는 내용을 번역하려면 앱이 화면을 읽어야 합니다. 곧 Android가 권한을 요청하며 화면의 모든 내용에 대해 경고하지만, 이 앱은 글자만 읽고 처리는 모두 기기 안에서 이루어집니다. 업로드·녹화·저장은 하지 않으며 언제든지 중지할 수 있습니다.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API 키를 확인할 수 없습니다. 연결 또는 제공업체 계정을 확인하고 다시 시도하세요. 저장된 키는 변경되지 않았습니다.';
+
+  @override
+  String get api_key_storage_error => 'API 키를 안전하게 저장할 수 없습니다. 다시 시도하세요.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return '번역 엔진이 다운로드한 “$pack” 팩을 인식하지 못했습니다. 다시 다운로드하거나 의견을 보내 주세요.';
+  }
 }

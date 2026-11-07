@@ -551,4 +551,17 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Pentru a traduce ceea ce vezi, aplicația trebuie să îți citească ecranul. Android va cere permisiunea imediat și avertizează cu privire la tot ce apare pe ecran — însă această aplicație citește doar text, direct pe dispozitivul tău. Nimic nu este încărcat, înregistrat sau salvat și poți opri oricând.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Cheia API nu a putut fi verificată. Verifică conexiunea sau contul furnizorului și încearcă din nou. Cheia salvată nu a fost modificată.';
+
+  @override
+  String get api_key_storage_error =>
+      'Cheia API nu a putut fi salvată în siguranță. Încearcă din nou.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Motorul de traducere nu a recunoscut pachetul descărcat „$pack”. Descarcă-l din nou sau trimite feedback.';
+  }
 }

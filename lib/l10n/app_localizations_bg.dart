@@ -549,4 +549,17 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'За да превежда това, което виждате, приложението трябва да чете екрана ви. Android ще попита след малко и предупреждава за всичко на екрана — това приложение чете само текст и само на вашето устройство. Нищо не се качва, записва или запазва и можете да спрете по всяко време.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API ключът не можа да бъде проверен. Проверете връзката или профила си при доставчика и опитайте пак. Запазеният ключ не е променен.';
+
+  @override
+  String get api_key_storage_error =>
+      'API ключът не можа да бъде запазен сигурно. Опитайте пак.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Преводачът не разпозна изтегления пакет „$pack“. Изтеглете отново или изпратете отзив.';
+  }
 }

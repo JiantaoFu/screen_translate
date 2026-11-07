@@ -544,4 +544,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'To translate what you see, the app has to read your screen. Android will ask next and warns about everything on screen — this app only reads text, on your device. Nothing is uploaded, recorded or saved, and you can stop any time.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Could not verify the API key. Check your connection or provider account and retry. Your saved key was not changed.';
+
+  @override
+  String get api_key_storage_error =>
+      'Could not save the API key securely. Please try again.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'The downloaded \"$pack\" pack could not be recognized by the translation engine. Retry the download or send feedback.';
+  }
 }

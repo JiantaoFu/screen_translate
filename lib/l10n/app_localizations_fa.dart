@@ -547,4 +547,17 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'برای ترجمهٔ آنچه می‌بینید، برنامه باید صفحهٔ شما را بخواند. اندروید در ادامه اجازه می‌خواهد و دربارهٔ همه‌چیزِ روی صفحه هشدار می‌دهد — اما این برنامه فقط متن را می‌خواند، آن هم روی دستگاه خودتان. چیزی بارگذاری، ضبط یا ذخیره نمی‌شود و هر زمان می‌توانید متوقف کنید.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'کلید API تأیید نشد. اتصال یا حساب ارائه‌دهنده را بررسی کنید و دوباره تلاش کنید. کلید ذخیره‌شده تغییر نکرده است.';
+
+  @override
+  String get api_key_storage_error =>
+      'ذخیرهٔ امن کلید API ممکن نشد. دوباره تلاش کنید.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'موتور ترجمه بستهٔ دانلودشدهٔ «$pack» را تشخیص نداد. دوباره دانلود کنید یا بازخورد بفرستید.';
+  }
 }

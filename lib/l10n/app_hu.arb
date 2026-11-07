@@ -164,5 +164,8 @@
   "paywall_reset_hint": "Az ingyenes fordítások éjfélkor nullázódnak.",
   "lite_remaining_today": "Ma hátralévő ingyenes fordítások: {count}",
   "screen_capture_permission_required": "Képernyőrögzítés engedélyezése",
-  "screen_capture_permission_required_content": "Ahhoz, hogy lefordítsa, amit lát, az alkalmazásnak olvasnia kell a képernyőt. Az Android mindjárt rákérdez, és mindenre figyelmeztet, ami a képernyőn van — ez az alkalmazás azonban csak szöveget olvas, a saját készülékén. Semmi nem kerül feltöltésre, rögzítésre vagy mentésre, és bármikor leállíthatja."
+  "screen_capture_permission_required_content": "Ahhoz, hogy lefordítsa, amit lát, az alkalmazásnak olvasnia kell a képernyőt. Az Android mindjárt rákérdez, és mindenre figyelmeztet, ami a képernyőn van — ez az alkalmazás azonban csak szöveget olvas, a saját készülékén. Semmi nem kerül feltöltésre, rögzítésre vagy mentésre, és bármikor leállíthatja.",
+  "api_key_validation_unavailable": "Az API-kulcs nem ellenőrizhető. Ellenőrizd a kapcsolatot vagy a szolgáltatói fiókot, majd próbáld újra. A mentett kulcs nem változott.",
+  "api_key_storage_error": "Az API-kulcs nem menthető biztonságosan. Próbáld újra.",
+  "download_model_not_recognized": "A fordítómotor nem ismerte fel a letöltött „{pack}” csomagot. Töltsd le újra, vagy küldj visszajelzést."
 }

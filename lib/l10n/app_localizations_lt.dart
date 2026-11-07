@@ -548,4 +548,17 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Kad išverstų tai, ką matote, programa turi skaityti jūsų ekraną. „Android“ netrukus paprašys leidimo ir įspės dėl visko, kas rodoma ekrane, tačiau ši programa skaito tik tekstą ir tik jūsų įrenginyje. Niekas neįkeliama, neįrašoma ir neišsaugoma, o sustabdyti galite bet kada.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Nepavyko patikrinti API rakto. Patikrinkite ryšį arba paslaugos teikėjo paskyrą ir bandykite dar kartą. Išsaugotas raktas nepakeistas.';
+
+  @override
+  String get api_key_storage_error =>
+      'Nepavyko saugiai išsaugoti API rakto. Bandykite dar kartą.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Vertimo variklis neatpažino atsisiųsto paketo „$pack“. Atsisiųskite dar kartą arba siųskite atsiliepimą.';
+  }
 }

@@ -560,4 +560,17 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Um zu übersetzen, was Sie sehen, muss die App Ihren Bildschirm lesen. Android fragt gleich und warnt vor allem, was auf dem Bildschirm zu sehen ist — diese App liest jedoch nur Text, und zwar auf Ihrem Gerät. Nichts wird hochgeladen, aufgezeichnet oder gespeichert, und Sie können jederzeit aufhören.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Der API-Schlüssel konnte nicht überprüft werden. Prüfe die Verbindung oder dein Anbieterkonto und versuche es erneut. Dein gespeicherter Schlüssel wurde nicht geändert.';
+
+  @override
+  String get api_key_storage_error =>
+      'Der API-Schlüssel konnte nicht sicher gespeichert werden. Versuche es erneut.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Die Übersetzungsengine hat das heruntergeladene Paket „$pack“ nicht erkannt. Lade es erneut herunter oder sende Feedback.';
+  }
 }

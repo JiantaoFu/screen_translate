@@ -58,6 +58,21 @@ void main() {
     expect(isDownloadFailedDialogShowing, isFalse);
   });
 
+  testWidgets('unrecognized pack explains installation failure and offers retry', (tester) async {
+    final ctx = await pumpHost(tester);
+    final result = showDownloadFailedDialog(
+      ctx, packLabel: 'Tamil', modelNotRecognized: true,
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('could not be recognized'), findsOneWidget);
+    expect(find.textContaining('Tamil'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+    await tester.tap(find.text('Retry'));
+    await tester.pumpAndSettle();
+    expect(await result, DownloadFailedAction.retry);
+    expect(isDownloadFailedDialogShowing, isFalse);
+  });
+
   for (final locale in const [Locale('en'), Locale('es'), Locale('pt'), Locale('id'), Locale('de')]) {
     testWidgets('four buttons fit on a small phone without overflow ($locale)', (tester) async {
       tester.view.physicalSize = const Size(320, 568);

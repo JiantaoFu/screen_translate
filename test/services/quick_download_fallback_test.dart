@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class _FakeGoogle extends OnDeviceTranslatorModelManager {
   bool hang;
   bool downloaded = false;
+  bool failRecognition = false;
   int downloadCalls = 0;
   _FakeGoogle({this.hang = true});
 
@@ -25,7 +26,10 @@ class _FakeGoogle extends OnDeviceTranslatorModelManager {
   }
 
   @override
-  Future<bool> isModelDownloaded(String model) async => downloaded;
+  Future<bool> isModelDownloaded(String model) async {
+    if (failRecognition) throw Exception('SDK model query failed');
+    return downloaded;
+  }
 }
 
 /// The backup server; fails the first [failures] calls.
@@ -33,7 +37,8 @@ class _FakeBackup extends CustomModelManager {
   int failures;
   int calls = 0;
   bool? sawAlreadyInstalled;
-  _FakeBackup({this.failures = 0});
+  final void Function()? onInstalled;
+  _FakeBackup({this.failures = 0, this.onInstalled});
 
   @override
   Future<void> downloadAndInstallModel(String langCode,
@@ -43,6 +48,7 @@ class _FakeBackup extends CustomModelManager {
     if (calls <= failures) throw Exception('backup failed');
     sawAlreadyInstalled = await isAlreadyInstalled?.call();
     onProgress?.call(1.0);
+    onInstalled?.call();
   }
 }
 
@@ -78,7 +84,7 @@ void main() {
 
   test('a stalled Google download falls through to the backup server', () async {
     final google = _FakeGoogle(hang: true);
-    final backup = _FakeBackup();
+    final backup = _FakeBackup(onInstalled: () => google.downloaded = true);
     await ModelDownloadService.withManagers(google, backup).downloadModelWithFallback('ar');
     expect(google.downloadCalls, 1);
     expect(backup.calls, 1);
@@ -87,7 +93,7 @@ void main() {
 
   test('after Google fails once, retries go straight to the backup', () async {
     final google = _FakeGoogle(hang: true);
-    final backup = _FakeBackup(failures: 2);
+    final backup = _FakeBackup(failures: 2, onInstalled: () => google.downloaded = true);
     await ModelDownloadService.withManagers(google, backup).downloadModelWithFallback('fa');
     expect(google.downloadCalls, 1, reason: 'Google must not eat 2 minutes per retry');
     expect(backup.calls, 3);
@@ -110,7 +116,9 @@ void main() {
     expect(ModelDownloadService.quickDownloadFailed('he'), isTrue);
     expect(ModelDownloadService.quickDownloadFailed('en'), isFalse);
 
-    final ok = ModelDownloadService.withManagers(_FakeGoogle(hang: false), _FakeBackup());
+    final retryGoogle = _FakeGoogle(hang: false);
+    final ok = ModelDownloadService.withManagers(retryGoogle,
+        _FakeBackup(onInstalled: () => retryGoogle.downloaded = true));
     final retry = ok.downloadModelWithFallback('he');
     expect(ModelDownloadService.quickDownloadFailed('he'), isFalse,
         reason: 'a running retry is not a failure');
@@ -147,6 +155,57 @@ void main() {
     google.downloaded = true;
     await service.downloadModelWithFallback('ko');
     expect(backup.sawAlreadyInstalled, isTrue);
+  });
+
+  test('an unpacked but unrecognized Tamil model never reports ready', () async {
+    final google = _FakeGoogle(hang: false);
+    final backup = _FakeBackup(); // Unzip succeeds, SDK still sees no model.
+    final progress = <double>[];
+    final service = ModelDownloadService.withManagers(google, backup);
+    await expectLater(
+      service.downloadModelWithFallback('ta', onProgress: progress.add),
+      throwsA(isA<QuickModelVerificationException>()),
+    );
+    expect(backup.calls, 3, reason: 'verification failure uses normal retries');
+    expect(progress, isNot(contains(1.0)), reason: 'unzip alone is not completion');
+    expect(ModelDownloadService.quickDownloadFailed('ta'), isTrue);
+    expect(ModelDownloadService.isQuickDownloading('ta'), isFalse);
+    expect(await service.quickDownloadStillFailed('ta'), isTrue);
+
+    // No stale in-flight future/failure prevents a successful later attempt.
+    final installed = _FakeBackup(onInstalled: () => google.downloaded = true);
+    final retryProgress = <double>[];
+    await ModelDownloadService.withManagers(google, installed)
+        .downloadModelWithFallback('ta', onProgress: retryProgress.add);
+    expect(installed.calls, 1);
+    expect(retryProgress.last, 1.0);
+    expect(ModelDownloadService.quickDownloadFailed('ta'), isFalse);
+  });
+
+  test('a model that becomes recognized on retry completes only then', () async {
+    final google = _FakeGoogle(hang: false);
+    var installs = 0;
+    final backup = _FakeBackup(onInstalled: () {
+      if (++installs == 2) google.downloaded = true;
+    });
+    await ModelDownloadService.withManagers(google, backup)
+        .downloadModelWithFallback('ta');
+    expect(backup.calls, 2);
+    expect(google.downloadCalls, 1);
+    expect(ModelDownloadService.quickDownloadFailed('ta'), isFalse);
+  });
+
+  test('a failed SDK recognition query cannot report backup success', () async {
+    final google = _FakeGoogle(hang: false)..failRecognition = true;
+    final progress = <double>[];
+    await expectLater(
+      ModelDownloadService.withManagers(google, _FakeBackup())
+          .downloadModelWithFallback('ta', onProgress: progress.add),
+      throwsA(isA<QuickModelVerificationException>()),
+    );
+    expect(progress, isNot(contains(1.0)));
+    expect(ModelDownloadService.quickDownloadFailed('ta'), isTrue);
+    expect(ModelDownloadService.isQuickDownloading('ta'), isFalse);
   });
 
   group('backup server download', () {

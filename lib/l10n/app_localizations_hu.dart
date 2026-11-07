@@ -552,4 +552,17 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Ahhoz, hogy lefordítsa, amit lát, az alkalmazásnak olvasnia kell a képernyőt. Az Android mindjárt rákérdez, és mindenre figyelmeztet, ami a képernyőn van — ez az alkalmazás azonban csak szöveget olvas, a saját készülékén. Semmi nem kerül feltöltésre, rögzítésre vagy mentésre, és bármikor leállíthatja.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Az API-kulcs nem ellenőrizhető. Ellenőrizd a kapcsolatot vagy a szolgáltatói fiókot, majd próbáld újra. A mentett kulcs nem változott.';
+
+  @override
+  String get api_key_storage_error =>
+      'Az API-kulcs nem menthető biztonságosan. Próbáld újra.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'A fordítómotor nem ismerte fel a letöltött „$pack” csomagot. Töltsd le újra, vagy küldj visszajelzést.';
+  }
 }

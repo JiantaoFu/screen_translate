@@ -549,4 +549,17 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Jotta sovellus voi kääntää näkemäsi, sen on luettava näyttöäsi. Android kysyy seuraavaksi ja varoittaa kaikesta näytöllä näkyvästä — tämä sovellus lukee kuitenkin vain tekstiä, ja laitteellasi. Mitään ei lähetetä, tallenneta eikä nauhoiteta, ja voit lopettaa milloin tahansa.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API-avainta ei voitu vahvistaa. Tarkista yhteys tai palveluntarjoajan tili ja yritä uudelleen. Tallennettua avainta ei muutettu.';
+
+  @override
+  String get api_key_storage_error =>
+      'API-avainta ei voitu tallentaa turvallisesti. Yritä uudelleen.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Käännösmoottori ei tunnistanut ladattua pakettia ”$pack”. Lataa se uudelleen tai lähetä palautetta.';
+  }
 }

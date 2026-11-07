@@ -548,4 +548,17 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Para traduzir o que vê, a aplicação precisa de ler o seu ecrã. O Android vai perguntar a seguir e avisa sobre tudo o que aparece no ecrã — mas esta aplicação lê apenas texto, e fá-lo no seu dispositivo. Nada é enviado, gravado ou guardado, e pode parar quando quiser.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'Não foi possível verificar a chave API. Verifique a conexão ou a conta do provedor e tente novamente. A chave salva não foi alterada.';
+
+  @override
+  String get api_key_storage_error =>
+      'Não foi possível salvar a chave API com segurança. Tente novamente.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'O mecanismo de tradução não reconheceu o pacote baixado “$pack”. Baixe novamente ou envie feedback.';
+  }
 }

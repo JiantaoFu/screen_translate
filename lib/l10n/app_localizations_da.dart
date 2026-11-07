@@ -547,4 +547,17 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'For at oversætte det, du ser, skal appen læse din skærm. Android spørger om lidt og advarer om alt på skærmen — men denne app læser kun tekst, og kun på din enhed. Intet uploades, optages eller gemmes, og du kan stoppe når som helst.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'API-nøglen kunne ikke bekræftes. Tjek forbindelsen eller din udbyderkonto, og prøv igen. Din gemte nøgle er ikke ændret.';
+
+  @override
+  String get api_key_storage_error =>
+      'API-nøglen kunne ikke gemmes sikkert. Prøv igen.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'Oversættelsesmotoren genkendte ikke den hentede pakke “$pack”. Hent den igen, eller send feedback.';
+  }
 }

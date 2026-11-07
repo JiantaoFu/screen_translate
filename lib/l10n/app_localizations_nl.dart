@@ -548,4 +548,17 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get screen_capture_permission_required_content =>
       'Om te vertalen wat u ziet, moet de app uw scherm lezen. Android vraagt dit zo meteen en waarschuwt voor alles wat op het scherm staat — maar deze app leest alleen tekst, en dat gebeurt op uw apparaat. Er wordt niets geüpload, opgenomen of bewaard, en u kunt altijd stoppen.';
+
+  @override
+  String get api_key_validation_unavailable =>
+      'De API-sleutel kon niet worden gecontroleerd. Controleer je verbinding of provideraccount en probeer opnieuw. Je opgeslagen sleutel is niet gewijzigd.';
+
+  @override
+  String get api_key_storage_error =>
+      'De API-sleutel kon niet veilig worden opgeslagen. Probeer opnieuw.';
+
+  @override
+  String download_model_not_recognized(Object pack) {
+    return 'De vertaalengine herkende het gedownloade pakket “$pack” niet. Download het opnieuw of stuur feedback.';
+  }
 }

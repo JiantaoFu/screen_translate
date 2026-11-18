@@ -3,6 +3,7 @@
 Usage:
   python tools/store_assets/upload.py            # dry run: upload into an edit, validate, discard
   python tools/store_assets/upload.py --commit   # commit (store listing changes go to review)
+  python tools/store_assets/upload.py vi id      # only these listings; all others untouched
 
 For en-US, zh-CN, ja-JP, vi and id it replaces: phone screenshots, 7- and
 10-inch tablet screenshots (the same 1440x2560 set; vi and id have none yet,
@@ -45,10 +46,16 @@ def files_for(locale):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--commit', action='store_true', help='commit the edit instead of discarding it')
+    ap.add_argument('locales', nargs='*', metavar='locale',
+                    help=f'only these listings ({", ".join(LOCALES)}); other languages are then left alone. '
+                         'Use it while a store listing experiment runs on a listing you are not changing.')
     args = ap.parse_args()
+    unknown = sorted(set(args.locales) - set(LOCALES))
+    if unknown:
+        ap.error(f'unknown locale {", ".join(unknown)}; choose from {", ".join(LOCALES)}')
     from googleapiclient.http import MediaFileUpload
 
-    plan = {loc: files_for(loc) for loc in LOCALES}
+    plan = {loc: files_for(loc) for loc in (args.locales or LOCALES)}
     for loc, kinds in plan.items():
         for kind, files in kinds.items():
             if not files and loc in TABLET_OPTIONAL and kind in ('sevenInchScreenshots', 'tenInchScreenshots'):
@@ -72,7 +79,7 @@ def main():
                                           media_body=MediaFileUpload(f, mimetype='image/png')).execute()
                 print(f'{loc:6} {kind:22} ' + (f'{len(files)} uploaded' if files else 'removed (falls back to en-US)'))
         for lang in languages:
-            if lang in plan:
+            if lang in plan or args.locales:
                 continue
             for kind in SCREENSHOT_TYPES:
                 edits.images().deleteall(packageName=pkg, editId=edit, language=lang, imageType=kind).execute()

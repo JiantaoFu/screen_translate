@@ -32,6 +32,16 @@ typedef WaitingForNetworkCallback = void Function(bool waiting);
 /// paused it to wait for the network.
 typedef QuickDownloadReading = ({double? progress, bool waiting});
 
+/// The backup archive unpacked, but ML Kit cannot use the resulting model.
+class QuickModelVerificationException implements Exception {
+  final String languageCode;
+  const QuickModelVerificationException(this.languageCode);
+
+  @override
+  String toString() => 'ML Kit did not recognize the downloaded model for '
+      '"$languageCode". Retry the download or send feedback.';
+}
+
 // ─── ModelDownloadService ─────────────────────────────────────────────────────
 
 class ModelDownloadService {
@@ -354,7 +364,14 @@ class ModelDownloadService {
           onProgress: onFallbackProgress,
           isAlreadyInstalled: () => _isDownloadedSafe(langCode),
         );
-        debugPrint('ML Kit model for "$langCode" downloaded successfully from custom server.');
+        // A completed unzip is not proof that ML Kit recognizes this archive's
+        // layout/version. Do not emit ready/100% until the SDK confirms it.
+        if (!await _isDownloadedSafe(langCode)) {
+          throw QuickModelVerificationException(langCode);
+        }
+        debugPrint('ML Kit model for "$langCode" verified after backup installation.');
+      } on QuickModelVerificationException {
+        rethrow;
       } catch (fallbackError) {
         debugPrint('Fallback download also failed. Reason: $fallbackError');
         throw Exception(

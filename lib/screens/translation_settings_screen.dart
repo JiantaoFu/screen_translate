@@ -392,6 +392,7 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
         final action = await showDownloadFailedDialog(
           context,
           packLabel: localizations.languageName(code),
+          modelNotRecognized: e is QuickModelVerificationException,
         );
         if (!mounted) return;
         if (action == DownloadFailedAction.retry) {
@@ -446,21 +447,31 @@ class _TranslationSettingsScreenState extends State<TranslationSettingsScreen>
     }
     setState(() => _isSavingApiKey = true);
     final svc = LLMTranslationService();
-    await svc.saveApiKey(key);
-    final valid = await svc.hasValidApiKey();
-    if (!mounted) return;
-    setState(() => _isSavingApiKey = false);
-    if (valid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations.cloud_ai_connected), backgroundColor: Colors.green),
-      );
-      Provider.of<TranslationProvider>(context, listen: false).setTranslationMode(TranslationMode.llm);
-    } else {
-      await svc.clearApiKey();
+    try {
+      final result = await svc.validateAndSaveApiKey(key);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations.api_key_save_error), backgroundColor: Colors.red),
-      );
+      if (result == ApiKeyValidationResult.valid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localizations.cloud_ai_connected), backgroundColor: Colors.green),
+        );
+        Provider.of<TranslationProvider>(context, listen: false).setTranslationMode(TranslationMode.llm);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(result == ApiKeyValidationResult.invalid
+              ? localizations.api_key_save_error
+              : localizations.api_key_validation_unavailable),
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(localizations.api_key_storage_error),
+        backgroundColor: Colors.red,
+      ));
+    } finally {
+      svc.dispose();
+      if (mounted) setState(() => _isSavingApiKey = false);
     }
   }
 

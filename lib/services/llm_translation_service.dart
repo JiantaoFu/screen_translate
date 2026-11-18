@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'dart:collection';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Top-level class for translation tasks
@@ -67,10 +66,15 @@ class LRUCache<K, V> {
   }
 }
 
+/// A provider/network failure is not evidence that a credential is invalid.
+enum ApiKeyValidationResult { valid, invalid, unavailable }
+
 class LLMTranslationService {
   final String _baseUrl;
   static const _apiKeyStorageKey = 'llm_translation_api_key';
-  final _secureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage _secureStorage;
+  final http.Client _validationClient;
+  final Duration _validationTimeout;
   late final LRUCache<String, String> _translationCache;
 
   // Concurrency control for LLM translations
@@ -80,9 +84,14 @@ class LLMTranslationService {
   Timer? _queueProcessingTimer;
 
   LLMTranslationService({
-    String baseUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
-  }) : 
-    _baseUrl = baseUrl {
+    String baseUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
+    http.Client? validationClient,
+    Duration validationTimeout = const Duration(seconds: 15),
+  }) : _baseUrl = baseUrl,
+       _secureStorage = secureStorage,
+       _validationClient = validationClient ?? http.Client(),
+       _validationTimeout = validationTimeout {
     _translationCache = LRUCache<String, String>(100); // 100 item cache
     // Start periodic queue processing
     _startQueueProcessingTimer();
@@ -129,47 +138,53 @@ class LLMTranslationService {
     return storedKey != null && storedKey.isNotEmpty && storedKey.length > 10;
   }
 
+  /// Validate the candidate without touching secure storage. Only an explicit
+  /// authentication rejection (401) proves it invalid; permissions, quota,
+  /// rate limits, timeouts and provider errors must remain retryable.
+  Future<ApiKeyValidationResult> validateApiKey(String candidate) async {
+    final key = candidate.trim();
+    if (key.isEmpty) return ApiKeyValidationResult.invalid;
+    try {
+      final response = await _validationClient.post(
+        Uri.parse(_baseUrl),
+        headers: {
+          'Authorization': 'Bearer $key',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'model': 'GLM-4-Flash',
+          'messages': [
+            {'role': 'user', 'content': 'Hello, can you verify my API key?'}
+          ],
+          'max_tokens': 10,
+        }),
+      ).timeout(_validationTimeout);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ApiKeyValidationResult.valid;
+      }
+      if (response.statusCode == 401) return ApiKeyValidationResult.invalid;
+      return ApiKeyValidationResult.unavailable;
+    } catch (_) {
+      // Never log a client exception or response body: either may contain a key.
+      return ApiKeyValidationResult.unavailable;
+    }
+  }
+
+  /// Do not overwrite (or delete) an existing key until the new one works.
+  /// Even an invalid replacement says nothing about the previously saved key.
+  Future<ApiKeyValidationResult> validateAndSaveApiKey(String candidate) async {
+    final key = candidate.trim();
+    final result = await validateApiKey(key);
+    if (result == ApiKeyValidationResult.valid) await saveApiKey(key);
+    return result;
+  }
+
   Future<bool> hasValidApiKey() async {
     try {
-      // Retrieve the stored API key
-      final storedApiKey = await _secureStorage.read(key: _apiKeyStorageKey);
-      
-      // Check if the API key exists and is not empty
-      if (storedApiKey == null || storedApiKey.isEmpty) {
-        return false;
-      }
-      
-      try {
-        // Attempt API validation using chat completions endpoint
-        final response = await http.post(
-          Uri.parse(_baseUrl),
-          headers: {
-            'Authorization': 'Bearer $storedApiKey',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'model': 'GLM-4-Flash',
-            'messages': [
-              {
-                'role': 'user',
-                'content': 'Hello, can you verify my API key?'
-              }
-            ],
-            'max_tokens': 10, // Limit response to minimize unnecessary tokens
-          }),
-        );
-        
-        // Check if the response indicates a valid key
-        // Successful responses are typically 200 or 201
-        return response.statusCode == 200 || response.statusCode == 201;
-      } catch (e) {
-        // If there's an error during validation, log it and return false
-        print('API key validation error: $e');
-        return false;
-      }
-    } catch (e) {
-      // Log the error
-      print('Error checking API key: $e');
+      final key = await _secureStorage.read(key: _apiKeyStorageKey);
+      if (key == null || key.isEmpty) return false;
+      return await validateApiKey(key) == ApiKeyValidationResult.valid;
+    } catch (_) {
       return false;
     }
   }
@@ -496,6 +511,7 @@ Maintain the exact same array length. DO NOT output any markdown blocks or expla
 
   // Cleanup method to dispose of resources
   void dispose() {
+    _validationClient.close();
     _queueProcessingTimer?.cancel();
     cancelAllTranslations();
   }

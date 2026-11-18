@@ -56,6 +56,7 @@ bool get isDownloadFailedDialogShowing => _downloadFailedDialogShowing;
 Future<DownloadFailedAction> showDownloadFailedDialog(
   BuildContext context, {
   required String packLabel,
+  bool modelNotRecognized = false,
 }) async {
   if (_downloadFailedDialogShowing) return DownloadFailedAction.dismiss;
   _downloadFailedDialogShowing = true;
@@ -66,7 +67,9 @@ Future<DownloadFailedAction> showDownloadFailedDialog(
       barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         title: Text(localizations.download_failed_title),
-        content: Text(localizations.download_failed_body(packLabel)),
+        content: Text(modelNotRecognized
+            ? localizations.download_model_not_recognized(packLabel)
+            : localizations.download_failed_body(packLabel)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, DownloadFailedAction.dismiss),

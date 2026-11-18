@@ -12,6 +12,16 @@ ProductDetails proProduct({String price = r'$2.99'}) => ProductDetails(
       currencyCode: 'USD',
     );
 
+/// A Pro product with any id, e.g. a subscription plan.
+ProductDetails planProduct(String id, String price) => ProductDetails(
+      id: id,
+      title: id,
+      description: 'Unlimited translations',
+      price: price,
+      rawPrice: 1,
+      currencyCode: 'USD',
+    );
+
 PurchaseDetails purchase(PurchaseStatus status,
     {String productId = ProEntitlement.productId, bool pendingComplete = true}) {
   final p = PurchaseDetails(

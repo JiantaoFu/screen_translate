@@ -533,6 +533,45 @@ class AppLocalizationsTh extends AppLocalizations {
   String get paywall_reset_hint => 'การแปลฟรีจะรีเซ็ตตอนเที่ยงคืน';
 
   @override
+  String get paywall_plan_yearly => 'รายปี';
+
+  @override
+  String get paywall_plan_monthly => 'รายเดือน';
+
+  @override
+  String get paywall_plan_lifetime => 'ตลอดชีพ';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / ปี';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / เดือน';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price จ่ายครั้งเดียว';
+  }
+
+  @override
+  String get paywall_continue => 'ดำเนินการต่อ';
+
+  @override
+  String get paywall_subscription_terms =>
+      'การสมัครใช้บริการจะต่ออายุโดยอัตโนมัติจนกว่าจะยกเลิก ยกเลิกได้ทุกเมื่อใน Google Play';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite แปลฟรีได้วันละ $limit ครั้ง อัปเกรดเป็น Pro เพื่อแปลได้ไม่จำกัด';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'ยกเลิกได้ทุกเมื่อ';
+
+  @override
   String lite_remaining_today(int count) {
     return 'การแปลฟรีที่เหลือวันนี้: $count';
   }

@@ -31,6 +31,25 @@ class FirebaseRemoteConfigService {
     }
   }
 
+  /// Lite flavor: which Pro products the paywall offers, in display order,
+  /// comma separated (`pro_yearly,pro_monthly,pro_unlock`). The first one is
+  /// preselected. Parsed by ProEntitlement.parseOfferedIds.
+  static const litePaywallProductsKey = 'lite_paywall_products';
+  static const litePaywallProductsDefault = 'pro_unlock';
+
+  /// [litePaywallProductsKey], or the default when Firebase isn't available
+  /// or the value is empty.
+  String getLitePaywallProducts() {
+    try {
+      final v = _remoteConfig.getValue(litePaywallProductsKey);
+      if (v.source == ValueSource.valueStatic) return litePaywallProductsDefault;
+      final s = v.asString().trim();
+      return s.isEmpty ? litePaywallProductsDefault : s;
+    } catch (_) {
+      return litePaywallProductsDefault;
+    }
+  }
+
   /// Initialize Remote Config with default values
   Future<void> init() async {
     try {
@@ -42,6 +61,7 @@ class FirebaseRemoteConfigService {
         'translation_timeout_seconds': 30,
         'max_concurrent_translations': 3,
         liteDailyFreeTranslationsKey: liteDailyFreeTranslationsDefault,
+        litePaywallProductsKey: litePaywallProductsDefault,
       });
 
       // Set cache duration - how long to use cached values before fetching fresh

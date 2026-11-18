@@ -538,6 +538,45 @@ class AppLocalizationsLt extends AppLocalizations {
   String get paywall_reset_hint => 'Nemokami vertimai atnaujinami vidurnaktį.';
 
   @override
+  String get paywall_plan_yearly => 'Metinis';
+
+  @override
+  String get paywall_plan_monthly => 'Mėnesinis';
+
+  @override
+  String get paywall_plan_lifetime => 'Visam laikui';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / metus';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / mėn.';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price vieną kartą';
+  }
+
+  @override
+  String get paywall_continue => 'Tęsti';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Prenumeratos automatiškai atnaujinamos, kol jų neatšauksite. Atšaukti galite bet kada „Google Play“.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return '„Screen Translator Lite“ suteikia $limit nemokamų vertimų per dieną. Įsigykite „Pro“ ir verskite neribotai.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Atšaukite bet kada';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Šiandien liko nemokamų vertimų: $count';
   }

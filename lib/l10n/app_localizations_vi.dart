@@ -538,6 +538,45 @@ class AppLocalizationsVi extends AppLocalizations {
       'Lượt dịch miễn phí được đặt lại lúc nửa đêm.';
 
   @override
+  String get paywall_plan_yearly => 'Hằng năm';
+
+  @override
+  String get paywall_plan_monthly => 'Hằng tháng';
+
+  @override
+  String get paywall_plan_lifetime => 'Trọn đời';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / năm';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / tháng';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price một lần';
+  }
+
+  @override
+  String get paywall_continue => 'Tiếp tục';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Gói đăng ký tự động gia hạn cho đến khi bạn hủy. Bạn có thể hủy bất cứ lúc nào trong Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite có $limit lượt dịch miễn phí mỗi ngày. Nâng cấp Pro để dịch không giới hạn.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Hủy bất cứ lúc nào';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Lượt dịch miễn phí còn lại hôm nay: $count';
   }

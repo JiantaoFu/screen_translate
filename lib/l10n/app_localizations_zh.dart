@@ -520,6 +520,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get paywall_reset_hint => '免费次数将在午夜重置。';
 
   @override
+  String get paywall_plan_yearly => '按年';
+
+  @override
+  String get paywall_plan_monthly => '按月';
+
+  @override
+  String get paywall_plan_lifetime => '永久';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price/年';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price/月';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price，一次性';
+  }
+
+  @override
+  String get paywall_continue => '继续';
+
+  @override
+  String get paywall_subscription_terms =>
+      '订阅会自动续订，直到取消为止。可随时在 Google Play 中取消。';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite 每天提供 $limit 次免费翻译。升级 Pro 即可无限次翻译。';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => '可随时取消';
+
+  @override
   String lite_remaining_today(int count) {
     return '今日剩余免费翻译：$count 次';
   }

@@ -20,12 +20,14 @@ typedef LiteEventLogger = Future<void> Function(String name, Map<String, Object>
 ///   last free translation sets [paywallPending], and the UI shows the
 ///   paywall right after (on return to the app for live sessions).
 /// - Analytics: translation_success, free_limit_hit, paywall_shown,
-///   pro_purchased (with remaining_free / daily_limit where they apply),
-///   pro_revoked (Play no longer reports pro_unlock, e.g. refunded).
+///   purchase_started, pro_purchased (with remaining_free / daily_limit
+///   where they apply), pro_revoked (Play no longer reports a Pro product:
+///   refunded, or a subscription ended). `product_id` says which plan.
 class LiteGate extends ChangeNotifier {
   static const evTranslationSuccess = 'translation_success';
   static const evFreeLimitHit = 'free_limit_hit';
   static const evPaywallShown = 'paywall_shown';
+  static const evPurchaseStarted = 'purchase_started';
   static const evProPurchased = 'pro_purchased';
   static const evProRevoked = 'pro_revoked';
 
@@ -55,8 +57,10 @@ class LiteGate extends ChangeNotifier {
     late final LiteGate gate;
     final entitlement = ProEntitlement(
       prefs,
-      onPurchased: (p) => gate._onPurchased(),
-      onRevoked: () => gate._onRevoked(),
+      onPurchased: (p) => gate._onPurchased(p.productID),
+      onRevoked: (id) => gate._onRevoked(id),
+      offeredIds: () => ProEntitlement.parseOfferedIds(
+          FirebaseRemoteConfigService().getLitePaywallProducts()),
     );
     gate = LiteGate(
       enabled: true,
@@ -140,29 +144,47 @@ class LiteGate extends ChangeNotifier {
   }
 
   /// [trigger]: limit_reached (just used the last free one), limit_hit
-  /// (tried to start with none left), or home (user opened it).
+  /// (tried to start with none left), or home (user opened it). `offers` is
+  /// what the paywall listed, in order, e.g. `pro_yearly,pro_unlock`.
   void paywallShown(String trigger) {
-    _log(evPaywallShown, {..._quotaParams, 'trigger': trigger});
-  }
-
-  void _onPurchased() {
-    _paywallPending = false;
-    _log(evProPurchased, {
+    _log(evPaywallShown, {
       ..._quotaParams,
-      'product_id': ProEntitlement.productId,
-      'price': entitlement.price ?? '',
+      'trigger': trigger,
+      'offers': entitlement.offers.map((p) => p.id).join(','),
     });
   }
 
-  void _onRevoked() {
-    _log(evProRevoked, {'product_id': ProEntitlement.productId});
+  /// Opens Play's purchase sheet for [productId] and logs purchase_started,
+  /// the step between paywall_shown and pro_purchased.
+  Future<bool> startPurchase(String productId) {
+    _log(evPurchaseStarted, {
+      ..._quotaParams,
+      'product_id': productId,
+      'price': entitlement.productFor(productId)?.price ?? '',
+    });
+    return entitlement.buy(productId);
+  }
+
+  void _onPurchased(String productId) {
+    _paywallPending = false;
+    _log(evProPurchased, {
+      ..._quotaParams,
+      'product_id': productId,
+      'price': entitlement.productFor(productId)?.price ?? '',
+    });
+  }
+
+  void _onRevoked(String productId) {
+    _log(evProRevoked, {'product_id': productId});
   }
 
   @visibleForTesting
-  void debugOnPurchased() => _onPurchased();
+  void debugOnPurchased([String productId = ProEntitlement.productId]) =>
+      _onPurchased(productId);
 
   @visibleForTesting
-  void debugOnRevoked() => _onRevoked();
+  void debugOnRevoked([String productId = ProEntitlement.productId]) =>
+      _onRevoked(productId);
 
   @override
   void dispose() {

@@ -536,6 +536,45 @@ class AppLocalizationsEt extends AppLocalizations {
   String get paywall_reset_hint => 'Tasuta tõlked lähtestatakse keskööl.';
 
   @override
+  String get paywall_plan_yearly => 'Aastane';
+
+  @override
+  String get paywall_plan_monthly => 'Kuine';
+
+  @override
+  String get paywall_plan_lifetime => 'Eluaegne';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / aasta';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / kuu';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price ühekordselt';
+  }
+
+  @override
+  String get paywall_continue => 'Jätka';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Tellimused uuenevad automaatselt kuni tühistamiseni. Tühistada saab igal ajal Google Plays.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite sisaldab $limit tasuta tõlget päevas. Hangi Pro piiramatuks tõlkimiseks.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Tühista igal ajal';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Täna jäänud tasuta tõlkeid: $count';
   }

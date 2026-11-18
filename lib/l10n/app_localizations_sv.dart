@@ -540,6 +540,45 @@ class AppLocalizationsSv extends AppLocalizations {
       'Gratis översättningar återställs vid midnatt.';
 
   @override
+  String get paywall_plan_yearly => 'Årsvis';
+
+  @override
+  String get paywall_plan_monthly => 'Månadsvis';
+
+  @override
+  String get paywall_plan_lifetime => 'Livstid';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / år';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / månad';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price en gång';
+  }
+
+  @override
+  String get paywall_continue => 'Fortsätt';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite innehåller $limit gratis översättningar per dag. Skaffa Pro för obegränsade översättningar.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Säg upp när som helst';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Gratis översättningar kvar i dag: $count';
   }

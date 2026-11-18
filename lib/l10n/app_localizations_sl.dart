@@ -540,6 +540,45 @@ class AppLocalizationsSl extends AppLocalizations {
       'Brezplačni prevodi se ponastavijo ob polnoči.';
 
   @override
+  String get paywall_plan_yearly => 'Letno';
+
+  @override
+  String get paywall_plan_monthly => 'Mesečno';
+
+  @override
+  String get paywall_plan_lifetime => 'Doživljenjsko';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / leto';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / mesec';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price enkratno';
+  }
+
+  @override
+  String get paywall_continue => 'Nadaljuj';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Naročnine se samodejno podaljšujejo, dokler jih ne prekličete. Prekličete lahko kadar koli v Googlu Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite vključuje $limit brezplačnih prevodov na dan. Izberite Pro za neomejeno prevajanje.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Prekličite kadar koli';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Preostali brezplačni prevodi danes: $count';
   }

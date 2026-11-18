@@ -540,6 +540,45 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paywall_reset_hint => 'Бесплатные переводы обновляются в полночь.';
 
   @override
+  String get paywall_plan_yearly => 'На год';
+
+  @override
+  String get paywall_plan_monthly => 'На месяц';
+
+  @override
+  String get paywall_plan_lifetime => 'Навсегда';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price в год';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price в месяц';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price единоразово';
+  }
+
+  @override
+  String get paywall_continue => 'Продолжить';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Подписка продлевается автоматически, пока вы её не отмените. Отменить можно в любой момент в Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'В Screen Translator Lite доступно $limit бесплатных переводов в день. Оформите Pro, чтобы переводить без ограничений.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Отмена в любой момент';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Осталось бесплатных переводов сегодня: $count';
   }

@@ -539,6 +539,45 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ilmaiset käännökset nollautuvat keskiyöllä.';
 
   @override
+  String get paywall_plan_yearly => 'Vuosi';
+
+  @override
+  String get paywall_plan_monthly => 'Kuukausi';
+
+  @override
+  String get paywall_plan_lifetime => 'Elinikäinen';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / vuosi';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / kuukausi';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price kertamaksu';
+  }
+
+  @override
+  String get paywall_continue => 'Jatka';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Tilaukset uusiutuvat automaattisesti, kunnes ne perutaan. Voit perua milloin tahansa Google Playssa.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite sisältää $limit ilmaista käännöstä päivässä. Hanki Pro, niin voit kääntää rajattomasti.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Peru milloin tahansa';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Ilmaisia käännöksiä jäljellä tänään: $count';
   }

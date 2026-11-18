@@ -100,25 +100,56 @@ enum ProSyncOutcome {
   revoked,
 }
 
-/// Whether the lite user owns the one-time `pro_unlock` product.
+/// Whether the lite user owns Pro: the one-time `pro_unlock` product or an
+/// active subscription ([subscriptionIds]).
 ///
-/// - Purchased/restored `pro_unlock` grants Pro and is remembered locally,
-///   so Pro works offline and right at launch.
+/// - Any purchased/restored Pro product grants Pro and is remembered
+///   locally, so Pro works offline and right at launch.
+/// - Which products the paywall offers, and in what order, comes from
+///   [offers] (Remote Config `lite_paywall_products`). A product Play
+///   doesn't return is left out, so listing a subscription that hasn't been
+///   created in Play Console yet changes nothing. Owning is checked against
+///   every Pro product whatever is on offer, so turning a plan off never
+///   takes Pro away from someone who bought it.
 /// - Every purchase update that needs it is completed, which acknowledges it
 ///   on Google Play (unacknowledged purchases are refunded after 3 days).
 /// - [init] restores purchases, so a reinstall or a new phone gets Pro back
 ///   without a tap; the paywall also has a Restore button.
 /// - [init] also asks Play which purchases are owned ([syncWithStore]) and
-///   revokes local Pro once Play has answered successfully without
-///   `pro_unlock` [emptyQueriesBeforeRevoke] times in a row (refunded +
-///   revoked in Play Console). Offline, billing unavailable, any error, or a
+///   revokes local Pro once Play has answered successfully without any
+///   Pro product [emptyQueriesBeforeRevoke] times in a row (refunded +
+///   revoked in Play Console, or a subscription that ran out). Offline, billing unavailable, any error, or a
 ///   single empty answer keeps the local state, so a paying user is never
 ///   locked out by a flaky connection or a signed-out Play Store.
 /// - The price shown is Play's localized [ProductDetails.price], never a
 ///   hard-coded string.
 class ProEntitlement extends ChangeNotifier {
+  /// The one-time (lifetime) unlock.
   static const productId = 'pro_unlock';
+  static const monthlyId = 'pro_monthly';
+  static const yearlyId = 'pro_yearly';
+
+  /// Auto-renewing plans. In Play Console each is a subscription with one
+  /// base plan and no free-trial offer, so [ProductDetails.price] is the
+  /// recurring price.
+  static const subscriptionIds = {monthlyId, yearlyId};
+  static const allProductIds = {productId, ...subscriptionIds};
+
+  static bool isSubscription(String id) => subscriptionIds.contains(id);
+
+  /// [raw] ("pro_yearly, pro_monthly,pro_unlock") as an ordered list of known
+  /// product ids without repeats; `[pro_unlock]` when nothing usable is left.
+  static List<String> parseOfferedIds(String raw) {
+    final ids = <String>[];
+    for (final part in raw.split(',')) {
+      final id = part.trim();
+      if (allProductIds.contains(id) && !ids.contains(id)) ids.add(id);
+    }
+    return ids.isEmpty ? const [productId] : ids;
+  }
+
   static const prefsKey = 'lite_pro_unlocked';
+  static const ownedProductKey = 'lite_pro_product';
   static const emptyQueriesKey = 'lite_pro_empty_queries';
 
   /// Successful owned-purchase queries in a row that must come back without
@@ -140,8 +171,13 @@ class ProEntitlement extends ChangeNotifier {
   /// Called once for a new purchase (not for restores): analytics.
   final void Function(PurchaseDetails purchase)? onPurchased;
 
-  /// Called when Play no longer reports `pro_unlock` and Pro is revoked.
-  final void Function()? onRevoked;
+  /// Called when Play no longer reports a Pro product and Pro is revoked,
+  /// with the product that had granted it.
+  final void Function(String productId)? onRevoked;
+
+  /// The products to offer, in paywall order; read on every use so a Remote
+  /// Config change applies without a restart.
+  final List<String> Function() _offeredIds;
 
   StreamSubscription<List<PurchaseDetails>>? _sub;
   bool _isPro;
@@ -149,7 +185,7 @@ class ProEntitlement extends ChangeNotifier {
   bool _purchasePending = false;
   bool _initialized = false;
   int _grants = 0;
-  ProductDetails? _product;
+  final Map<String, ProductDetails> _products = {};
   String? _lastError;
 
   ProEntitlement(
@@ -158,7 +194,9 @@ class ProEntitlement extends ChangeNotifier {
     OwnedPurchasesSource? ownedPurchases,
     this.onPurchased,
     this.onRevoked,
+    List<String> Function()? offeredIds,
   })  : _store = store ?? InAppPurchaseGateway(),
+        _offeredIds = offeredIds ?? (() => const [productId]),
         _owned = ownedPurchases ?? PlayOwnedPurchasesSource(),
         _isPro = _prefs.getBool(prefsKey) ?? false;
 
@@ -166,10 +204,31 @@ class ProEntitlement extends ChangeNotifier {
   bool get storeAvailable => _storeAvailable;
   bool get purchasePending => _purchasePending;
   bool get initialized => _initialized;
-  ProductDetails? get product => _product;
 
-  /// Play's localized price, e.g. "$2.99" or "¥22.00"; null until loaded.
-  String? get price => _product?.price;
+  /// The one-time unlock's details; null until loaded.
+  ProductDetails? get product => _products[productId];
+
+  /// The one-time unlock's localized price from Play, e.g. "$2.99" or
+  /// "¥22.00"; null until loaded.
+  String? get price => product?.price;
+
+  ProductDetails? productFor(String id) => _products[id];
+
+  /// The products to show on the paywall, in order: the configured ones that
+  /// Play returned. Falls back to the one-time unlock when none of them
+  /// loaded, and is empty only when nothing loaded at all.
+  List<ProductDetails> get offers {
+    final configured = [
+      for (final id in _offeredIds())
+        if (_products[id] != null) _products[id]!,
+    ];
+    if (configured.isNotEmpty) return configured;
+    final fallback = product;
+    return fallback == null ? const [] : [fallback];
+  }
+
+  /// The product that granted Pro on this install, when known.
+  String? get ownedProductId => _prefs.getString(ownedProductKey);
   String? get lastError => _lastError;
 
   Future<void> init() async {
@@ -198,7 +257,7 @@ class ProEntitlement extends ChangeNotifier {
 
   /// Reconciles local Pro with what Play says is owned (run at app start).
   ///
-  /// Grants (and acknowledges) when Play has `pro_unlock` but local doesn't.
+  /// Grants (and acknowledges) when Play has a Pro product but local doesn't.
   /// Revokes only after [emptyQueriesBeforeRevoke] successful queries in a
   /// row came back without it; otherwise keeps the current state.
   Future<ProSyncOutcome> syncWithStore() async {
@@ -211,9 +270,11 @@ class ProEntitlement extends ChangeNotifier {
     }
     if (res.status != OwnedQueryStatus.ok) return ProSyncOutcome.kept;
 
-    final owned = res.purchases.where((p) =>
-        p.productID == productId &&
-        (p.status == PurchaseStatus.purchased || p.status == PurchaseStatus.restored));
+    final owned = res.purchases
+        .where((p) =>
+            allProductIds.contains(p.productID) &&
+            (p.status == PurchaseStatus.purchased || p.status == PurchaseStatus.restored))
+        .toList();
     if (owned.isNotEmpty) {
       if (_isPro) {
         if ((_prefs.getInt(emptyQueriesKey) ?? 0) != 0) {
@@ -221,7 +282,7 @@ class ProEntitlement extends ChangeNotifier {
         }
         return ProSyncOutcome.unchanged;
       }
-      await _grant();
+      await _grant(owned.first.productID);
       for (final p in owned) {
         if (p.pendingCompletePurchase) await _complete(p); // acknowledge
       }
@@ -233,19 +294,25 @@ class ProEntitlement extends ChangeNotifier {
     final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
     await _prefs.setInt(emptyQueriesKey, empties);
     if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
+    final lost = ownedProductId ?? productId;
     _isPro = false;
     await _prefs.setBool(prefsKey, false);
     await _prefs.setInt(emptyQueriesKey, 0);
+    await _prefs.remove(ownedProductKey);
     notifyListeners();
-    onRevoked?.call();
+    onRevoked?.call(lost);
     return ProSyncOutcome.revoked;
   }
 
   Future<void> loadProduct() async {
     try {
-      final res = await _store.queryProductDetails({productId});
-      final match = res.productDetails.where((p) => p.id == productId);
-      _product = match.isEmpty ? null : match.first;
+      final res = await _store.queryProductDetails(allProductIds);
+      _products.clear();
+      for (final p in res.productDetails) {
+        // Play returns one entry per offer of a subscription; the first is
+        // the base plan (see [subscriptionIds]).
+        if (allProductIds.contains(p.id)) _products.putIfAbsent(p.id, () => p);
+      }
       if (res.error != null) _lastError = res.error!.message;
     } catch (e) {
       _lastError = e.toString();
@@ -253,11 +320,12 @@ class ProEntitlement extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Starts the Play purchase sheet. The result arrives on the purchase stream.
-  Future<bool> buy() async {
+  /// Starts the Play purchase sheet for [id] (the one-time unlock unless
+  /// told otherwise). The result arrives on the purchase stream.
+  Future<bool> buy([String id = productId]) async {
     if (_isPro) return true;
-    if (_product == null) await loadProduct();
-    final product = _product;
+    if (_products[id] == null) await loadProduct();
+    final product = _products[id];
     if (product == null) return false;
     _lastError = null;
     _purchasePending = true;
@@ -290,7 +358,7 @@ class ProEntitlement extends ChangeNotifier {
   @visibleForTesting
   Future<void> handlePurchases(List<PurchaseDetails> purchases) async {
     for (final p in purchases) {
-      if (p.productID != productId) {
+      if (!allProductIds.contains(p.productID)) {
         if (p.pendingCompletePurchase) await _complete(p);
         continue;
       }
@@ -301,7 +369,7 @@ class ProEntitlement extends ChangeNotifier {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
           final wasPro = _isPro;
-          await _grant();
+          await _grant(p.productID);
           _purchasePending = false;
           if (p.status == PurchaseStatus.purchased && !wasPro) onPurchased?.call(p);
           break;
@@ -326,10 +394,11 @@ class ProEntitlement extends ChangeNotifier {
     }
   }
 
-  Future<void> _grant() async {
+  Future<void> _grant(String id) async {
     _grants++;
     _isPro = true;
     await _prefs.setBool(prefsKey, true);
+    await _prefs.setString(ownedProductKey, id);
     // Play has the purchase, so any earlier empty answers were transient.
     await _prefs.setInt(emptyQueriesKey, 0);
   }

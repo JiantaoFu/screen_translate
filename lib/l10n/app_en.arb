@@ -239,6 +239,48 @@
   "paywall_store_unavailable": "Google Play isn't available right now. Please try again later.",
   "paywall_pro_unlocked": "Pro unlocked: unlimited translations!",
   "paywall_reset_hint": "Free translations reset at midnight.",
+  "paywall_plan_yearly": "Yearly",
+  "paywall_plan_monthly": "Monthly",
+  "paywall_plan_lifetime": "Lifetime",
+  "paywall_price_per_year": "{price} / year",
+  "@paywall_price_per_year": {
+    "description": "Lite paywall plan price; price is Google Play's localized yearly price",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "paywall_price_per_month": "{price} / month",
+  "@paywall_price_per_month": {
+    "description": "Lite paywall plan price; price is Google Play's localized monthly price",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "paywall_price_once": "{price} once",
+  "@paywall_price_once": {
+    "description": "Lite paywall plan price for the one-time unlock; price is Google Play's localized price",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "paywall_continue": "Continue",
+  "paywall_subscription_terms": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play.",
+  "paywall_body_plans": "Screen Translator Lite includes {limit} free translations a day. Go Pro for unlimited translations.",
+  "@paywall_body_plans": {
+    "description": "Lite paywall body when several plans are offered; limit = free translations per day",
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "paywall_benefit_cancel_anytime": "Cancel anytime",
   "lite_remaining_today": "Free translations left today: {count}",
   "@lite_remaining_today": {
     "description": "Lite home screen: free translations left today",

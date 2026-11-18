@@ -539,6 +539,45 @@ class AppLocalizationsHr extends AppLocalizations {
       'Besplatni prijevodi poništavaju se u ponoć.';
 
   @override
+  String get paywall_plan_yearly => 'Godišnje';
+
+  @override
+  String get paywall_plan_monthly => 'Mjesečno';
+
+  @override
+  String get paywall_plan_lifetime => 'Doživotno';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / godina';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / mjesec';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price jednokratno';
+  }
+
+  @override
+  String get paywall_continue => 'Nastavi';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Pretplate se automatski obnavljaju dok se ne otkažu. Otkažite bilo kada na Google Playu.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite uključuje $limit besplatnih prijevoda dnevno. Nabavite Pro za neograničene prijevode.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Otkažite bilo kada';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Preostali besplatni prijevodi danas: $count';
   }

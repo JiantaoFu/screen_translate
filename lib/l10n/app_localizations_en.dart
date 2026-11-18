@@ -534,6 +534,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywall_reset_hint => 'Free translations reset at midnight.';
 
   @override
+  String get paywall_plan_yearly => 'Yearly';
+
+  @override
+  String get paywall_plan_monthly => 'Monthly';
+
+  @override
+  String get paywall_plan_lifetime => 'Lifetime';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / year';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / month';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price once';
+  }
+
+  @override
+  String get paywall_continue => 'Continue';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Subscriptions renew automatically until cancelled. Cancel anytime in Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite includes $limit free translations a day. Go Pro for unlimited translations.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Cancel anytime';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Free translations left today: $count';
   }

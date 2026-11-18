@@ -528,6 +528,45 @@ class AppLocalizationsJa extends AppLocalizations {
   String get paywall_reset_hint => '無料回数は午前0時にリセットされます。';
 
   @override
+  String get paywall_plan_yearly => '年額';
+
+  @override
+  String get paywall_plan_monthly => '月額';
+
+  @override
+  String get paywall_plan_lifetime => '買い切り';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price/年';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price/月';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price（1回のみ）';
+  }
+
+  @override
+  String get paywall_continue => '続ける';
+
+  @override
+  String get paywall_subscription_terms =>
+      '定期購入は解約するまで自動的に更新されます。Google Play でいつでも解約できます。';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite では1日$limit回まで無料で翻訳できます。Pro にすると無制限に翻訳できます。';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'いつでも解約可能';
+
+  @override
   String lite_remaining_today(int count) {
     return '本日の残り無料翻訳：$count回';
   }

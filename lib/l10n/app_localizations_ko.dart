@@ -528,6 +528,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywall_reset_hint => '무료 번역은 자정에 초기화됩니다.';
 
   @override
+  String get paywall_plan_yearly => '연간';
+
+  @override
+  String get paywall_plan_monthly => '월간';
+
+  @override
+  String get paywall_plan_lifetime => '평생';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price/년';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price/월';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price (1회 결제)';
+  }
+
+  @override
+  String get paywall_continue => '계속';
+
+  @override
+  String get paywall_subscription_terms =>
+      '구독은 해지할 때까지 자동으로 갱신됩니다. Google Play에서 언제든지 해지할 수 있습니다.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite는 하루 $limit회 무료 번역을 제공합니다. Pro로 무제한 번역하세요.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => '언제든지 해지 가능';
+
+  @override
   String lite_remaining_today(int count) {
     return '오늘 남은 무료 번역: $count회';
   }

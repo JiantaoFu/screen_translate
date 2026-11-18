@@ -537,6 +537,45 @@ class AppLocalizationsFa extends AppLocalizations {
   String get paywall_reset_hint => 'ترجمه‌های رایگان نیمه‌شب بازنشانی می‌شوند.';
 
   @override
+  String get paywall_plan_yearly => 'سالانه';
+
+  @override
+  String get paywall_plan_monthly => 'ماهانه';
+
+  @override
+  String get paywall_plan_lifetime => 'مادام‌العمر';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / سال';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / ماه';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price یک‌بار';
+  }
+
+  @override
+  String get paywall_continue => 'ادامه';
+
+  @override
+  String get paywall_subscription_terms =>
+      'اشتراک‌ها تا زمان لغو به‌طور خودکار تمدید می‌شوند. هر زمان بخواهید می‌توانید در Google Play لغو کنید.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite روزانه $limit ترجمهٔ رایگان دارد. برای ترجمهٔ نامحدود Pro را تهیه کنید.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'لغو در هر زمان';
+
+  @override
   String lite_remaining_today(int count) {
     return 'ترجمه‌های رایگان باقی‌مانده امروز: $count';
   }

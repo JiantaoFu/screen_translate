@@ -538,6 +538,45 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gratis vertalingen worden om middernacht gereset.';
 
   @override
+  String get paywall_plan_yearly => 'Jaarlijks';
+
+  @override
+  String get paywall_plan_monthly => 'Maandelijks';
+
+  @override
+  String get paywall_plan_lifetime => 'Levenslang';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / jaar';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / maand';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price eenmalig';
+  }
+
+  @override
+  String get paywall_continue => 'Doorgaan';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Abonnementen worden automatisch verlengd totdat je ze opzegt. Je kunt altijd opzeggen in Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite bevat $limit gratis vertalingen per dag. Kies Pro voor onbeperkt vertalen.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Altijd opzegbaar';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Resterende gratis vertalingen vandaag: $count';
   }

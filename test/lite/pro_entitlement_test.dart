@@ -15,7 +15,7 @@ void main() {
       store: store,
       ownedPurchases: store,
       onPurchased: purchasedCallbacks.add,
-      onRevoked: () => revokedCallbacks++);
+      onRevoked: (_) => revokedCallbacks++);
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});

@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import 'lite_gate.dart';
+import 'pro_entitlement.dart';
 
 /// Lite home screen: today's remaining free translations and an
 /// "Unlock Pro · <price>" button.
 ///
 /// The price is Play's localized [ProEntitlement.price] (ProductDetails of
 /// pro_unlock), never a hardcoded amount; until it is loaded, or when the
-/// store is unavailable, the button reads just "Unlock Pro". Nothing is shown
+/// store is unavailable, the button reads just "Unlock Pro". It also reads
+/// just "Unlock Pro" when the paywall offers a choice of plans, since no one
+/// price is then the price. Nothing is shown
 /// once Pro is owned. Both buttons call [onOpenPaywall] (the existing
 /// paywall, which runs the purchase) with a trigger for analytics.
 class LiteHomeProRow extends StatelessWidget {
@@ -22,7 +25,9 @@ class LiteHomeProRow extends StatelessWidget {
     final gate = this.gate;
     if (gate == null || gate.isPro) return const SizedBox.shrink();
     final l = AppLocalizations.of(context)!;
-    final price = gate.entitlement.price;
+    final offers = gate.entitlement.offers;
+    final onlyOneTimeUnlock = offers.length == 1 && offers.first.id == ProEntitlement.productId;
+    final price = onlyOneTimeUnlock ? gate.entitlement.price : null;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Wrap(

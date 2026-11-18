@@ -539,6 +539,45 @@ class AppLocalizationsId extends AppLocalizations {
       'Terjemahan gratis diatur ulang tengah malam.';
 
   @override
+  String get paywall_plan_yearly => 'Tahunan';
+
+  @override
+  String get paywall_plan_monthly => 'Bulanan';
+
+  @override
+  String get paywall_plan_lifetime => 'Seumur hidup';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / tahun';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / bulan';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price sekali bayar';
+  }
+
+  @override
+  String get paywall_continue => 'Lanjutkan';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Langganan diperpanjang otomatis sampai dibatalkan. Batalkan kapan saja di Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite menyertakan $limit terjemahan gratis per hari. Pakai Pro untuk terjemahan tanpa batas.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Batalkan kapan saja';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Sisa terjemahan gratis hari ini: $count';
   }

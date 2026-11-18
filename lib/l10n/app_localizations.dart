@@ -1136,6 +1136,66 @@ abstract class AppLocalizations {
   /// **'Free translations reset at midnight.'**
   String get paywall_reset_hint;
 
+  /// No description provided for @paywall_plan_yearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get paywall_plan_yearly;
+
+  /// No description provided for @paywall_plan_monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get paywall_plan_monthly;
+
+  /// No description provided for @paywall_plan_lifetime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get paywall_plan_lifetime;
+
+  /// Lite paywall plan price; price is Google Play's localized yearly price
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / year'**
+  String paywall_price_per_year(String price);
+
+  /// Lite paywall plan price; price is Google Play's localized monthly price
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / month'**
+  String paywall_price_per_month(String price);
+
+  /// Lite paywall plan price for the one-time unlock; price is Google Play's localized price
+  ///
+  /// In en, this message translates to:
+  /// **'{price} once'**
+  String paywall_price_once(String price);
+
+  /// No description provided for @paywall_continue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get paywall_continue;
+
+  /// No description provided for @paywall_subscription_terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions renew automatically until cancelled. Cancel anytime in Google Play.'**
+  String get paywall_subscription_terms;
+
+  /// Lite paywall body when several plans are offered; limit = free translations per day
+  ///
+  /// In en, this message translates to:
+  /// **'Screen Translator Lite includes {limit} free translations a day. Go Pro for unlimited translations.'**
+  String paywall_body_plans(int limit);
+
+  /// No description provided for @paywall_benefit_cancel_anytime.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel anytime'**
+  String get paywall_benefit_cancel_anytime;
+
   /// Lite home screen: free translations left today
   ///
   /// In en, this message translates to:

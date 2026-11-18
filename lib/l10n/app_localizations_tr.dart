@@ -539,6 +539,45 @@ class AppLocalizationsTr extends AppLocalizations {
   String get paywall_reset_hint => 'Ücretsiz çeviriler gece yarısı sıfırlanır.';
 
   @override
+  String get paywall_plan_yearly => 'Yıllık';
+
+  @override
+  String get paywall_plan_monthly => 'Aylık';
+
+  @override
+  String get paywall_plan_lifetime => 'Ömür boyu';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / yıl';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / ay';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price tek seferlik';
+  }
+
+  @override
+  String get paywall_continue => 'Devam';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Abonelikler iptal edilene kadar otomatik olarak yenilenir. Google Play üzerinden istediğiniz zaman iptal edebilirsiniz.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite günde $limit ücretsiz çeviri içerir. Sınırsız çeviri için Pro\'ya geçin.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'İstediğiniz zaman iptal edin';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Bugün kalan ücretsiz çeviri: $count';
   }

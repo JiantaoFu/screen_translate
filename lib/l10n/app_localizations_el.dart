@@ -544,6 +544,45 @@ class AppLocalizationsEl extends AppLocalizations {
       'Οι δωρεάν μεταφράσεις μηδενίζονται τα μεσάνυχτα.';
 
   @override
+  String get paywall_plan_yearly => 'Ετήσιο';
+
+  @override
+  String get paywall_plan_monthly => 'Μηνιαίο';
+
+  @override
+  String get paywall_plan_lifetime => 'Εφ’ όρου ζωής';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / έτος';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / μήνα';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price εφάπαξ';
+  }
+
+  @override
+  String get paywall_continue => 'Συνέχεια';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Οι συνδρομές ανανεώνονται αυτόματα μέχρι να ακυρωθούν. Ακυρώστε οποιαδήποτε στιγμή στο Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Το Screen Translator Lite περιλαμβάνει $limit δωρεάν μεταφράσεις την ημέρα. Αποκτήστε το Pro για απεριόριστες μεταφράσεις.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Ακύρωση οποιαδήποτε στιγμή';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Δωρεάν μεταφράσεις που απομένουν σήμερα: $count';
   }

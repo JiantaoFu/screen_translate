@@ -82,7 +82,9 @@ void main() {
     events.clear();
     gate.paywallShown('limit_reached');
     expect(events.single.key, LiteGate.evPaywallShown);
-    expect(events.single.value, {'remaining_free': 4, 'daily_limit': 5, 'trigger': 'limit_reached'});
+    // `offers` is empty here: this gate's store was never asked for products.
+    expect(events.single.value,
+        {'remaining_free': 4, 'daily_limit': 5, 'trigger': 'limit_reached', 'offers': ''});
   });
 
   test('a new day unblocks', () async {
@@ -150,7 +152,7 @@ void main() {
     final entitlement = ProEntitlement(prefs,
         store: store,
         ownedPurchases: store,
-        onRevoked: () => g.debugOnRevoked());
+        onRevoked: (id) => g.debugOnRevoked(id));
     g = LiteGate(
       enabled: true,
       quota: DailyTranslationQuota(prefs, now: () => now, limit: () => 5),

@@ -535,6 +535,45 @@ class AppLocalizationsSk extends AppLocalizations {
   String get paywall_reset_hint => 'Bezplatné preklady sa obnovia o polnoci.';
 
   @override
+  String get paywall_plan_yearly => 'Ročné';
+
+  @override
+  String get paywall_plan_monthly => 'Mesačné';
+
+  @override
+  String get paywall_plan_lifetime => 'Doživotné';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / rok';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / mesiac';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price jednorazovo';
+  }
+
+  @override
+  String get paywall_continue => 'Pokračovať';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Predplatné sa automaticky obnovuje, kým ho nezrušíte. Zrušiť ho môžete kedykoľvek v Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite obsahuje $limit bezplatných prekladov denne. S verziou Pro prekladáte bez obmedzení.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Zrušíte kedykoľvek';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Zostávajúce bezplatné preklady dnes: $count';
   }

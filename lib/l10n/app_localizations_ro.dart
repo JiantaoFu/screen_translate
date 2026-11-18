@@ -540,6 +540,45 @@ class AppLocalizationsRo extends AppLocalizations {
       'Traducerile gratuite se resetează la miezul nopții.';
 
   @override
+  String get paywall_plan_yearly => 'Anual';
+
+  @override
+  String get paywall_plan_monthly => 'Lunar';
+
+  @override
+  String get paywall_plan_lifetime => 'Pe viață';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / an';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / lună';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price o singură dată';
+  }
+
+  @override
+  String get paywall_continue => 'Continuă';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Abonamentele se reînnoiesc automat până la anulare. Poți anula oricând din Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'Screen Translator Lite include $limit traduceri gratuite pe zi. Treci la Pro pentru traduceri nelimitate.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Anulezi oricând';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Traduceri gratuite rămase azi: $count';
   }

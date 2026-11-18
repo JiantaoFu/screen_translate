@@ -538,6 +538,45 @@ class AppLocalizationsPt extends AppLocalizations {
       'As traduções grátis reiniciam à meia-noite.';
 
   @override
+  String get paywall_plan_yearly => 'Anual';
+
+  @override
+  String get paywall_plan_monthly => 'Mensal';
+
+  @override
+  String get paywall_plan_lifetime => 'Vitalício';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / ano';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / mês';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price uma única vez';
+  }
+
+  @override
+  String get paywall_continue => 'Continuar';
+
+  @override
+  String get paywall_subscription_terms =>
+      'As assinaturas são renovadas automaticamente até serem canceladas. Cancele quando quiser no Google Play.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'O Screen Translator Lite inclui $limit traduções grátis por dia. Assine o Pro para traduzir sem limites.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Cancele quando quiser';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Traduções grátis restantes hoje: $count';
   }

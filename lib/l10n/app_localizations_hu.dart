@@ -541,6 +541,45 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az ingyenes fordítások éjfélkor nullázódnak.';
 
   @override
+  String get paywall_plan_yearly => 'Éves';
+
+  @override
+  String get paywall_plan_monthly => 'Havi';
+
+  @override
+  String get paywall_plan_lifetime => 'Örökös';
+
+  @override
+  String paywall_price_per_year(String price) {
+    return '$price / év';
+  }
+
+  @override
+  String paywall_price_per_month(String price) {
+    return '$price / hó';
+  }
+
+  @override
+  String paywall_price_once(String price) {
+    return '$price egyszeri díj';
+  }
+
+  @override
+  String get paywall_continue => 'Tovább';
+
+  @override
+  String get paywall_subscription_terms =>
+      'Az előfizetések a lemondásig automatikusan megújulnak. Bármikor lemondhatók a Google Playen.';
+
+  @override
+  String paywall_body_plans(int limit) {
+    return 'A Screen Translator Lite napi $limit ingyenes fordítást tartalmaz. Váltson Pro-ra a korlátlan fordításért.';
+  }
+
+  @override
+  String get paywall_benefit_cancel_anytime => 'Bármikor lemondható';
+
+  @override
   String lite_remaining_today(int count) {
     return 'Ma hátralévő ingyenes fordítások: $count';
   }

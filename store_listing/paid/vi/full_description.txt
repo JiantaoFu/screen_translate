@@ -1,0 +1,26 @@
+Muốn dùng thử trước? Screen Translator Lite miễn phí 5 lượt dịch mỗi ngày: https://play.google.com/store/apps/details?id=com.lomoware.screen_translate.lite
+
+Dịch màn hình ngay trong mọi ứng dụng: đọc truyện tranh, manga, manhwa, webtoon và chơi game tiếng Nhật, Hàn, Trung hay Anh mà không cần chụp màn hình hay chuyển ứng dụng. Bản dịch tiếng Việt hiện ngay trên chữ gốc.
+
+Tính năng chính
+
+Chế độ dịch
+• Chế độ thủ công — Chạm để dịch chỉ khi bạn cần
+• Chế độ tự động — Tự động dịch văn bản mới ngay khi xuất hiện
+• Chế độ gốc — Quay lại văn bản gốc ngay lập tức
+
+Hai công cụ dịch
+• Công cụ trên thiết bị — Nhanh, riêng tư, hoạt động ngoại tuyến
+• Công cụ AI — AI tiên tiến cho bản dịch tự nhiên và chính xác hơn
+
+Thêm lý do để yêu thích ScreenTranslate
+• Hỗ trợ hơn 50 ngôn ngữ
+• Hoạt động ngoại tuyến với công cụ trên thiết bị
+• Không quảng cáo, không đăng ký
+• Lớp phủ có thể di chuyển và thay đổi kích thước, phù hợp với mọi màn hình
+
+Về quyền truy cập hỗ trợ tiếp cận
+ScreenTranslate sử dụng Dịch vụ hỗ trợ tiếp cận của Android để phát hiện và đọc văn bản trên màn hình, nhờ đó có thể hiển thị bản dịch trực tiếp trên nội dung bạn đang xem. Quyền này chỉ được sử dụng cho mục đích dịch. Ứng dụng có thu thập một số dữ liệu và có thể chia sẻ một số dữ liệu với bên thứ ba, như được liệt kê trong mục An toàn dữ liệu trên trang này: vị trí gần đúng, hoạt động tương tác trong ứng dụng, nhật ký sự cố, thông tin chẩn đoán và mã nhận dạng thiết bị hoặc mã nhận dạng khác, nhằm phục vụ phân tích và chức năng của ứng dụng. Nếu bạn dùng chế độ dịch trực tuyến hoặc Cloud AI, văn bản bạn chọn để dịch có thể được gửi ra khỏi thiết bị; mục An toàn dữ liệu liệt kê nội dung này là nội dung do người dùng tạo (không bắt buộc). Dữ liệu được gửi ra khỏi thiết bị được mã hóa khi truyền, và bạn có thể yêu cầu xóa dữ liệu của mình. Dịch trên thiết bị / ngoại tuyến không gửi văn bản trên màn hình của bạn.
+Mẹo: nếu lớp phủ bị kẹt hoặc màn hình hiển thị tối sau khi cấp quyền, hãy chạm vào biểu tượng nổi để làm mới hoặc khởi động lại ứng dụng.
+
+Cho dù bạn đang chơi game, đọc manga hoặc truyện tranh, trò chuyện với bạn bè ở nước ngoài, hay học một ngôn ngữ mới, ScreenTranslate giúp bạn hiểu ngay mọi thứ trên màn hình của mình.

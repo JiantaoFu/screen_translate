@@ -1,0 +1,39 @@
+Screen Translator Lite cho bạn 5 lượt dịch màn hình miễn phí mỗi ngày. Nâng cấp Pro để dùng không giới hạn. Không quảng cáo.
+
+Đây là ứng dụng dịch màn hình bằng OCR: một nút nổi nằm trên mọi ứng dụng. Chạm vào nút, chọn vùng chữ trên màn hình và xem bản dịch tiếng Việt ngay tại chỗ, không cần sao chép chữ hay chuyển ứng dụng.
+
+BẠN CÓ THỂ LÀM GÌ
+
+• Dịch chữ trong mọi ứng dụng: truyện tranh, manga, manhwa, webtoon, trang web, mạng xã hội, tin nhắn, menu và lời thoại trong game, kể cả game gacha và visual novel
+• Đọc được chữ tiếng Nhật viết dọc, thường gặp trong manga và game Nhật
+• Dùng ngoại tuyến: nhận dạng và dịch trên thiết bị hoạt động không cần mạng (sau khi tải gói ngôn ngữ)
+• Đọc liền mạch: bản dịch hiện ngay trên màn hình, bạn không phải rời ứng dụng đang dùng
+• Sau khi cuộn hoặc sang trang mới, chạm nút nổi lần nữa để dịch phần chữ mới
+• Không quảng cáo, cả ở bản miễn phí lẫn Pro
+
+BẢN MIỄN PHÍ HOẠT ĐỘNG THẾ NÀO
+
+• Mỗi ngày có 5 lượt dịch miễn phí
+• Số lượt được làm mới mỗi ngày; con số có thể thay đổi theo thời gian và luôn hiển thị trong ứng dụng
+• Cần nhiều hơn? Nâng cấp Pro ngay trong ứng dụng để bỏ giới hạn hằng ngày; các gói và giá theo khu vực của bạn được hiển thị trong ứng dụng
+
+BẮT ĐẦU
+
+1. Mở ứng dụng và cho phép quyền hiển thị trên ứng dụng khác
+2. Cho phép ghi màn hình khi được hỏi, để ứng dụng đọc được phần chữ bạn chọn
+3. Chạm nút nổi trong bất kỳ ứng dụng nào và chọn vùng cần dịch
+
+QUYỀN RIÊNG TƯ VÀ QUYỀN TRUY CẬP
+
+• Quyền hiển thị trên ứng dụng khác chỉ dùng để hiện nút nổi và bản dịch
+• Ghi màn hình chỉ được dùng khi bạn bắt đầu dịch
+• Ở chế độ ngoại tuyến, việc nhận dạng và dịch diễn ra trên thiết bị của bạn
+• Khi dùng dịch trực tuyến, phần chữ bạn chọn sẽ được gửi đi để dịch
+
+CẦN BIẾT
+
+• Độ chính xác phụ thuộc vào chất lượng hình ảnh, phông chữ và cặp ngôn ngữ; chữ cách điệu hoặc viết tay có thể không được nhận dạng hoàn hảo
+• Một số ứng dụng chặn ghi màn hình (ví dụ một số ứng dụng ngân hàng hoặc video có DRM); chữ trong các ứng dụng đó không dịch được
+• Đã có Screen Translate: Manga, Games (bản trả phí)? Bạn không cần Lite: bản đó có cùng tính năng chính và không giới hạn hằng ngày
+
+Câu hỏi hoặc góp ý: liên hệ qua email nhà phát triển trên trang này.

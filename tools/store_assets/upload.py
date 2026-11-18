@@ -4,8 +4,9 @@ Usage:
   python tools/store_assets/upload.py            # dry run: upload into an edit, validate, discard
   python tools/store_assets/upload.py --commit   # commit (store listing changes go to review)
 
-For en-US, zh-CN and ja-JP it replaces: phone screenshots, 7- and 10-inch
-tablet screenshots (the same 1440x2560 set) and the feature graphic, from
+For en-US, zh-CN, ja-JP, vi and id it replaces: phone screenshots, 7- and
+10-inch tablet screenshots (the same 1440x2560 set; vi and id have none yet,
+so theirs are removed and fall back to en-US) and the feature graphic, from
 build/play_store_assets/{screens,tablet,feature}/<locale>/. Every other
 listing language gets its own screenshots deleted, so it falls back to the
 en-US set instead of showing the old mock-ups. Uses the service account of
@@ -22,7 +23,10 @@ sys.path.insert(0, os.path.join(REPO, 'tools'))
 import release  # noqa: E402
 
 ASSETS = os.path.join(REPO, 'build', 'play_store_assets')
-LOCALES = ['en-US', 'zh-CN', 'ja-JP']
+LOCALES = ['en-US', 'zh-CN', 'ja-JP', 'vi', 'id']
+# Locales without their own tablet captures yet: their tablet screenshots
+# are removed, so Play shows the en-US tablet set.
+TABLET_OPTIONAL = {'vi', 'id'}
 SCREENSHOT_TYPES = ['phoneScreenshots', 'sevenInchScreenshots', 'tenInchScreenshots']
 
 
@@ -47,6 +51,8 @@ def main():
     plan = {loc: files_for(loc) for loc in LOCALES}
     for loc, kinds in plan.items():
         for kind, files in kinds.items():
+            if not files and loc in TABLET_OPTIONAL and kind in ('sevenInchScreenshots', 'tenInchScreenshots'):
+                continue
             if not files:
                 sys.exit(f'missing {kind} for {loc}: run compose.py / feature.py first')
             if kind != 'featureGraphic' and not 2 <= len(files) <= 8:
@@ -64,7 +70,7 @@ def main():
                 for f in files:
                     edits.images().upload(packageName=pkg, editId=edit, language=loc, imageType=kind,
                                           media_body=MediaFileUpload(f, mimetype='image/png')).execute()
-                print(f'{loc:6} {kind:22} {len(files)} uploaded')
+                print(f'{loc:6} {kind:22} ' + (f'{len(files)} uploaded' if files else 'removed (falls back to en-US)'))
         for lang in languages:
             if lang in plan:
                 continue

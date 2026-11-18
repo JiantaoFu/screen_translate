@@ -6,7 +6,8 @@
 # Content scenes (manga, game, webtoon, chat): start live translation, show
 # the artwork full-screen in Google Photos, wait for "Translations complete",
 # let it settle, screencap. The text is translated into the listing's
-# language: English via the AI packs, Chinese and Japanese via Quick mode
+# language: English via the AI packs; Chinese, Japanese, Vietnamese and
+# Indonesian via Quick mode
 # (AI packs only translate into English). OCR is not deterministic: check
 # every capture; check_lines.sh is how the lines were chosen.
 # App scenes (home, settings, languages): the app's own screens, with its UI
@@ -21,23 +22,31 @@ OUTDIR="$HERE/raw/$LOCALE"
 mkdir -p "$OUTDIR"
 PH=com.google.android.apps.photos
 
-target() { case $LOCALE in zh-CN) echo zh;; ja-JP) echo ja;; *) echo en;; esac; }
+target() { case $LOCALE in zh-CN) echo zh;; ja-JP) echo ja;; vi) echo vi;; id) echo id;; *) echo en;; esac; }
 mode() { [ "$(target)" = en ] && echo onnx || echo onDevice; }
 default_scenes() {
   case $LOCALE in
     # Japanese artwork translated into Japanese makes no sense: the Japanese
     # listing's manga and game use English lines (manga_en, tavern_en_lines).
     ja-JP) echo "manga game webtoon chat home settings languages";;
+    # No settings: it shows the AI packs, which only translate into English.
+    # No Vietnamese chat: ML Kit's en->vi output for it reads badly.
+    vi) echo "manga game webtoon home languages";;
+    id) echo "manga game webtoon chat home languages";;
     *) echo "manga game webtoon chat home settings languages";;
   esac
 }
 SCENES=${*:-$(default_scenes)}
 
 # Content scene → image and source language.
+# Vietnamese and Indonesian: Quick mode pivots through English, so Japanese
+# sources come out garbled (ロボット -> "Robout", マルタ -> "Amasa"); their
+# manga (and the Indonesian game) use the English lettering instead. The
+# Vietnamese game reads correctly from Japanese and in larger type.
 scene_image() {
   case $1 in
-    manga) case $(target) in en) echo manga.png;; ja) echo manga_en.png;; *) echo manga_cjk.png;; esac;;
-    game) case $(target) in en) echo tavern_en.png;; ja) echo tavern_en_lines.png;; *) echo tavern.png;; esac;;
+    manga) case $(target) in en) echo manga.png;; ja|vi|id) echo manga_en.png;; *) echo manga_cjk.png;; esac;;
+    game) case $(target) in en) echo tavern_en.png;; ja|id) echo tavern_en_lines.png;; *) echo tavern.png;; esac;;
     webtoon) [ "$(target)" = en ] && echo webtoon_screen.png || echo webtoon_screen_cjk.png;;
     chat) case $(target) in en) echo chat_ja.png;; ja) echo chat_en_ja.png;; *) echo chat_en.png;; esac;;
   esac
@@ -45,7 +54,8 @@ scene_image() {
 scene_lang() {
   case $1 in
     webtoon) echo ko;;
-    manga|game) [ "$(target)" = ja ] && echo en || echo ja;;
+    manga) case $(target) in ja|vi|id) echo en;; *) echo ja;; esac;;
+    game) case $(target) in ja|id) echo en;; *) echo ja;; esac;;
     chat) [ "$(target)" = en ] && echo ja || echo en;;
     *) echo ja;;
   esac

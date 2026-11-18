@@ -1,0 +1,26 @@
+Ingin coba dulu? Screen Translator Lite gratis 5 terjemahan per hari: https://play.google.com/store/apps/details?id=com.lomoware.screen_translate.lite
+
+Terjemahkan layar langsung di aplikasi apa pun: baca komik, manga, manhwa, webtoon, dan main game berbahasa Jepang, Korea, Mandarin, atau Inggris tanpa screenshot atau pindah aplikasi. Terjemahan bahasa Indonesia muncul tepat di atas teks aslinya.
+
+Fitur Utama
+
+Mode Terjemahan
+• Mode Manual — Ketuk untuk menerjemahkan hanya saat diperlukan
+• Mode Otomatis — Secara otomatis menerjemahkan teks baru saat muncul
+• Mode Asli — Beralih instan untuk melihat teks asli
+
+Dua Mesin Terjemahan
+• Mesin On-Device — Cepat, privat, berfungsi offline
+• Mesin AI — AI canggih untuk terjemahan yang lebih alami dan akurat
+
+Alasan Lain untuk Menyukai ScreenTranslate
+• Mendukung lebih dari 50 bahasa
+• Berfungsi offline dengan mesin on-device
+• Tanpa iklan, tanpa berlangganan
+• Overlay yang dapat dipindahkan dan diubah ukurannya, sesuai untuk layar apa pun
+
+Tentang Izin Aksesibilitas
+ScreenTranslate menggunakan Layanan Aksesibilitas Android untuk mendeteksi dan membaca teks di layar sehingga dapat menampilkan terjemahan langsung di atas apa yang Anda lihat. Izin ini hanya digunakan untuk tujuan penerjemahan. Aplikasi ini mengumpulkan sebagian data dan dapat membagikan sebagian data kepada pihak ketiga, sebagaimana tercantum di bagian Keamanan data di halaman ini: perkiraan lokasi, interaksi aplikasi, log error, diagnostik, serta ID perangkat atau ID lainnya, untuk analisis dan fungsi aplikasi. Jika Anda menggunakan mode terjemahan online atau Cloud AI, teks yang Anda pilih untuk diterjemahkan dapat dikirim ke luar perangkat; bagian Keamanan data mencantumkannya sebagai konten buatan pengguna yang opsional. Data yang dikirim ke luar perangkat dienkripsi saat transit, dan Anda dapat meminta agar data Anda dihapus. Terjemahan di perangkat / offline tidak mengirim teks layar Anda.
+Tips: Jika overlay macet atau layar terlihat gelap setelah memberikan izin, ketuk ikon melayang untuk menyegarkannya, atau mulai ulang aplikasi.
+
+Baik saat bermain game, membaca manga atau komik, mengobrol dengan teman di luar negeri, atau belajar bahasa baru, ScreenTranslate membantu Anda memahami semua yang ada di layar Anda secara instan.

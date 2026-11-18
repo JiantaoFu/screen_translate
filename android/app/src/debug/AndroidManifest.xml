@@ -5,6 +5,15 @@
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
+        <!-- Debug builds (emulator regression, store-asset recording, local
+             runs) must not reach GA: they inflated the funnel with test
+             sessions. This stops the native SDK's automatic events
+             (first_open, session_start, screen_view) from the first moment
+             of the process, before Dart runs; FirebaseAnalyticsService.init
+             keeps it off from the Dart side. -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
         <!-- Debug-only live-translation test harness, see MotionTestActivity. -->
         <activity
             android:name="com.lomoware.screen_translate.MotionTestActivity"

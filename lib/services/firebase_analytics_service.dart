@@ -3,6 +3,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
+import '../app_flavor.dart';
+
 class FirebaseAnalyticsService {
   static final FirebaseAnalyticsService _instance = FirebaseAnalyticsService._internal();
   // Resolved on first use, not in the constructor, for two reasons.
@@ -33,11 +35,27 @@ class FirebaseAnalyticsService {
   /// startup_tasks.dart), and a step that swallows its own error reports
   /// "ok" for a launch where analytics never came up — which is exactly the
   /// blind spot that made every funnel denominator untrustworthy.
-  Future<void> init() async {
-    // Enable analytics collection
-    await _analytics.setAnalyticsCollectionEnabled(true);
-    _logger.info('Firebase Analytics initialized');
+  ///
+  /// Only release builds collect. Debug builds are the emulator regression,
+  /// store-asset recordings and local runs; they reported like real users and
+  /// skewed every funnel. The debug manifest also turns collection off, so
+  /// the native SDK's automatic events never go out before this runs.
+  ///
+  /// Sets the `flavor` user property (`paid` / `lite`) before anything else
+  /// is logged, so every event of this launch, `app_opened` included, can be
+  /// split by app. [AppFlavorConfig.resolve] has run before startup tasks.
+  Future<void> init({bool collect = kReleaseMode}) async {
+    await _analytics.setAnalyticsCollectionEnabled(collect);
+    if (!collect) {
+      _logger.info('Firebase Analytics off: not a release build');
+      return;
+    }
+    await _analytics.setUserProperty(name: flavorProperty, value: AppFlavorConfig.current.name);
+    _logger.info('Firebase Analytics initialized (flavor ${AppFlavorConfig.current.name})');
   }
+
+  /// GA user property telling the paid and Lite apps apart.
+  static const String flavorProperty = 'flavor';
 
   /// Log a custom event, letting failures propagate.
   ///

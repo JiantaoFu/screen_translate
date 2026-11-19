@@ -281,34 +281,42 @@ def main():
     prune(out_dir)
 
 
-# A set no list points at is kept this long before prune() removes it. A
-# parallel compose run, or an upload.py that has already read the list,
-# may still be using a set that is no longer current; both take minutes.
+# A set no list points at any more is kept this long, counted from when it
+# was first seen retired, before prune() removes it. A parallel compose run,
+# or an upload.py that has already read the list, may still be using it.
 PRUNE_AFTER_S = 24 * 3600
+RETIRED = '.retired'   # inside a set: its mtime is when it left the list
 
 
 def prune(out_dir):
-    """Remove old sets that composed.txt no longer lists. Best effort.
+    """Remove sets composed.txt stopped listing over PRUNE_AFTER_S ago.
 
-    Never touches the current set or anything younger than PRUNE_AFTER_S,
-    so it can't delete what a parallel run just switched to or what an
-    upload in progress is reading.
+    A set's own age doesn't matter: yesterday's set retired a minute ago by
+    a new run still gets the full period, because the clock starts at the
+    first prune that finds it unlisted (right after the switch that retired
+    it). A listed set loses any mark, so the clock restarts if it is retired
+    again. Best effort: errors only leave files behind.
     """
     try:
         with open(os.path.join(out_dir, MANIFEST), encoding='utf-8') as f:
             live = {n.split('/')[0] for n in f.read().split() if n}
     except OSError:
         return
-    cutoff = time.time() - PRUNE_AFTER_S
+    now = time.time()
     for n in os.listdir(out_dir):
         p = os.path.join(out_dir, n)
         try:
-            if os.path.getmtime(p) > cutoff or n in live:
-                continue
             if n.startswith('set-') and os.path.isdir(p):
-                shutil.rmtree(p)
-            elif n.endswith('.png') or n.endswith('.tmp'):   # pre-set images, abandoned lists
-                os.remove(p)
+                mark = os.path.join(p, RETIRED)
+                if n in live:
+                    if os.path.exists(mark):
+                        os.remove(mark)
+                elif not os.path.exists(mark):
+                    open(mark, 'w').close()        # retired now: start the clock
+                elif now - os.path.getmtime(mark) > PRUNE_AFTER_S:
+                    shutil.rmtree(p)
+            elif n.endswith(('.png', '.tmp')) and now - os.path.getmtime(p) > PRUNE_AFTER_S:
+                os.remove(p)                       # pre-set images, abandoned lists
         except OSError:
             pass
 

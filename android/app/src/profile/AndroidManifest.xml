@@ -4,4 +4,14 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <application>
+        <!-- Only release builds report to GA (FirebaseAnalyticsService.init
+             collects only when kReleaseMode). Profile builds are local
+             performance runs; deactivate the native SDK too, so it cannot log
+             first_open / session_start before Dart turns collection off.
+             Same setting and reasoning as the debug manifest. -->
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+    </application>
 </manifest>

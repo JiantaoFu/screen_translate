@@ -396,6 +396,22 @@ void main() {
       expect(shown(), hasLength(2));
     });
 
+    testWidgets('a Remote Config switch seen only on a rebuild is logged too', (tester) async {
+      offered = [lifetime];
+      await open(tester);
+      expect(shown().single['offers'], 'pro_unlock');
+
+      // Remote Config activates the subscriptions: no Billing or entitlement
+      // notification. Then the page rebuilds (a rotation, say).
+      offered = [yearly, monthly, lifetime];
+      tester.element(find.byType(PaywallScreen)).markNeedsBuild();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('paywall_plan_pro_yearly')), findsOneWidget);
+      expect(shown(), hasLength(2));
+      expect(shown().last['offers'], 'pro_yearly,pro_monthly,pro_unlock');
+      expect(shown().last['offers_changed'], 1);
+    });
+
     testWidgets('Pro arriving with a page over the paywall closes only the paywall',
         (tester) async {
       await open(tester);

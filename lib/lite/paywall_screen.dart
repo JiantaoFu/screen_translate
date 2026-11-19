@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 
 import 'lite_gate.dart';
@@ -46,7 +47,6 @@ class _PaywallScreenState extends State<PaywallScreen> {
     widget.gate.addListener(_onChange);
     final e = widget.gate.entitlement;
     if (e.storeAvailable && e.product == null) e.loadProduct();
-    _logShownOnceOffered();
   }
 
   @override
@@ -54,35 +54,41 @@ class _PaywallScreenState extends State<PaywallScreen> {
     widget.gate.removeListener(_onChange);
     // Closed before Play returned any plan: still an exposure, with the
     // empty offers it really had.
-    if (!_shownLogged && !widget.gate.isPro) _logShown();
+    if (!_shownLogged && !widget.gate.isPro) _logShown(_offerIds(widget.gate.entitlement.offers));
     super.dispose();
   }
 
-  /// paywall_shown is logged when the plans are actually on screen, not
-  /// when the route opens: on a cold start Play's products can arrive after
-  /// the paywall does, and logging at open recorded `offers` as empty for a
-  /// session that then showed (and sold) the yearly plan.
-  void _logShownOnceOffered() {
-    if (!_shownLogged && widget.gate.entitlement.offers.isNotEmpty) _logShown();
+  static String _offerIds(List<ProductDetails> offers) => offers.map((p) => p.id).join(',');
+
+  /// Called by build() with the plans it is drawing, so the exposure log
+  /// is the list on screen, whatever caused the rebuild: a Billing or
+  /// entitlement change, or a rotation after Remote Config switched the
+  /// plans (which notifies nobody).
+  ///
+  /// paywall_shown is logged once plans are on screen, not when the route
+  /// opens: on a cold start Play's products can arrive after the paywall,
+  /// and logging at open recorded empty offers for a session that then
+  /// showed the yearly plan. If the plans change afterwards (the default
+  /// one-time unlock, then the subscriptions), it is logged again with
+  /// offers_changed, so plan conversion can use what was finally shown.
+  void _noteShownOffers(List<ProductDetails> offers) {
+    final ids = _offerIds(offers);
+    if (ids.isEmpty || ids == _loggedOffers) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || ids == _loggedOffers) return;
+      if (_shownLogged) {
+        _loggedOffers = ids;
+        widget.gate.paywallShown(widget.trigger, offers: ids, offersChanged: true);
+      } else {
+        _logShown(ids);
+      }
+    });
   }
 
-  void _logShown() {
+  void _logShown(String ids) {
     _shownLogged = true;
-    _loggedOffers = _offerIds();
-    widget.gate.paywallShown(widget.trigger);
-  }
-
-  String _offerIds() => widget.gate.entitlement.offers.map((p) => p.id).join(',');
-
-  /// The plans on screen changed after the exposure was logged (cold start:
-  /// the default one-time unlock, then Remote Config turns on the
-  /// subscriptions). Logged again, marked as an update, so plan conversion
-  /// can use what was finally shown.
-  void _logOffersChanged() {
-    final ids = _offerIds();
-    if (!_shownLogged || ids.isEmpty || ids == _loggedOffers) return;
     _loggedOffers = ids;
-    widget.gate.paywallShown(widget.trigger, offersChanged: true);
+    widget.gate.paywallShown(widget.trigger, offers: ids);
   }
 
   /// Pro arrived (a purchase, or a background re-sync): close this paywall.
@@ -100,8 +106,6 @@ class _PaywallScreenState extends State<PaywallScreen> {
 
   void _onChange() {
     if (!mounted) return;
-    _logShownOnceOffered();
-    _logOffersChanged();
     if (widget.gate.isPro && !_closing) {
       _closing = true;
       final messenger = ScaffoldMessenger.maybeOf(context);
@@ -121,6 +125,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
     final theme = Theme.of(context);
     final price = e.price;
     final offers = e.offers;
+    _noteShownOffers(offers);
     final showPlans =
         offers.length > 1 || offers.any((p) => ProEntitlement.isSubscription(p.id));
     // Keep the choice while it is still on offer; otherwise the first plan.

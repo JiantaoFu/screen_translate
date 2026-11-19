@@ -7,13 +7,16 @@
     <application>
         <!-- Debug builds (emulator regression, store-asset recording, local
              runs) must not reach GA: they inflated the funnel with test
-             sessions. This stops the native SDK's automatic events
-             (first_open, session_start, screen_view) from the first moment
-             of the process, before Dart runs; FirebaseAnalyticsService.init
-             keeps it off from the Dart side. -->
+             sessions. "deactivated" rather than collection_enabled=false:
+             Firebase persists setAnalyticsCollectionEnabled(true), which
+             older debug builds called, and that saved value overrides
+             collection_enabled on an upgrade install, so the native SDK
+             could log first_open / session_start before Dart turned it off.
+             Deactivation is permanent for the build and cannot be undone at
+             runtime. -->
         <meta-data
-            android:name="firebase_analytics_collection_enabled"
-            android:value="false" />
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
         <!-- Debug-only live-translation test harness, see MotionTestActivity. -->
         <activity
             android:name="com.lomoware.screen_translate.MotionTestActivity"

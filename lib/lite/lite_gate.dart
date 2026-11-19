@@ -183,11 +183,14 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   /// [trigger]: limit_reached (just used the last free one), limit_hit
   /// (tried to start with none left), or home (user opened it). `offers` is
   /// what the paywall listed, in order, e.g. `pro_yearly,pro_unlock`.
-  void paywallShown(String trigger) {
+  /// [offersChanged]: a repeat for the same paywall because the plans on
+  /// screen changed; count exposures without it.
+  void paywallShown(String trigger, {bool offersChanged = false}) {
     _log(evPaywallShown, {
       ..._quotaParams,
       'trigger': trigger,
       'offers': entitlement.offers.map((p) => p.id).join(','),
+      if (offersChanged) 'offers_changed': 1,
     });
   }
 

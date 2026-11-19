@@ -257,7 +257,24 @@ class TranslationProvider with ChangeNotifier {
   /// (alreadyRunning) can't replace the running session's.
   TranslationAdmission? _sessionAdmission;
 
-  void _sessionSucceeded() => _onSessionSucceeded(_sessionAdmission);
+  /// Bumped by every accepted Start and every stop, so a capture pass that
+  /// began in one session can tell, after its awaits, that the session it
+  /// belonged to is gone.
+  int _liveSession = 0;
+
+  @visibleForTesting
+  int get liveSession => _liveSession;
+
+  /// Counts the session's success, once, if [passSession] (the session the
+  /// capture pass started in) is still the running one. A pass of a stopped
+  /// session that finishes rendering after the next Start must not mark
+  /// that new session as succeeded, nor settle with its admission.
+  void _translationShown(int passSession) {
+    if (!_isTranslating || passSession != _liveSession) return;
+    if (_sessionProducedTranslations) return;
+    _sessionProducedTranslations = true;
+    _onSessionSucceeded(_sessionAdmission);
+  }
 
   static Future<void> _recordReviewSuccess(TranslationAdmission? liteAdmission) async {
     // Lite flavor: one live session that drew a translation is one of the
@@ -402,6 +419,7 @@ class TranslationProvider with ChangeNotifier {
   Future<StartOutcome> startTranslation({TranslationAdmission? liteAdmission}) async {
     if (_isTranslating || _isStarting) return StartOutcome.alreadyRunning;
     _isStarting = true;
+    _liveSession++;
     _sessionAdmission = liteAdmission;
     try {
       return await _startTranslation();
@@ -512,6 +530,7 @@ class TranslationProvider with ChangeNotifier {
     print('Projection stopped by the system, resetting translation state');
     ActivationTracker.instance.liveStopped();
     _isTranslating = false;
+    _liveSession++;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;
     _displayedOverlays.clear();
@@ -528,13 +547,11 @@ class TranslationProvider with ChangeNotifier {
     if (value) _captureTimer ??= Timer.periodic(const Duration(hours: 1), (_) {});
   }
 
+  /// [fromSession]: the session the simulated capture pass started in
+  /// (default: the current one).
   @visibleForTesting
-  void debugMarkTranslationShown() {
-    if (!_sessionProducedTranslations) {
-      _sessionProducedTranslations = true;
-      _sessionSucceeded();
-    }
-  }
+  void debugMarkTranslationShown({int? fromSession}) =>
+      _translationShown(fromSession ?? _liveSession);
 
   void requestManualTranslation() {
     _isManualTranslationRequested = true;
@@ -575,6 +592,7 @@ class TranslationProvider with ChangeNotifier {
       // frame change) lands while this tick is capturing/OCRing, the frame
       // it's working on no longer matches the screen.
       final tickToken = _translationToken;
+      final tickSession = _liveSession;
       // "…" placeholder ids shown this tick that haven't been replaced by a
       // real translation yet. Whatever is left when the tick ends — stale
       // abort or an unexpected exception — gets hidden in `finally`, since
@@ -943,11 +961,10 @@ class TranslationProvider with ChangeNotifier {
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
-                if (!_sessionProducedTranslations) {
-                  _sessionProducedTranslations = true;
-                  // One success per live session, not per 500 ms tick.
-                  _sessionSucceeded();
-                }
+                // One success per live session, not per 500 ms tick; and
+                // only for the session this pass began in (checked after
+                // the render awaits above).
+                _translationShown(tickSession);
                 ActivationTracker.instance.translationShown(newIndices.length);
                 notifyListeners();
               }
@@ -999,6 +1016,7 @@ class TranslationProvider with ChangeNotifier {
   Future<void> stopTranslation() async {
     ActivationTracker.instance.liveStopped();
     _isTranslating = false;
+    _liveSession++;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;
     _displayedOverlays.clear();

@@ -386,6 +386,25 @@ void main() {
       expect(admissions, [asPro]);
     });
 
+    test('a pass of a stopped session never settles with the next Start', () async {
+      const asPro = TranslationAdmission.forTest(asPro: true);
+      const asFree = TranslationAdmission.forTest(asPro: false);
+      await p.startTranslation(liteAdmission: asPro);
+      p.debugSetTranslating(true);
+      final proSession = p.liveSession; // a capture pass starts rendering here
+
+      await p.stopTranslation(); // the user stops while it renders
+      await p.startTranslation(liteAdmission: asFree); // and starts again
+      p.debugSetTranslating(true);
+
+      p.debugMarkTranslationShown(fromSession: proSession); // the old pass returns
+      expect(successes, 0, reason: 'not counted for the new session');
+      expect(p.sessionProducedTranslations, isFalse);
+
+      p.debugMarkTranslationShown(); // the new session's own first frame
+      expect(admissions, [asFree]);
+    });
+
     test('projectionStopped resets state so Start works again', () {
       p.debugSetTranslating(true);
       var notified = 0;

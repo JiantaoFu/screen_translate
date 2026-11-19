@@ -347,12 +347,16 @@ class ProEntitlement extends ChangeNotifier {
       await _prefs.setBool(prefsKey, false);
       await _prefs.setInt(emptyQueriesKey, 0);
       await _prefs.remove(ownedProductKey);
-      return ProSyncOutcome.revoked;
-    });
-    if (outcome == ProSyncOutcome.revoked) {
+      // A purchase that arrived during these writes is queued right behind
+      // and restores Pro; reporting a revoke for it would be a false
+      // pro_revoked.
+      if (_grants != grantsBefore) return ProSyncOutcome.unchanged;
+      // Reported before the section ends: once it does, a purchase is a
+      // new grant after a finished revoke, not part of this one.
       notifyListeners();
       onRevoked?.call(lost);
-    }
+      return ProSyncOutcome.revoked;
+    });
     return outcome;
   }
 

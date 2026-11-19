@@ -22,11 +22,14 @@ void main() {
   late FakeStore store;
   late List<MapEntry<String, Map<String, Object>>> events;
   late DateTime now;
+  late List<String> offered;
+  late List<String> revoked;
 
   ProEntitlement makeEntitlement() => ProEntitlement(prefs,
       store: store,
       ownedPurchases: store,
-      offeredIds: () => const [yearly, monthly, lifetime],
+      offeredIds: () => offered,
+      onRevoked: revoked.add,
       now: () => now);
 
   setUp(() async {
@@ -40,6 +43,8 @@ void main() {
       ];
     events = [];
     now = DateTime(2026, 11, 18, 12);
+    offered = [yearly, monthly, lifetime];
+    revoked = [];
   });
 
   group('cancel or error without a product id', () {
@@ -118,6 +123,7 @@ void main() {
       // The second empty answer revokes; a restored subscription landing on
       // the purchase stream at any point while that revoke writes its
       // preferences must win. Try every interleaving up to 40 microtasks.
+      var finishedFirst = 0;
       for (var delay = 0; delay < 40; delay++) {
         SharedPreferences.setMockInitialValues(
             {ProEntitlement.prefsKey: true, ProEntitlement.emptyQueriesKey: 1});
@@ -133,13 +139,25 @@ void main() {
         for (var i = 0; i < delay; i++) {
           await Future<void>.microtask(() {});
         }
+        // Revoke already finished and reported before the purchase came:
+        // a real revoke followed by a restore, not this race.
+        final revokedBefore = revoked.isNotEmpty;
         await e.handlePurchases(
             [purchase(PurchaseStatus.restored, productId: yearly)]);
         await sync;
         expect(e.isPro, isTrue, reason: 'in memory, delay $delay');
         expect(prefs.getBool(ProEntitlement.prefsKey), isTrue,
             reason: 'persisted, delay $delay');
+        if (!revokedBefore) {
+          expect(revoked, isEmpty, reason: 'no pro_revoked, delay $delay');
+        } else {
+          finishedFirst++;
+        }
+        revoked.clear();
       }
+      // The sweep reached past the revoke's end, so the race window above
+      // was covered in full.
+      expect(finishedFirst, greaterThan(0));
     });
 
     test('nothing to do before init', () async {
@@ -270,6 +288,25 @@ void main() {
       });
     }
 
+    test('two free images finishing together spend two', () async {
+      final quota = DailyTranslationQuota(prefs);
+      final gate = LiteGate(
+        enabled: true,
+        quota: quota,
+        entitlement: makeEntitlement(),
+        logEvent: (name, params) async {},
+      );
+      await gate.entitlement.init();
+      final a = gate.admitTranslation(kind: LiteGate.kindImage)!;
+      final b = gate.admitTranslation(kind: LiteGate.kindImage)!;
+      await Future.wait([
+        gate.recordTranslationSuccess(kind: LiteGate.kindImage, admission: a),
+        gate.recordTranslationSuccess(kind: LiteGate.kindImage, admission: b),
+      ]);
+      expect(quota.usedToday, 2);
+      expect(quota.remaining, quota.dailyLimit - 2);
+    });
+
     test('a live session is counted with its own admission', () async {
       await setUpRevokingGate();
       final live = gate.admitTranslation(kind: LiteGate.kindLive)!;
@@ -339,6 +376,45 @@ void main() {
       await tester.pumpAndSettle();
       expect(shown(), hasLength(1));
       expect(shown().single['offers'], 'pro_yearly,pro_monthly,pro_unlock');
+    });
+
+    testWidgets('plans changing after the exposure are logged as an update', (tester) async {
+      offered = [lifetime]; // Remote Config default on a cold start
+      await open(tester);
+      expect(shown().single['offers'], 'pro_unlock');
+
+      offered = [yearly, monthly, lifetime]; // Remote Config activates
+      await gate.entitlement.loadProduct();
+      await tester.pumpAndSettle();
+      expect(shown(), hasLength(2));
+      expect(shown().last['offers'], 'pro_yearly,pro_monthly,pro_unlock');
+      expect(shown().last['offers_changed'], 1);
+      expect(shown().first.containsKey('offers_changed'), isFalse);
+
+      await gate.entitlement.loadProduct(); // same plans again: nothing new
+      await tester.pumpAndSettle();
+      expect(shown(), hasLength(2));
+    });
+
+    testWidgets('Pro arriving with a page over the paywall closes only the paywall',
+        (tester) async {
+      await open(tester);
+      final nav = tester.state<NavigatorState>(find.byType(Navigator));
+      nav.push(MaterialPageRoute(
+          builder: (_) => const Scaffold(body: Text('shared image'))));
+      await tester.pumpAndSettle();
+
+      // A background re-sync (or restore) grants Pro.
+      await gate.entitlement.handlePurchases(
+          [purchase(PurchaseStatus.restored, productId: yearly)]);
+      await tester.pumpAndSettle();
+      expect(find.text('shared image'), findsOneWidget);
+      expect(find.byType(PaywallScreen), findsNothing);
+
+      nav.pop(); // back from the image goes home, not to a stale paywall
+      await tester.pumpAndSettle();
+      expect(find.text('open'), findsOneWidget);
+      expect(find.byType(PaywallScreen), findsNothing);
     });
 
     testWidgets('closed before any plan loaded: logged once, with empty offers', (tester) async {

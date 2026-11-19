@@ -37,6 +37,7 @@ class PaywallScreen extends StatefulWidget {
 class _PaywallScreenState extends State<PaywallScreen> {
   bool _closing = false;
   bool _shownLogged = false;
+  String _loggedOffers = '';
   String? _selectedId;
 
   @override
@@ -67,17 +68,45 @@ class _PaywallScreenState extends State<PaywallScreen> {
 
   void _logShown() {
     _shownLogged = true;
+    _loggedOffers = _offerIds();
     widget.gate.paywallShown(widget.trigger);
+  }
+
+  String _offerIds() => widget.gate.entitlement.offers.map((p) => p.id).join(',');
+
+  /// The plans on screen changed after the exposure was logged (cold start:
+  /// the default one-time unlock, then Remote Config turns on the
+  /// subscriptions). Logged again, marked as an update, so plan conversion
+  /// can use what was finally shown.
+  void _logOffersChanged() {
+    final ids = _offerIds();
+    if (!_shownLogged || ids.isEmpty || ids == _loggedOffers) return;
+    _loggedOffers = ids;
+    widget.gate.paywallShown(widget.trigger, offersChanged: true);
+  }
+
+  /// Pro arrived (a purchase, or a background re-sync): close this paywall.
+  /// Not maybePop(): a page opened over the paywall (an image shared in
+  /// from outside) would be closed instead, and the paywall left behind.
+  void _closeOwnRoute() {
+    final route = ModalRoute.of(context);
+    final nav = Navigator.of(context);
+    if (route == null || route.isCurrent) {
+      nav.maybePop();
+    } else {
+      nav.removeRoute(route);
+    }
   }
 
   void _onChange() {
     if (!mounted) return;
     _logShownOnceOffered();
+    _logOffersChanged();
     if (widget.gate.isPro && !_closing) {
       _closing = true;
       final messenger = ScaffoldMessenger.maybeOf(context);
       final text = AppLocalizations.of(context)!.paywall_pro_unlocked;
-      Navigator.of(context).maybePop();
+      _closeOwnRoute();
       messenger?.showSnackBar(SnackBar(content: Text(text)));
       return;
     }

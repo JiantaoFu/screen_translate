@@ -15,6 +15,8 @@ TEXT = {
     'en-US': ('Screen Translate', 'Manga, webtoons & games,\ntranslated right on screen'),
     'zh-CN': ('屏幕翻译', '漫画、条漫、游戏\n在屏幕上直接翻译'),
     'ja-JP': ('画面翻訳', 'マンガ・Webtoon・ゲームを\n画面上でそのまま翻訳'),
+    'vi': ('Dịch Màn Hình', 'Manga, webtoon và game,\ndịch ngay trên màn hình'),
+    'id': ('Terjemah Layar', 'Manga, webtoon & game,\nditerjemahkan langsung di layar'),
 }
 
 

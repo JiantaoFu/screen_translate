@@ -13,6 +13,9 @@ cluttered); the code is kept for shots that set `callout`.
 """
 import argparse
 import os
+import shutil
+import time
+import uuid
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -28,7 +31,12 @@ FONTS = {
     'en-US': ('C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/seguisb.ttf'),
     'zh-CN': ('C:/Windows/Fonts/msyhbd.ttc', 'C:/Windows/Fonts/msyh.ttc'),
     'ja-JP': ('C:/Windows/Fonts/YuGothB.ttc', 'C:/Windows/Fonts/YuGothM.ttc'),
+    'vi': ('C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/seguisb.ttf'),
+    'id': ('C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/seguisb.ttf'),
 }
+
+# Written next to the images by a run that finished: the files upload.py may send.
+MANIFEST = 'composed.txt'
 
 # Phone screen (1080x2400 capture) placement inside the 1080x1920 canvas.
 PHONE = (196, 300, 688, 1528)   # x, y, w, h (top follows the captions)
@@ -39,31 +47,45 @@ SHOTS = {
     'manga': dict(
         text={'en-US': ('Translate manga right on the page', 'Even vertical speech bubbles'),
               'zh-CN': ('漫画对白，原地翻译', '竖排气泡也能读懂'),
-              'ja-JP': ('マンガのセリフをその場で翻訳', '海外コミックもそのまま読める')}),
+              'ja-JP': ('マンガのセリフをその場で翻訳', '海外コミックもそのまま読める'),
+              'vi': ('Dịch manga ngay trên trang', 'Đọc manga, manhwa bằng tiếng Việt'),
+              'id': ('Terjemahkan manga langsung di halaman', 'Baca manga & manhwa dalam bahasa Indonesia')}),
     'game': dict(
         text={'en-US': ('Play games in any language', 'Dialogue translated as you play'),
               'zh-CN': ('外语游戏，边玩边懂', '对话实时翻译'),
-              'ja-JP': ('海外ゲームもそのまま遊べる', 'セリフをリアルタイムで翻訳')}),
+              'ja-JP': ('海外ゲームもそのまま遊べる', 'セリフをリアルタイムで翻訳'),
+              'vi': ('Chơi game mọi ngôn ngữ', 'Lời thoại được dịch ngay khi chơi'),
+              'id': ('Main game bahasa apa pun', 'Dialog diterjemahkan saat bermain')}),
     'webtoon': dict(
         text={'en-US': ('Read webtoons as you scroll', 'Korean, Japanese, Chinese and more'),
               'zh-CN': ('条漫边滑边翻译', '韩语、日语等多种语言'),
-              'ja-JP': ('Webtoonもスクロールしながら翻訳', '韓国語・英語など多言語対応')}),
+              'ja-JP': ('Webtoonもスクロールしながら翻訳', '韓国語・英語など多言語対応'),
+              'vi': ('Đọc webtoon, vừa cuộn vừa dịch', 'Tiếng Hàn, Nhật, Trung và nhiều hơn nữa'),
+              'id': ('Baca webtoon sambil menggulir', 'Korea, Jepang, Mandarin, dan lainnya')}),
     'chat': dict(
         text={'en-US': ('Chats and posts, too', 'Works over any app on your screen'),
               'zh-CN': ('聊天、帖子也能翻', '任何应用里的文字都能翻译'),
-              'ja-JP': ('チャットもSNSも翻訳', '画面上のどのアプリでも使える')}),
+              'ja-JP': ('チャットもSNSも翻訳', '画面上のどのアプリでも使える'),
+              'vi': ('Cả tin nhắn và bài đăng', 'Dùng được trên mọi ứng dụng'),
+              'id': ('Chat dan postingan juga bisa', 'Berfungsi di aplikasi apa pun')}),
     'home': dict(
         text={'en-US': ('One tap to start', 'A floating button stays on top of any app'),
               'zh-CN': ('一键开启', '悬浮按钮常驻在任何应用上方'),
-              'ja-JP': ('ワンタップで開始', 'フローティングボタンがどのアプリにも'),}),
+              'ja-JP': ('ワンタップで開始', 'フローティングボタンがどのアプリにも'),
+              'vi': ('Một chạm để bắt đầu', 'Nút nổi luôn nằm trên mọi ứng dụng'),
+              'id': ('Mulai dengan satu ketukan', 'Tombol mengambang di atas aplikasi apa pun'),}),
     'settings': dict(
         text={'en-US': ('Quick or AI translation', 'AI packs run on your phone, offline'),
               'zh-CN': ('快速翻译或 AI 翻译', 'AI 语言包在手机本地运行，可离线使用'),
-              'ja-JP': ('クイック翻訳とAI翻訳', 'AIパックは端末内で動作、オフラインでも')}),
+              'ja-JP': ('クイック翻訳とAI翻訳', 'AIパックは端末内で動作、オフラインでも'),
+              'vi': ('Dịch nhanh hoặc dịch AI', 'Gói AI chạy ngay trên điện thoại, không cần mạng'),
+              'id': ('Terjemahan cepat atau AI', 'Paket AI berjalan di ponsel, bisa offline')}),
     'languages': dict(
         text={'en-US': ('50+ languages', 'Pick any pair'),
               'zh-CN': ('支持 50 多种语言', '任意语言组合'),
-              'ja-JP': ('50以上の言語に対応', '好きな組み合わせで翻訳')}),
+              'ja-JP': ('50以上の言語に対応', '好きな組み合わせで翻訳'),
+              'vi': ('Hơn 50 ngôn ngữ', 'Chọn cặp ngôn ngữ bất kỳ'),
+              'id': ('50+ bahasa', 'Pilih pasangan bahasa mana pun')}),
 }
 
 
@@ -210,14 +232,93 @@ def main():
         RAW = os.path.join(RAW, 'tablet')
         OUT = os.path.join(os.path.dirname(OUT), 'tablet')
     shots = args.only.split(',') if args.only else list(SHOTS)
-    for i, shot in enumerate(SHOTS, 1):
-        if shot not in shots:
-            continue
-        raw = os.path.join(RAW, args.locale, shot + '.png')
-        if not os.path.exists(raw):
-            print(f'skip {shot}: no {raw}')
-            continue
-        print(compose(args.locale, shot, raw, os.path.join(OUT, args.locale, f'{i:02d}_{shot}.png')))
+    out_dir = os.path.join(OUT, args.locale)
+    manifest = os.path.join(out_dir, MANIFEST)
+    previous = []
+    if args.only:
+        # Replacing some shots of a finished set: the rest come from it.
+        if not os.path.exists(manifest):
+            raise SystemExit(f'no {manifest}: run a full compose for {args.locale} first')
+        with open(manifest, encoding='utf-8') as f:
+            previous = [n for n in f.read().split() if n]
+
+    # Each run writes a complete set into a folder of its own, and the set
+    # becomes the one upload.py sends only when composed.txt (a single file,
+    # replaced atomically) points at it. Until then the previous set and
+    # list are untouched, so a run that stops anywhere (a landscape raw, a
+    # file Windows keeps open) can't leave a mix of new and old images.
+    os.makedirs(out_dir, exist_ok=True)
+    set_name = time.strftime('set-%Y%m%d-%H%M%S-') + uuid.uuid4().hex[:8]
+    set_dir = os.path.join(out_dir, set_name)
+    os.makedirs(set_dir)
+    try:
+        redo = {f'{i:02d}_{shot}.png' for i, shot in enumerate(SHOTS, 1) if shot in shots}
+        for rel in previous:   # --only: carry over the shots not being redone
+            name = os.path.basename(rel)
+            if name not in redo:
+                shutil.copy2(os.path.join(out_dir, rel), os.path.join(set_dir, name))
+        for i, shot in enumerate(SHOTS, 1):
+            if shot not in shots:
+                continue
+            raw = os.path.join(RAW, args.locale, shot + '.png')
+            if not os.path.exists(raw):
+                print(f'skip {shot}: no {raw}')
+                continue
+            rw, rh = Image.open(raw).size
+            if rw > rh:
+                # A capture taken while the AVD was rotated (raw/zh-CN/home.png
+                # was overwritten by one, 2400x1080) composes as a sideways screen.
+                raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
+            print(compose(args.locale, shot, raw, os.path.join(set_dir, f'{i:02d}_{shot}.png')))
+        names = sorted(n for n in os.listdir(set_dir) if n.endswith('.png'))
+        tmp = f'{manifest}.{set_name}.tmp'   # per run: parallel runs don't share it
+        with open(tmp, 'w', encoding='utf-8') as f:
+            f.write(''.join(f'{set_name}/{n}\n' for n in names))
+        os.replace(tmp, manifest)
+    except BaseException:
+        shutil.rmtree(set_dir, ignore_errors=True)
+        raise
+    prune(out_dir)
+
+
+# A set no list points at any more is kept this long, counted from when it
+# was first seen retired, before prune() removes it. A parallel compose run,
+# or an upload.py that has already read the list, may still be using it.
+PRUNE_AFTER_S = 24 * 3600
+RETIRED = '.retired'   # inside a set: its mtime is when it left the list
+
+
+def prune(out_dir):
+    """Remove sets composed.txt stopped listing over PRUNE_AFTER_S ago.
+
+    A set's own age doesn't matter: yesterday's set retired a minute ago by
+    a new run still gets the full period, because the clock starts at the
+    first prune that finds it unlisted (right after the switch that retired
+    it). A listed set loses any mark, so the clock restarts if it is retired
+    again. Best effort: errors only leave files behind.
+    """
+    try:
+        with open(os.path.join(out_dir, MANIFEST), encoding='utf-8') as f:
+            live = {n.split('/')[0] for n in f.read().split() if n}
+    except OSError:
+        return
+    now = time.time()
+    for n in os.listdir(out_dir):
+        p = os.path.join(out_dir, n)
+        try:
+            if n.startswith('set-') and os.path.isdir(p):
+                mark = os.path.join(p, RETIRED)
+                if n in live:
+                    if os.path.exists(mark):
+                        os.remove(mark)
+                elif not os.path.exists(mark):
+                    open(mark, 'w').close()        # retired now: start the clock
+                elif now - os.path.getmtime(mark) > PRUNE_AFTER_S:
+                    shutil.rmtree(p)
+            elif n.endswith(('.png', '.tmp')) and now - os.path.getmtime(p) > PRUNE_AFTER_S:
+                os.remove(p)                       # pre-set images, abandoned lists
+        except OSError:
+            pass
 
 
 if __name__ == '__main__':

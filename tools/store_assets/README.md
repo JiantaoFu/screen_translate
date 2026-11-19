@@ -11,6 +11,7 @@ Real emulator captures of the app translating, laid out as store images.
 | 4b. Tablet screenshots | same capture.sh on the Pixel_Tablet AVD in portrait, then `compose.py --device tablet` | `raw/tablet/<locale>/` → `build/play_store_assets/tablet/<locale>/` (1440x2560) |
 | 5. Feature graphic | `cd tools/store_assets && python feature.py --locale <locale>` | `build/play_store_assets/feature/<locale>.png` (1024x500) |
 | 6. Upload | `python tools/store_assets/upload.py [--commit]` | dry run by default; needs the service account's store-listing permission |
+| Listing text | `python tools/store_assets/upload_text.py [--app paid\|lite] [lang ...] [--commit]` | title and descriptions from `store_listing/`; dry run by default |
 
 Scenes: manga, game, webtoon, chat (artwork shown in Google Photos with live
 translation running) and home, settings, languages (the app's own screens,

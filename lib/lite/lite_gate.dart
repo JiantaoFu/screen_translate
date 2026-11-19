@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_flavor.dart';
@@ -23,7 +23,7 @@ typedef LiteEventLogger = Future<void> Function(String name, Map<String, Object>
 ///   purchase_started, pro_purchased (with remaining_free / daily_limit
 ///   where they apply), pro_revoked (Play no longer reports a Pro product:
 ///   refunded, or a subscription ended). `product_id` says which plan.
-class LiteGate extends ChangeNotifier {
+class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   static const evTranslationSuccess = 'translation_success';
   static const evFreeLimitHit = 'free_limit_hit';
   static const evPaywallShown = 'paywall_shown';
@@ -69,7 +69,17 @@ class LiteGate extends ChangeNotifier {
       entitlement: entitlement,
     );
     current.value = gate;
+    WidgetsBinding.instance.addObserver(gate);
     await entitlement.init();
+  }
+
+  /// Re-checks Play's owned purchases when the app returns to the
+  /// foreground (throttled in [ProEntitlement.syncIfStale]), so a
+  /// subscription that expired while the app was in the background stops
+  /// unlocking translations without waiting for a cold start.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) entitlement.syncIfStale();
   }
 
   /// Waits for the lite gate to be built, and returns [instance].
@@ -188,6 +198,7 @@ class LiteGate extends ChangeNotifier {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     entitlement.removeListener(notifyListeners);
     super.dispose();
   }

@@ -13,6 +13,7 @@ cluttered); the code is kept for shots that set `callout`.
 """
 import argparse
 import os
+import shutil
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -238,33 +239,52 @@ def main():
         with open(manifest, encoding='utf-8') as f:
             done = [n for n in f.read().split() if n]
     else:
-        # A full run starts clean, so a shot skipped this time (missing raw)
-        # can't leave an older image behind for upload.py to pick up, and the
-        # list is only written once every shot has been composed.
         done = []
-        if os.path.isdir(out_dir):
+
+    # Every image of the run goes to a staging folder first, and only when
+    # all of them succeeded do they replace the finished set and its list.
+    # A run that stops half-way (a landscape raw) leaves the previous set
+    # and composed.txt exactly as they were, instead of mixing new and old
+    # images that upload.py would send together.
+    staging = out_dir + '.staging'
+    shutil.rmtree(staging, ignore_errors=True)
+    os.makedirs(staging)
+    try:
+        made = []
+        for i, shot in enumerate(SHOTS, 1):
+            if shot not in shots:
+                continue
+            raw = os.path.join(RAW, args.locale, shot + '.png')
+            if not os.path.exists(raw):
+                print(f'skip {shot}: no {raw}')
+                continue
+            rw, rh = Image.open(raw).size
+            if rw > rh:
+                # A capture taken while the AVD was rotated (raw/zh-CN/home.png
+                # was overwritten by one, 2400x1080) composes as a sideways screen.
+                raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
+            name = f'{i:02d}_{shot}.png'
+            compose(args.locale, shot, raw, os.path.join(staging, name))
+            made.append(name)
+
+        os.makedirs(out_dir, exist_ok=True)
+        if not args.only:
+            # A full run replaces the whole set: a shot skipped this time
+            # (missing raw) must not leave an older image behind.
             for n in os.listdir(out_dir):
-                if n.endswith('.png') or n == MANIFEST:
+                if n.endswith('.png'):
                     os.remove(os.path.join(out_dir, n))
-    for i, shot in enumerate(SHOTS, 1):
-        if shot not in shots:
-            continue
-        raw = os.path.join(RAW, args.locale, shot + '.png')
-        if not os.path.exists(raw):
-            print(f'skip {shot}: no {raw}')
-            continue
-        rw, rh = Image.open(raw).size
-        if rw > rh:
-            # A capture taken while the AVD was rotated (raw/zh-CN/home.png
-            # was overwritten by one, 2400x1080) composes as a sideways screen.
-            raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
-        name = f'{i:02d}_{shot}.png'
-        print(compose(args.locale, shot, raw, os.path.join(out_dir, name)))
-        if name not in done:
-            done.append(name)
-    os.makedirs(out_dir, exist_ok=True)
-    with open(manifest, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(sorted(done)) + '\n')
+        for name in made:
+            os.replace(os.path.join(staging, name), os.path.join(out_dir, name))
+            print(os.path.join(out_dir, name))
+            if name not in done:
+                done.append(name)
+        tmp = manifest + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(sorted(done)) + '\n')
+        os.replace(tmp, manifest)
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
 
 
 if __name__ == '__main__':

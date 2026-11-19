@@ -271,25 +271,46 @@ def main():
                 raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
             print(compose(args.locale, shot, raw, os.path.join(set_dir, f'{i:02d}_{shot}.png')))
         names = sorted(n for n in os.listdir(set_dir) if n.endswith('.png'))
-        tmp = manifest + '.tmp'
+        tmp = f'{manifest}.{set_name}.tmp'   # per run: parallel runs don't share it
         with open(tmp, 'w', encoding='utf-8') as f:
             f.write(''.join(f'{set_name}/{n}\n' for n in names))
         os.replace(tmp, manifest)
     except BaseException:
         shutil.rmtree(set_dir, ignore_errors=True)
         raise
-    # The new set is live; older sets and images from before sets existed
-    # are no longer listed anywhere. Best effort: a locked file only costs
-    # disk space.
+    prune(out_dir)
+
+
+# A set no list points at is kept this long before prune() removes it. A
+# parallel compose run, or an upload.py that has already read the list,
+# may still be using a set that is no longer current; both take minutes.
+PRUNE_AFTER_S = 24 * 3600
+
+
+def prune(out_dir):
+    """Remove old sets that composed.txt no longer lists. Best effort.
+
+    Never touches the current set or anything younger than PRUNE_AFTER_S,
+    so it can't delete what a parallel run just switched to or what an
+    upload in progress is reading.
+    """
+    try:
+        with open(os.path.join(out_dir, MANIFEST), encoding='utf-8') as f:
+            live = {n.split('/')[0] for n in f.read().split() if n}
+    except OSError:
+        return
+    cutoff = time.time() - PRUNE_AFTER_S
     for n in os.listdir(out_dir):
         p = os.path.join(out_dir, n)
-        if n != set_name and n.startswith('set-') and os.path.isdir(p):
-            shutil.rmtree(p, ignore_errors=True)
-        elif n.endswith('.png') or n.endswith('.staging'):
-            try:
-                shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
-            except OSError:
-                pass
+        try:
+            if os.path.getmtime(p) > cutoff or n in live:
+                continue
+            if n.startswith('set-') and os.path.isdir(p):
+                shutil.rmtree(p)
+            elif n.endswith('.png') or n.endswith('.tmp'):   # pre-set images, abandoned lists
+                os.remove(p)
+        except OSError:
+            pass
 
 
 if __name__ == '__main__':

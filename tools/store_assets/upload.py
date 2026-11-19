@@ -14,14 +14,15 @@ en-US set instead of showing the old mock-ups. Uses the service account of
 tools/release.py ($PLAY_SERVICE_ACCOUNT_JSON).
 """
 import argparse
-import glob
 import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
+sys.path.insert(0, HERE)
 import release  # noqa: E402
+from compose import MANIFEST  # noqa: E402
 
 ASSETS = os.path.join(REPO, 'build', 'play_store_assets')
 LOCALES = ['en-US', 'zh-CN', 'ja-JP', 'vi', 'id']
@@ -31,9 +32,28 @@ TABLET_OPTIONAL = {'vi', 'id'}
 SCREENSHOT_TYPES = ['phoneScreenshots', 'sevenInchScreenshots', 'tenInchScreenshots']
 
 
+def composed(kind, locale):
+    """The images compose.py's last finished run wrote for kind/locale.
+
+    Only those, never every PNG in the folder: a shot skipped in that run, or
+    a run that stopped half-way, must not send an older image to Play. No
+    list means no finished run (empty, and the caller decides).
+    """
+    folder = os.path.join(ASSETS, kind, locale)
+    manifest = os.path.join(folder, MANIFEST)
+    if not os.path.exists(manifest):
+        return []
+    with open(manifest, encoding='utf-8') as f:
+        names = [n for n in f.read().split() if n]
+    missing = [n for n in names if not os.path.exists(os.path.join(folder, n))]
+    if missing:
+        sys.exit(f'{manifest} lists missing files: {", ".join(missing)}; rerun compose.py')
+    return [os.path.join(folder, n) for n in sorted(names)]
+
+
 def files_for(locale):
-    phone = sorted(glob.glob(os.path.join(ASSETS, 'screens', locale, '*.png')))
-    tablet = sorted(glob.glob(os.path.join(ASSETS, 'tablet', locale, '*.png')))
+    phone = composed('screens', locale)
+    tablet = composed('tablet', locale)
     feature = os.path.join(ASSETS, 'feature', locale + '.png')
     return {
         'phoneScreenshots': phone,

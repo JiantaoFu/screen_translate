@@ -32,6 +32,9 @@ FONTS = {
     'id': ('C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/seguisb.ttf'),
 }
 
+# Written next to the images by a run that finished: the files upload.py may send.
+MANIFEST = 'composed.txt'
+
 # Phone screen (1080x2400 capture) placement inside the 1080x1920 canvas.
 PHONE = (196, 300, 688, 1528)   # x, y, w, h (top follows the captions)
 
@@ -226,6 +229,23 @@ def main():
         RAW = os.path.join(RAW, 'tablet')
         OUT = os.path.join(os.path.dirname(OUT), 'tablet')
     shots = args.only.split(',') if args.only else list(SHOTS)
+    out_dir = os.path.join(OUT, args.locale)
+    manifest = os.path.join(out_dir, MANIFEST)
+    if args.only:
+        # Replacing some shots of a finished set: keep the rest of the list.
+        if not os.path.exists(manifest):
+            raise SystemExit(f'no {manifest}: run a full compose for {args.locale} first')
+        with open(manifest, encoding='utf-8') as f:
+            done = [n for n in f.read().split() if n]
+    else:
+        # A full run starts clean, so a shot skipped this time (missing raw)
+        # can't leave an older image behind for upload.py to pick up, and the
+        # list is only written once every shot has been composed.
+        done = []
+        if os.path.isdir(out_dir):
+            for n in os.listdir(out_dir):
+                if n.endswith('.png') or n == MANIFEST:
+                    os.remove(os.path.join(out_dir, n))
     for i, shot in enumerate(SHOTS, 1):
         if shot not in shots:
             continue
@@ -238,7 +258,13 @@ def main():
             # A capture taken while the AVD was rotated (raw/zh-CN/home.png
             # was overwritten by one, 2400x1080) composes as a sideways screen.
             raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
-        print(compose(args.locale, shot, raw, os.path.join(OUT, args.locale, f'{i:02d}_{shot}.png')))
+        name = f'{i:02d}_{shot}.png'
+        print(compose(args.locale, shot, raw, os.path.join(out_dir, name)))
+        if name not in done:
+            done.append(name)
+    os.makedirs(out_dir, exist_ok=True)
+    with open(manifest, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(sorted(done)) + '\n')
 
 
 if __name__ == '__main__':

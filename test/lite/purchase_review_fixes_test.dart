@@ -114,6 +114,34 @@ void main() {
       expect(e.isPro, isTrue);
     });
 
+    test('a purchase arriving during the revoke never ends up revoked', () async {
+      // The second empty answer revokes; a restored subscription landing on
+      // the purchase stream at any point while that revoke writes its
+      // preferences must win. Try every interleaving up to 40 microtasks.
+      for (var delay = 0; delay < 40; delay++) {
+        SharedPreferences.setMockInitialValues(
+            {ProEntitlement.prefsKey: true, ProEntitlement.emptyQueriesKey: 1});
+        prefs = await SharedPreferences.getInstance();
+        store.owned = [purchase(PurchaseStatus.purchased, productId: yearly)];
+        final e = makeEntitlement();
+        await e.init(); // resets the empty count: Play has it
+        await prefs.setInt(ProEntitlement.emptyQueriesKey, 1);
+        store.owned = [];
+        now = now.add(ProEntitlement.resyncInterval);
+
+        final sync = e.syncIfStale();
+        for (var i = 0; i < delay; i++) {
+          await Future<void>.microtask(() {});
+        }
+        await e.handlePurchases(
+            [purchase(PurchaseStatus.restored, productId: yearly)]);
+        await sync;
+        expect(e.isPro, isTrue, reason: 'in memory, delay $delay');
+        expect(prefs.getBool(ProEntitlement.prefsKey), isTrue,
+            reason: 'persisted, delay $delay');
+      }
+    });
+
     test('nothing to do before init or without a store', () async {
       final e = makeEntitlement();
       expect(await e.syncIfStale(), isNull);
@@ -121,6 +149,28 @@ void main() {
       await e.init();
       expect(await e.syncIfStale(), isNull);
       expect(store.ownedQueries, 0);
+    });
+  });
+
+  group('re-check while translating', () {
+    test('a new translation by a Pro user re-checks Play, throttled', () async {
+      await prefs.setBool(ProEntitlement.prefsKey, true);
+      store.owned = [purchase(PurchaseStatus.purchased, productId: yearly)];
+      final gate = LiteGate(
+        enabled: true,
+        quota: DailyTranslationQuota(prefs),
+        entitlement: makeEntitlement(),
+        logEvent: (name, params) async {},
+      );
+      await gate.entitlement.init();
+      final queries = store.ownedQueries;
+      expect(gate.mayStartTranslation(kind: 'live'), isTrue);
+      await pumpEventQueue();
+      expect(store.ownedQueries, queries, reason: 'inside the interval');
+      now = now.add(ProEntitlement.resyncInterval);
+      expect(gate.mayStartTranslation(kind: 'live'), isTrue);
+      await pumpEventQueue();
+      expect(store.ownedQueries, queries + 1);
     });
   });
 

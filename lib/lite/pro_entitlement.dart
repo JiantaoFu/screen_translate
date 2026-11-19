@@ -185,6 +185,7 @@ class ProEntitlement extends ChangeNotifier {
   bool _purchasePending = false;
   bool _initialized = false;
   int _grants = 0;
+  Future<void>? _writing;
   final Map<String, ProductDetails> _products = {};
   String? _lastError;
   final DateTime Function() _now;
@@ -315,19 +316,47 @@ class ProEntitlement extends ChangeNotifier {
       notifyListeners();
       return ProSyncOutcome.granted;
     }
-    // A purchase that landed on the stream while we were querying wins.
-    if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
-    final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
-    await _prefs.setInt(emptyQueriesKey, empties);
-    if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
     final lost = ownedProductId ?? productId;
-    _isPro = false;
-    await _prefs.setBool(prefsKey, false);
-    await _prefs.setInt(emptyQueriesKey, 0);
-    await _prefs.remove(ownedProductKey);
-    notifyListeners();
-    onRevoked?.call(lost);
-    return ProSyncOutcome.revoked;
+    final outcome = await _serialized(() async {
+      // A purchase that landed on the stream while we were querying, or
+      // while an earlier write was in flight, wins. Checked inside the
+      // serialized section, so no grant can slip in between this check and
+      // the revoke below.
+      if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
+      final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
+      await _prefs.setInt(emptyQueriesKey, empties);
+      if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
+      _isPro = false;
+      await _prefs.setBool(prefsKey, false);
+      await _prefs.setInt(emptyQueriesKey, 0);
+      await _prefs.remove(ownedProductKey);
+      return ProSyncOutcome.revoked;
+    });
+    if (outcome == ProSyncOutcome.revoked) {
+      notifyListeners();
+      onRevoked?.call(lost);
+    }
+    return outcome;
+  }
+
+  /// Runs entitlement writes (grant, revoke) one after another. Each one
+  /// awaits several preference writes; without this a purchase granted
+  /// during a revoke's writes could be overwritten by the revoke.
+  ///
+  /// When nothing is writing it runs at once, in the caller's zone and up to
+  /// its first await synchronously, exactly like an unguarded call.
+  Future<T> _serialized<T>(Future<T> Function() write) async {
+    while (_writing != null) {
+      await _writing;
+    }
+    final done = Completer<void>();
+    _writing = done.future;
+    try {
+      return await write();
+    } finally {
+      _writing = null;
+      done.complete();
+    }
   }
 
   Future<void> loadProduct() async {
@@ -429,13 +458,16 @@ class ProEntitlement extends ChangeNotifier {
     }
   }
 
-  Future<void> _grant(String id) async {
+  Future<void> _grant(String id) {
+    // Counted at once, so a revoke queued behind an earlier write sees it.
     _grants++;
-    _isPro = true;
-    await _prefs.setBool(prefsKey, true);
-    await _prefs.setString(ownedProductKey, id);
-    // Play has the purchase, so any earlier empty answers were transient.
-    await _prefs.setInt(emptyQueriesKey, 0);
+    return _serialized(() async {
+      _isPro = true;
+      await _prefs.setBool(prefsKey, true);
+      await _prefs.setString(ownedProductKey, id);
+      // Play has the purchase, so any earlier empty answers were transient.
+      await _prefs.setInt(emptyQueriesKey, 0);
+    });
   }
 
   @override

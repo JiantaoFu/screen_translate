@@ -121,6 +121,10 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   /// Whether a new translation attempt may go ahead. Logs free_limit_hit
   /// when it may not; the caller then shows the paywall.
   bool mayStartTranslation({required String kind}) {
+    // A Pro user who keeps the app in the foreground never triggers the
+    // resume check, so each new translation also re-checks Play (same
+    // throttle). The answer applies from the next attempt on.
+    if (enabled && isPro) entitlement.syncIfStale();
     if (!enabled || isPro || quota.canTranslate(isPro: false)) return true;
     _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
     return false;

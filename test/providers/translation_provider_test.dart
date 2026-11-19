@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:screen_translate/lite/lite_gate.dart';
 import 'package:screen_translate/models/ocr_result.dart';
 import 'package:screen_translate/providers/translation_provider.dart';
 
@@ -346,10 +347,12 @@ void main() {
 
   group('session success counting and system stop', () {
     late int successes;
+    late List<TranslationAdmission?> admissions;
     late TranslationProvider p;
 
     setUp(() {
       successes = 0;
+      admissions = [];
       p = TranslationProvider(
         null,
         FakeOCRService(),
@@ -357,7 +360,10 @@ void main() {
         FakeOverlayService(),
         llmTranslationService: FakeLLMTranslationService(),
         onnxTranslationService: FakeOnnxTranslationService(),
-        onSessionSucceeded: () async => successes++,
+        onSessionSucceeded: (admission) async {
+          successes++;
+          admissions.add(admission);
+        },
       );
     });
 
@@ -368,6 +374,16 @@ void main() {
       }
       expect(successes, 1);
       expect(p.sessionProducedTranslations, isTrue);
+    });
+
+    test('a rejected second Start keeps the running session\'s lite admission', () async {
+      const asPro = TranslationAdmission.forTest(asPro: true);
+      const asFree = TranslationAdmission.forTest(asPro: false);
+      await p.startTranslation(liteAdmission: asPro); // accepted (fails off-device)
+      p.debugSetTranslating(true); // the session it started is running
+      expect(await p.startTranslation(liteAdmission: asFree), StartOutcome.alreadyRunning);
+      p.debugMarkTranslationShown();
+      expect(admissions, [asPro]);
     });
 
     test('projectionStopped resets state so Start works again', () {

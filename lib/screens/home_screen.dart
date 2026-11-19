@@ -486,12 +486,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// source language — and a check at one of them silently leaves the other
   /// ungated. Same lesson as the cold-start share intent.
   Future<void> _startLiveTranslation(BuildContext context, TranslationProvider provider) async {
-    if (!await _liteAllows('live')) return;
-    if (!context.mounted) return;
+    final lite = await _liteAdmit(LiteGate.kindLive);
+    if (!lite.allowed || !context.mounted) return;
     if (!await _confirmQuickPacksBeforeTranslate(context, provider)) return;
     if (!context.mounted) return;
     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
-    final outcome = await provider.startTranslation();
+    final outcome = await provider.startTranslation(liteAdmission: lite.admission);
     if (!context.mounted) return;
     // A denied screen-capture consent is the one failure worth a second go
     // in place: the user has already granted the overlay and is one tap from
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Either way the dialog has already said what went wrong, so no
       // snackbar saying it again.
       if (retry) {
-        final retried = await provider.startTranslation();
+        final retried = await provider.startTranslation(liteAdmission: lite.admission);
         if (!context.mounted) return;
         _explainStartOutcome(context, retried);
       }

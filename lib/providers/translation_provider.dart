@@ -238,7 +238,7 @@ class TranslationProvider with ChangeNotifier {
     this._overlayService, {
     LLMTranslationService? llmTranslationService,
     OnnxTranslationService? onnxTranslationService,
-    Future<void> Function()? onSessionSucceeded,
+    Future<void> Function(TranslationAdmission? liteAdmission)? onSessionSucceeded,
   })  : _onSessionSucceeded = onSessionSucceeded ?? _recordReviewSuccess,
         _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
         _onnxTranslationService = onnxTranslationService ?? OnnxTranslationService() {
@@ -250,13 +250,21 @@ class TranslationProvider with ChangeNotifier {
     _initPreferences();
   }
 
-  final Future<void> Function() _onSessionSucceeded;
+  final Future<void> Function(TranslationAdmission? liteAdmission) _onSessionSucceeded;
 
-  static Future<void> _recordReviewSuccess() async {
+  /// Lite: how the current live session was let in. Bound only by a Start
+  /// this provider accepted, so a second tap that ends up rejected
+  /// (alreadyRunning) can't replace the running session's.
+  TranslationAdmission? _sessionAdmission;
+
+  void _sessionSucceeded() => _onSessionSucceeded(_sessionAdmission);
+
+  static Future<void> _recordReviewSuccess(TranslationAdmission? liteAdmission) async {
     // Lite flavor: one live session that drew a translation is one of the
     // day's free translations (no-op in the paid app).
     try {
-      await LiteGate.instance?.recordTranslationSuccess(kind: 'live');
+      await LiteGate.instance?.recordTranslationSuccess(
+          kind: LiteGate.kindLive, admission: liteAdmission);
     } catch (e) {
       print('Lite quota not updated: $e');
     }
@@ -389,9 +397,12 @@ class TranslationProvider with ChangeNotifier {
   /// True while Start is walking through the permission screens.
   bool get isStarting => _isStarting;
 
-  Future<StartOutcome> startTranslation() async {
+  /// [liteAdmission]: the lite gate's admission for this Start (null in
+  /// paid); bound to the session only once this Start is accepted.
+  Future<StartOutcome> startTranslation({TranslationAdmission? liteAdmission}) async {
     if (_isTranslating || _isStarting) return StartOutcome.alreadyRunning;
     _isStarting = true;
+    _sessionAdmission = liteAdmission;
     try {
       return await _startTranslation();
     } finally {
@@ -521,7 +532,7 @@ class TranslationProvider with ChangeNotifier {
   void debugMarkTranslationShown() {
     if (!_sessionProducedTranslations) {
       _sessionProducedTranslations = true;
-      _onSessionSucceeded();
+      _sessionSucceeded();
     }
   }
 
@@ -935,7 +946,7 @@ class TranslationProvider with ChangeNotifier {
                 if (!_sessionProducedTranslations) {
                   _sessionProducedTranslations = true;
                   // One success per live session, not per 500 ms tick.
-                  _onSessionSucceeded();
+                  _sessionSucceeded();
                 }
                 ActivationTracker.instance.translationShown(newIndices.length);
                 notifyListeners();

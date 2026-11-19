@@ -272,11 +272,13 @@ void main() {
 
     test('a live session is counted with its own admission', () async {
       await setUpRevokingGate();
-      expect(gate.mayStartTranslation(kind: LiteGate.kindLive), isTrue);
+      final live = gate.admitTranslation(kind: LiteGate.kindLive)!;
       await pumpEventQueue();
       expect(gate.isPro, isFalse);
-      // The capture service reports the session without an admission.
-      await gate.recordTranslationSuccess(kind: LiteGate.kindLive);
+      // A second Start, let in as free, must not change how the first counts
+      // (TranslationProvider only binds an admission when it accepts Start).
+      expect(gate.admitTranslation(kind: LiteGate.kindLive)!.asPro, isFalse);
+      await gate.recordTranslationSuccess(kind: LiteGate.kindLive, admission: live);
       expect(quota.remaining, 1);
     });
   });

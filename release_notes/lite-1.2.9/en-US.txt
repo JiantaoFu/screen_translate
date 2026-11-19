@@ -1,0 +1,4 @@
+• Purchase screen no longer gets stuck after you cancel
+• Pro status stays in sync with Google Play while the app is open
+• Cloud translation keys are kept, and AI model downloads are verified
+• Stability improvements

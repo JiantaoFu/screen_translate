@@ -112,6 +112,7 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   int get dailyLimit => quota.dailyLimit;
   int get remainingFree => quota.remaining;
   bool get paywallPending => _paywallPending;
+  final Map<String, bool> _admittedAsPro = {};
 
   Map<String, Object> get _quotaParams => {
         'remaining_free': quota.remaining,
@@ -125,6 +126,9 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
     // resume check, so each new translation also re-checks Play (same
     // throttle). The answer applies from the next attempt on.
     if (enabled && isPro) entitlement.syncIfStale();
+    // Remembered so the success is counted with the entitlement this attempt
+    // was let in with, not one the check above changes meanwhile.
+    _admittedAsPro[kind] = isPro;
     if (!enabled || isPro || quota.canTranslate(isPro: false)) return true;
     _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
     return false;
@@ -133,11 +137,15 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   /// Counts one successful translation (`live` session or `image`).
   Future<QuotaUse?> recordTranslationSuccess({required String kind}) async {
     if (!enabled) return null;
-    final use = await quota.recordSuccess(isPro: isPro);
+    // An attempt let in as Pro doesn't spend free translations (or open the
+    // paywall) even if the subscription lapsed while it ran; that applies
+    // from the next attempt on.
+    final pro = isPro || (_admittedAsPro.remove(kind) ?? false);
+    final use = await quota.recordSuccess(isPro: pro);
     _log(evTranslationSuccess, {
       'remaining_free': use.remaining,
       'daily_limit': use.dailyLimit,
-      'is_pro': isPro ? 1 : 0,
+      'is_pro': pro ? 1 : 0,
       'kind': kind,
     });
     if (use.justExhausted) {

@@ -280,10 +280,27 @@ class ProEntitlement extends ChangeNotifier {
   /// as at launch ([emptyQueriesBeforeRevoke] empty answers in a row; failed
   /// queries don't count).
   Future<ProSyncOutcome?> syncIfStale() async {
-    if (!_initialized || !_storeAvailable) return null;
+    if (!_initialized) return null;
     final last = _lastSync;
     if (last != null && _now().difference(last) < resyncInterval) return null;
+    // Play may have been unavailable at launch (Billing not ready, offline)
+    // and back since. Not returning early here: otherwise a cached Pro
+    // could never be checked again in this process. The owned-purchases
+    // query reports an unavailable store itself, which keeps Pro.
+    _lastSync = _now();
+    if (!_storeAvailable) await _retryStore();
     return syncWithStore();
+  }
+
+  Future<void> _retryStore() async {
+    try {
+      if (!await _store.isAvailable()) return;
+      _storeAvailable = true;
+      await loadProduct(); // so the paywall can offer the plans again
+      notifyListeners();
+    } catch (e) {
+      _lastError = e.toString();
+    }
   }
 
   Future<ProSyncOutcome> _syncWithStore() async {

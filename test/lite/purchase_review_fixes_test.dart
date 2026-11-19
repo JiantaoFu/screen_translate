@@ -142,13 +142,40 @@ void main() {
       }
     });
 
-    test('nothing to do before init or without a store', () async {
+    test('nothing to do before init', () async {
       final e = makeEntitlement();
       expect(await e.syncIfStale(), isNull);
-      store.available = false;
-      await e.init();
-      expect(await e.syncIfStale(), isNull);
       expect(store.ownedQueries, 0);
+    });
+
+    test('Play unavailable at launch: a later check still reaches it', () async {
+      store.available = false;
+      final e = makeEntitlement();
+      await e.init();
+      expect(store.ownedQueries, 0);
+      expect(e.offers, isEmpty);
+
+      store.available = true; // Billing back; the subscription has lapsed
+      store.owned = [];
+      now = now.add(ProEntitlement.resyncInterval);
+      expect(await e.syncIfStale(), ProSyncOutcome.kept);
+      expect(e.storeAvailable, isTrue);
+      expect(e.offers, isNotEmpty, reason: 'plans loaded once Play is back');
+      now = now.add(ProEntitlement.resyncInterval);
+      expect(await e.syncIfStale(), ProSyncOutcome.revoked);
+      expect(e.isPro, isFalse);
+    });
+
+    test('still unavailable: Pro is kept and the check stays throttled', () async {
+      store.available = false;
+      final e = makeEntitlement();
+      await e.init();
+      for (var i = 0; i < 3; i++) {
+        now = now.add(ProEntitlement.resyncInterval);
+        await e.syncIfStale();
+      }
+      expect(e.isPro, isTrue);
+      expect(await e.syncIfStale(), isNull, reason: 'inside the interval');
     });
   });
 
@@ -171,6 +198,42 @@ void main() {
       expect(gate.mayStartTranslation(kind: 'live'), isTrue);
       await pumpEventQueue();
       expect(store.ownedQueries, queries + 1);
+    });
+  });
+
+  group('counting an attempt let in as Pro', () {
+    test('a revoke during the attempt does not spend free translations', () async {
+      await prefs.setBool(ProEntitlement.prefsKey, true);
+      final quota = DailyTranslationQuota(prefs);
+      for (var i = 1; i < quota.dailyLimit; i++) {
+        await quota.recordSuccess(isPro: false);
+      }
+      expect(quota.remaining, 1);
+      store.owned = [];
+      final gate = LiteGate(
+        enabled: true,
+        quota: quota,
+        entitlement: makeEntitlement(),
+        logEvent: (name, params) async => events.add(MapEntry(name, params)),
+      );
+      await gate.entitlement.init(); // first empty answer: kept
+      expect(gate.isPro, isTrue);
+
+      now = now.add(ProEntitlement.resyncInterval);
+      expect(gate.mayStartTranslation(kind: 'image'), isTrue); // let in as Pro
+      await pumpEventQueue(); // the check it started revokes meanwhile
+      expect(gate.isPro, isFalse);
+
+      await gate.recordTranslationSuccess(kind: 'image');
+      expect(quota.remaining, 1, reason: 'counted as the Pro attempt it was');
+      expect(gate.paywallPending, isFalse);
+      expect(events.last.value['is_pro'], 1);
+
+      // The next attempt is a free one and is counted as such.
+      expect(gate.mayStartTranslation(kind: 'image'), isTrue);
+      await gate.recordTranslationSuccess(kind: 'image');
+      expect(quota.remaining, 0);
+      expect(gate.paywallPending, isTrue);
     });
   });
 

@@ -238,7 +238,7 @@ class TranslationProvider with ChangeNotifier {
     this._overlayService, {
     LLMTranslationService? llmTranslationService,
     OnnxTranslationService? onnxTranslationService,
-    Future<void> Function()? onSessionSucceeded,
+    Future<void> Function(TranslationAdmission? liteAdmission)? onSessionSucceeded,
   })  : _onSessionSucceeded = onSessionSucceeded ?? _recordReviewSuccess,
         _llmTranslationService = llmTranslationService ?? LLMTranslationService(),
         _onnxTranslationService = onnxTranslationService ?? OnnxTranslationService() {
@@ -250,13 +250,38 @@ class TranslationProvider with ChangeNotifier {
     _initPreferences();
   }
 
-  final Future<void> Function() _onSessionSucceeded;
+  final Future<void> Function(TranslationAdmission? liteAdmission) _onSessionSucceeded;
 
-  static Future<void> _recordReviewSuccess() async {
+  /// Lite: how the current live session was let in. Bound only by a Start
+  /// this provider accepted, so a second tap that ends up rejected
+  /// (alreadyRunning) can't replace the running session's.
+  TranslationAdmission? _sessionAdmission;
+
+  /// Bumped by every accepted Start and every stop, so a capture pass that
+  /// began in one session can tell, after its awaits, that the session it
+  /// belonged to is gone.
+  int _liveSession = 0;
+
+  @visibleForTesting
+  int get liveSession => _liveSession;
+
+  /// Counts the session's success, once, if [passSession] (the session the
+  /// capture pass started in) is still the running one. A pass of a stopped
+  /// session that finishes rendering after the next Start must not mark
+  /// that new session as succeeded, nor settle with its admission.
+  void _translationShown(int passSession) {
+    if (!_isTranslating || passSession != _liveSession) return;
+    if (_sessionProducedTranslations) return;
+    _sessionProducedTranslations = true;
+    _onSessionSucceeded(_sessionAdmission);
+  }
+
+  static Future<void> _recordReviewSuccess(TranslationAdmission? liteAdmission) async {
     // Lite flavor: one live session that drew a translation is one of the
     // day's free translations (no-op in the paid app).
     try {
-      await LiteGate.instance?.recordTranslationSuccess(kind: 'live');
+      await LiteGate.instance?.recordTranslationSuccess(
+          kind: LiteGate.kindLive, admission: liteAdmission);
     } catch (e) {
       print('Lite quota not updated: $e');
     }
@@ -389,9 +414,13 @@ class TranslationProvider with ChangeNotifier {
   /// True while Start is walking through the permission screens.
   bool get isStarting => _isStarting;
 
-  Future<StartOutcome> startTranslation() async {
+  /// [liteAdmission]: the lite gate's admission for this Start (null in
+  /// paid); bound to the session only once this Start is accepted.
+  Future<StartOutcome> startTranslation({TranslationAdmission? liteAdmission}) async {
     if (_isTranslating || _isStarting) return StartOutcome.alreadyRunning;
     _isStarting = true;
+    _liveSession++;
+    _sessionAdmission = liteAdmission;
     try {
       return await _startTranslation();
     } finally {
@@ -501,6 +530,7 @@ class TranslationProvider with ChangeNotifier {
     print('Projection stopped by the system, resetting translation state');
     ActivationTracker.instance.liveStopped();
     _isTranslating = false;
+    _liveSession++;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;
     _displayedOverlays.clear();
@@ -517,13 +547,11 @@ class TranslationProvider with ChangeNotifier {
     if (value) _captureTimer ??= Timer.periodic(const Duration(hours: 1), (_) {});
   }
 
+  /// [fromSession]: the session the simulated capture pass started in
+  /// (default: the current one).
   @visibleForTesting
-  void debugMarkTranslationShown() {
-    if (!_sessionProducedTranslations) {
-      _sessionProducedTranslations = true;
-      _onSessionSucceeded();
-    }
-  }
+  void debugMarkTranslationShown({int? fromSession}) =>
+      _translationShown(fromSession ?? _liveSession);
 
   void requestManualTranslation() {
     _isManualTranslationRequested = true;
@@ -564,6 +592,7 @@ class TranslationProvider with ChangeNotifier {
       // frame change) lands while this tick is capturing/OCRing, the frame
       // it's working on no longer matches the screen.
       final tickToken = _translationToken;
+      final tickSession = _liveSession;
       // "…" placeholder ids shown this tick that haven't been replaced by a
       // real translation yet. Whatever is left when the tick ends — stale
       // abort or an unexpected exception — gets hidden in `finally`, since
@@ -932,11 +961,10 @@ class TranslationProvider with ChangeNotifier {
 
               if (ocrResults.isNotEmpty) {
                 _lastTranslatedText = ocrResults.map((r) => r.text).join('\n');
-                if (!_sessionProducedTranslations) {
-                  _sessionProducedTranslations = true;
-                  // One success per live session, not per 500 ms tick.
-                  _onSessionSucceeded();
-                }
+                // One success per live session, not per 500 ms tick; and
+                // only for the session this pass began in (checked after
+                // the render awaits above).
+                _translationShown(tickSession);
                 ActivationTracker.instance.translationShown(newIndices.length);
                 notifyListeners();
               }
@@ -988,6 +1016,7 @@ class TranslationProvider with ChangeNotifier {
   Future<void> stopTranslation() async {
     ActivationTracker.instance.liveStopped();
     _isTranslating = false;
+    _liveSession++;
     _isProcessingCapture = false;
     _isManualTranslationRequested = false;
     _displayedOverlays.clear();

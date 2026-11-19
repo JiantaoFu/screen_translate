@@ -185,8 +185,15 @@ class ProEntitlement extends ChangeNotifier {
   bool _purchasePending = false;
   bool _initialized = false;
   int _grants = 0;
+  Future<void>? _writing;
   final Map<String, ProductDetails> _products = {};
   String? _lastError;
+  final DateTime Function() _now;
+  DateTime? _lastSync;
+  Future<ProSyncOutcome>? _syncing;
+
+  /// Minimum time between the re-syncs [syncIfStale] runs on app resume.
+  static const resyncInterval = Duration(minutes: 30);
 
   ProEntitlement(
     this._prefs, {
@@ -195,7 +202,9 @@ class ProEntitlement extends ChangeNotifier {
     this.onPurchased,
     this.onRevoked,
     List<String> Function()? offeredIds,
+    DateTime Function()? now,
   })  : _store = store ?? InAppPurchaseGateway(),
+        _now = now ?? DateTime.now,
         _offeredIds = offeredIds ?? (() => const [productId]),
         _owned = ownedPurchases ?? PlayOwnedPurchasesSource(),
         _isPro = _prefs.getBool(prefsKey) ?? false;
@@ -260,7 +269,42 @@ class ProEntitlement extends ChangeNotifier {
   /// Grants (and acknowledges) when Play has a Pro product but local doesn't.
   /// Revokes only after [emptyQueriesBeforeRevoke] successful queries in a
   /// row came back without it; otherwise keeps the current state.
-  Future<ProSyncOutcome> syncWithStore() async {
+  Future<ProSyncOutcome> syncWithStore() {
+    // One query at a time: a resume during the launch sync joins it.
+    return _syncing ??= _syncWithStore().whenComplete(() => _syncing = null);
+  }
+
+  /// Re-checks Play when the app comes back to the foreground, at most once
+  /// per [resyncInterval]. Without it an expired subscription stayed Pro for
+  /// as long as the app was never cold-started. The revoke rule is the same
+  /// as at launch ([emptyQueriesBeforeRevoke] empty answers in a row; failed
+  /// queries don't count).
+  Future<ProSyncOutcome?> syncIfStale() async {
+    if (!_initialized) return null;
+    final last = _lastSync;
+    if (last != null && _now().difference(last) < resyncInterval) return null;
+    // Play may have been unavailable at launch (Billing not ready, offline)
+    // and back since. Not returning early here: otherwise a cached Pro
+    // could never be checked again in this process. The owned-purchases
+    // query reports an unavailable store itself, which keeps Pro.
+    _lastSync = _now();
+    if (!_storeAvailable) await _retryStore();
+    return syncWithStore();
+  }
+
+  Future<void> _retryStore() async {
+    try {
+      if (!await _store.isAvailable()) return;
+      _storeAvailable = true;
+      await loadProduct(); // so the paywall can offer the plans again
+      notifyListeners();
+    } catch (e) {
+      _lastError = e.toString();
+    }
+  }
+
+  Future<ProSyncOutcome> _syncWithStore() async {
+    _lastSync = _now();
     final grantsBefore = _grants;
     OwnedPurchasesResult res;
     try {
@@ -289,19 +333,51 @@ class ProEntitlement extends ChangeNotifier {
       notifyListeners();
       return ProSyncOutcome.granted;
     }
-    // A purchase that landed on the stream while we were querying wins.
-    if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
-    final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
-    await _prefs.setInt(emptyQueriesKey, empties);
-    if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
     final lost = ownedProductId ?? productId;
-    _isPro = false;
-    await _prefs.setBool(prefsKey, false);
-    await _prefs.setInt(emptyQueriesKey, 0);
-    await _prefs.remove(ownedProductKey);
-    notifyListeners();
-    onRevoked?.call(lost);
-    return ProSyncOutcome.revoked;
+    final outcome = await _serialized(() async {
+      // A purchase that landed on the stream while we were querying, or
+      // while an earlier write was in flight, wins. Checked inside the
+      // serialized section, so no grant can slip in between this check and
+      // the revoke below.
+      if (!_isPro || _grants != grantsBefore) return ProSyncOutcome.unchanged;
+      final empties = (_prefs.getInt(emptyQueriesKey) ?? 0) + 1;
+      await _prefs.setInt(emptyQueriesKey, empties);
+      if (empties < emptyQueriesBeforeRevoke) return ProSyncOutcome.kept;
+      _isPro = false;
+      await _prefs.setBool(prefsKey, false);
+      await _prefs.setInt(emptyQueriesKey, 0);
+      await _prefs.remove(ownedProductKey);
+      // A purchase that arrived during these writes is queued right behind
+      // and restores Pro; reporting a revoke for it would be a false
+      // pro_revoked.
+      if (_grants != grantsBefore) return ProSyncOutcome.unchanged;
+      // Reported before the section ends: once it does, a purchase is a
+      // new grant after a finished revoke, not part of this one.
+      notifyListeners();
+      onRevoked?.call(lost);
+      return ProSyncOutcome.revoked;
+    });
+    return outcome;
+  }
+
+  /// Runs entitlement writes (grant, revoke) one after another. Each one
+  /// awaits several preference writes; without this a purchase granted
+  /// during a revoke's writes could be overwritten by the revoke.
+  ///
+  /// When nothing is writing it runs at once, in the caller's zone and up to
+  /// its first await synchronously, exactly like an unguarded call.
+  Future<T> _serialized<T>(Future<T> Function() write) async {
+    while (_writing != null) {
+      await _writing;
+    }
+    final done = Completer<void>();
+    _writing = done.future;
+    try {
+      return await write();
+    } finally {
+      _writing = null;
+      done.complete();
+    }
   }
 
   Future<void> loadProduct() async {
@@ -359,6 +435,15 @@ class ProEntitlement extends ChangeNotifier {
   Future<void> handlePurchases(List<PurchaseDetails> purchases) async {
     for (final p in purchases) {
       if (!allProductIds.contains(p.productID)) {
+        // The Billing plugin can report a cancelled (or failed) purchase
+        // with an empty productID. Only Pro products ever start a purchase
+        // here, so that event still ends ours; otherwise the paywall would
+        // spin forever. It never grants anything.
+        if (p.status == PurchaseStatus.canceled) _purchasePending = false;
+        if (p.status == PurchaseStatus.error) {
+          _lastError = p.error?.message ?? 'purchase error';
+          _purchasePending = false;
+        }
         if (p.pendingCompletePurchase) await _complete(p);
         continue;
       }
@@ -394,13 +479,16 @@ class ProEntitlement extends ChangeNotifier {
     }
   }
 
-  Future<void> _grant(String id) async {
+  Future<void> _grant(String id) {
+    // Counted at once, so a revoke queued behind an earlier write sees it.
     _grants++;
-    _isPro = true;
-    await _prefs.setBool(prefsKey, true);
-    await _prefs.setString(ownedProductKey, id);
-    // Play has the purchase, so any earlier empty answers were transient.
-    await _prefs.setInt(emptyQueriesKey, 0);
+    return _serialized(() async {
+      _isPro = true;
+      await _prefs.setBool(prefsKey, true);
+      await _prefs.setString(ownedProductKey, id);
+      // Play has the purchase, so any earlier empty answers were transient.
+      await _prefs.setInt(emptyQueriesKey, 0);
+    });
   }
 
   @override

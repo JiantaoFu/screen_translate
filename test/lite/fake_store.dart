@@ -61,6 +61,8 @@ class FakeStore implements StoreGateway, OwnedPurchasesSource {
   Future<OwnedPurchasesResult> queryOwned() async {
     ownedQueries++;
     if (ownedThrows != null) throw ownedThrows!;
+    // Like PlayOwnedPurchasesSource: no Billing, no answer.
+    if (!available) return const OwnedPurchasesResult.unavailable();
     return ownedResult ?? OwnedPurchasesResult.ok(owned);
   }
 

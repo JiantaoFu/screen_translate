@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_flavor.dart';
@@ -23,7 +23,7 @@ typedef LiteEventLogger = Future<void> Function(String name, Map<String, Object>
 ///   purchase_started, pro_purchased (with remaining_free / daily_limit
 ///   where they apply), pro_revoked (Play no longer reports a Pro product:
 ///   refunded, or a subscription ended). `product_id` says which plan.
-class LiteGate extends ChangeNotifier {
+class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   static const evTranslationSuccess = 'translation_success';
   static const evFreeLimitHit = 'free_limit_hit';
   static const evPaywallShown = 'paywall_shown';
@@ -69,7 +69,17 @@ class LiteGate extends ChangeNotifier {
       entitlement: entitlement,
     );
     current.value = gate;
+    WidgetsBinding.instance.addObserver(gate);
     await entitlement.init();
+  }
+
+  /// Re-checks Play's owned purchases when the app returns to the
+  /// foreground (throttled in [ProEntitlement.syncIfStale]), so a
+  /// subscription that expired while the app was in the background stops
+  /// unlocking translations without waiting for a cold start.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) entitlement.syncIfStale();
   }
 
   /// Waits for the lite gate to be built, and returns [instance].
@@ -110,20 +120,47 @@ class LiteGate extends ChangeNotifier {
 
   /// Whether a new translation attempt may go ahead. Logs free_limit_hit
   /// when it may not; the caller then shows the paywall.
-  bool mayStartTranslation({required String kind}) {
-    if (!enabled || isPro || quota.canTranslate(isPro: false)) return true;
-    _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
-    return false;
+  bool mayStartTranslation({required String kind}) => admitTranslation(kind: kind) != null;
+
+  /// Lets a new translation attempt in, or returns null (and logs
+  /// free_limit_hit) when it may not; the caller then shows the paywall.
+  ///
+  /// The admission records whether the attempt was let in as Pro. Hand it
+  /// to [recordTranslationSuccess] for that attempt, so the success is
+  /// counted with that entitlement, not one a check changed meanwhile.
+  TranslationAdmission? admitTranslation({required String kind}) {
+    // A Pro user who keeps the app in the foreground never triggers the
+    // resume check, so each new translation also re-checks Play (same
+    // throttle). The answer applies from the next attempt on.
+    if (enabled && isPro) entitlement.syncIfStale();
+    if (enabled && !isPro && !quota.canTranslate(isPro: false)) {
+      _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
+      return null;
+    }
+    return TranslationAdmission._(kind, asPro: enabled && isPro);
   }
 
+  static const kindLive = 'live';
+  static const kindImage = 'image';
+
   /// Counts one successful translation (`live` session or `image`).
-  Future<QuotaUse?> recordTranslationSuccess({required String kind}) async {
+  ///
+  /// [admission] is the one [admitTranslation] gave this attempt (an image
+  /// carries it; TranslationProvider binds a live session's when it accepts
+  /// the Start). An attempt let in as Pro doesn't
+  /// spend free translations (or open the paywall) even if the subscription
+  /// lapsed while it ran; that applies from the next attempt on.
+  Future<QuotaUse?> recordTranslationSuccess({
+    required String kind,
+    TranslationAdmission? admission,
+  }) async {
     if (!enabled) return null;
-    final use = await quota.recordSuccess(isPro: isPro);
+    final pro = isPro || (admission?.asPro ?? false);
+    final use = await quota.recordSuccess(isPro: pro);
     _log(evTranslationSuccess, {
       'remaining_free': use.remaining,
       'daily_limit': use.dailyLimit,
-      'is_pro': isPro ? 1 : 0,
+      'is_pro': pro ? 1 : 0,
       'kind': kind,
     });
     if (use.justExhausted) {
@@ -146,11 +183,15 @@ class LiteGate extends ChangeNotifier {
   /// [trigger]: limit_reached (just used the last free one), limit_hit
   /// (tried to start with none left), or home (user opened it). `offers` is
   /// what the paywall listed, in order, e.g. `pro_yearly,pro_unlock`.
-  void paywallShown(String trigger) {
+  /// [offers]: the plan ids on screen, comma-separated (default: what the
+  /// entitlement offers now). [offersChanged]: a repeat for the same paywall
+  /// because the plans on screen changed; count exposures without it.
+  void paywallShown(String trigger, {String? offers, bool offersChanged = false}) {
     _log(evPaywallShown, {
       ..._quotaParams,
       'trigger': trigger,
-      'offers': entitlement.offers.map((p) => p.id).join(','),
+      'offers': offers ?? entitlement.offers.map((p) => p.id).join(','),
+      if (offersChanged) 'offers_changed': 1,
     });
   }
 
@@ -188,7 +229,21 @@ class LiteGate extends ChangeNotifier {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     entitlement.removeListener(notifyListeners);
     super.dispose();
   }
+}
+
+/// One translation attempt let in by [LiteGate.admitTranslation].
+class TranslationAdmission {
+  const TranslationAdmission._(this.kind, {required this.asPro});
+
+  @visibleForTesting
+  const TranslationAdmission.forTest({this.kind = LiteGate.kindLive, required this.asPro});
+
+  final String kind;
+
+  /// Let in as Pro: its success never spends a free translation.
+  final bool asPro;
 }

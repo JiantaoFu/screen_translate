@@ -372,11 +372,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// the gate is built just after runApp, and a share-into-the-app on a cold
   /// start arrives inside that window, which let an exhausted user translate
   /// for free. Paid returns null immediately and is unaffected.
-  Future<bool> _liteAllows(String kind) async {
+  Future<bool> _liteAllows(String kind) async => (await _liteAdmit(kind)).allowed;
+
+  /// [_liteAllows], plus the lite admission to hand to the attempt's success
+  /// callback (null in paid).
+  Future<({bool allowed, TranslationAdmission? admission})> _liteAdmit(String kind) async {
     final gate = _liteGate ?? await LiteGate.waitForInstance();
-    if (gate == null || gate.mayStartTranslation(kind: kind)) return true;
+    if (gate == null) return (allowed: true, admission: null);
+    final admission = gate.admitTranslation(kind: kind);
+    if (admission != null) return (allowed: true, admission: admission);
     if (mounted) _openPaywall(gate, 'limit_hit');
-    return false;
+    return (allowed: false, admission: null);
   }
 
   Widget _buildLiteRemaining(BuildContext context) =>
@@ -449,8 +455,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _navigateToImageTranslation(File file) async {
-    if (!await _liteAllows('image')) return;
-    if (!mounted) return;
+    final lite = await _liteAdmit(LiteGate.kindImage);
+    if (!lite.allowed || !mounted) return;
     // Provide translation provider so ImageTranslationScreen can use it
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     Navigator.push(
@@ -458,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider.value(
           value: provider,
-          child: ImageTranslationScreen(imageFile: file),
+          child: ImageTranslationScreen(imageFile: file, liteAdmission: lite.admission),
         ),
       ),
     );
@@ -480,12 +486,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// source language — and a check at one of them silently leaves the other
   /// ungated. Same lesson as the cold-start share intent.
   Future<void> _startLiveTranslation(BuildContext context, TranslationProvider provider) async {
-    if (!await _liteAllows('live')) return;
-    if (!context.mounted) return;
+    final lite = await _liteAdmit(LiteGate.kindLive);
+    if (!lite.allowed || !context.mounted) return;
     if (!await _confirmQuickPacksBeforeTranslate(context, provider)) return;
     if (!context.mounted) return;
     if (!await _ensureOnnxModelReadyForCurrentPair(context, provider)) return;
-    final outcome = await provider.startTranslation();
+    final outcome = await provider.startTranslation(liteAdmission: lite.admission);
     if (!context.mounted) return;
     // A denied screen-capture consent is the one failure worth a second go
     // in place: the user has already granted the overlay and is one tap from
@@ -497,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Either way the dialog has already said what went wrong, so no
       // snackbar saying it again.
       if (retry) {
-        final retried = await provider.startTranslation();
+        final retried = await provider.startTranslation(liteAdmission: lite.admission);
         if (!context.mounted) return;
         _explainStartOutcome(context, retried);
       }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,7 +78,26 @@ class DailyTranslationQuota {
   bool canTranslate({required bool isPro}) => isPro || !isExhausted;
 
   /// Counts one success. Pro successes aren't counted (Pro is unlimited).
+  Future<void>? _writing;
+
+  /// Counts one success. Serialized: two images finishing together used to
+  /// both read the same count across the awaited writes and save it + 1
+  /// twice, spending one free translation for two.
   Future<QuotaUse> recordSuccess({required bool isPro}) async {
+    while (_writing != null) {
+      await _writing;
+    }
+    final done = Completer<void>();
+    _writing = done.future;
+    try {
+      return await _recordSuccess(isPro: isPro);
+    } finally {
+      _writing = null;
+      done.complete();
+    }
+  }
+
+  Future<QuotaUse> _recordSuccess({required bool isPro}) async {
     final limit = dailyLimit;
     if (isPro) {
       return QuotaUse(usedToday: usedToday, dailyLimit: limit, remaining: remaining, justExhausted: false);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:screen_translate/l10n/app_localizations.dart';
 
 import 'lite_gate.dart';
@@ -21,9 +22,9 @@ class PaywallScreen extends StatefulWidget {
 
   const PaywallScreen({super.key, required this.gate, required this.trigger});
 
-  /// Pushes the paywall (logs paywall_shown); completes when it closes.
+  /// Pushes the paywall; completes when it closes. The screen logs
+  /// paywall_shown itself, once it lists what can be bought.
   static Future<void> show(BuildContext context, LiteGate gate, {required String trigger}) {
-    gate.paywallShown(trigger);
     return Navigator.of(context).push(MaterialPageRoute(
       fullscreenDialog: true,
       builder: (_) => PaywallScreen(gate: gate, trigger: trigger),
@@ -36,6 +37,8 @@ class PaywallScreen extends StatefulWidget {
 
 class _PaywallScreenState extends State<PaywallScreen> {
   bool _closing = false;
+  bool _shownLogged = false;
+  String _loggedOffers = '';
   String? _selectedId;
 
   @override
@@ -49,7 +52,56 @@ class _PaywallScreenState extends State<PaywallScreen> {
   @override
   void dispose() {
     widget.gate.removeListener(_onChange);
+    // Closed before Play returned any plan: still an exposure, with the
+    // empty offers it really had.
+    if (!_shownLogged && !widget.gate.isPro) _logShown(_offerIds(widget.gate.entitlement.offers));
     super.dispose();
+  }
+
+  static String _offerIds(List<ProductDetails> offers) => offers.map((p) => p.id).join(',');
+
+  /// Called by build() with the plans it is drawing, so the exposure log
+  /// is the list on screen, whatever caused the rebuild: a Billing or
+  /// entitlement change, or a rotation after Remote Config switched the
+  /// plans (which notifies nobody).
+  ///
+  /// paywall_shown is logged once plans are on screen, not when the route
+  /// opens: on a cold start Play's products can arrive after the paywall,
+  /// and logging at open recorded empty offers for a session that then
+  /// showed the yearly plan. If the plans change afterwards (the default
+  /// one-time unlock, then the subscriptions), it is logged again with
+  /// offers_changed, so plan conversion can use what was finally shown.
+  void _noteShownOffers(List<ProductDetails> offers) {
+    final ids = _offerIds(offers);
+    if (ids.isEmpty || ids == _loggedOffers) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || ids == _loggedOffers) return;
+      if (_shownLogged) {
+        _loggedOffers = ids;
+        widget.gate.paywallShown(widget.trigger, offers: ids, offersChanged: true);
+      } else {
+        _logShown(ids);
+      }
+    });
+  }
+
+  void _logShown(String ids) {
+    _shownLogged = true;
+    _loggedOffers = ids;
+    widget.gate.paywallShown(widget.trigger, offers: ids);
+  }
+
+  /// Pro arrived (a purchase, or a background re-sync): close this paywall.
+  /// Not maybePop(): a page opened over the paywall (an image shared in
+  /// from outside) would be closed instead, and the paywall left behind.
+  void _closeOwnRoute() {
+    final route = ModalRoute.of(context);
+    final nav = Navigator.of(context);
+    if (route == null || route.isCurrent) {
+      nav.maybePop();
+    } else {
+      nav.removeRoute(route);
+    }
   }
 
   void _onChange() {
@@ -58,7 +110,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
       _closing = true;
       final messenger = ScaffoldMessenger.maybeOf(context);
       final text = AppLocalizations.of(context)!.paywall_pro_unlocked;
-      Navigator.of(context).maybePop();
+      _closeOwnRoute();
       messenger?.showSnackBar(SnackBar(content: Text(text)));
       return;
     }
@@ -73,6 +125,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
     final theme = Theme.of(context);
     final price = e.price;
     final offers = e.offers;
+    _noteShownOffers(offers);
     final showPlans =
         offers.length > 1 || offers.any((p) => ProEntitlement.isSubscription(p.id));
     // Keep the choice while it is still on offer; otherwise the first plan.

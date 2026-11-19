@@ -187,6 +187,12 @@ class ProEntitlement extends ChangeNotifier {
   int _grants = 0;
   final Map<String, ProductDetails> _products = {};
   String? _lastError;
+  final DateTime Function() _now;
+  DateTime? _lastSync;
+  Future<ProSyncOutcome>? _syncing;
+
+  /// Minimum time between the re-syncs [syncIfStale] runs on app resume.
+  static const resyncInterval = Duration(minutes: 30);
 
   ProEntitlement(
     this._prefs, {
@@ -195,7 +201,9 @@ class ProEntitlement extends ChangeNotifier {
     this.onPurchased,
     this.onRevoked,
     List<String> Function()? offeredIds,
+    DateTime Function()? now,
   })  : _store = store ?? InAppPurchaseGateway(),
+        _now = now ?? DateTime.now,
         _offeredIds = offeredIds ?? (() => const [productId]),
         _owned = ownedPurchases ?? PlayOwnedPurchasesSource(),
         _isPro = _prefs.getBool(prefsKey) ?? false;
@@ -260,7 +268,25 @@ class ProEntitlement extends ChangeNotifier {
   /// Grants (and acknowledges) when Play has a Pro product but local doesn't.
   /// Revokes only after [emptyQueriesBeforeRevoke] successful queries in a
   /// row came back without it; otherwise keeps the current state.
-  Future<ProSyncOutcome> syncWithStore() async {
+  Future<ProSyncOutcome> syncWithStore() {
+    // One query at a time: a resume during the launch sync joins it.
+    return _syncing ??= _syncWithStore().whenComplete(() => _syncing = null);
+  }
+
+  /// Re-checks Play when the app comes back to the foreground, at most once
+  /// per [resyncInterval]. Without it an expired subscription stayed Pro for
+  /// as long as the app was never cold-started. The revoke rule is the same
+  /// as at launch ([emptyQueriesBeforeRevoke] empty answers in a row; failed
+  /// queries don't count).
+  Future<ProSyncOutcome?> syncIfStale() async {
+    if (!_initialized || !_storeAvailable) return null;
+    final last = _lastSync;
+    if (last != null && _now().difference(last) < resyncInterval) return null;
+    return syncWithStore();
+  }
+
+  Future<ProSyncOutcome> _syncWithStore() async {
+    _lastSync = _now();
     final grantsBefore = _grants;
     OwnedPurchasesResult res;
     try {
@@ -359,6 +385,15 @@ class ProEntitlement extends ChangeNotifier {
   Future<void> handlePurchases(List<PurchaseDetails> purchases) async {
     for (final p in purchases) {
       if (!allProductIds.contains(p.productID)) {
+        // The Billing plugin can report a cancelled (or failed) purchase
+        // with an empty productID. Only Pro products ever start a purchase
+        // here, so that event still ends ours; otherwise the paywall would
+        // spin forever. It never grants anything.
+        if (p.status == PurchaseStatus.canceled) _purchasePending = false;
+        if (p.status == PurchaseStatus.error) {
+          _lastError = p.error?.message ?? 'purchase error';
+          _purchasePending = false;
+        }
         if (p.pendingCompletePurchase) await _complete(p);
         continue;
       }

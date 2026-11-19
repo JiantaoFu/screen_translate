@@ -21,9 +21,9 @@ class PaywallScreen extends StatefulWidget {
 
   const PaywallScreen({super.key, required this.gate, required this.trigger});
 
-  /// Pushes the paywall (logs paywall_shown); completes when it closes.
+  /// Pushes the paywall; completes when it closes. The screen logs
+  /// paywall_shown itself, once it lists what can be bought.
   static Future<void> show(BuildContext context, LiteGate gate, {required String trigger}) {
-    gate.paywallShown(trigger);
     return Navigator.of(context).push(MaterialPageRoute(
       fullscreenDialog: true,
       builder: (_) => PaywallScreen(gate: gate, trigger: trigger),
@@ -36,6 +36,7 @@ class PaywallScreen extends StatefulWidget {
 
 class _PaywallScreenState extends State<PaywallScreen> {
   bool _closing = false;
+  bool _shownLogged = false;
   String? _selectedId;
 
   @override
@@ -44,16 +45,34 @@ class _PaywallScreenState extends State<PaywallScreen> {
     widget.gate.addListener(_onChange);
     final e = widget.gate.entitlement;
     if (e.storeAvailable && e.product == null) e.loadProduct();
+    _logShownOnceOffered();
   }
 
   @override
   void dispose() {
     widget.gate.removeListener(_onChange);
+    // Closed before Play returned any plan: still an exposure, with the
+    // empty offers it really had.
+    if (!_shownLogged && !widget.gate.isPro) _logShown();
     super.dispose();
+  }
+
+  /// paywall_shown is logged when the plans are actually on screen, not
+  /// when the route opens: on a cold start Play's products can arrive after
+  /// the paywall does, and logging at open recorded `offers` as empty for a
+  /// session that then showed (and sold) the yearly plan.
+  void _logShownOnceOffered() {
+    if (!_shownLogged && widget.gate.entitlement.offers.isNotEmpty) _logShown();
+  }
+
+  void _logShown() {
+    _shownLogged = true;
+    widget.gate.paywallShown(widget.trigger);
   }
 
   void _onChange() {
     if (!mounted) return;
+    _logShownOnceOffered();
     if (widget.gate.isPro && !_closing) {
       _closing = true;
       final messenger = ScaffoldMessenger.maybeOf(context);

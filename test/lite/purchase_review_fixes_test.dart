@@ -202,15 +202,19 @@ void main() {
   });
 
   group('counting an attempt let in as Pro', () {
-    test('a revoke during the attempt does not spend free translations', () async {
+    late DailyTranslationQuota quota;
+    late LiteGate gate;
+
+    // Pro cached, one free translation left today, and Play has already
+    // answered "nothing owned" once, so the next check revokes.
+    Future<void> setUpRevokingGate() async {
       await prefs.setBool(ProEntitlement.prefsKey, true);
-      final quota = DailyTranslationQuota(prefs);
+      quota = DailyTranslationQuota(prefs);
       for (var i = 1; i < quota.dailyLimit; i++) {
         await quota.recordSuccess(isPro: false);
       }
-      expect(quota.remaining, 1);
       store.owned = [];
-      final gate = LiteGate(
+      gate = LiteGate(
         enabled: true,
         quota: quota,
         entitlement: makeEntitlement(),
@@ -218,22 +222,62 @@ void main() {
       );
       await gate.entitlement.init(); // first empty answer: kept
       expect(gate.isPro, isTrue);
-
+      expect(quota.remaining, 1);
       now = now.add(ProEntitlement.resyncInterval);
-      expect(gate.mayStartTranslation(kind: 'image'), isTrue); // let in as Pro
+    }
+
+    test('a revoke during the attempt does not spend free translations', () async {
+      await setUpRevokingGate();
+      final a = gate.admitTranslation(kind: LiteGate.kindImage)!; // let in as Pro
+      expect(a.asPro, isTrue);
       await pumpEventQueue(); // the check it started revokes meanwhile
       expect(gate.isPro, isFalse);
 
-      await gate.recordTranslationSuccess(kind: 'image');
+      await gate.recordTranslationSuccess(kind: LiteGate.kindImage, admission: a);
       expect(quota.remaining, 1, reason: 'counted as the Pro attempt it was');
       expect(gate.paywallPending, isFalse);
       expect(events.last.value['is_pro'], 1);
 
       // The next attempt is a free one and is counted as such.
-      expect(gate.mayStartTranslation(kind: 'image'), isTrue);
-      await gate.recordTranslationSuccess(kind: 'image');
+      final b = gate.admitTranslation(kind: LiteGate.kindImage)!;
+      expect(b.asPro, isFalse);
+      await gate.recordTranslationSuccess(kind: LiteGate.kindImage, admission: b);
       expect(quota.remaining, 0);
       expect(gate.paywallPending, isTrue);
+    });
+
+    for (final firstDoneFirst in [true, false]) {
+      test(
+          'two images in flight keep their own admission '
+          '(${firstDoneFirst ? 'first' : 'second'} finishes first)', () async {
+        await setUpRevokingGate();
+        final pro = gate.admitTranslation(kind: LiteGate.kindImage)!;
+        await pumpEventQueue(); // revoked while the first image is processed
+        final free = gate.admitTranslation(kind: LiteGate.kindImage)!; // shared next
+        expect([pro.asPro, free.asPro], [true, false]);
+
+        final order = firstDoneFirst ? [pro, free] : [free, pro];
+        for (final a in order) {
+          await gate.recordTranslationSuccess(kind: LiteGate.kindImage, admission: a);
+        }
+        expect(quota.remaining, 0, reason: 'only the free image spent one');
+        expect(gate.paywallPending, isTrue);
+        final counted = [
+          for (final e in events)
+            if (e.key == LiteGate.evTranslationSuccess) e.value['is_pro']
+        ];
+        expect(counted, firstDoneFirst ? [1, 0] : [0, 1]);
+      });
+    }
+
+    test('a live session is counted with its own admission', () async {
+      await setUpRevokingGate();
+      expect(gate.mayStartTranslation(kind: LiteGate.kindLive), isTrue);
+      await pumpEventQueue();
+      expect(gate.isPro, isFalse);
+      // The capture service reports the session without an admission.
+      await gate.recordTranslationSuccess(kind: LiteGate.kindLive);
+      expect(quota.remaining, 1);
     });
   });
 

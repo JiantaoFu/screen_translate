@@ -112,7 +112,11 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
   int get dailyLimit => quota.dailyLimit;
   int get remainingFree => quota.remaining;
   bool get paywallPending => _paywallPending;
-  final Map<String, bool> _admittedAsPro = {};
+
+  /// The admission of the live session in progress. Live sessions never
+  /// overlap (one capture service), so one slot is enough; images can, so
+  /// their admission travels with each image instead.
+  TranslationAdmission? _liveAdmission;
 
   Map<String, Object> get _quotaParams => {
         'remaining_free': quota.remaining,
@@ -121,26 +125,44 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Whether a new translation attempt may go ahead. Logs free_limit_hit
   /// when it may not; the caller then shows the paywall.
-  bool mayStartTranslation({required String kind}) {
+  bool mayStartTranslation({required String kind}) => admitTranslation(kind: kind) != null;
+
+  /// Lets a new translation attempt in, or returns null (and logs
+  /// free_limit_hit) when it may not; the caller then shows the paywall.
+  ///
+  /// The admission records whether the attempt was let in as Pro. Hand it
+  /// to [recordTranslationSuccess] for that attempt, so the success is
+  /// counted with that entitlement, not one a check changed meanwhile.
+  TranslationAdmission? admitTranslation({required String kind}) {
     // A Pro user who keeps the app in the foreground never triggers the
     // resume check, so each new translation also re-checks Play (same
     // throttle). The answer applies from the next attempt on.
     if (enabled && isPro) entitlement.syncIfStale();
-    // Remembered so the success is counted with the entitlement this attempt
-    // was let in with, not one the check above changes meanwhile.
-    _admittedAsPro[kind] = isPro;
-    if (!enabled || isPro || quota.canTranslate(isPro: false)) return true;
-    _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
-    return false;
+    if (enabled && !isPro && !quota.canTranslate(isPro: false)) {
+      _log(evFreeLimitHit, {..._quotaParams, 'kind': kind});
+      return null;
+    }
+    final admission = TranslationAdmission._(kind, asPro: enabled && isPro);
+    if (kind == kindLive) _liveAdmission = admission;
+    return admission;
   }
 
+  static const kindLive = 'live';
+  static const kindImage = 'image';
+
   /// Counts one successful translation (`live` session or `image`).
-  Future<QuotaUse?> recordTranslationSuccess({required String kind}) async {
+  ///
+  /// [admission] is the one [admitTranslation] gave this attempt; a live
+  /// session's is remembered by the gate. An attempt let in as Pro doesn't
+  /// spend free translations (or open the paywall) even if the subscription
+  /// lapsed while it ran; that applies from the next attempt on.
+  Future<QuotaUse?> recordTranslationSuccess({
+    required String kind,
+    TranslationAdmission? admission,
+  }) async {
     if (!enabled) return null;
-    // An attempt let in as Pro doesn't spend free translations (or open the
-    // paywall) even if the subscription lapsed while it ran; that applies
-    // from the next attempt on.
-    final pro = isPro || (_admittedAsPro.remove(kind) ?? false);
+    final admitted = admission ?? (kind == kindLive ? _liveAdmission : null);
+    final pro = isPro || (admitted?.asPro ?? false);
     final use = await quota.recordSuccess(isPro: pro);
     _log(evTranslationSuccess, {
       'remaining_free': use.remaining,
@@ -214,4 +236,14 @@ class LiteGate extends ChangeNotifier with WidgetsBindingObserver {
     entitlement.removeListener(notifyListeners);
     super.dispose();
   }
+}
+
+/// One translation attempt let in by [LiteGate.admitTranslation].
+class TranslationAdmission {
+  const TranslationAdmission._(this.kind, {required this.asPro});
+
+  final String kind;
+
+  /// Let in as Pro: its success never spends a free translation.
+  final bool asPro;
 }

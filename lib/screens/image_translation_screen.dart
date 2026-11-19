@@ -17,7 +17,14 @@ class ImageTranslationScreen extends StatefulWidget {
   final File? imageFile;
   final Uint8List? memoryImage;
 
-  const ImageTranslationScreen({Key? key, this.imageFile, this.memoryImage}) : super(key: key);
+  /// Lite: how this image was let in (see [LiteGate.admitTranslation]).
+  /// Carried per image, because a second shared image can start before the
+  /// first finishes.
+  final TranslationAdmission? liteAdmission;
+
+  const ImageTranslationScreen(
+      {Key? key, this.imageFile, this.memoryImage, this.liteAdmission})
+      : super(key: key);
 
   @override
   _ImageTranslationScreenState createState() => _ImageTranslationScreenState();
@@ -137,7 +144,8 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
       // the last one, show the paywall now, over the result.
       final gate = LiteGate.instance;
       if (gate != null && results.isNotEmpty) {
-        await gate.recordTranslationSuccess(kind: 'image');
+        await gate.recordTranslationSuccess(
+            kind: LiteGate.kindImage, admission: widget.liteAdmission);
         if (mounted && gate.takePendingPaywall()) {
           PaywallScreen.show(context, gate, trigger: 'limit_reached');
         }

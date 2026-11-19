@@ -14,6 +14,8 @@ cluttered); the code is kept for shots that set `callout`.
 import argparse
 import os
 import shutil
+import time
+import uuid
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -232,25 +234,29 @@ def main():
     shots = args.only.split(',') if args.only else list(SHOTS)
     out_dir = os.path.join(OUT, args.locale)
     manifest = os.path.join(out_dir, MANIFEST)
+    previous = []
     if args.only:
-        # Replacing some shots of a finished set: keep the rest of the list.
+        # Replacing some shots of a finished set: the rest come from it.
         if not os.path.exists(manifest):
             raise SystemExit(f'no {manifest}: run a full compose for {args.locale} first')
         with open(manifest, encoding='utf-8') as f:
-            done = [n for n in f.read().split() if n]
-    else:
-        done = []
+            previous = [n for n in f.read().split() if n]
 
-    # Every image of the run goes to a staging folder first, and only when
-    # all of them succeeded do they replace the finished set and its list.
-    # A run that stops half-way (a landscape raw) leaves the previous set
-    # and composed.txt exactly as they were, instead of mixing new and old
-    # images that upload.py would send together.
-    staging = out_dir + '.staging'
-    shutil.rmtree(staging, ignore_errors=True)
-    os.makedirs(staging)
+    # Each run writes a complete set into a folder of its own, and the set
+    # becomes the one upload.py sends only when composed.txt (a single file,
+    # replaced atomically) points at it. Until then the previous set and
+    # list are untouched, so a run that stops anywhere (a landscape raw, a
+    # file Windows keeps open) can't leave a mix of new and old images.
+    os.makedirs(out_dir, exist_ok=True)
+    set_name = time.strftime('set-%Y%m%d-%H%M%S-') + uuid.uuid4().hex[:8]
+    set_dir = os.path.join(out_dir, set_name)
+    os.makedirs(set_dir)
     try:
-        made = []
+        redo = {f'{i:02d}_{shot}.png' for i, shot in enumerate(SHOTS, 1) if shot in shots}
+        for rel in previous:   # --only: carry over the shots not being redone
+            name = os.path.basename(rel)
+            if name not in redo:
+                shutil.copy2(os.path.join(out_dir, rel), os.path.join(set_dir, name))
         for i, shot in enumerate(SHOTS, 1):
             if shot not in shots:
                 continue
@@ -263,28 +269,27 @@ def main():
                 # A capture taken while the AVD was rotated (raw/zh-CN/home.png
                 # was overwritten by one, 2400x1080) composes as a sideways screen.
                 raise SystemExit(f'{raw} is landscape ({rw}x{rh}); recapture it in portrait')
-            name = f'{i:02d}_{shot}.png'
-            compose(args.locale, shot, raw, os.path.join(staging, name))
-            made.append(name)
-
-        os.makedirs(out_dir, exist_ok=True)
-        if not args.only:
-            # A full run replaces the whole set: a shot skipped this time
-            # (missing raw) must not leave an older image behind.
-            for n in os.listdir(out_dir):
-                if n.endswith('.png'):
-                    os.remove(os.path.join(out_dir, n))
-        for name in made:
-            os.replace(os.path.join(staging, name), os.path.join(out_dir, name))
-            print(os.path.join(out_dir, name))
-            if name not in done:
-                done.append(name)
+            print(compose(args.locale, shot, raw, os.path.join(set_dir, f'{i:02d}_{shot}.png')))
+        names = sorted(n for n in os.listdir(set_dir) if n.endswith('.png'))
         tmp = manifest + '.tmp'
         with open(tmp, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(sorted(done)) + '\n')
+            f.write(''.join(f'{set_name}/{n}\n' for n in names))
         os.replace(tmp, manifest)
-    finally:
-        shutil.rmtree(staging, ignore_errors=True)
+    except BaseException:
+        shutil.rmtree(set_dir, ignore_errors=True)
+        raise
+    # The new set is live; older sets and images from before sets existed
+    # are no longer listed anywhere. Best effort: a locked file only costs
+    # disk space.
+    for n in os.listdir(out_dir):
+        p = os.path.join(out_dir, n)
+        if n != set_name and n.startswith('set-') and os.path.isdir(p):
+            shutil.rmtree(p, ignore_errors=True)
+        elif n.endswith('.png') or n.endswith('.staging'):
+            try:
+                shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
+            except OSError:
+                pass
 
 
 if __name__ == '__main__':

@@ -40,7 +40,7 @@ def composed(kind, locale):
     list means no finished run (empty, and the caller decides).
     """
     folder = os.path.join(ASSETS, kind, locale)
-    manifest = os.path.join(folder, MANIFEST)
+    manifest = os.path.join(folder, MANIFEST)   # paths relative to folder: <set>/<image>
     if not os.path.exists(manifest):
         return []
     with open(manifest, encoding='utf-8') as f:

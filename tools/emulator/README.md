@@ -5,7 +5,7 @@ Android emulator. They use the debug-only `MotionTestActivity` harness, which
 shows video, feed, game, typewriter or static screens in its own process.
 
 Run `run_all.sh` after changing the capture/overlay pipeline and before every
-release. It takes about 16 minutes. Every check prints `PASS`/`FAIL`, and the
+release. It takes about 17 minutes. Every check prints `PASS`/`FAIL`, and the
 run ends with `ALL EMULATOR CHECKS PASSED` or a list of the failures.
 Screenshots and logs go to `build/emulator-regression/`.
 
@@ -60,6 +60,7 @@ paid and Lite home layouts can differ without opening the image picker by mistak
 | `typecheck.sh` | typed-out game dialogue ends up fully translated, not as stacked fragments |
 | `hidecheck.sh` | Hide all (long-press on the floating button) clears every box and keeps them off an unchanged page, also when pressed during a page change; the next page change brings boxes back |
 | `rotcheck.sh` | another app rotating to landscape and back: the rotation is detected, no stale boxes are drawn, and the boxes stay on the text |
+| `cyrcheck.sh` | Russian -> English (restarts the session with that pair): ML Kit can't read Cyrillic, so each line is re-read by the downloaded East Slavic model (`LineRereader`); both Russian pages must come out as English. `OCR_MODEL_DIR=<dir>` installs `rec.onnx`/`dict.txt` instead of downloading |
 | `awaycheck.sh` | one app only (`CAPTURE=app`): leaving the shared app clears its boxes from the screen and keeps the session running; coming back brings the boxes back without a restart |
 | `set_prefs.py` | sets the app's saved preferences (language pair, mode); `start.sh` pins en→zh in Quick mode with it, because only text in the source language's script is translated |
 | `fdprobe.sh` | report only: file descriptor growth, to track the emulator `getPlanes()` sync_file leak |

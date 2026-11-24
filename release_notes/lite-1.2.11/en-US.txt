@@ -1,0 +1,1 @@
+• Russian, Ukrainian and Belarusian text can now be translated: a small text recognition pack (about 8 MB) downloads the first time you choose one of them as the source language

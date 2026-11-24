@@ -93,6 +93,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
     try {
       final translationProvider = Provider.of<TranslationProvider>(context, listen: false);
       final ocrService = OCRService();
+      final rereader = await translationProvider.lineRereaderForSource();
 
       List<OCRResult> results = [];
       if (widget.memoryImage != null) {
@@ -101,6 +102,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
           {'bytes': widget.memoryImage, 'width': 0, 'height': 0},
           translationProvider.currentOCRScript,
           mergeAggressiveness: translationProvider.mergeAggressiveness,
+          rereader: rereader,
         );
       } else if (widget.imageFile != null) {
         debugPrint('[ImageTranslation] Processing image file via OCR: ${widget.imageFile!.path}');
@@ -108,6 +110,7 @@ class _ImageTranslationScreenState extends State<ImageTranslationScreen> {
           widget.imageFile!,
           translationProvider.currentOCRScript,
           mergeAggressiveness: translationProvider.mergeAggressiveness,
+          rereader: rereader,
         );
       }
 

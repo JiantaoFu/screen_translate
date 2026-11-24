@@ -19,13 +19,31 @@ else
   export PKG=${PKG:-com.lomoware.screen_translate}
 fi
 APK="${APK:-$ROOT/build/app/outputs/apk/$FLAVOR/debug/app-$FLAVOR-debug.apk}"
+# CAPTURE=screen (default) shares the entire screen; CAPTURE=app keeps
+# Android 14+'s default, "Share one app", which is what most users get.
+# Android's "Choose app to share" list never offers the app that asked to
+# capture (none of its tasks), so in app mode the harness screens come
+# from the other flavor's debug install: the same MotionTestActivity in
+# its own package, shared like the manga or game app a user picks.
+# HARNESS_LABEL is that app's name in the list.
+CAPTURE=${CAPTURE:-screen}
+if [ "$CAPTURE" = app ]; then
+  if [ "$FLAVOR" = lite ]; then
+    HARNESS_FLAVOR=paid; HARNESS_PKG=com.lomoware.screen_translate; HARNESS_LABEL='Screen Translate'
+  else
+    HARNESS_FLAVOR=lite; HARNESS_PKG=com.lomoware.screen_translate.lite; HARNESS_LABEL='Screen Translator Lite'
+  fi
+  HARNESS_APK="${HARNESS_APK:-$ROOT/build/app/outputs/apk/$HARNESS_FLAVOR/debug/app-$HARNESS_FLAVOR-debug.apk}"
+else
+  HARNESS_PKG=$PKG
+fi
 OUT="${OUT:-$ROOT/build/emulator-regression}"
 mkdir -p "$OUT"
 PY=$(command -v python3 || command -v python)
 
 harness() { # harness <mode> [extras...] — shows a MotionTestActivity screen
   local mode=$1; shift
-  $A shell am start -n "$PKG/com.lomoware.screen_translate.MotionTestActivity" --es mode "$mode" "$@" >/dev/null 2>&1
+  $A shell am start -n "$HARNESS_PKG/com.lomoware.screen_translate.MotionTestActivity" --es mode "$mode" "$@" >/dev/null 2>&1
 }
 
 # Our translation windows as "(x,y)(wxh)", minus the two 126x126 control

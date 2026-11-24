@@ -1,0 +1,3 @@
+• Fixed: when sharing one app, a new line of text under a translation (such as the next dialogue line in a game) could keep showing the old translation
+• A cloud API key that can't be verified is no longer cleared; your saved key stays
+• A translation pack that downloads but can't be used is now reported instead of failing silently

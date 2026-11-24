@@ -36,6 +36,20 @@ object OverlayRegions {
     private val controls: MutableSet<View> = java.util.Collections.newSetFromMap(java.util.WeakHashMap())
     // Bumped whenever a window is added, moved or removed.
     @Volatile private var version = 0L
+    private val listeners = java.util.concurrent.CopyOnWriteArrayList<() -> Unit>()
+
+    /**
+     * Calls [listener] after each [version] change, on the main thread;
+     * returns a function that removes it. Sharing one app, our windows are
+     * not in the captured frames, so drawing one brings no new frame: this
+     * is how FrameStabilizer learns of it.
+     */
+    fun addChangeListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return { listeners.remove(listener) }
+    }
+
+    private fun notifyChanged() = listeners.forEach { it() }
 
     /**
      * Call once per view, before it is first added to the WindowManager.
@@ -72,22 +86,25 @@ object OverlayRegions {
             loc[0] - MARGIN_PX, loc[1] - MARGIN_PX,
             loc[0] + view.width + MARGIN_PX, loc[1] + view.height + MARGIN_PX
         )
-        synchronized(lock) {
+        val changed = synchronized(lock) {
             val old = live.put(view, rect)
             if (old != rect) version++
             if (old != null && old != rect) {
                 ghosts.add(old to SystemClock.uptimeMillis() + GHOST_MS)
             }
+            old != rect
         }
+        if (changed) notifyChanged()
     }
 
     private fun remove(view: View) {
-        synchronized(lock) {
-            live.remove(view)?.let {
+        val removed = synchronized(lock) {
+            live.remove(view)?.also {
                 ghosts.add(it to SystemClock.uptimeMillis() + GHOST_MS)
                 version++
-            }
+            } != null
         }
+        if (removed) notifyChanged()
     }
 
     /**

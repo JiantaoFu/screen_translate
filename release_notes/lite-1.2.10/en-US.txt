@@ -1,0 +1,1 @@
+• Fixed: when sharing one app, a new line of text under a translation (such as the next dialogue line in a game) could keep showing the old translation

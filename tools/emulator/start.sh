@@ -2,16 +2,22 @@
 # Installs the x86_64 debug APK (SKIP_INSTALL=1 to reuse the installed one),
 # grants overlay/accessibility without the settings UIs, and starts a live
 # translation session through the screen-capture consent dialog.
+# CAPTURE=app shares one app (the harness in the other flavor's install)
+# instead of the entire screen; see common.sh.
 # Taps are for the 1080x2400 Medium_Phone AVD.
 source "$(dirname "$0")/common.sh"
-if [ "$SKIP_INSTALL" != 1 ]; then
-  [ -f "$APK" ] || { echo "FAIL start: $APK missing (see tools/emulator/README.md)"; exit 1; }
-  if ! install_output=$($A install -r "$APK" 2>&1); then
+install_apk() { # install_apk <apk>
+  [ -f "$1" ] || { echo "FAIL start: $1 missing (see tools/emulator/README.md)"; exit 1; }
+  if ! install_output=$($A install -r "$1" 2>&1); then
     printf '%s\n' "$install_output"
     echo "FAIL start: APK installation failed; refusing to test an older install"
     exit 1
   fi
   printf '%s\n' "$install_output" | tail -1
+}
+if [ "$SKIP_INSTALL" != 1 ]; then
+  install_apk "$APK"
+  [ "$CAPTURE" = app ] && install_apk "$HARNESS_APK"
 fi
 $A shell appops set $PKG SYSTEM_ALERT_WINDOW allow
 $A shell settings put secure enabled_accessibility_services "$PKG/com.lomoware.screen_translate.ScrollDetectionAccessibilityService"
@@ -23,6 +29,12 @@ $A shell am force-stop $PKG
 # translated, so pin the pair (and Quick mode) instead of using whatever the
 # app last saved.
 $PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLanguage=zh translationMode=onDevice >/dev/null
+if [ "$CAPTURE" = app ]; then
+  # The app to share must be in recents before the dialog opens.
+  $A shell am force-stop $HARNESS_PKG
+  harness static
+  sleep 5
+fi
 $A shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 sleep 14
 $A logcat -c
@@ -50,7 +62,19 @@ sleep 2
 # and no crash, which looks exactly like a broken pipeline.
 # Android 14+ defaults to "Share one app"; if a device defaults to the whole
 # screen there is no dropdown to open, so that tap decides whether to select.
-if $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share one app' --timeout 6 >/dev/null 2>&1; then
+if [ "$CAPTURE" = app ]; then
+  # Keep the default. "Next" leads to "Choose app to share"; a device
+  # without single-app sharing labels the button "Share screen" instead.
+  $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Next' --timeout 8 || {
+    echo "FAIL start: no single-app capture on this device (Android 14+ needed)"
+    exit 1
+  }
+  sleep 3
+  $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" "$HARNESS_LABEL" --timeout 8 || {
+    echo "FAIL start: '$HARNESS_LABEL' not offered in Choose app to share"
+    exit 1
+  }
+elif $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share one app' --timeout 6 >/dev/null 2>&1; then
   sleep 1.5
   $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share entire screen' --timeout 6 || {
     echo "FAIL start: could not select full-screen capture"
@@ -62,7 +86,9 @@ fi
 # the whole screen, "Next" for one app (it leads to the app picker). Same
 # position either way, which is why the old coordinate tap hid the
 # difference.
-if ! $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share screen' --timeout 8 >/dev/null 2>&1; then
+if [ "$CAPTURE" = app ]; then
+  : # picking the app above already confirmed
+elif ! $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Share screen' --timeout 8 >/dev/null 2>&1; then
   $PY "$ROOT/tools/emulator/tap_text.py" "$SERIAL" 'Next' --timeout 4 || {
     echo "FAIL start: could not confirm the capture dialog"
     exit 1
@@ -71,7 +97,8 @@ fi
 sleep 4
 if $A logcat -d | grep -q 'Service started, reset stopped flag'; then
   app_pid > "$OUT/pid"
-  echo "PASS start: live translation running (pid $(cat "$OUT/pid"))"
+  shared="entire screen"; [ "$CAPTURE" = app ] && shared="one app: $HARNESS_LABEL"
+  echo "PASS start: live translation running, sharing $shared (pid $(cat "$OUT/pid"))"
 else
   echo "FAIL start: capture service did not start"; exit 1
 fi

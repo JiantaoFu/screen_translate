@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'firebase_remote_config_service.dart';
+import 'line_rereader.dart';
 
 extension ColorAdaptation on Color {
   // Determine if a color is considered "light"
@@ -102,8 +103,40 @@ class OCRService {
     return sorted.map((l) => l.$1).join('\n');
   }
 
-  static String _blockText(TextBlock block, TextRecognitionScript script) =>
-      readingOrderText([for (final l in block.lines) (l.text, l.boundingBox)], script);
+  static String _blockText(TextBlock block, TextRecognitionScript script,
+          [Map<TextLine, String>? reread]) =>
+      readingOrderText(
+          [for (final l in block.lines) (reread?[l] ?? l.text, l.boundingBox)], script);
+
+  /// Every line read again by [rereader] (see [LineRereader]), or null
+  /// without one. A failure keeps ML Kit's text, i.e. today's behaviour.
+  Future<Map<TextLine, String>?> _rereadLines(
+      RecognizedText text, LumaImage? image, LineRereader? rereader) async {
+    if (rereader == null || image == null) return null;
+    final lines = [for (final b in text.blocks) ...b.lines];
+    if (lines.isEmpty) return null;
+    try {
+      final sw = Stopwatch()..start();
+      final texts = await rereader.reread(image, [for (final l in lines) l.boundingBox]);
+      _logger.info('OCR: re-read ${lines.length} lines in ${sw.elapsedMilliseconds}ms');
+      return {for (var i = 0; i < lines.length; i++) lines[i]: texts[i]};
+    } catch (e) {
+      _logger.warning('OCR: re-reading lines failed: $e');
+      return null;
+    }
+  }
+
+  /// [decoded] as one luma byte per pixel.
+  static LumaImage lumaOf(img.Image decoded) {
+    final out = Uint8List(decoded.width * decoded.height);
+    var i = 0;
+    for (final px in decoded) {
+      out[i++] = ((px.r * 299 + px.g * 587 + px.b * 114) / 1000 * 255 / px.maxChannelValue)
+          .round()
+          .clamp(0, 255);
+    }
+    return LumaImage(decoded.width, decoded.height, out);
+  }
 
   @visibleForTesting
   List<OCRResult> mergeNearbyBlocksForTest(
@@ -250,7 +283,8 @@ class OCRService {
   Future<List<OCRResult>> processImage(
     Map<String, dynamic> imageData,
     TextRecognitionScript script,
-    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
+    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5,
+     LineRereader? rereader}
   ) async {
     try {
       // Get configuration from Firebase Remote Config
@@ -295,15 +329,23 @@ class OCRService {
 
       final RecognizedText recognizedText =
           await textRecognizer.processImage(image);
+      // NV21 starts with the full-resolution luma plane.
+      final reread = await _rereadLines(
+          recognizedText,
+          imageBytes.length >= width * height && width > 0
+              ? LumaImage(width, height, Uint8List.sublistView(imageBytes, 0, width * height))
+              : null,
+          rereader);
 
       final List<OCRResult> initialResults = [];
 
       for (final TextBlock block in recognizedText.blocks) {
         final Rect boundingBox = block.boundingBox;
+        final blockText = _blockText(block, script, reread);
 
         // Only add if text is not empty, meets minimum length, and box is valid
-        if (block.text.trim().isNotEmpty &&
-            block.text.trim().length >= minTextLength &&
+        if (blockText.trim().isNotEmpty &&
+            blockText.trim().length >= minTextLength &&
             boundingBox.width > 0 &&
             boundingBox.height > 0) {
           // Sample a little outside the tight OCR box (which hugs the
@@ -320,7 +362,7 @@ class OCRService {
             imageBytes, width, height, boundingBox, pad,
           );
           initialResults.add(OCRResult(
-            text: _blockText(block, script),
+            text: blockText,
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,
@@ -373,7 +415,8 @@ class OCRService {
   Future<List<OCRResult>> processFile(
     File file,
     TextRecognitionScript script,
-    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5}
+    {bool? drawDebugBoxes, int? minTextLength, double mergeAggressiveness = 1.5,
+     LineRereader? rereader}
   ) async {
     try {
       final remoteConfig = FirebaseRemoteConfigService();
@@ -400,14 +443,17 @@ class OCRService {
       final decodedImage = await decodeImageFromList(fileBytes);
       final double width = decodedImage.width.toDouble();
       final double height = decodedImage.height.toDouble();
+      final reread = await _rereadLines(recognizedText,
+          rereader != null && decodedForColor != null ? lumaOf(decodedForColor) : null, rereader);
 
       final List<OCRResult> initialResults = [];
 
       for (final TextBlock block in recognizedText.blocks) {
         final Rect boundingBox = block.boundingBox;
+        final blockText = _blockText(block, script, reread);
 
-        if (block.text.trim().isNotEmpty &&
-            block.text.trim().length >= minTextLength &&
+        if (blockText.trim().isNotEmpty &&
+            blockText.trim().length >= minTextLength &&
             boundingBox.width > 0 &&
             boundingBox.height > 0) {
           Color localColor = Colors.white;
@@ -418,7 +464,7 @@ class OCRService {
             );
           }
           initialResults.add(OCRResult(
-            text: _blockText(block, script),
+            text: blockText,
             x: boundingBox.left,
             y: boundingBox.top,
             width: boundingBox.width,

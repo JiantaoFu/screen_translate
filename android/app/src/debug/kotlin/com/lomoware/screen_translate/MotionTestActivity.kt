@@ -27,6 +27,7 @@ import android.widget.TextView
  *
  *   adb shell am start -n com.lomoware.screen_translate/.MotionTestActivity \
  *       --es mode video|feed|game|typewriter|static [--ei page N] [--ez landscape true]
+ *       [--es lang ru]   (Russian text, for scripts ML Kit can't read; see LineRereader)
  *
  * Re-sending the intent with a different `page` swaps the text, simulating
  * navigation to new content (which must still clear and re-translate).
@@ -34,6 +35,7 @@ import android.widget.TextView
 class MotionTestActivity : Activity() {
 
     private val handler = Handler(Looper.getMainLooper())
+    private var pages = PAGES
     private var typewriter: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,12 +59,13 @@ class MotionTestActivity : Activity() {
         typewriter?.let { handler.removeCallbacks(it) }
         val mode = intent.getStringExtra("mode") ?: "video"
         val page = intent.getIntExtra("page", 0)
+        pages = if (intent.getStringExtra("lang") == "ru") RU_PAGES else PAGES
         requestedOrientation = if (intent.getBooleanExtra("landscape", false))
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContentView(
             when (mode) {
-                "game" -> gameLayout(PAGES[page % PAGES.size][0], typeOut = false)
-                "typewriter" -> gameLayout(PAGES[page % PAGES.size][0], typeOut = true)
+                "game" -> gameLayout(pages[page % pages.size][0], typeOut = false)
+                "typewriter" -> gameLayout(pages[page % pages.size][0], typeOut = true)
                 "static" -> feedLayout(page, withVideo = false)
                 "feed" -> longFeedLayout()
                 else -> feedLayout(page, withVideo = true)
@@ -72,7 +75,7 @@ class MotionTestActivity : Activity() {
 
     // A social-feed-like page: posts above and below a playing "video".
     private fun feedLayout(page: Int, withVideo: Boolean): View {
-        val posts = PAGES[page % PAGES.size]
+        val posts = pages[page % pages.size]
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.WHITE)
@@ -95,7 +98,7 @@ class MotionTestActivity : Activity() {
             setBackgroundColor(Color.WHITE)
             setPadding(dp(16), dp(48), dp(16), dp(16))
         }
-        PAGES.flatten().plus(PAGES.flatten()).forEachIndexed { i, text ->
+        pages.flatten().plus(pages.flatten()).forEachIndexed { i, text ->
             column.addView(post(text))
             if (i % 3 == 1) {
                 column.addView(AnimatedView(this, fullScreen = false), LinearLayout.LayoutParams(
@@ -179,6 +182,18 @@ class MotionTestActivity : Activity() {
                 "The train to the mountains leaves at seven in the morning from the central station.",
                 "Our teacher told us that the library will be closed for repairs until next month.",
                 "She cooked a delicious dinner for her friends and everyone asked for the recipe."
+            ),
+        )
+        val RU_PAGES = arrayOf(
+            arrayOf(
+                "Сегодня прекрасная погода, поэтому мы решили пойти на старый рынок у реки.",
+                "На прошлой неделе мой брат купил новый фотоаппарат и фотографирует всё подряд.",
+                "Пожалуйста, не забудь закрыть окна, прежде чем уйти из дома вечером."
+            ),
+            arrayOf(
+                "Поезд в горы отправляется в семь часов утра с центрального вокзала.",
+                "Учитель сказал нам, что библиотека будет закрыта на ремонт до следующего месяца.",
+                "Она приготовила вкусный ужин для друзей, и все попросили рецепт."
             ),
         )
     }

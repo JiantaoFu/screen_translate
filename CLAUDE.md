@@ -15,7 +15,7 @@ Run all of these before saying a change is done, and report the results:
 | Release tool tests | `python tools/test_release.py` | when `tools/release.py` changes |
 | Emulator regression | `tools/emulator/run_all.sh` (setup: `tools/emulator/README.md`; needs both flavors' emulator builds) | changes that can alter capture/overlay behaviour (see below), and before every release |
 
-The emulator regression takes about 16 minutes (an entire-screen pass,
+The emulator regression takes about 17 minutes (an entire-screen pass,
 then a one-app pass: "Share one app" is Android 14+'s default), so decide
 from what the change can affect rather than which file it touches:
 - **Run it all** when a change can alter frame capture, change detection,

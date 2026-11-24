@@ -1,3 +1,4 @@
+import 'package:screen_translate/services/line_rereader.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -33,6 +34,8 @@ class _TranslationProvider extends Fake
   TextRecognitionScript get currentOCRScript => TextRecognitionScript.latin;
   @override
   double get mergeAggressiveness => 1.5;
+  @override
+  Future<LineRereader?> lineRereaderForSource() async => null;
   @override
   String get sourceLanguage => 'ja';
   @override

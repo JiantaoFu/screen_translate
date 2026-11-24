@@ -28,7 +28,9 @@ $A shell am force-stop $PKG
 # The harness text is English. Only text in the source language's script is
 # translated, so pin the pair (and Quick mode) instead of using whatever the
 # app last saved.
-$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=en targetLanguage=zh translationMode=onDevice >/dev/null
+# SOURCE_LANG/TARGET_LANG override it (cyrcheck.sh: Russian to English).
+$PY "$ROOT/tools/emulator/set_prefs.py" "$SERIAL" sourceLanguage=${SOURCE_LANG:-en} \
+  targetLanguage=${TARGET_LANG:-zh} translationMode=onDevice >/dev/null
 if [ "$CAPTURE" = app ]; then
   # The app to share must be in recents before the dialog opens.
   $A shell am force-stop $HARNESS_PKG

@@ -21,6 +21,8 @@ import '../services/review_prompt_service.dart';
 import '../services/firebase_analytics_service.dart';
 import '../services/activation_tracker.dart';
 import '../widgets/screen_capture_consent.dart';
+import '../services/line_rereader.dart';
+import 'package:screen_translate/l10n/locale_resolution.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -654,6 +656,7 @@ class TranslationProvider with ChangeNotifier {
                 currentOCRScript,
                 minTextLength: 1, // Ignore blocks that have only 1 character
                 mergeAggressiveness: _mergeAggressiveness,
+                rereader: await lineRereaderForSource(),
               );
               final ocrMs = stopwatch.elapsedMilliseconds;
               print('Timer: OCR found ${rawOcrResults.length} text blocks in ${ocrMs}ms');
@@ -1072,6 +1075,29 @@ class TranslationProvider with ChangeNotifier {
 
   TextRecognitionScript get currentOCRScript {
     return _ocrService.getScriptForLanguage(_sourceLanguage);
+  }
+
+  Future<void>? _lineModelDownload;
+
+  /// The recognizer that reads the source language's lines when ML Kit has
+  /// none for its script (see [LineRereader]); null when ML Kit reads it, or
+  /// while its model is still downloading (started here, once).
+  Future<LineRereader?> lineRereaderForSource() async {
+    if (!CyrillicLineRecognizer.supports(_sourceLanguage)) return null;
+    final recognizer = CyrillicLineRecognizer.instance;
+    if (await recognizer.isDownloaded()) return recognizer;
+    if (_lineModelDownload == null) {
+      _overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
+      _lineModelDownload = recognizer
+          .ensureDownloaded()
+          // A still screen sends no new frame, so the text read (and
+          // dropped) before the model arrived would stay untranslated:
+          // ask for one.
+          .then((_) => _androidScreenCaptureService?.requestFreshFrame())
+          .catchError((Object e) => print('OCR: line model download failed: $e'))
+          .whenComplete(() => _lineModelDownload = null);
+    }
+    return null;
   }
 
   Future<void> initTranslationServiceChannel() async {

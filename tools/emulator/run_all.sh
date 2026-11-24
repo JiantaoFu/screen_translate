@@ -2,7 +2,7 @@
 # Full emulator regression for live translation. Run it after changing the
 # capture/overlay pipeline (ScreenCaptureService, FrameStabilizer,
 # MotionClassifier, OverlayService, OverlayRegions, TranslationProvider's
-# box logic) and before every release. Takes ~16 minutes.
+# box logic) and before every release. Takes ~17 minutes.
 #
 # Two passes: sharing the entire screen, then sharing one app (Android
 # 14+'s default, so what most users run). The one-app pass shares the
@@ -41,6 +41,8 @@ run rotation rotcheck.sh 4
 run "hide all" hidecheck.sh
 run fdprobe fdprobe.sh video
 check_pid "entire screen"
+# Restarts the session with Russian -> English, so after the pid check.
+run cyrillic cyrcheck.sh
 
 echo
 echo "Sharing one app:"

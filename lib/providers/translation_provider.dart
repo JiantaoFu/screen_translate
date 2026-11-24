@@ -93,9 +93,17 @@ class TranslationProvider with ChangeNotifier {
   /// [covered]. Judged by covered area rather than a single point because OCR
   /// often merges two neighbouring boxes of ours into one block whose centre
   /// falls in the gap between them. See the call site for why.
+  ///
+  /// [sources] (overlay id -> the source text it translates): a block that
+  /// reads as that source text with more after it is not ours, whatever it
+  /// covers. Our boxes show the translation, never the source, so this is
+  /// the source itself, grown: sharing one app (Android 14+'s default) our
+  /// boxes aren't in the frame at all, and dialogue typed out past what was
+  /// translated was dropped here as "ours", leaving half a sentence.
   @visibleForTesting
   static List<OCRResult> withoutOwnOverlayText(
-      List<OCRResult> results, Map<int, Rect> drawn, Set<int> covered) {
+      List<OCRResult> results, Map<int, Rect> drawn, Set<int> covered,
+      {Map<int, String> sources = const {}}) {
     if (drawn.isEmpty) return results;
     return results.where((r) {
       final box = Rect.fromLTWH(r.x, r.y, r.width, r.height);
@@ -110,12 +118,27 @@ class TranslationProvider with ChangeNotifier {
           touching.add(e.key);
         }
       }
+      if (touching.any((id) => extendsText(r.text, sources[id]))) return true;
       if (coveredArea >= area * 0.6) {
         covered.addAll(touching);
         return false;
       }
       return true;
     }).toList();
+  }
+
+  /// Whether [text] is [source] with more text after it. The last few
+  /// characters of [source] are not required to match: they may be a word
+  /// cut off mid-typing that OCR reads differently once it is complete.
+  @visibleForTesting
+  static bool extendsText(String text, String? source) {
+    if (source == null) return false;
+    String norm(String s) => s.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+    final t = norm(text);
+    final s = norm(source);
+    const slack = 3;
+    if (s.length < 2 * slack || t.length < s.length + slack) return false;
+    return t.startsWith(s.substring(0, s.length - slack));
   }
 
   /// Ids of our boxes ([drawn]: id -> drawn rect) whose underlying text has
@@ -655,6 +678,7 @@ class TranslationProvider with ChangeNotifier {
                     ? const <int, Rect>{}
                     : {for (final e in _displayedOverlays.entries) e.key: e.value.drawnRect},
                 coveredIds,
+                sources: {for (final e in _displayedOverlays.entries) e.key: e.value.ocrResult.text},
               );
 
               // Pad and de-overlap boxes before handing them to the native

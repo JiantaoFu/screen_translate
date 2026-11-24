@@ -58,6 +58,20 @@ class MotionClassifier(private val cols: Int, private val rows: Int) {
         streak[i] >= ANIMATION_STREAK && now - lastMove[i] <= STREAK_GAP_MS
 
     /**
+     * When the last sample still counted as animated at [now] stops being
+     * so, if no further movement is seen; null when none is animated.
+     */
+    fun animationEndsAt(now: Long): Long? {
+        var end: Long? = null
+        for (i in 0 until sampleCount) {
+            if (!isAnimated(i, now)) continue
+            val e = lastMove[i] + STREAK_GAP_MS + 1
+            if (end == null || e > end) end = e
+        }
+        return end
+    }
+
+    /**
      * @param changed per-sample "differs meaningfully from the previous frame"
      *        flags, with our own overlay windows already masked out.
      * @param moved per-sample "differs at all" flags (a superset of [changed]).

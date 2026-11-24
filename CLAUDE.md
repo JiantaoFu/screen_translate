@@ -13,10 +13,11 @@ Run all of these before saying a change is done, and report the results:
 | Flutter tests | `flutter test` | every change |
 | Android unit tests | `cd android && JAVA_HOME="C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot" ./gradlew :app:testDebugUnitTest` | every change |
 | Release tool tests | `python tools/test_release.py` | when `tools/release.py` changes |
-| Emulator regression | `tools/emulator/run_all.sh` (setup: `tools/emulator/README.md`) | changes that can alter capture/overlay behaviour (see below), and before every release |
+| Emulator regression | `tools/emulator/run_all.sh` (setup: `tools/emulator/README.md`; needs both flavors' emulator builds) | changes that can alter capture/overlay behaviour (see below), and before every release |
 
-The emulator regression takes about 10 minutes, so decide from what the
-change can affect rather than which file it touches:
+The emulator regression takes about 16 minutes (an entire-screen pass,
+then a one-app pass: "Share one app" is Android 14+'s default), so decide
+from what the change can affect rather than which file it touches:
 - **Run it all** when a change can alter frame capture, change detection,
   or how boxes are placed, updated or removed: logic in ScreenCaptureService,
   FrameStabilizer, MotionClassifier, OverlayService, OverlayRegions, or

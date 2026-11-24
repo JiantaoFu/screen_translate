@@ -206,6 +206,43 @@ void main() {
       expect(covered, isEmpty);
     });
 
+    test('source text typed out past what our box translated is not ours', () {
+      // Sharing one app our box isn't in the frame: OCR reads the dialogue
+      // itself, now a line longer, mostly under the box.
+      final covered = <int>{};
+      final grown = _box('The weather is beautiful today, so we\ndecided to walk to the old market by the river.',
+          60, 2060, 900, 230);
+      final kept = TranslationProvider.withoutOwnOverlayText(
+        [grown],
+        {4: const Rect.fromLTWH(60, 2060, 900, 160)},
+        covered,
+        sources: {4: 'The weather is beautiful today, so we\ndecided to walk to the old mar'},
+      );
+      expect(kept, [grown]);
+      expect(covered, isEmpty);
+    });
+
+    test('the same source text under our box is still left to the box', () {
+      final covered = <int>{};
+      final same = _box('The weather is beautiful today', 60, 2060, 900, 120);
+      final kept = TranslationProvider.withoutOwnOverlayText(
+        [same],
+        {4: const Rect.fromLTWH(50, 2050, 920, 140)},
+        covered,
+        sources: {4: 'The weather is beautiful today'},
+      );
+      expect(kept, isEmpty);
+      expect(covered, {4});
+    });
+
+    test('extendsText needs the source first and more after it', () {
+      expect(TranslationProvider.extendsText('Hello there my friend', 'Hello there'), isTrue);
+      expect(TranslationProvider.extendsText('Hello there my friend', 'Goodbye now'), isFalse);
+      expect(TranslationProvider.extendsText('Hello there', 'Hello there'), isFalse);
+      expect(TranslationProvider.extendsText('天気がいいですね今日は', null), isFalse);
+      expect(TranslationProvider.extendsText('abcdefgh', 'ab'), isFalse);
+    });
+
     test('keeps everything when no overlays are shown', () {
       final covered = <int>{};
       final all = [_box('a', 0, 0, 10, 10), _box('b', 50, 50, 10, 10)];

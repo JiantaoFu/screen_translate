@@ -80,6 +80,16 @@ class FrameStabilizer(
     // Rows above this are the status bar — its clock and the screen-capture
     // indicator's running timer change every second and aren't content.
     private val ignoreTopPx: Int,
+    // Our windows, from OverlayRegions; replaceable in tests.
+    private val ownWindows: () -> List<Rect> = { OverlayRegions.snapshot() },
+    private val textBoxes: () -> List<Rect> = { OverlayRegions.textBoxRects() },
+    private val windowsVersion: () -> Long = { OverlayRegions.version() },
+    // Same clock as the frame times passed to onNewFrame.
+    private val clock: () -> Long = System::currentTimeMillis,
+    // Runs the block after the delay; returns a cancel function.
+    private val schedule: (Long, () -> Unit) -> (() -> Unit) = ::scheduleOnTimer,
+    // Subscribes to changes of windowsVersion; returns the unsubscribe function.
+    windowsChanged: (() -> Unit) -> (() -> Unit) = OverlayRegions::addChangeListener,
     private val onMotionDetected: () -> Unit
 ) {
     private companion object {
@@ -96,6 +106,9 @@ class FrameStabilizer(
         // Time for a newly added/moved box to be fully drawn before its
         // look is recorded as the reference for under-box changes.
         const val BOX_SETTLE_MS = 400L
+        // With no new frame for this long, a change under a box that was
+        // still moving on the last frame is taken as settled (see recheck).
+        const val UNDER_BOX_SETTLE_MS = 300L
         // BoxWatch sampling: every STEP px inside a box; MIN_PIXELS differing
         // pixels is a few glyphs rather than noise. Through a ~98% opaque
         // box, full-contrast text beneath shifts luma by ~4-5; a static
@@ -104,6 +117,10 @@ class FrameStabilizer(
         const val MIN_PIXELS = 12
         const val CHANGE_TOLERANCE = 2
         const val MOVE_TOLERANCE = 1
+        // A glyph replaced by another: text against its background differs
+        // by far more than this, while an animated scene showing faintly
+        // through a semi-transparent dialogue box stays below it.
+        const val GLYPH_TOLERANCE = 48
     }
 
     private val classifier = MotionClassifier(GRID, GRID)
@@ -122,6 +139,16 @@ class FrameStabilizer(
     private var boxVersion = -1L
     private var boxWatches: List<BoxWatch> = emptyList()
     private var boxBaselineDueAt = 0L
+    private var cancelRecheck: (() -> Unit)? = null
+    /**
+     * Our boxes changed. Sharing one app they aren't captured, so no frame
+     * follows, and the next one (say, the next page) used to be the first
+     * to notice them: what lay under the boxes was then recorded from that
+     * next page, and its change under them was never seen. Look at the
+     * latest frame now instead, so the boxes' reference is recorded from
+     * the screen as it is, BOX_SETTLE_MS later, before anything else comes.
+     */
+    private val stopWatchingWindows = windowsChanged { onWindowsChanged() }
 
     private var lastFrame: ByteArray? = null
     private var lastFrameTime = 0L
@@ -194,6 +221,17 @@ class FrameStabilizer(
         private var prev: IntArray? = null
         private var moveStreak = 0
         private var lastMove = Long.MIN_VALUE / 2
+        private var glyphMoveStreak = 0
+        private var lastGlyphMove = Long.MIN_VALUE / 2
+        /** The last frame looked at still showed the content moving. */
+        var unsettled = false
+            private set
+
+        /** When movement under this box stops counting as animation; null if it doesn't. */
+        fun animationEndsAt(now: Long): Long? =
+            if (moveStreak >= MotionClassifier.ANIMATION_STREAK &&
+                now - lastMove <= MotionClassifier.STREAK_GAP_MS
+            ) lastMove + MotionClassifier.STREAK_GAP_MS + 1 else null
 
         private fun read(frame: ByteArray): IntArray {
             val out = IntArray(size)
@@ -225,19 +263,40 @@ class FrameStabilizer(
             // Only a change that has settled counts: something that keeps
             // moving under the box (a video under a subtitle) never settles,
             // while a new dialogue line changes once and then holds.
+            //
+            // Sharing one app our boxes aren't in the frame, so this sees the
+            // dialogue box itself. A game's is often semi-transparent, and
+            // its animated scene showing through faintly made every frame
+            // "moving", so a new line was never seen; sharing the entire
+            // screen, our box covered that up. So glyphs are also judged on
+            // their own, at GLYPH_TOLERANCE: a new line still counts once
+            // they have settled, whatever flickers faintly behind them.
             val moving = count(cur, last, MOVE_TOLERANCE) >= threshold
+            val glyphsMoving = count(cur, last, GLYPH_TOLERANCE) >= threshold
+            unsettled = moving
             if (moving) {
                 moveStreak = if (now - lastMove <= MotionClassifier.STREAK_GAP_MS) moveStreak + 1 else 1
                 lastMove = now
+            }
+            if (glyphsMoving) {
+                glyphMoveStreak =
+                    if (now - lastGlyphMove <= MotionClassifier.STREAK_GAP_MS) glyphMoveStreak + 1 else 1
+                lastGlyphMove = now
                 return false
             }
-            val animated = moveStreak >= MotionClassifier.ANIMATION_STREAK &&
-                now - lastMove <= MotionClassifier.STREAK_GAP_MS
-            if (animated) return false
-            if (count(cur, base, CHANGE_TOLERANCE) < threshold) return false
+            val changed = if (!moving && !animated(moveStreak, lastMove, now)) {
+                count(cur, base, CHANGE_TOLERANCE) >= threshold
+            } else {
+                !animated(glyphMoveStreak, lastGlyphMove, now) &&
+                    count(cur, base, GLYPH_TOLERANCE) >= threshold
+            }
+            if (!changed) return false
             baseline = cur // acknowledged; the boxes get cleared next
             return true
         }
+
+        private fun animated(streak: Int, last: Long, now: Long) =
+            streak >= MotionClassifier.ANIMATION_STREAK && now - last <= MotionClassifier.STREAK_GAP_MS
     }
 
     private fun drift(base: IntArray, cur: IntArray, mask: List<Rect>, now: Long): Int {
@@ -248,22 +307,76 @@ class FrameStabilizer(
     @Synchronized
     fun onNewFrame(currentFrame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
         if (disposed) return
+        examine(currentFrame, currentTime, onStable)
+        scheduleRecheck(currentTime)
+    }
+
+    /**
+     * Several decisions here need a frame after the fact:
+     *  - under a box: one at least BOX_SETTLE_MS after the boxes were drawn,
+     *    to record what is beneath them, and one after a change beneath
+     *    them, to see that it has settled;
+     *  - where something was animating (a game scene, a video): changes there
+     *    are ignored until the animation has been still for STREAK_GAP_MS,
+     *    and only a frame after that sees the screen has changed (drift).
+     * Sharing the entire screen, the status bar's screen-sharing timer
+     * brings a new frame every second. Sharing one app (Android 14+'s
+     * default) the status bar is not captured, and neither are our boxes,
+     * so a static screen sends nothing more: a new dialogue line under a box
+     * was seen once as "moving" and never confirmed, and a static page
+     * shown after an animated one was never translated, leaving the old
+     * translations up.
+     *
+     * So when one of those frames is owed, the latest frame is looked at
+     * again at that time instead. With no newer frame it is the screen as
+     * it is now: any change, including our own box being drawn when the
+     * entire screen is shared, would have produced one.
+     */
+    private fun scheduleRecheck(now: Long) {
+        cancelRecheck?.invoke()
+        cancelRecheck = null
+        val due = listOfNotNull(
+            boxBaselineDueAt.takeIf { it > 0 }?.let { it + 1 },
+            (now + UNDER_BOX_SETTLE_MS).takeIf { boxWatches.any { it.unsettled } },
+            classifier.animationEndsAt(now),
+            boxWatches.mapNotNull { it.animationEndsAt(now) }.maxOrNull(),
+        ).minOrNull() ?: return
+        cancelRecheck = schedule(maxOf(1L, due - now)) { recheck() }
+    }
+
+    @Synchronized
+    private fun onWindowsChanged() {
+        if (disposed || latestFrame == null) return
+        cancelRecheck?.invoke()
+        cancelRecheck = schedule(1L) { recheck() }
+    }
+
+    @Synchronized
+    private fun recheck() {
+        cancelRecheck = null
+        if (disposed) return
+        val frame = latestFrame ?: return
+        val onStable = latestOnStable ?: return
+        onNewFrame(frame, clock(), onStable)
+    }
+
+    private fun examine(currentFrame: ByteArray, currentTime: Long, onStable: (ByteArray) -> Unit) {
         latestFrame = currentFrame
         latestOnStable = onStable
         val samples = sample(currentFrame)
-        val mask = OverlayRegions.snapshot()
+        val mask = ownWindows()
         val prev = lastSamples
         val prevMask = lastMask
         lastSamples = samples
         lastMask = mask
 
-        val version = OverlayRegions.version()
+        val version = windowsVersion()
         val boxesStable = version == boxVersion
         if (!boxesStable) {
             boxVersion = version
             // Like the rest of change detection, leave the status bar out:
             // its clock and the screen-sharing timer tick on their own.
-            boxWatches = OverlayRegions.textBoxRects()
+            boxWatches = textBoxes()
                 .filter { it.top >= ignoreTopPx }
                 .map { BoxWatch(it) }
             boxBaselineDueAt = currentTime + BOX_SETTLE_MS
@@ -341,6 +454,9 @@ class FrameStabilizer(
     @Synchronized
     fun dispose() {
         disposed = true
+        stopWatchingWindows()
+        cancelRecheck?.invoke()
+        cancelRecheck = null
         stabilizationTimer?.cancel()
         stabilizationTimer = null
         stabilizationPending = false
@@ -414,6 +530,15 @@ class FrameStabilizer(
             }, STABILIZATION_DELAY_MS)
         }
     }
+}
+
+/** FrameStabilizer's default scheduler: a daemon Timer, like its stabilization delay. */
+private fun scheduleOnTimer(delayMs: Long, block: () -> Unit): () -> Unit {
+    val timer = Timer(true)
+    timer.schedule(object : TimerTask() {
+        override fun run() = block()
+    }, delayMs)
+    return { timer.cancel() }
 }
 
 class ScreenCaptureService(private val context: Context, private val activity: Activity) {

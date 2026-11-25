@@ -1,0 +1,1 @@
+• Thai text can now be translated: a small text recognition pack (about 8 MB) downloads the first time you choose Thai as the source language

@@ -41,8 +41,9 @@ run rotation rotcheck.sh 4
 run "hide all" hidecheck.sh
 run fdprobe fdprobe.sh video
 check_pid "entire screen"
-# Restarts the session with Russian -> English, so after the pid check.
-run cyrillic cyrcheck.sh
+# Restart the session with Russian/Thai -> English, so after the pid check.
+run "reread ru" rereadcheck.sh ru
+run "reread th" rereadcheck.sh th
 
 echo
 echo "Sharing one app:"

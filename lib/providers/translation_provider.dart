@@ -1077,25 +1077,26 @@ class TranslationProvider with ChangeNotifier {
     return _ocrService.getScriptForLanguage(_sourceLanguage);
   }
 
-  Future<void>? _lineModelDownload;
+  final Map<String, Future<void>> _lineModelDownloads = {};
 
   /// The recognizer that reads the source language's lines when ML Kit has
   /// none for its script (see [LineRereader]); null when ML Kit reads it, or
-  /// while its model is still downloading (started here, once).
+  /// while its model is still downloading (started here, once per model).
   Future<LineRereader?> lineRereaderForSource() async {
-    if (!CyrillicLineRecognizer.supports(_sourceLanguage)) return null;
-    final recognizer = CyrillicLineRecognizer.instance;
+    final recognizer = DownloadedLineRecognizer.forLanguage(_sourceLanguage);
+    if (recognizer == null) return null;
     if (await recognizer.isDownloaded()) return recognizer;
-    if (_lineModelDownload == null) {
+    final key = recognizer.model.key;
+    if (!_lineModelDownloads.containsKey(key)) {
       _overlayService.showToast(deviceAppLocalizations().downloading_language_model_toast);
-      _lineModelDownload = recognizer
+      _lineModelDownloads[key] = recognizer
           .ensureDownloaded()
           // A still screen sends no new frame, so the text read (and
           // dropped) before the model arrived would stay untranslated:
           // ask for one.
           .then((_) => _androidScreenCaptureService?.requestFreshFrame())
           .catchError((Object e) => print('OCR: line model download failed: $e'))
-          .whenComplete(() => _lineModelDownload = null);
+          .whenComplete(() => _lineModelDownloads.remove(key));
     }
     return null;
   }

@@ -24,27 +24,54 @@ class LumaImage {
 ///
 /// ML Kit's on-device recognizers cover Latin, Chinese, Devanagari,
 /// Japanese and Korean only. Text in another script still comes back from
-/// the Latin one with correct line boxes but garbled text (Cyrillic
-/// "Привет" as "Npnbet"), which the source-language filter then dropped,
-/// so Russian, Ukrainian... translated nothing at all. The boxes are kept
-/// and each line is read again by a model for that script.
+/// one of them with usable line boxes but garbled text (Cyrillic "Привет"
+/// from the Latin one as "Npnbet"), which the source-language filter then
+/// dropped, so Russian, Thai... translated nothing at all. The boxes are
+/// kept and each line is read again by a model for that script. Which ML
+/// Kit recognizer finds the lines is `OCRService.getScriptForLanguage`'s
+/// choice.
 abstract class LineRereader {
   /// One text per rect in [lines] (same order); empty where nothing was read.
   Future<List<String>> reread(LumaImage image, List<Rect> lines);
 }
 
-/// PaddleOCR's PP-OCRv5 East Slavic line recognizer (Russian, Ukrainian,
-/// Belarusian; Apache-2.0), converted to ONNX with an ArgMax appended so
-/// it returns character ids. Downloaded on demand (about 8 MB).
-class CyrillicLineRecognizer implements LineRereader {
-  CyrillicLineRecognizer._();
-  static final CyrillicLineRecognizer instance = CyrillicLineRecognizer._();
+/// One downloadable line recognizer and the source languages it reads.
+class LineModel {
+  /// Folder name: `ocr-<key>` on Hugging Face, `ocr_models/<key>` on the
+  /// device.
+  final String key;
+  final Set<String> languages;
+  const LineModel(this.key, this.languages);
+}
 
-  static const Set<String> languages = {'ru', 'uk', 'be'};
-  static bool supports(String languageCode) => languages.contains(languageCode);
+/// A PaddleOCR PP-OCRv5 mobile line recognizer (Apache-2.0), converted to
+/// ONNX with an ArgMax appended so it returns character ids, plus its
+/// dictionary. Downloaded on demand (about 8 MB each).
+class DownloadedLineRecognizer implements LineRereader {
+  DownloadedLineRecognizer._(this.model);
+  final LineModel model;
 
-  static const _baseUrl =
-      'https://huggingface.co/fuji246/small-translation/resolve/main/ocr-eslav';
+  static const models = [
+    // East Slavic; ML Kit's Latin recognizer finds the lines.
+    LineModel('eslav', {'ru', 'uk', 'be'}),
+    // Thai; ML Kit's Devanagari recognizer finds the lines.
+    LineModel('th', {'th'}),
+  ];
+
+  static final Map<String, DownloadedLineRecognizer> _instances = {};
+
+  /// The recognizer for [languageCode]'s script, or null when ML Kit reads
+  /// that script itself (or nothing here does).
+  static DownloadedLineRecognizer? forLanguage(String languageCode) {
+    for (final m in models) {
+      if (m.languages.contains(languageCode)) {
+        return _instances.putIfAbsent(m.key, () => DownloadedLineRecognizer._(m));
+      }
+    }
+    return null;
+  }
+
+  static const _baseUrl = 'https://huggingface.co/fuji246/small-translation/resolve/main';
   static const _files = ['rec.onnx', 'dict.txt'];
 
   static const int _height = 48;
@@ -58,7 +85,7 @@ class CyrillicLineRecognizer implements LineRereader {
 
   Future<Directory> _dir() async {
     final support = await getApplicationSupportDirectory();
-    return Directory(p.join(support.path, 'ocr_models', 'eslav'));
+    return Directory(p.join(support.path, 'ocr_models', model.key));
   }
 
   Future<bool> isDownloaded() async {
@@ -82,7 +109,7 @@ class CyrillicLineRecognizer implements LineRereader {
           // to a .tmp first), and isDownloaded needs both.
           for (final f in _files) {
             await resumableDownload(
-                client: client, url: '$_baseUrl/$f', target: File(p.join(dir.path, f)));
+                client: client, url: '$_baseUrl/ocr-${model.key}/$f', target: File(p.join(dir.path, f)));
           }
         } finally {
           client.close();

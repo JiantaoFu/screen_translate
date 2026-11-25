@@ -59,6 +59,11 @@ class OCRService {
       case 'hi':
       case 'mr':
         return TextRecognitionScript.devanagiri;
+      // ML Kit has no Thai recognizer. Its Devanagari one finds Thai lines
+      // best (22 of 24 on the emulator; Latin 14, Korean 19), and
+      // DownloadedLineRecognizer reads them.
+      case 'th':
+        return TextRecognitionScript.devanagiri;
       case 'ja':
         return TextRecognitionScript.japanese;
       case 'ko':

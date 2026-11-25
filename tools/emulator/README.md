@@ -60,7 +60,7 @@ paid and Lite home layouts can differ without opening the image picker by mistak
 | `typecheck.sh` | typed-out game dialogue ends up fully translated, not as stacked fragments |
 | `hidecheck.sh` | Hide all (long-press on the floating button) clears every box and keeps them off an unchanged page, also when pressed during a page change; the next page change brings boxes back |
 | `rotcheck.sh` | another app rotating to landscape and back: the rotation is detected, no stale boxes are drawn, and the boxes stay on the text |
-| `cyrcheck.sh` | Russian -> English (restarts the session with that pair): ML Kit can't read Cyrillic, so each line is re-read by the downloaded East Slavic model (`LineRereader`); both Russian pages must come out as English. `OCR_MODEL_DIR=<dir>` installs `rec.onnx`/`dict.txt` instead of downloading |
+| `rereadcheck.sh ru\|th` | Russian or Thai -> English (restarts the session with that pair): ML Kit can't read Cyrillic or Thai, so each line it finds is re-read by a downloaded line model (`DownloadedLineRecognizer`); both pages must come out as English. `OCR_MODEL_DIR=<dir>` installs `rec.onnx`/`dict.txt` instead of downloading |
 | `awaycheck.sh` | one app only (`CAPTURE=app`): leaving the shared app clears its boxes from the screen and keeps the session running; coming back brings the boxes back without a restart |
 | `set_prefs.py` | sets the app's saved preferences (language pair, mode); `start.sh` pins en→zh in Quick mode with it, because only text in the source language's script is translated |
 | `fdprobe.sh` | report only: file descriptor growth, to track the emulator `getPlanes()` sync_file leak |

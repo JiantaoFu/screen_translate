@@ -2,33 +2,64 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:screen_translate/services/line_rereader.dart';
 import 'package:screen_translate/services/ocr_service.dart';
 
 void main() {
-  group('CyrillicLineRecognizer.ctcDecode', () {
+  group('DownloadedLineRecognizer.forLanguage', () {
+    test('East Slavic languages share one model', () {
+      final ru = DownloadedLineRecognizer.forLanguage('ru')!;
+      expect(ru.model.key, 'eslav');
+      expect(DownloadedLineRecognizer.forLanguage('uk'), same(ru));
+      expect(DownloadedLineRecognizer.forLanguage('be'), same(ru));
+    });
+
+    test('Thai has its own model', () {
+      expect(DownloadedLineRecognizer.forLanguage('th')!.model.key, 'th');
+    });
+
+    test('scripts ML Kit reads need none', () {
+      for (final code in ['en', 'ja', 'zh', 'ko', 'hi', 'de']) {
+        expect(DownloadedLineRecognizer.forLanguage(code), isNull, reason: code);
+      }
+    });
+
+    test('each language belongs to one model', () {
+      final all = [for (final m in DownloadedLineRecognizer.models) ...m.languages];
+      expect(all.toSet().length, all.length);
+    });
+  });
+
+  test('Thai lines are found by the Devanagari recognizer, not Latin', () {
+    // Latin missed 10 of 24 Thai lines on the emulator; Devanagari 2.
+    expect(OCRService().getScriptForLanguage('th'), TextRecognitionScript.devanagiri);
+    expect(OCRService().getScriptForLanguage('ru'), TextRecognitionScript.latin);
+  });
+
+  group('DownloadedLineRecognizer.ctcDecode', () {
     const dict = ['П', 'р', 'и', 'в', 'е', 'т', '!'];
 
     test('collapses repeats, drops blanks, maps the id after the dictionary to a space', () {
       // П П _ р и в в е т ␠ !   (ids: 1-based; 0 blank; 8 space)
       final ids = [1, 1, 0, 2, 3, 4, 4, 5, 6, 8, 7];
-      expect(CyrillicLineRecognizer.ctcDecode(ids, dict), 'Привет !');
+      expect(DownloadedLineRecognizer.ctcDecode(ids, dict), 'Привет !');
     });
 
     test('a blank between equal ids keeps both letters', () {
-      expect(CyrillicLineRecognizer.ctcDecode([4, 0, 4], dict), 'вв');
+      expect(DownloadedLineRecognizer.ctcDecode([4, 0, 4], dict), 'вв');
     });
 
     test('ids outside the dictionary are ignored and spaces trimmed', () {
-      expect(CyrillicLineRecognizer.ctcDecode([8, 1, 99, 8], dict), 'П');
+      expect(DownloadedLineRecognizer.ctcDecode([8, 1, 99, 8], dict), 'П');
     });
   });
 
-  group('CyrillicLineRecognizer.cropLine', () {
+  group('DownloadedLineRecognizer.cropLine', () {
     test('scales the line, with a margin, to 48 px high', () {
       final image = LumaImage(400, 200, Uint8List(400 * 200));
-      final crop = CyrillicLineRecognizer.cropLine(image, const Rect.fromLTWH(100, 80, 200, 24));
+      final crop = DownloadedLineRecognizer.cropLine(image, const Rect.fromLTWH(100, 80, 200, 24));
       expect(crop.height, 48);
       // 212 x 32 after the margins (rows 76..108), scaled to 48 high.
       expect(crop.width, (212 * 48 / 32).round());
@@ -43,7 +74,7 @@ void main() {
           luma[y * w + x] = 10;
         }
       }
-      final crop = CyrillicLineRecognizer.cropLine(
+      final crop = DownloadedLineRecognizer.cropLine(
           LumaImage(w, h, luma), const Rect.fromLTWH(90, 40, 120, 20));
       final values = crop.luma.toList()..sort();
       expect(values.first, lessThan(40));
@@ -52,14 +83,14 @@ void main() {
 
     test('a line at the image edge stays inside it', () {
       final image = LumaImage(50, 30, Uint8List(50 * 30));
-      final crop = CyrillicLineRecognizer.cropLine(image, const Rect.fromLTWH(0, 0, 50, 30));
+      final crop = DownloadedLineRecognizer.cropLine(image, const Rect.fromLTWH(0, 0, 50, 30));
       expect(crop.height, 48);
     });
   });
 
   test('batchTensor normalizes to [-1, 1] in three channels and pads with 0', () {
     final a = LumaImage(2, 48, Uint8List(2 * 48)..fillRange(0, 96, 255));
-    final t = CyrillicLineRecognizer.batchTensor([a], 3);
+    final t = DownloadedLineRecognizer.batchTensor([a], 3);
     const plane = 48 * 3;
     expect(t.length, 3 * plane);
     expect(t[0], closeTo(1.0, 1e-6));

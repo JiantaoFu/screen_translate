@@ -27,7 +27,7 @@ import android.widget.TextView
  *
  *   adb shell am start -n com.lomoware.screen_translate/.MotionTestActivity \
  *       --es mode video|feed|game|typewriter|static [--ei page N] [--ez landscape true]
- *       [--es lang ru]   (Russian text, for scripts ML Kit can't read; see LineRereader)
+ *       [--es lang ru|th]   (Russian/Thai text, for scripts ML Kit can't read; see LineRereader)
  *
  * Re-sending the intent with a different `page` swaps the text, simulating
  * navigation to new content (which must still clear and re-translate).
@@ -59,7 +59,11 @@ class MotionTestActivity : Activity() {
         typewriter?.let { handler.removeCallbacks(it) }
         val mode = intent.getStringExtra("mode") ?: "video"
         val page = intent.getIntExtra("page", 0)
-        pages = if (intent.getStringExtra("lang") == "ru") RU_PAGES else PAGES
+        pages = when (intent.getStringExtra("lang")) {
+            "ru" -> RU_PAGES
+            "th" -> TH_PAGES
+            else -> PAGES
+        }
         requestedOrientation = if (intent.getBooleanExtra("landscape", false))
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContentView(
@@ -194,6 +198,18 @@ class MotionTestActivity : Activity() {
                 "Поезд в горы отправляется в семь часов утра с центрального вокзала.",
                 "Учитель сказал нам, что библиотека будет закрыта на ремонт до следующего месяца.",
                 "Она приготовила вкусный ужин для друзей, и все попросили рецепт."
+            ),
+        )
+        val TH_PAGES = arrayOf(
+            arrayOf(
+                "วันนี้อากาศดีมาก เราจึงตัดสินใจไปตลาดเก่าริมแม่น้ำ",
+                "เมื่อสัปดาห์ที่แล้วพี่ชายของฉันซื้อกล้องถ่ายรูปใหม่",
+                "อย่าลืมปิดหน้าต่างก่อนออกจากบ้านตอนเย็นนะ"
+            ),
+            arrayOf(
+                "รถไฟไปภูเขาออกจากสถานีกลางตอนเจ็ดโมงเช้า",
+                "ครูบอกเราว่าห้องสมุดจะปิดซ่อมแซมจนถึงเดือนหน้า",
+                "เธอทำอาหารเย็นอร่อยให้เพื่อนๆ และทุกคนขอสูตร"
             ),
         )
     }
